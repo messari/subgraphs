@@ -1,4 +1,4 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   HubPool,
   LiquidityAdded,
@@ -19,6 +19,8 @@ import {
   getTokenBalance,
 } from "../util";
 import { BIGINT_MINUS_ONE } from "../sdk/util/constants";
+import { _OutputTokenToPool } from "../../generated/schema";
+import { _ERC20 } from "../../generated/AcceleratingDistributor/_ERC20";
 
 const conf = new BridgeConfig(
   ACROSS_HUB_POOL_CONTRACT,
@@ -67,7 +69,23 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
     pool.save();
   }
 
-  pool.addOutputTokenSupply(event.params.lpTokensMinted);
+  // output token supply
+  let outputTokenSupply: BigInt;
+  const erc20 = _ERC20.bind(outputTokenAddress);
+  const outputTokenSupplyResult = erc20.try_totalSupply();
+  if (outputTokenSupplyResult.reverted) {
+    log.info(
+      "[_ERC20:tokenSupply()] retrieve outputTokenSupply for LP pool call reverted",
+      []
+    );
+  } else {
+    outputTokenSupply = outputTokenSupplyResult.value;
+    pool.setOutputTokenSupply(outputTokenSupply);
+  }
+
+  // output token price
+  pool.pool.outputTokenPriceUSD = token.lastPriceUSD;
+  pool.save();
 
   // account
   const amount = event.params.amount;
@@ -78,6 +96,15 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   pool.setInputTokenBalance(
     getTokenBalance(event.params.l1Token, event.address)
   );
+
+  // output token to pool mapping (required for staking handler)
+  let outputTokenToPool = _OutputTokenToPool.load(outputToken.id);
+  if (!outputTokenToPool) {
+    outputTokenToPool = new _OutputTokenToPool(outputToken.id);
+    outputTokenToPool.token = outputToken.id;
+    outputTokenToPool.pool = pool.pool.id;
+    outputTokenToPool.save();
+  }
 }
 
 export function handleLiquidityRemoved(event: LiquidityRemoved): void {
@@ -119,7 +146,23 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
     pool.save();
   }
 
-  pool.addOutputTokenSupply(event.params.lpTokensBurnt.times(BIGINT_MINUS_ONE));
+  // output token supply
+  let outputTokenSupply: BigInt;
+  const erc20 = _ERC20.bind(outputTokenAddress);
+  const outputTokenSupplyResult = erc20.try_totalSupply();
+  if (outputTokenSupplyResult.reverted) {
+    log.info(
+      "[_ERC20:tokenSupply()] retrieve outputTokenSupply for LP pool call reverted",
+      []
+    );
+  } else {
+    outputTokenSupply = outputTokenSupplyResult.value;
+    pool.setOutputTokenSupply(outputTokenSupply);
+  }
+
+  // output token price
+  pool.pool.outputTokenPriceUSD = token.lastPriceUSD;
+  pool.save();
 
   // account
   const amount = event.params.amount;
@@ -130,4 +173,13 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   pool.setInputTokenBalance(
     getTokenBalance(event.params.l1Token, event.address)
   );
+
+  // output token to pool mapping
+  let outputTokenToPool = _OutputTokenToPool.load(outputToken.id);
+  if (!outputTokenToPool) {
+    outputTokenToPool = new _OutputTokenToPool(outputToken.id);
+    outputTokenToPool.token = outputToken.id;
+    outputTokenToPool.pool = pool.pool.id;
+    outputTokenToPool.save();
+  }
 }

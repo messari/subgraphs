@@ -57,6 +57,63 @@ dataSources:
           handler: handleLiquidityRemoved
       file: ./src/handlers/liquidity.ts
   {{/HubPool}}
+  {{#AcceleratingDistributor}}
+  - kind: ethereum
+    name: AcceleratingDistributor
+    network: mainnet
+    source:
+      address: "0x9040e41eF5E8b281535a96D9a48aCb8cfaBD9a48"
+      abi: AcceleratingDistributor
+      startBlock: 15977129
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+      abis:
+        - name: AcceleratingDistributor
+          file: ./abis/AcceleratingDistributor.json
+        ################################################ 
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Stake(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleStake
+        - event: Unstake(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleUnstake
+      file: ./src/handlers/staking.ts
+  {{/AcceleratingDistributor}}
   {{#SpokePool}}
   - kind: ethereum
     name: SpokePool
@@ -70,7 +127,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - BridgeProtocolA
+        - BridgeProtocol
         - FinancialsDailySnapshot
         - UsageMetricsDailySnapshot
         - UsageMetricsHourlySnapshot

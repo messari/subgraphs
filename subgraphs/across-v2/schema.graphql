@@ -1380,3 +1380,15 @@ type _CircularBuffer @entity {
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
 }
+
+# Hellper entity for output token to pool mapping
+type _OutputTokenToPool @entity {
+  " Output token id as bytes "
+  id: Bytes!
+
+  " Output token "
+  token: Token!
+
+  " Output token belongs to this pool "
+  pool: Pool!
+}

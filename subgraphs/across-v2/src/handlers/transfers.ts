@@ -1,15 +1,9 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
+import { Network } from "../sdk/util/constants";
 import {
-  Network,
-  RewardTokenType,
-  SECONDS_PER_DAY_BI,
-} from "../sdk/util/constants";
-import {
-  ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT,
   ACROSS_HUB_POOL_CONTRACT,
   ACROSS_PROTOCOL_NAME,
-  ACROSS_REWARD_TOKEN,
   Pricer,
   TokenInit,
   getTokenBalance,
@@ -30,7 +24,6 @@ import {
   FilledRelay,
   FundsDeposited,
 } from "../../generated/SpokePool/SpokePool";
-import { AcceleratingDistributor } from "../../generated/SpokePool/AcceleratingDistributor";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 
 export function handleFilledRelay(event: FilledRelay): void {
@@ -121,38 +114,6 @@ export function handleFilledRelay(event: FilledRelay): void {
     supplySideRevenueAmount
   );
   pool.addSupplySideRevenueUSD(supplySideRevenue);
-
-  // Rewards
-  // RewardToken can also be fetched from AcceleratingDistributor contract ("rewardToken" method)
-  // Only track rewardToken emissions on mainnet where AcceleratingDistributor is deployed
-  if (
-    destinationChainId == networkToChainID(Network.MAINNET) &&
-    event.block.number >= BigInt.fromI32(15977129)
-  ) {
-    const rewardTokenAddress = Address.fromString(ACROSS_REWARD_TOKEN);
-    const rewardToken = sdk.Tokens.getOrCreateToken(rewardTokenAddress);
-
-    const acceleratingDistributorContract = AcceleratingDistributor.bind(
-      Address.fromString(ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT)
-    );
-    const contractCall =
-      acceleratingDistributorContract.try_stakingTokens(rewardTokenAddress);
-
-    let baseEmissionRate: BigInt;
-    if (contractCall.reverted) {
-      log.info(
-        "[AcceleratingDistributor:stakingToken()] retrieve baseEmissionRate for pools call reverted",
-        []
-      );
-    } else {
-      baseEmissionRate = contractCall.value.getBaseEmissionRate();
-    }
-
-    const amount = baseEmissionRate!
-      .times(SECONDS_PER_DAY_BI)
-      .div(BigInt.fromI32(rewardToken.decimals));
-    pool.setRewardEmissions(RewardTokenType.DEPOSIT, rewardToken, amount);
-  }
 }
 
 export function handleFundsDeposited(event: FundsDeposited): void {
