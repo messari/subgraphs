@@ -8,4 +8,5 @@ export namespace Deploy {
   export const ODOS_OPTIMISM = 3;
   export const ODOS_AVALANCHE = 4;
   export const ODOS_BSC = 5;
+  export const ODOS_FANTOM = 6;
 }

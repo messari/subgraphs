@@ -1,0 +1,8 @@
+{
+  "deployment": "ODOS_FANTOM",
+  "network": "fantom",
+  "factory": {
+    "address": "0x061dc8e41C05207BedD6242eA4b342ef294BE359",
+    "startBlock": 61163337
+  }
+}

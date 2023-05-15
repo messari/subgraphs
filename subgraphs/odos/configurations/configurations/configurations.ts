@@ -4,6 +4,7 @@ import { OdosPolygonConfigurations } from "../../protocols/odos/config/deploymen
 import { OdosOptimismConfigurations } from "../../protocols/odos/config/deployments/odos-optimism/configurations";
 import { OdosAvalancheConfigurations } from "../../protocols/odos/config/deployments/odos-avalanche/configurations";
 import { OdosBscConfigurations } from "../../protocols/odos/config/deployments/odos-bsc/configurations";
+import { OdosFantomConfigurations } from "../../protocols/odos/config/deployments/odos-fantom/configurations";
 
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
@@ -31,6 +32,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.ODOS_BSC: {
       return new OdosBscConfigurations();
+    }
+    case Deploy.ODOS_FANTOM: {
+      return new OdosFantomConfigurations();
     }
     default: {
       log.critical(
