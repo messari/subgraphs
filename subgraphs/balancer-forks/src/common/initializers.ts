@@ -1,9 +1,9 @@
 import {
+  Bytes,
   BigInt,
   Address,
   ethereum,
   BigDecimal,
-  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   Token,
@@ -23,6 +23,7 @@ import * as constants from "./constants";
 import { getRewardsPerDay } from "./rewards";
 import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
+import { protocolLevelPriceValidation } from "../prices/common/validation";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 
@@ -52,7 +53,7 @@ export function getOrCreateRewardToken(
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address, block.number);
+    const token = getOrCreateToken(address, block);
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType;
 
@@ -126,7 +127,11 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block,
+  fetchlatestPrice: boolean = false
+): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -140,23 +145,34 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .readValue<BigInt>(contract.try_decimals(), constants.BIGINT_ZERO)
       .toI32();
 
-    const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
-    token.lastPriceBlockNumber = blockNumber;
+    token.lastPriceUSD = constants.BIGDECIMAL_ZERO;
+    token._totalSupply = constants.BIGINT_ZERO;
+    token._totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    token._largePriceChangeBuffer = 0;
+    token._largeTVLImpactBuffer = 0;
+
+    if (constants.assets.stableAssets.includes(address))
+      token.lastPriceUSD = constants.BIGDECIMAL_ONE;
+
+    token.lastPriceBlockNumber = block.number;
     token.save();
   }
 
+  if (constants.USE_SWAP_BASED_PRICE_LIB) return token;
+
   if (
+    fetchlatestPrice ||
     !token.lastPriceUSD ||
     !token.lastPriceBlockNumber ||
-    blockNumber
+    block.number
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
-    token.lastPriceBlockNumber = blockNumber;
+    const tokenPrice = getUsdPricePerToken(address, block);
+    const latestPrice = tokenPrice.usdPrice;
 
+    token.lastPriceUSD = protocolLevelPriceValidation(token, latestPrice);
+    token.lastPriceBlockNumber = block.number;
     token.save();
   }
 
@@ -394,7 +410,7 @@ export function getOrCreateLiquidityPool(
     );
     pool._poolId = poolId.toHexString();
 
-    const inputTokensInfo = utils.getPoolTokensInfo(poolId);
+    const inputTokensInfo = utils.getPoolTokensInfo(poolAddress, poolId);
     pool.inputTokens = inputTokensInfo.getInputTokens;
     pool.inputTokenBalances = inputTokensInfo.getBalances;
     pool.inputTokenWeights = utils.getPoolTokenWeights(
@@ -402,7 +418,8 @@ export function getOrCreateLiquidityPool(
       pool.inputTokens
     );
 
-    pool.outputToken = getOrCreateToken(poolAddress, block.number).id;
+    pool.outputToken = getOrCreateToken(poolAddress, block).id;
+
     pool.outputTokenSupply = constants.BIGINT_ZERO;
     pool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 

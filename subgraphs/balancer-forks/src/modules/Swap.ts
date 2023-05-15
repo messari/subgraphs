@@ -1,16 +1,16 @@
 import {
-  Token,
-  Swap as SwapTransaction,
-  LiquidityPool as LiquidityPoolStore,
-} from "../../generated/schema";
-import {
   log,
+  Bytes,
   BigInt,
   Address,
   ethereum,
   BigDecimal,
-  Bytes,
 } from "@graphprotocol/graph-ts";
+import {
+  Token,
+  Swap as SwapTransaction,
+  LiquidityPool as LiquidityPoolStore,
+} from "../../generated/schema";
 import {
   updateProtocolRevenue,
   updateSnapshotsVolume,
@@ -25,6 +25,7 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { swapValueInUSD, updateTokenPrices } from "./Pricing";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -100,35 +101,36 @@ export function Swap(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  const tokenInStore = getOrCreateToken(tokenIn, block.number);
-  const tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
-
-  let amountInUSD = amountIn
-    .divDecimal(
-      constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
-    )
+  const tokenInStore = getOrCreateToken(tokenIn, block);
+  const amountInUSD = amountIn
+    .divDecimal(utils.exponentToBigDecimal(tokenInStore.decimals))
     .times(tokenInStore.lastPriceUSD!);
 
-  if (tokenInIndex == -1) amountInUSD = constants.BIGDECIMAL_ZERO;
-
-  const tokenOutStore = getOrCreateToken(tokenOut, block.number);
-  const tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
-
-  let amountOutUSD = amountOut
-    .divDecimal(
-      constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
-    )
+  const tokenOutStore = getOrCreateToken(tokenOut, block);
+  const amountOutUSD = amountOut
+    .divDecimal(utils.exponentToBigDecimal(tokenOutStore.decimals))
     .times(tokenOutStore.lastPriceUSD!);
 
-  if (tokenOutIndex == -1) amountOutUSD = constants.BIGDECIMAL_ZERO;
+  const volumeUSD = constants.USE_SWAP_BASED_PRICE_LIB
+    ? swapValueInUSD(tokenIn, amountIn, tokenOut, amountOut, block)
+    : utils.calculateAverage([amountInUSD, amountOutUSD]);
 
-  const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
+  updateTokenPrices(
+    pool,
+    tokenIn,
+    amountIn,
+    tokenOut,
+    amountOut,
+    volumeUSD,
+    block
+  );
 
   pool.inputTokenBalances = utils.getPoolInputTokenBalances(
     poolAddress,
     Bytes.fromHexString(pool._poolId)
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
+    poolAddress,
     pool.inputTokens,
     pool.inputTokenBalances,
     block

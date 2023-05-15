@@ -17,9 +17,132 @@
 
   "balancerTokenAdmin": "0xf302f9f50958c5593770fdf4d4812309ff77414f",
   "balancerTokenAdminStartBlock": 14456738,
+  
   "usesBalancerTokenAdmin": true,
+  "useSwapBasedPriceLib": false,
 
-  "graftEnabled": true,
-  "subgraphId": "QmRD5cEyRossPmz2AdYjeoa1KPLgS7wu5v5oF9uGDd81HC",
-  "graftStartBlock": "16637574"
+  "stableAssets": [
+    {
+      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "symbol": "USDT"
+    }
+  ],
+  "pricingAssets": [
+    {
+      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "symbol": "WETH"
+    },
+    {
+      "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+      "symbol": "wstETH"
+    },
+    {
+      "address": "0x804CdB9116a10bB78768D3252355a1b18067bF8f",
+      "symbol": "bb-a-DAI-V1"
+    },
+    {
+      "address": "0x9210F1204b5a24742Eba12f710636D76240dF3d0",
+      "symbol": "bb-a-USDC-V1"
+    },
+    {
+      "address": "0x2BBf681cC4eb09218BEe85EA2a5d3D13Fa40fC0C",
+      "symbol": "bb-a-USDT-V1"
+    },
+    {
+      "address": "0xae37D54Ae477268B9997d4161B96b8200755935c",
+      "symbol": "bb-a-DAI-V2"
+    },
+    {
+      "address": "0x82698aeCc9E28e9Bb27608Bd52cF57f704BD1B83",
+      "symbol": "bb-a-USDC-V2"
+    },
+    {
+      "address": "0x2F4eb100552ef93840d5aDC30560E5513DFfFACb",
+      "symbol": "bb-a-USDT-V2"
+    },
+    {
+      "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+      "symbol": "WBTC"
+    },
+    {
+      "address": "0xba100000625a3754423978a60c9317c58a424e3D",
+      "symbol": "BAL"
+    },
+    {
+      "address": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
+      "symbol": "MKR"
+    },
+    {
+      "address": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
+      "symbol": "GNO"
+    },
+    {
+      "address": "0x5c6ee304399dbdb9c8ef030ab642b10820db8f56",
+      "symbol": "B-80BAL-20WETH"
+    },
+    {
+      "address": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+      "symbol": "MATIC"
+    },
+    {
+      "address": "0xA13a9247ea42D743238089903570127DdA72fE44",
+      "symbol": "bb-a-USD"
+    }
+  ],
+  "fxAssets": [
+    {
+      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0x70e8dE73cE538DA2bEEd35d14187F6959a8ecA96",
+      "symbol": "XSGD"
+    },
+    {
+      "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0xdB25f211AB05b1c97D595516F45794528a807ad8",
+      "symbol": "EURS"
+    },
+    {
+      "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+      "symbol": "CRV"
+    }
+  ],
+  "fxAggregators": [
+    {
+      "address": "0x789190466E21a8b78b8027866CBBDc151542A26C",
+      "symbol": "USDC-USD"
+    },
+    {
+      "address": "0xc96129C796F03bb21AC947EfC5329CD1F560305B",
+      "symbol": "XSGD-USD"
+    },
+    {
+      "address": "0xDEc0a100eaD1fAa37407f0Edc76033426CF90b82",
+      "symbol": "DAI-USD"
+    },
+    {
+      "address": "0x02F878A94a1AE1B15705aCD65b5519A46fe3517e",
+      "symbol": "EURS-USD"
+    },
+    {
+      "address": "0xb4c4a493AB6356497713A78FFA6c60FB53517c63",
+      "symbol": "CRV-USD"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

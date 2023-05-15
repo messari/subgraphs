@@ -93,9 +93,9 @@ export namespace NULL {
 }
 
 export namespace Protocol {
-  export const NAME = "{{protocolName}}";
-  export const SLUG = "{{protocolSlug}}";
-  export const NETWORK = {{defaultNetwork}};
+  export const NAME = "Beethoven X";
+  export const SLUG = "beethoven-x";
+  export const NETWORK = Network.FANTOM;
 }
 
 export namespace MasterChef {
@@ -144,16 +144,16 @@ export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 /////////////////////////////////////
 
 export const VAULT_ADDRESS = Address.fromString(
-  "{{vaultAddress}}"
+  "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce"
 );
 export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
-  "{{protocolFeesCollectorAddress}}"
+  "0xc6920d3a369e7c8bd1a22dbe385e11d1f7af948f"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "{{protocolTokenAddress}}"
+  "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "{{gaugeControllerAddress}}"
+  "0x0000000000000000000000000000000000000000"
 );
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
@@ -167,10 +167,10 @@ export const BLACKLISTED_PHANTOM_POOLS: Address[] = [
   Address.fromString("0x82698aecc9e28e9bb27608bd52cf57f704bd1b83"), // Balancer Aave Boosted Pool (USDC)
 ];
 
-export const USE_SWAP_BASED_PRICE_LIB = {{useSwapBasedPriceLib}};
+export const USE_SWAP_BASED_PRICE_LIB = true;
 
-export const INFLATION_INTERVAL = "{{inflationInterval}}";
-export const STARTING_INFLATION_RATE = BigDecimal.fromString(({{protocolTokenStartingInflationPerIntervalUnit}}).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);
+export const INFLATION_INTERVAL = "TIMESTAMP";
+export const STARTING_INFLATION_RATE = BigDecimal.fromString((0).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);
 
 class Assets {
   public stableAssets: Address[];
@@ -185,24 +185,21 @@ export const USDT_ADDRESS = Address.fromString('0xdac17f958d2ee523a2206206994597
 
 export const assets: Assets = {
   stableAssets: [
-    {{#stableAssets}}
-    Address.fromString('{{address}}'), // {{symbol}}
-    {{/stableAssets}}
+    Address.fromString('0x04068da6c83afcfa0e13ba15a6696662335d5b75'), // USDC
+    Address.fromString('0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e'), // DAI
+    Address.fromString('0x049d68029688eabf473097a2fc38ef61633a3c7a'), // fUSDT
   ],
   pricingAssets: [
-    {{#pricingAssets}}
-    Address.fromString('{{address}}'), // {{symbol}}
-    {{/pricingAssets}}
+    Address.fromString('0x74b23882a30290451a17c44f4f05243b6b58c76d'), // WETH
+    Address.fromString('0x1f32b1c2345538c0c6f582fcb022739c4a194ebb'), // wstETH
+    Address.fromString('0x13bc6df7189f7997b4977322f2142aa4bb18efae'), // bb-a-USD
+    Address.fromString('0x58a547ed09684ac2a688610d5caf8e8968b51908'), // BAL
+    Address.fromString('0x38aca5484b8603373acc6961ecd57a6a594510a3'), // WBTC
+    Address.fromString('0x39b3bd37208cbade74d0fcbdbb12d606295b430a'), // FTM
   ],
   fxAssets: [
-    {{#fxAssets}}
-    Address.fromString('{{address}}'), // {{symbol}}
-    {{/fxAssets}}
   ],
   fxAggregators: [
-    {{#fxAggregators}}
-    Address.fromString('{{address}}'), // {{symbol}}
-    {{/fxAggregators}}
   ],
 };
 

@@ -95,23 +95,22 @@ export function Deposit(
   const inputTokenBalances = pool.inputTokenBalances;
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
 
-  for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
-    if (inputTokens.at(idx).equals(poolAddress)) continue;
+  for (let i = 0; i < pool.inputTokens.length; i++) {
+    const tokenIdx = inputTokens.indexOf(
+      Address.fromString(pool.inputTokens[i])
+    );
+    if (tokenIdx == -1) continue;
 
-    const inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
+    const inputToken = getOrCreateToken(inputTokens[tokenIdx], block);
 
-    const inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
-    inputTokenBalances[inputTokenIndex] = inputTokenBalances[
-      inputTokenIndex
-    ].plus(depositedCoinAmounts[idx].minus(fees[idx]));
-
-    inputTokenAmounts.push(depositedCoinAmounts[idx]);
+    inputTokenBalances[i] = inputTokenBalances[i].plus(
+      depositedCoinAmounts[tokenIdx].minus(fees[tokenIdx])
+    );
+    inputTokenAmounts.push(depositedCoinAmounts[tokenIdx]);
 
     depositAmountUSD = depositAmountUSD.plus(
-      depositedCoinAmounts[idx]
-        .divDecimal(
-          constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-        )
+      depositedCoinAmounts[tokenIdx]
+        .divDecimal(utils.exponentToBigDecimal(inputToken.decimals))
         .times(inputToken.lastPriceUSD!)
     );
   }
@@ -124,22 +123,21 @@ export function Deposit(
     pool.outputTokenSupply!
   );
 
-  pool.inputTokenBalances = inputTokenBalances;
   pool.totalValueLockedUSD = utils.getPoolTVL(
+    poolAddress,
     pool.inputTokens,
     pool.inputTokenBalances,
     block
   );
-  const inputTokenWeights = utils.getPoolTokenWeightsForDynamicWeightPools(
+
+  pool.inputTokenWeights = utils.getPoolTokenWeights(
     poolAddress,
     pool.inputTokens
   );
 
-  if (inputTokenWeights.length > 0) {
-    pool.inputTokenWeights = inputTokenWeights;
-  }
-  pool.outputTokenSupply = totalSupplyAfterDeposit;
   pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
+  pool.outputTokenSupply = totalSupplyAfterDeposit;
+  pool.inputTokenBalances = inputTokenBalances;
   pool.save();
 
   createDepositTransaction(

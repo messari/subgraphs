@@ -1,8 +1,4 @@
 import {
-  Withdraw as WithdrawTransaction,
-  LiquidityPool as LiquidityPoolStore,
-} from "../../generated/schema";
-import {
   log,
   BigInt,
   Address,
@@ -10,11 +6,15 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
-  getOrCreateToken,
+  Withdraw as WithdrawTransaction,
+  LiquidityPool as LiquidityPoolStore,
+} from "../../generated/schema";
+import {
   getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
@@ -100,23 +100,22 @@ export function Withdraw(
   const inputTokenBalances = pool.inputTokenBalances;
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
-  for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
-    if (inputTokens.at(idx).equals(poolAddress)) continue;
+  for (let i = 0; i < pool.inputTokens.length; i++) {
+    const tokenIdx = inputTokens.indexOf(
+      Address.fromString(pool.inputTokens[i])
+    );
+    if (tokenIdx == -1) continue;
 
-    const inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
-    const inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
+    const inputToken = getOrCreateToken(inputTokens[tokenIdx], block);
 
-    inputTokenBalances[inputTokenIndex] = inputTokenBalances[
-      inputTokenIndex
-    ].minus(withdrawnTokenAmounts[idx].minus(fees[idx]));
-
-    inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
+    inputTokenBalances[i] = inputTokenBalances[i].minus(
+      withdrawnTokenAmounts[tokenIdx].minus(fees[tokenIdx])
+    );
+    inputTokenAmounts.push(withdrawnTokenAmounts[tokenIdx]);
 
     withdrawAmountUSD = withdrawAmountUSD.plus(
-      withdrawnTokenAmounts[idx]
-        .divDecimal(
-          constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-        )
+      withdrawnTokenAmounts[tokenIdx]
+        .divDecimal(utils.exponentToBigDecimal(inputToken.decimals))
         .times(inputToken.lastPriceUSD!)
     );
   }
@@ -129,18 +128,21 @@ export function Withdraw(
     tokenSupplyAfterWithdrawal
   );
 
-  pool.inputTokenBalances = inputTokenBalances;
   pool.totalValueLockedUSD = utils.getPoolTVL(
+    poolAddress,
     pool.inputTokens,
     pool.inputTokenBalances,
     block
   );
+
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     poolAddress,
     pool.inputTokens
   );
-  pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
+
   pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
+  pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
+  pool.inputTokenBalances = inputTokenBalances;
   pool.save();
 
   createWithdrawTransaction(

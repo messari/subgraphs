@@ -1,4 +1,3 @@
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   ActiveAccount,
   LiquidityPool as LiquidityPoolStore,
@@ -16,6 +15,7 @@ import {
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   getOrCreateAccount(from.toHexString());

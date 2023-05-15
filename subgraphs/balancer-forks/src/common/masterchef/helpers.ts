@@ -26,7 +26,7 @@ export function createMasterChefStakingPool(
   const pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (pool) {
     pool.rewardTokens = [
-      getOrCreateToken(constants.PROTOCOL_TOKEN_ADDRESS, event.block.number).id,
+      getOrCreateToken(constants.PROTOCOL_TOKEN_ADDRESS, event.block).id,
     ];
     pool.save();
   }

@@ -15,12 +15,53 @@
 
   "protocolTokenAddress": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
   "protocolTokenStartingInflationPerIntervalUnit": 0,
-
   "inflationInterval": "TIMESTAMP",
-
   "gaugeControllerAddress": "0x0000000000000000000000000000000000000000",
 
+  "useSwapBasedPriceLib": true,
+
+  "stableAssets": [
+    {
+      "address": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
+      "symbol": "fUSDT"
+    }
+  ],
+  "pricingAssets": [
+    {
+      "address": "0x74b23882a30290451a17c44f4f05243b6b58c76d",
+      "symbol": "WETH"
+    },
+    {
+      "address": "0x1f32b1c2345538c0c6f582fcb022739c4a194ebb",
+      "symbol": "wstETH"
+    },
+    {
+      "address": "0x13bc6df7189f7997b4977322f2142aa4bb18efae",
+      "symbol": "bb-a-USD"
+    },
+    {
+      "address": "0x58a547ed09684ac2a688610d5caf8e8968b51908",
+      "symbol": "BAL"
+    },
+    {
+      "address": "0x38aca5484b8603373acc6961ecd57a6a594510a3",
+      "symbol": "WBTC"
+    },
+    {
+      "address": "0x39b3bd37208cbade74d0fcbdbb12d606295b430a",
+      "symbol": "FTM"
+    }
+  ],
+
   "graftEnabled": false,
-  "subgraphId": "Qme6b5E86jgs3NpiZXj2iL5gnYhAswCgwQdsV8HJx9BW1J",
-  "graftStartBlock": 27921709
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

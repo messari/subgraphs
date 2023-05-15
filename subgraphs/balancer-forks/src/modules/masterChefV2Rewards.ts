@@ -31,7 +31,7 @@ export function updateMasterChef(
 
   const rewardToken = getOrCreateToken(
     constants.PROTOCOL_TOKEN_ADDRESS,
-    event.block.number
+    event.block
   );
   pool.rewardTokens = [
     getOrCreateRewardToken(
