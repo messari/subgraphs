@@ -144,6 +144,7 @@ export function _handleReserveInitialized(
     TokenType.REBASING
   );
   market.outputToken = outputTokenManager.getToken().id;
+  market.name = outputTokenManager._getName();
   market._vToken = vDebtTokenManager.getToken().id;
 
   // map tokens to market
@@ -462,7 +463,7 @@ export function _handleReserveDataUpdated(
   assetPriceUSD: BigDecimal = BIGDECIMAL_ZERO,
   updateRewards: bool = false
 ): void {
-  const market = getMarketFromToken(asset, protocolData);
+  let market = getMarketFromToken(asset, protocolData);
   if (!market) {
     log.warning("[_handlReserveDataUpdated] Market for asset {} not found", [
       asset.toHexString(),
@@ -476,6 +477,7 @@ export function _handleReserveDataUpdated(
     event,
     protocolData
   );
+  market = manager.getMarket();
   const inputToken = manager.getInputToken();
   // get current borrow balance
   let trySBorrowBalance: ethereum.CallResult<BigInt> | null = null;
@@ -645,7 +647,6 @@ export function _handleReserveDataUpdated(
       manager.updateRewards(rewardData);
     }
   }
-  //market.save();
 }
 
 export function _handleDeposit(
@@ -1124,6 +1125,16 @@ export function _handleTransfer(
     return;
   }
   const tokenManager = new TokenManager(asset, event);
+  const assetToken = tokenManager.getToken();
+  let interestRateType: string | null;
+  if (assetToken._iavsTokenType! == IavsTokenType.STOKEN) {
+    interestRateType = InterestRateType.STABLE;
+  } else if (assetToken._iavsTokenType! == IavsTokenType.VTOKEN) {
+    interestRateType = InterestRateType.VARIABLE;
+  } else {
+    interestRateType = null;
+  }
+
   const amountUSD = tokenManager.getAmountUSD(amount);
   const manager = new DataManager(
     market.id,
@@ -1138,7 +1149,8 @@ export function _handleTransfer(
     amount,
     amountUSD,
     senderBalanceResult.value,
-    receiverBalanceResult.value
+    receiverBalanceResult.value,
+    interestRateType
   );
 }
 
