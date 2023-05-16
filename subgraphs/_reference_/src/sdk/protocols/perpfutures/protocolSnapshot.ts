@@ -18,8 +18,8 @@ import {
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.2
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan

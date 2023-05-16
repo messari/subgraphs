@@ -33,8 +33,8 @@ import {
  *  - Making a position
  *  - Making position snapshots
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.2
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
