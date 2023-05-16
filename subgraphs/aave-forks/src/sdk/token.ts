@@ -9,7 +9,14 @@ import {
   ethereum,
 } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, exponentToBigDecimal } from "./constants";
+import {
+  BIGDECIMAL_ZERO,
+  INT_EIGHTTEEN,
+  INT_NINE,
+  INT_SIX,
+  INT_SIXTEEN,
+  exponentToBigDecimal,
+} from "./constants";
 
 /**
  * This file contains the TokenClass, which acts as
@@ -207,14 +214,14 @@ export class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    const staticDefinitions = new Array<StaticTokenDefinition>(6);
+    const staticDefinitions = new Array<StaticTokenDefinition>(INT_SIX);
 
     // Add DGD
     const tokenDGD = new StaticTokenDefinition(
       Address.fromString("0xe0b7927c4af23765cb51314a0e0521a9645f0e2a"),
       "DGD",
       "DGD",
-      9 as i32
+      INT_NINE
     );
     staticDefinitions.push(tokenDGD);
 
@@ -223,7 +230,7 @@ export class StaticTokenDefinition {
       Address.fromString("0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"),
       "AAVE",
       "Aave Token",
-      18 as i32
+      INT_EIGHTTEEN
     );
     staticDefinitions.push(tokenAAVE);
 
@@ -232,7 +239,7 @@ export class StaticTokenDefinition {
       Address.fromString("0xeb9951021698b42e4399f9cbb6267aa35f82d59d"),
       "LIF",
       "Lif",
-      18 as i32
+      INT_EIGHTTEEN
     );
     staticDefinitions.push(tokenLIF);
 
@@ -241,7 +248,7 @@ export class StaticTokenDefinition {
       Address.fromString("0xbdeb4b83251fb146687fa19d1c660f99411eefe3"),
       "SVD",
       "savedroid",
-      18 as i32
+      INT_EIGHTTEEN
     );
     staticDefinitions.push(tokenSVD);
 
@@ -250,7 +257,7 @@ export class StaticTokenDefinition {
       Address.fromString("0xbb9bc244d798123fde783fcc1c72d3bb8c189413"),
       "TheDAO",
       "TheDAO",
-      16 as i32
+      INT_SIXTEEN
     );
     staticDefinitions.push(tokenTheDAO);
 
@@ -259,7 +266,7 @@ export class StaticTokenDefinition {
       Address.fromString("0x38c6a68304cdefb9bec48bbfaaba5c5b47818bb2"),
       "HPB",
       "HPBCoin",
-      18 as i32
+      INT_EIGHTTEEN
     );
     staticDefinitions.push(tokenHPB);
 

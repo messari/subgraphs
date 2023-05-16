@@ -204,11 +204,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // update gToken price
   let assetPriceUSD: BigDecimal;
 
+  const CRV_PRICE_BLOCK_NUMBER = 25266668;
   // CRV prices are not returned from gCRV for the first 3 days
   // ie blocks 24879410 - 25266668
   if (
     market.id.toHexString().toLowerCase() == CRV_ADDRESS.toLowerCase() &&
-    event.block.number.toI64() <= 25266668
+    event.block.number.toI64() <= CRV_PRICE_BLOCK_NUMBER
   ) {
     assetPriceUSD = getCRVPriceUSD();
   } else {

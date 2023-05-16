@@ -450,7 +450,8 @@ function getAssetPriceInUSDC(
     // we will override the price at this block to $1.55615781978
     // this price is derived using the following method on that block using historical contract calls
     // The contract calls return 634291527055835 / 407601027988722 = our new price
-    if (blockNumber.equals(BigInt.fromI32(15783457))) {
+    const MISPRICE_BLOCK_NUMBER = 15783457;
+    if (blockNumber.equals(BigInt.fromI32(MISPRICE_BLOCK_NUMBER))) {
       return BigDecimal.fromString("1.55615781978");
     }
 

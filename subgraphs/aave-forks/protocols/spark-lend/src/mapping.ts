@@ -88,6 +88,9 @@ import {
   RiskType,
   InterestRateType,
   PositionSide,
+  INT_TEN,
+  INT_152,
+  INT_THIRTY_TWO,
 } from "../../../src/sdk/constants";
 
 function getProtocolData(): ProtocolData {
@@ -528,7 +531,7 @@ function getAssetPriceInUSDC(
   const oracle = AaveOracle.bind(priceOracle);
   const baseUnit = readValue<BigInt>(
     oracle.try_BASE_CURRENCY_UNIT(),
-    BigInt.fromI32(10).pow(AAVE_DECIMALS as u8)
+    BigInt.fromI32(INT_TEN).pow(AAVE_DECIMALS as u8)
   ).toBigDecimal();
 
   const oracleResult = readValue<BigInt>(
@@ -556,7 +559,7 @@ function storeLiquidationProtocolFee(
   // for how to decode configuration data to get _liquidationProtocolFee
   const liquidationProtocolFeeMask =
     "0xFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-  const liquidationProtocolFeeStartBitPosition = 152 as u8;
+  const liquidationProtocolFeeStartBitPosition = INT_152 as u8;
   const pool = LendingPoolContract.bind(poolAddress);
   const poolConfigData = pool.getConfiguration(reserve).data;
   const liquidationProtocolFee = decodeConfig(
@@ -585,7 +588,7 @@ function decodeConfig(
   // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
   // for how to decode configuration data to get _liquidationProtocolFee
 
-  const maskArray = new Uint8Array(32);
+  const maskArray = new Uint8Array(INT_THIRTY_TWO);
   maskArray.set(Bytes.fromHexString(maskStr));
   // BITWISE NOT
   for (let i = 0; i < maskArray.length; i++) {
@@ -605,9 +608,8 @@ function decodeConfig(
 
 function getIsIsolatedFlag(event: ethereum.Event): boolean {
   let isIsolated = false;
-  const eventSignature = crypto.keccak256(
-    ByteArray.fromUTF8("IsolationModeTotalDebtUpdated(address,uint256)")
-  );
+  const ISOLATE_MODE = "IsolationModeTotalDebtUpdated(address,uint256)";
+  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(ISOLATE_MODE));
   const logs = event.receipt!.logs;
   //IsolationModeTotalDebtUpdated emitted before Borrow's event.logIndex
   // e.g. https://etherscan.io/tx/0x4b038b26555d4b6c057cd612057b39e6482a7c60eb44058ee61d299332efdf29#eventlog
@@ -634,9 +636,9 @@ function getIsIsolatedFlag(event: ethereum.Event): boolean {
 
 function getBalanceTransferAmount(event: ethereum.Event): BigInt {
   let btAmount = BIGINT_ZERO;
-  const eventSignature = crypto.keccak256(
-    ByteArray.fromUTF8("BalanceTransfer(address, address, uint256, uint256)")
-  );
+  const BALANCE_TRANSFER =
+    "BalanceTransfer(address, address, uint256, uint256)";
+  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(BALANCE_TRANSFER));
   const logs = event.receipt!.logs;
   // BalanceTransfer emitted after Transfer's event.logIndex
   // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
@@ -650,9 +652,8 @@ function getBalanceTransferAmount(event: ethereum.Event): BigInt {
     // topics[0] - signature
     const logSignature = thisLog.topics[0];
     if (thisLog.address == event.address && logSignature == eventSignature) {
-      const decoded = ethereum
-        .decode("(uint256,uint256)", thisLog.data)!
-        .toTuple();
+      const UINT256_UINT256 = "(uint256,uint256)";
+      const decoded = ethereum.decode(UINT256_UINT256, thisLog.data)!.toTuple();
       btAmount = decoded[0].toBigInt();
       log.info("[handleCollateralTransfer] BalanceTransfer amount= {} tx {}", [
         btAmount.toString(),

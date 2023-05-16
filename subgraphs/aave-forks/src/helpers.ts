@@ -20,9 +20,16 @@ import {
   BIGINT_ONE,
   BIGDECIMAL_ZERO,
   IavsTokenType,
+  INT_TWO,
 } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
-import { InterestRateType } from "./sdk/constants";
+import {
+  INT_FIVE,
+  INT_NINE,
+  INT_TEN,
+  INT_THREE,
+  InterestRateType,
+} from "./sdk/constants";
 
 // returns the market based on any auxillary token
 // ie, outputToken, vToken, or sToken
@@ -147,7 +154,7 @@ export function storePrePauseState(market: Market): void {
 }
 
 export function restorePrePauseState(market: Market): void {
-  if (!market._prePauseState || market._prePauseState!.length !== 3) {
+  if (!market._prePauseState || market._prePauseState!.length !== INT_THREE) {
     log.error(
       "[restorePrePauseState] _prePauseState for market {} is not set correctly",
       [market.id.toHexString()]
@@ -168,19 +175,21 @@ export function readValue<T>(
 }
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
-  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+  const halfRatio = BigInt.fromI32(INT_TEN)
+    .pow(INT_NINE)
+    .div(BigInt.fromI32(INT_TWO));
+  return halfRatio.plus(a).div(BigInt.fromI32(INT_TEN).pow(INT_NINE));
 }
 
 export function wadToRay(a: BigInt): BigInt {
-  const result = a.times(BigInt.fromI32(10).pow(9));
+  const result = a.times(BigInt.fromI32(INT_TEN).pow(INT_NINE));
   return result;
 }
 
 // n => 10^n
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let result = BIGINT_ONE;
-  const ten = BigInt.fromI32(10);
+  const ten = BigInt.fromI32(INT_TEN);
   for (let i = 0; i < decimals; i++) {
     result = result.times(ten);
   }
@@ -188,7 +197,12 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 }
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
-  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+  const DASH = "-";
+  const UNDERSCORE = "_";
+  return (
+    a.replace(DASH, UNDERSCORE).toLowerCase() ==
+    b.replace(DASH, UNDERSCORE).toLowerCase()
+  );
 }
 
 // Use the Transfer event before Repay event to detect interestRateType
@@ -202,12 +216,11 @@ export function equalsIgnoreCase(a: string, b: string): boolean {
 export function getInterestRateType(
   event: ethereum.Event
 ): InterestRateType | null {
-  const eventSignature = crypto.keccak256(
-    ByteArray.fromUTF8("Transfer(address,address,uint256)")
-  );
+  const TRANSFER = "Transfer(address,address,uint256)";
+  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(TRANSFER));
   const logs = event.receipt!.logs;
   // Transfer emitted 5 index ahead of Repay's event.logIndex
-  const targetLogIndex = event.logIndex.minus(BigInt.fromI32(5));
+  const targetLogIndex = event.logIndex.minus(BigInt.fromI32(INT_FIVE));
   log.info("[getInterestRateType]tx {}-{},logs.length={},event.logIndex={}", [
     event.transaction.hash.toHexString(),
     event.logIndex.toString(),
@@ -222,12 +235,11 @@ export function getInterestRateType(
       continue;
     }
     // topics[0] - signature
+    const ADDRESS = "address";
     const logSignature = thisLog.topics[0];
     if (logSignature.equals(eventSignature)) {
-      const from = ethereum
-        .decode("address", thisLog.topics.at(1))!
-        .toAddress();
-      const to = ethereum.decode("address", thisLog.topics.at(2))!.toAddress();
+      const from = ethereum.decode(ADDRESS, thisLog.topics.at(1))!.toAddress();
+      const to = ethereum.decode(ADDRESS, thisLog.topics.at(2))!.toAddress();
       if (from.equals(Address.zero()) || to.equals(Address.zero())) {
         // this is a burn or mint event
         const tokenAddress = thisLog.address;
