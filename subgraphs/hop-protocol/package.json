@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.37.6",
-    "@graphprotocol/graph-ts": "0.29.1"
+    "@graphprotocol/graph-ts": "0.29.1",
+    "messari-subgraph-cli": "^0.1.52"
   },
   "devDependencies": {
     "prettier": "2.7.1"

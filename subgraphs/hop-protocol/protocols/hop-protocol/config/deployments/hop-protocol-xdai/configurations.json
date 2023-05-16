@@ -21,7 +21,7 @@
       "tokenName": "Tether USD",
       "tokenDecimals": 6,
       "address": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-      "startBlock": 17155195
+      "startBlock": 17155194
     },
     {
       "dataSourceName": "TokenMATIC",
