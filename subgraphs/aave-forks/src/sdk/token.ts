@@ -60,6 +60,10 @@ export class TokenManager {
     return this.token.decimals;
   }
 
+  _getName(): string {
+    return this.token.name;
+  }
+
   updatePrice(newPriceUSD: BigDecimal): void {
     this.token.lastPriceBlockNumber = this.event.block.number;
     this.token.lastPriceUSD = newPriceUSD;
