@@ -3721,6 +3721,36 @@
       }
     }
   },
+  "sushiswap-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "sushiswap-v3",
+    "project": "sushiswap",
+    "deployments": {
+      "sushiswap-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-ethereum",
+            "query-id": "sushiswap-v3-ethereum"
+          }
+        }
+      }
+    }
+  },
   "osmosis-dex": {
     "schema": "dex-amm",
     "base": "osmosis-dex",
