@@ -25,6 +25,7 @@ import {
   LiquidationProtocolFeeChanged,
   FlashloanPremiumTotalUpdated,
   FlashloanPremiumToProtocolUpdated,
+  SiloedBorrowingChanged,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
@@ -38,6 +39,7 @@ import {
   Supply,
   SwapBorrowRateMode,
   Withdraw,
+  UserEModeSet,
 } from "../../../generated/LendingPool/LendingPool";
 import { Market, _DefaultOracle } from "../../../generated/schema";
 import {
@@ -92,6 +94,7 @@ import {
   INT_152,
   INT_THIRTY_TWO,
 } from "../../../src/sdk/constants";
+import { AccountManager } from "../../../src/sdk/account";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();

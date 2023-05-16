@@ -176,13 +176,13 @@ export function readValue<T>(
 
 export function rayToWad(a: BigInt): BigInt {
   const halfRatio = BigInt.fromI32(INT_TEN)
-    .pow(INT_NINE)
+    .pow(INT_NINE as u8)
     .div(BigInt.fromI32(INT_TWO));
-  return halfRatio.plus(a).div(BigInt.fromI32(INT_TEN).pow(INT_NINE));
+  return halfRatio.plus(a).div(BigInt.fromI32(INT_TEN).pow(INT_NINE as u8));
 }
 
 export function wadToRay(a: BigInt): BigInt {
-  const result = a.times(BigInt.fromI32(INT_TEN).pow(INT_NINE));
+  const result = a.times(BigInt.fromI32(INT_TEN).pow(INT_NINE as u8));
   return result;
 }
 
