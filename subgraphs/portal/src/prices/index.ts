@@ -27,6 +27,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       Address.fromString("0xd2877702675e6ceb975b4a1dff9fb7baf4c91ea9"), // wrapped LUNA
       Address.fromString("0x4674672bcddda2ea5300f5207e1158185c944bc0"), // GXT
       Address.fromString("0x050cbff7bff0432b6096dd15cd9499913ddf8e23"), // FCI
+      Address.fromString("0x924828a9fb17d47d0eb64b57271d10706699ff11"), // SFI (Fantom)
     ].includes(tokenAddr)
   ) {
     return new CustomPriceType();
