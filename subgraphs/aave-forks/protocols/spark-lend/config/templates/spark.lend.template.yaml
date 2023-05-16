@@ -123,6 +123,7 @@ dataSources:
           handler: handleLiquidationCall
         - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
           handler: handleRepay
+          receipt: true
         - event: SwapBorrowRateMode(indexed address,indexed address,uint8)
           handler: handleSwapBorrowRateMode          
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
