@@ -334,7 +334,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
       bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
     ]);
 
-    let tokenIndex = event.params.boughtId;
+    const tokenIndex = event.params.boughtId;
     if (!tokenIndex.equals(BigInt.zero())) {
       return;
     }
