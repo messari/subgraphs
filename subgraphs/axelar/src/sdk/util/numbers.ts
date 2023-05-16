@@ -1,15 +1,11 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_TWO } from "./constants";
+import { BIGDECIMAL_TWO, DEFAULT_DECIMALS } from "./constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
-  decimals: i32 | null = null
+  decimals: i32 = DEFAULT_DECIMALS
 ): BigDecimal {
-  const DEFAULT_DECIMALS = 18;
   const BASE_TEN = 10;
-  if (!decimals) {
-    decimals = DEFAULT_DECIMALS;
-  }
   return quantity.divDecimal(
     BigInt.fromI32(BASE_TEN as i32)
       .pow(decimals as u8)
