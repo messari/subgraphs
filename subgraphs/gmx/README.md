@@ -111,11 +111,15 @@ Total volumes in this subgraph refer to perp trading volume. Meanwhile, there ar
 
 #### Supply Side Revenue
 
-> Supply Side Revenue = 70% \* Total Revenue
+> Supply Side Revenue = 55% \* Total Revenue
 
 #### Protocol Side Revenue
 
-> Protocol Side Revenue = 30% \* Total Revenue
+> Protocol Side Revenue = 15% \* Total Revenue
+
+#### Stake Side Revenue
+
+> Stake Side Revenue = 30% \* Total Revenue
 
 ## Useful Links
 
