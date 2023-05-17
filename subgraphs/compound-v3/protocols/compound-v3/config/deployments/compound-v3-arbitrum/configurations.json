@@ -1,0 +1,8 @@
+{
+  "network": "arbitrum-one",
+  "factoryAddress": "0xb21b06D71c75973babdE35b49fFDAc3F82Ad3775",
+  "startBlock": "87335242",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
