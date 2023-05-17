@@ -18,9 +18,8 @@ import {
   TokenInit,
   getTokenBalance,
 } from "../util";
-import { BIGINT_MINUS_ONE } from "../sdk/util/constants";
 import { _OutputTokenToPool } from "../../generated/schema";
-import { _ERC20 } from "../../generated/AcceleratingDistributor/_ERC20";
+import { _ERC20 } from "../../generated/SpokePool/_ERC20";
 
 const conf = new BridgeConfig(
   ACROSS_HUB_POOL_CONTRACT,

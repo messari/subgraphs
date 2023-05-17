@@ -1,6 +1,7 @@
 {
   "deployment": "ACROSS_V2_ETHEREUM",
   "HubPool": [{}],
+  "AcceleratingDistributor": [{}],
   "SpokePool": [
     {
       "chain": "Ethereum",
