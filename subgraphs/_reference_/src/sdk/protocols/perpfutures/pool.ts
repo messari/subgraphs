@@ -22,8 +22,8 @@ import {
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.2
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -99,6 +99,7 @@ export class Pool {
     this.pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     this.pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    this.pool.cumulativeStakeSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
@@ -318,32 +319,60 @@ export class Pool {
   }
 
   /**
-   * Adds a given USD value to the pool and protocol's supplySideRevenue and protocolSideRevenue. It can be a positive or negative amount.
+   * Adds a given USD value to the pool and protocol stakeSideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
+   */
+  private addStakeSideRevenueUSD(rev: BigDecimal): void {
+    this.pool.cumulativeTotalRevenueUSD =
+      this.pool.cumulativeTotalRevenueUSD.plus(rev);
+    this.pool.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD.plus(rev);
+    this.save();
+
+    this.protocol.addStakeSideRevenueUSD(rev);
+  }
+
+  /**
+   * Adds a given USD value to the pool and protocol's supplySideRevenue, protocolSideRevenue, and stakeSideRevenue.
+   * It can be a positive or negative amount.
    * Same as for the rest of setters, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param protocolSide {BigDecimal} The value to add to the protocol's protocolSideRevenue.
    * @param supplySide {BigDecimal} The value to add to the protocol's supplySideRevenue.
+   * @param stakeSide {BigDecimal} The value to add to the protocol's stakeSideRevenue.
    */
-  addRevenueUSD(protocolSide: BigDecimal, supplySide: BigDecimal): void {
+  addRevenueUSD(
+    protocolSide: BigDecimal,
+    supplySide: BigDecimal,
+    stakeSide: BigDecimal
+  ): void {
     this.addSupplySideRevenueUSD(supplySide);
     this.addProtocolSideRevenueUSD(protocolSide);
+    this.addStakeSideRevenueUSD(stakeSide);
   }
 
   addRevenueByToken(
     token: TokenSchema,
     protocolSide: BigInt,
-    supplySide: BigInt
+    supplySide: BigInt,
+    stakeSide: BigInt
   ): void {
-    const pAmountUSD = this.protocol.pricer.getAmountValueUSD(
+    const protocolAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
       protocolSide
     );
-    const sAmountUSD = this.protocol.pricer.getAmountValueUSD(
+    const supplyAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
       supplySide
     );
+    const stakeAmountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      stakeSide
+    );
 
-    this.addRevenueUSD(pAmountUSD, sAmountUSD);
+    this.addRevenueUSD(protocolAmountUSD, supplyAmountUSD, stakeAmountUSD);
   }
 
   /**
