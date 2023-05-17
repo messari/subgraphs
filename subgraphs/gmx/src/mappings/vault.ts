@@ -36,10 +36,7 @@ import {
   updatePositionRealisedPnlUSD,
   updateUserPosition,
 } from "../entities/position";
-import {
-  increaseProtocolStakeSideRevenue,
-  incrementProtocolEventCount,
-} from "../entities/protocol";
+import { incrementProtocolEventCount } from "../entities/protocol";
 import {
   getOrCreateLiquidityPool,
   increasePoolTotalRevenue,
@@ -50,6 +47,7 @@ import {
   increasePoolVolume,
   updatePoolInputTokenBalance,
   updatePoolFundingRate,
+  increasePoolStakeSideRevenue,
 } from "../entities/pool";
 import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
 import {
@@ -436,7 +434,7 @@ function handleCollectFees(event: ethereum.Event, feeUsd: BigInt): void {
     totalFee.times(PROTOCOL_SIDE_REVENUE_PERCENT)
   );
   // For GMX, 30% of trade fees goes to stakers of native token (e.g. GMX stakers)
-  increaseProtocolStakeSideRevenue(
+  increasePoolStakeSideRevenue(
     event,
     totalFee.times(STAKE_SIDE_REVENUE_PERCENT)
   );

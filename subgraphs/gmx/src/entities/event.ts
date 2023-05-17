@@ -263,10 +263,9 @@ export function createLiquidate(
   liquidate.position = position.id;
   liquidate.to = liquidator;
   liquidate.from = liquidatee;
-  liquidate.account = liquidatee;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.liquidator = liquidator;
+  liquidate.account = liquidator;
   liquidate.liquidatee = liquidatee;
   liquidate.asset = asset;
   liquidate.amount = amountLiquidated;

@@ -26,7 +26,6 @@ export function getOrCreateProtocol(): DerivPerpProtocol {
     protocol.type = ProtocolType.PERPETUAL;
 
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -68,7 +67,8 @@ export function getOrCreateProtocol(): DerivPerpProtocol {
     protocol.cumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
-    protocol._lastSnapshotDayID = INT_ZERO;
+    protocol._lastSnapshotDayID = BIGINT_ZERO;
+    protocol._lastSnapshotHourID = BIGINT_ZERO;
     protocol._lastUpdateTimestamp = BIGINT_ZERO;
   }
 
@@ -383,6 +383,12 @@ export function increaseProtocolStakeSideRevenue(
 
 export function updateProtocolSnapshotDayID(snapshotDayID: i32): void {
   const protocol = getOrCreateProtocol();
-  protocol._lastSnapshotDayID = snapshotDayID;
+  protocol._lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
+  protocol.save();
+}
+
+export function updateProtocolSnapshotHourID(snapshotHourID: i32): void {
+  const protocol = getOrCreateProtocol();
+  protocol._lastSnapshotDayID = BigInt.fromI32(snapshotHourID);
   protocol.save();
 }
