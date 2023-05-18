@@ -80,6 +80,7 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0xc931f61b1534eb21d8c11b24f3f5ab2471d4ab50"), // Binance USD
   Address.fromString("0xad84341756bf337f5a0164515b1f6f993d194e1f"), // Fantom USD
   Address.fromString("0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad"), // fETH
+  Address.fromString("0x25c130b2624cf12a4ea30143ef50c5d68cefa22f"), // geistETH
 ];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0xdbf31df14b66535af65aac99c32e9ea844e14501"), // renBTC
@@ -135,7 +136,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "WETH",
     18,
-    Address.fromString("0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad")
+    Address.fromString("0x25c130b2624cf12a4ea30143ef50c5d68cefa22f")
   )
 );
 

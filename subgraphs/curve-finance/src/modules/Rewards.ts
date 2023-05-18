@@ -13,8 +13,8 @@ import {
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
-import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
+import { RewardData, RewardsInfoType } from "../common/types";
 import { Rewards as PoolRewardsContract } from "../../generated/templates/PoolTemplate/Rewards";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
@@ -39,21 +39,14 @@ export function getRewardsData_v1(
     );
 
     if (rewardToken.equals(constants.NULL.TYPE_ADDRESS)) continue;
-
     rewardTokens.push(rewardToken);
 
-    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
-    if (!rewardRateCall.reverted) {
-      const rewardRate = rewardRateCall.value.getRate();
-      const periodFinish = rewardRateCall.value.getPeriod_finish();
+    const rewardData = new RewardData(gaugeAddress, rewardToken);
 
-      if (periodFinish.lt(block.timestamp)) {
-        rewardRates.push(constants.BIGINT_ZERO);
-      } else {
-        rewardRates.push(rewardRate);
-      }
-    } else {
+    if (rewardData.getPeriodFinish.lt(block.timestamp)) {
       rewardRates.push(constants.BIGINT_ZERO);
+    } else {
+      rewardRates.push(rewardData.getRewardRate);
     }
   }
 
@@ -113,32 +106,14 @@ export function getRewardsData_v3(
     if (rewardToken.equals(constants.NULL.TYPE_ADDRESS)) {
       return new RewardsInfoType(rewardTokens, rewardRates);
     }
-
     rewardTokens.push(rewardToken);
 
-    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
-    if (!rewardRateCall.reverted) {
-      const rewardRate = rewardRateCall.value.getRate();
+    const rewardData = new RewardData(gaugeAddress, rewardToken);
 
-      if (rewardRateCall.value.getPeriod_finish().lt(block.timestamp)) {
-        rewardRates.push(constants.BIGINT_ZERO);
-      } else {
-        rewardRates.push(rewardRate);
-      }
+    if (rewardData.getPeriodFinish.lt(block.timestamp)) {
+      rewardRates.push(constants.BIGINT_ZERO);
     } else {
-      const rewardRate1Call = gaugeContract.try_reward_data1(rewardToken);
-
-      if (!rewardRate1Call.reverted) {
-        const rewardRate = rewardRate1Call.value.rate;
-
-        if (rewardRate1Call.value.period_finish.lt(block.timestamp)) {
-          rewardRates.push(constants.BIGINT_ZERO);
-        } else {
-          rewardRates.push(rewardRate);
-        }
-      } else {
-        rewardRates.push(constants.BIGINT_ZERO);
-      }
+      rewardRates.push(rewardData.getRewardRate);
     }
   }
 
@@ -294,13 +269,12 @@ export function updateRewardTokenEmissions(
   }
   const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const token = getOrCreateToken(rewardTokenAddress, block);
-  const tokenPrice = getUsdPricePerToken(rewardTokenAddress);
+  const token = getOrCreateToken(rewardTokenAddress, block, true);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-    .times(tokenPrice.usdPrice);
+    .times(token.lastPriceUSD!);
 
   pool.rewardTokens = rewardTokens;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;

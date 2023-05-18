@@ -2,7 +2,7 @@
   "network": "matic",
   "defaultNetwork": "Network.MATIC",
 
-  "priceCaching": 10000,
+  "priceCaching": 25000,
 
   "poolInfoContract": "0x7544Fe3d184b6B55D6B36c3FCA1157eE0Ba30287",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
@@ -35,6 +35,6 @@
   ],
 
   "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": ""
+  "subgraphId": "QmRMetcuDNRuvEoSggdModza9TPRe99jzJDL7ygQwJKgym",
+  "graftStartBlock": "14905747"
 }

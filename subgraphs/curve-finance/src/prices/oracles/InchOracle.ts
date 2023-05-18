@@ -1,6 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
+import { getOrCreateToken } from "../../common/initializers";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { InchOracleContract } from "../../../generated/templates/PoolTemplate/InchOracleContract";
 
@@ -22,24 +23,27 @@ export function getTokenPriceUSDC(
       .whitelistedTokens()
       .mustGet(constants.STABLE_TOKENS[i]);
 
-    const tokenPrice: BigDecimal = utils
+    let tokenPrice: BigDecimal = utils
       .readValue<BigInt>(
         inchOracleContract.try_getRate(tokenAddr, dstToken.address, true),
         constants.BIGINT_ZERO
       )
       .toBigDecimal();
 
-    if (tokenPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
-      return CustomPriceType.initialize(
-        tokenPrice.times(
-          constants.BIGINT_TEN.pow(
-            srcTokenDecimals.toI32() as u8
-          ).toBigDecimal()
-        ),
-        (dstToken.decimals + constants.DEFAULT_DECIMALS.toI32()) as u8,
-        constants.OracleType.INCH_ORACLE
-      );
+    if (tokenPrice.equals(constants.BIGDECIMAL_ZERO)) continue;
+
+    if (constants.STABLE_TOKENS[i] == "WETH") {
+      const wethToken = getOrCreateToken(dstToken.address, block!);
+      tokenPrice = tokenPrice.times(wethToken.lastPriceUSD!);
     }
+
+    return CustomPriceType.initialize(
+      tokenPrice.times(
+        constants.BIGINT_TEN.pow(srcTokenDecimals.toI32() as u8).toBigDecimal()
+      ),
+      (dstToken.decimals + constants.DEFAULT_DECIMALS.toI32()) as u8,
+      constants.OracleType.INCH_ORACLE
+    );
   }
 
   return new CustomPriceType();

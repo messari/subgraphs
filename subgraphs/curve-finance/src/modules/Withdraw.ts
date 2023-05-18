@@ -201,6 +201,9 @@ export function Withdraw(
     tokenSupplyAfterWithdrawal,
     block
   );
+  pool._tvlUSDExcludingBasePoolLpTokens =
+    utils.getPoolTVLExcludingBasePoolLpToken(pool, block);
+
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
@@ -223,7 +226,7 @@ export function Withdraw(
     event,
     block
   );
-  utils.updateProtocolTotalValueLockedUSD();
+  utils.updateProtocolTotalValueLockedUSD(block);
   UpdateMetricsAfterWithdraw(block);
 
   log.info(

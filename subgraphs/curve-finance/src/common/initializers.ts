@@ -126,7 +126,8 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
 
 export function getOrCreateToken(
   address: Address,
-  block: ethereum.Block
+  block: ethereum.Block,
+  fetchLatestPrice: bool = false
 ): Token {
   let token = Token.load(address.toHexString());
 
@@ -140,6 +141,11 @@ export function getOrCreateToken(
     token.decimals = utils
       .readValue<BigInt>(contract.try_decimals(), constants.DEFAULT_DECIMALS)
       .toI32();
+    token.isBasePoolLpToken = false;
+    token._totalSupply = constants.BIGINT_ZERO;
+    token._totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    token._largePriceChangeBuffer = 0;
+    token._largeTVLImpactBuffer = 0;
 
     if (address.equals(constants.ETH_ADDRESS)) {
       token.name = "ETH";
@@ -151,6 +157,7 @@ export function getOrCreateToken(
   }
 
   if (
+    fetchLatestPrice ||
     !token.lastPriceUSD ||
     !token.lastPriceBlockNumber ||
     block.number
@@ -419,6 +426,7 @@ export function getOrCreateLiquidityPool(
     pool = new LiquidityPoolStore(poolAddress.toHexString());
 
     pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    pool._tvlUSDExcludingBasePoolLpTokens = constants.BIGDECIMAL_ZERO;
     pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     pool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -426,10 +434,18 @@ export function getOrCreateLiquidityPool(
 
     const lpToken = utils.getLpTokenFromPool(poolAddress, block);
     if (lpToken.id != constants.NULL.TYPE_STRING) {
-      const lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
+      const lpTokenAddress = Address.fromString(lpToken.id);
+      const lpTokenStore = getOrCreateLpToken(lpTokenAddress);
       lpTokenStore.poolAddress = poolAddress.toHexString();
-
       lpTokenStore.save();
+
+      if (
+        constants.HARDCODED_BASEPOOLS_LP_TOKEN.includes(lpTokenAddress) ||
+        utils.isMainRegistryPool(poolAddress)
+      ) {
+        lpToken.isBasePoolLpToken = true;
+        lpToken.save();
+      }
     }
 
     pool.name = lpToken.name;

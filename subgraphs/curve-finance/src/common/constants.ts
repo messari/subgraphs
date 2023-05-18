@@ -95,7 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Curve Finance";
   export const SLUG = "curve-finance";
-  export const NETWORK = {{defaultNetwork}};
+  export const NETWORK = Network.FANTOM;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.0.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -125,7 +125,7 @@ export const NUMBER_OF_WEEKS_DENOMINATOR = BigInt.fromI32(604800);
 export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32({{priceCaching}});
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(1000);
 
 export const CURVE_ADDRESS_PROVIDER = Address.fromString(
   "0x0000000022d53366457f9d5e68ec105046fc4383"
@@ -137,26 +137,24 @@ export const ETH_ADDRESS = Address.fromString(
 );
 
 export const PROTOCOL_ID = Address.fromString(
-  "{{protocolAddress}}"
+  "0x0000000022D53366457F9d5E68Ec105046FC4383"
 );
 export const POOL_INFO_ADDRESS = Address.fromString(
-  "{{poolInfoContract}}"
+  "0x8cC6e2144906e81F496429A1590Ef5f86bb7558f"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "{{gaugeControllerContract}}"
+  "0xabc000d88f23bb45525e447528dbf656a9d55bf5"
 );
 export const CRV_TOKEN_ADDRESS = Address.fromString(
-  "{{crvTokenAddress}}"
+  "0x1E4F97b9f9F913c46F1632781732927B9019C68b"
 );
 
 export const POOL_REGISTRIES: Address[] = [
-{{#poolRegistry}}
-  Address.fromString("{{address}}"), // {{name}}
-{{/poolRegistry}}
+  Address.fromString("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6"), // MainRegistry
+  Address.fromString("0x686d67265703D1f124c45E33d47d794c566889Ba"), // Factory
+  Address.fromString("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c"), // CryptoSwapRegistry
+  Address.fromString("0xe5de15a9c9bbedb4f5ec13b131e61245f2983a69"), // CryptoPoolRegistry
 ]
 
 export const HARDCODED_BASEPOOLS_LP_TOKEN: Address[] = [
-{{#basePoolsLpToken}}
-  Address.fromString("{{address}}"), // {{name}}
-{{/basePoolsLpToken}}
 ]
