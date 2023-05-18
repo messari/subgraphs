@@ -63,8 +63,8 @@ import {
   USDC_COMET_WETH_MARKET_ID,
   WETH_COMET_ADDRESS,
   getRewardAddress,
-  POLYGON_COMP_ORACLE_ADDRESS,
   equalsIgnoreCase,
+  getCOMPChainlinkFeed,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { Market, Token } from "../../../generated/schema";
@@ -999,12 +999,20 @@ function updateRewards(
     );
   }
 
+  if (tryRewardConfig.value.value0 == ZERO_ADDRESS) {
+    log.warning("[updateRewards] Reward token address is zero address", []);
+    return;
+  }
+
   const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
 
   // Update price for reward token using Chainlink oracle on Polygon
-  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+  if (
+    equalsIgnoreCase(dataSource.network(), Network.MATIC) ||
+    equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE)
+  ) {
     const chainlinkContract = Chainlink.bind(
-      Address.fromString(POLYGON_COMP_ORACLE_ADDRESS)
+      getCOMPChainlinkFeed(dataSource.network())
     );
     const tryPrice = chainlinkContract.try_latestAnswer();
     if (tryPrice.reverted) {

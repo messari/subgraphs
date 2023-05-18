@@ -35,8 +35,6 @@ export const REWARDS_ADDRESS = "0x1b0e765f6224c21223aea2af16c1c46e38885a40";
 export const WETH_COMET_ADDRESS = "0xa17581a9e3356d9a858b789d68b4d866e593ae94";
 export const USDC_COMET_WETH_MARKET_ID =
   "0xc3d688b66703497daa19211eedff47f25384cdc3c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const POLYGON_COMP_ORACLE_ADDRESS =
-  "0x2a8758b7257102461bc958279054e372c2b1bde6";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -127,6 +125,18 @@ export function getRewardAddress(): Address {
   }
 
   log.critical("[getRewardAddress] Unsupported network: {}", [network]);
+  return ZERO_ADDRESS;
+}
+
+export function getCOMPChainlinkFeed(network: string): Address {
+  if (equalsIgnoreCase(network, Network.MATIC)) {
+    return Address.fromString("0x2a8758b7257102461bc958279054e372c2b1bde6");
+  }
+  if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+    return Address.fromString("0xe7c53ffd03eb6cef7d208bc4c13446c76d1e5884");
+  }
+
+  log.error("[getCOMPChainlinkFeed] Unsupported network: {}", [network]);
   return ZERO_ADDRESS;
 }
 
