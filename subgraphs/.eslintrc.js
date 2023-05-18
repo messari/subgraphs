@@ -1,8 +1,7 @@
+const path = require("path");
+const rulesDirPlugin = require("eslint-plugin-rulesdir");
 
-const path =  require("path");
-const rulesDirPlugin = require('eslint-plugin-rulesdir');
-
-rulesDirPlugin.RULES_DIR = [path.join(__dirname, '_eslint-rules')];
+rulesDirPlugin.RULES_DIR = [path.join(__dirname, "_eslint-rules")];
 
 module.exports = {
   env: {
@@ -19,7 +18,11 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   overrides: [
     {
-      files: ["*.ts", "*.tsx"],
+      files: ["**/constants.ts", "**/constant.ts"],
+      rules: {
+        "@typescript-eslint/no-magic-numbers": ["off"],
+        "rulesdir/no-string-literals": ["off"],
+      },
     },
   ],
   parserOptions: {
@@ -53,10 +56,20 @@ module.exports = {
       },
     ],
 
+    // disallow magic numbers: https://eslint.org/docs/latest/rules/no-magic-numbers
+    "@typescript-eslint/no-magic-numbers": [
+      "error",
+      {
+        ignoreArrayIndexes: true,
+        ignore: [-1, 0, 1, 2],
+      },
+    ],
+
     // CUSTOM RULES, find them in subgraphs/_eslint-rules
     // -----------------------------------------------
-    
+
     // encourage address literals to be all lowercase to comparison errors when using strings.
     "rulesdir/no-checksum-addresses": "error",
+    "rulesdir/no-string-literals": "error",
   },
 };

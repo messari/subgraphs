@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Network } from "../../util/constants";
 

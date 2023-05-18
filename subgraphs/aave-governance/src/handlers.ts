@@ -145,6 +145,10 @@ export function getProposal(id: string): Proposal {
   return proposal as Proposal;
 }
 
+export function isNewDelegate(address: string): boolean {
+  return address != ZERO_ADDRESS && Delegate.load(address) == null;
+}
+
 export function getOrCreateDelegate(address: string): Delegate {
   let delegate = Delegate.load(address);
   if (!delegate) {
@@ -156,14 +160,7 @@ export function getOrCreateDelegate(address: string): Delegate {
     delegate.tokenHoldersRepresentedAmount = 0;
     delegate.numberVotes = 0;
     delegate.save();
-
-    if (address != ZERO_ADDRESS) {
-      const governance = getGovernance();
-      governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
-      governance.save();
-    }
   }
-
   return delegate as Delegate;
 }
 

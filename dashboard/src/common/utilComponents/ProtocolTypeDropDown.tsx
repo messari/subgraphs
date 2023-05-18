@@ -12,9 +12,9 @@ interface ProtocolTypeDropDownProps {
 export const ProtocolTypeDropDown = ({
   protocolTypeList,
   setProtocolType,
-  currentProtocolType
+  currentProtocolType,
 }: ProtocolTypeDropDownProps) => {
-  const options = protocolTypeList
+  const options = protocolTypeList;
   return (
     <>
       <Autocomplete

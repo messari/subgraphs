@@ -13,7 +13,12 @@ interface TableChartProps {
   isStringField: Boolean;
 }
 
-export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStringField = false }: TableChartProps) => {
+export const TableChart = ({
+  datasetLabel,
+  dataTable,
+  jpegDownloadHandler,
+  isStringField = false,
+}: TableChartProps) => {
   const field = datasetLabel.split("-")[1] || datasetLabel;
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
@@ -36,9 +41,9 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStr
     }
 
     if (sortOrderAsc) {
-      return (aVal - bVal);
+      return aVal - bVal;
     } else {
-      return (bVal - aVal);
+      return bVal - aVal;
     }
   }
 
@@ -86,7 +91,7 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStr
         dateColumn = toUnitsSinceEpoch(dateColumn, hourly);
       }
 
-      let returnVal = isNaN(Number(dataPoint.value)) || displayVal.includes('%') ? displayVal : Number(dataPoint.value);
+      let returnVal = isNaN(Number(dataPoint.value)) || displayVal.includes("%") ? displayVal : Number(dataPoint.value);
 
       if (isStringField) {
         returnVal = dataPoint.value;
@@ -110,54 +115,75 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStr
           <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
             {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
-          <Button className="Hover-Underline" onClick={() => {
-            const datesSelectedTimestamps = dates.map((date: Moment) => date.format("YYYY-MM-DD"));
-            let formatStr = "YYYY-MM-DD";
-            if (hourly) {
-              formatStr = "YYYY-MM-DD hh:mm:ss";
-            }
-            if (!Array.isArray(dataTable)) {
-              let length = dataTable[Object.keys(dataTable)[0]].length;
-              const arrayToSend: any[] = [];
-              for (let i = 0; i < length; i++) {
-                let objectIteration: any = {};
-                let hasUndefined = false;
-                objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
-                Object.keys(dataTable).forEach((key: string) => {
-                  if (dataTable[key][i]?.value) {
-                    objectIteration[key] = dataTable[key][i]?.value;
-                  } else {
-                    hasUndefined = true;
-                  }
-                });
-                if (!hasUndefined) {
-                  arrayToSend.push(objectIteration);
-                }
+          <Button
+            className="Hover-Underline"
+            onClick={() => {
+              const datesSelectedTimestamps = dates.map((date: Moment) => date.format("YYYY-MM-DD"));
+              let formatStr = "YYYY-MM-DD";
+              if (hourly) {
+                formatStr = "YYYY-MM-DD hh:mm:ss";
               }
-              return downloadCSV(arrayToSend
-                .sort(sortFunction)
-                .filter((json: { [x: string]: any }) => {
-                  if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format(formatStr));
+              if (!Array.isArray(dataTable)) {
+                let length = dataTable[Object.keys(dataTable)[0]].length;
+                const arrayToSend: any[] = [];
+                for (let i = 0; i < length; i++) {
+                  let objectIteration: any = {};
+                  let hasUndefined = false;
+                  objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
+                  Object.keys(dataTable).forEach((key: string) => {
+                    if (dataTable[key][i]?.value) {
+                      objectIteration[key] = dataTable[key][i]?.value;
+                    } else {
+                      hasUndefined = true;
+                    }
+                  });
+                  if (!hasUndefined) {
+                    arrayToSend.push(objectIteration);
                   }
-                  return true;
-                })
-                .map((json: { [x: string]: any }) => ({ date: moment.utc(json.date * 1000).format(formatStr), ...json })), datasetLabel + '-csv', datasetLabel);
-            } else {
-              downloadCSV(dataTable
-                .sort(sortFunction)
-                .filter((json: { [x: string]: any }) => {
-                  if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format(formatStr));
-                  }
-                  return true;
-                })
-                .map((json: { [x: string]: any }) => ({ date: moment.utc(json.date * 1000).format(formatStr), [field]: json.value })), datasetLabel + '-csv', datasetLabel);
-            }
-          }}>
+                }
+                return downloadCSV(
+                  arrayToSend
+                    .sort(sortFunction)
+                    .filter((json: { [x: string]: any }) => {
+                      if (datesSelectedTimestamps.length > 0) {
+                        return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format(formatStr));
+                      }
+                      return true;
+                    })
+                    .map((json: { [x: string]: any }) => ({
+                      date: moment.utc(json.date * 1000).format(formatStr),
+                      ...json,
+                    })),
+                  datasetLabel + "-csv",
+                  datasetLabel,
+                );
+              } else {
+                downloadCSV(
+                  dataTable
+                    .sort(sortFunction)
+                    .filter((json: { [x: string]: any }) => {
+                      if (datesSelectedTimestamps.length > 0) {
+                        return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format(formatStr));
+                      }
+                      return true;
+                    })
+                    .map((json: { [x: string]: any }) => ({
+                      date: moment.utc(json.date * 1000).format(formatStr),
+                      [field]: json.value,
+                    })),
+                  datasetLabel + "-csv",
+                  datasetLabel,
+                );
+              }
+            }}
+          >
             Save CSV
           </Button>
-          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
+          {jpegDownloadHandler ? (
+            <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>
+              Save Chart
+            </Button>
+          ) : null}
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}

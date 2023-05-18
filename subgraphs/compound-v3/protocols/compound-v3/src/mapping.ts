@@ -123,6 +123,7 @@ export function handleCometDeployed(event: CometDeployed): void {
     market._baseTrackingSupplySpeed = BIGINT_ZERO;
     market.canBorrowFrom = true;
     market._baseBorrowIndex = BASE_INDEX_SCALE;
+    market._baseSupplyIndex = BASE_INDEX_SCALE;
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
@@ -713,7 +714,8 @@ export function handleTransfer(event: Transfer): void {
       .div(exponentToBigDecimal(token.decimals))
       .times(token.lastPriceUSD!),
     newBalance,
-    InterestRateType.VARIABLE
+    InterestRateType.VARIABLE,
+    getPrincipal(event.params.from, cometContract)
   );
 
   amount = ethereum.decode("uint256", supplyLog.data)!.toBigInt();
@@ -735,7 +737,8 @@ export function handleTransfer(event: Transfer): void {
       .div(exponentToBigDecimal(token.decimals))
       .times(token.lastPriceUSD!),
     newBalance,
-    InterestRateType.VARIABLE
+    InterestRateType.VARIABLE,
+    getPrincipal(toAddress, cometContract)
   );
 }
 
@@ -846,7 +849,8 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     baseMarket.getProtocol(),
     baseAssetBorrowBalance,
     TransactionType.LIQUIDATE,
-    priceUSD
+    priceUSD,
+    getPrincipal(borrower, cometContract)
   );
   const positionID = liquidateePosition.getPositionID();
   if (!positionID) return;
@@ -869,6 +873,7 @@ function createBaseTokenTransactions(
   positionSide: string,
   accountActorID: Bytes
 ): void {
+  const principal = getPrincipal(accountID, comet);
   const newBalance = getUserBalance(comet, accountID, null, positionSide);
   if (transactionType == TransactionType.DEPOSIT) {
     const deposit = market.createDeposit(
@@ -877,7 +882,8 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -889,7 +895,8 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     if (withdraw) {
       withdraw.accountActor = accountActorID;
@@ -904,7 +911,8 @@ function createBaseTokenTransactions(
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
       token.lastPriceUSD!,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     borrow.accountActor = accountActorID;
     borrow.save();
@@ -917,7 +925,8 @@ function createBaseTokenTransactions(
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
       token.lastPriceUSD!,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     if (repay) {
       repay.accountActor = accountActorID;
@@ -1084,6 +1093,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     market._baseBorrowIndex!
   );
   market._baseBorrowIndex = newBaseBorrowIndex;
+  market._baseSupplyIndex = tryTotalsBasic.value.baseSupplyIndex;
 
   // the reserve factor is dynamic and is essentially
   // the spread between supply and borrow interest rates
@@ -1279,4 +1289,19 @@ function findTransfer(event: ethereum.Event): ethereum.Log | null {
   }
 
   return null;
+}
+
+//
+//
+// Get the Position Principal
+function getPrincipal(account: Address, cometContract: Comet): BigInt {
+  const tryUserBasic = cometContract.try_userBasic(account);
+  if (tryUserBasic.reverted) {
+    log.error("[getPrincipal] Could not get userBasic({})", [
+      account.toHexString(),
+    ]);
+    return BIGINT_ZERO;
+  }
+
+  return tryUserBasic.value.getPrincipal();
 }

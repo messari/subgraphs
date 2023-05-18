@@ -1,15 +1,16 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE } from "../constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TWO,
+  BIGINT_TEN,
+  DEFAULT_DECIMALS,
+} from "../constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
-  decimals: i32 = 18
+  decimals: i32 = DEFAULT_DECIMALS
 ): BigDecimal {
-  return quantity.divDecimal(
-    BigInt.fromI32(10)
-      .pow(decimals as u8)
-      .toBigDecimal()
-  );
+  return quantity.divDecimal(BIGINT_TEN.pow(decimals as u8).toBigDecimal());
 }
 
 // returns 10^exp
@@ -64,7 +65,7 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 
   const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
-    return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
+    return sorted[mid].plus(sorted[mid - 1]).div(BIGDECIMAL_TWO);
   }
 
   return sorted[mid - 1];
@@ -75,18 +76,18 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 // https://docs.aave.com/developers/v/2.0/glossary
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
-  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+  const halfRatio = BIGINT_TEN.pow(INT_NINE).div(BigInt.fromI32(2));
+  return halfRatio.plus(a).div(BIGINT_TEN.pow(INT_NINE));
 }
 
 export function wadToRay(a: BigInt): BigInt {
-  const result = a.times(BigInt.fromI32(10).pow(9));
+  const result = a.times(BIGINT_TEN.pow(INT_NINE));
   return result;
 }
 
 export function round(numberToRound: BigDecimal): BigDecimal {
   const parsedNumber: number = parseFloat(numberToRound.toString());
   const roundedNumber: number =
-    Math.ceil((parsedNumber + Number.EPSILON) * 100) / 100;
+    Math.ceil((parsedNumber + Number.EPSILON) * INT_HUNDRED) / INT_HUNDRED;
   return BigDecimal.fromString(roundedNumber.toString());
 }

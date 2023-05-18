@@ -37,6 +37,7 @@ import {
   updateWeightedStakedAmount,
   processRewardEpoch6_17,
   processRewardEpoch18_23,
+  processRewardEpoch24Onward,
 } from "./helpers";
 import {
   createBorrow,
@@ -430,6 +431,8 @@ export function handleStake(event: Stake): void {
       processRewardEpoch6_17(epoch, epochStartBlock, event);
     } else if (epoch.epoch <= 23) {
       processRewardEpoch18_23(epoch, epochStartBlock, event);
+    } else {
+      processRewardEpoch24Onward(epoch, epochStartBlock, event);
     }
   }
 
