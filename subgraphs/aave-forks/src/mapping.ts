@@ -669,7 +669,8 @@ export function _handleDeposit(
     event,
     protocolData
   );
-  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createDeposit(
     asset,
@@ -737,7 +738,8 @@ export function _handleWithdraw(
     event,
     protocolData
   );
-  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createWithdraw(
     asset,
@@ -770,7 +772,8 @@ export function _handleBorrow(
     event,
     protocolData
   );
-  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   manager.createBorrow(
@@ -805,7 +808,8 @@ export function _handleRepay(
     event,
     protocolData
   );
-  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   // use debtToken Transfer event for Burn/Mint to determine interestRateType of the Repay event

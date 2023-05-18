@@ -219,27 +219,29 @@ export function getInterestRateType(
   const TRANSFER = "Transfer(address,address,uint256)";
   const eventSignature = crypto.keccak256(ByteArray.fromUTF8(TRANSFER));
   const logs = event.receipt!.logs;
-  // Transfer emitted 5 index ahead of Repay's event.logIndex
-  const targetLogIndex = event.logIndex.minus(BigInt.fromI32(INT_FIVE));
-  log.info("[getInterestRateType]tx {}-{},logs.length={},event.logIndex={}", [
-    event.transaction.hash.toHexString(),
-    event.logIndex.toString(),
-    logs.length.toString(),
-    event.logIndex.toString(),
-  ]);
+  // Transfer emitted at 4 or 5 index ahead of Repay's event.logIndex
+  const logIndexMinus5 = event.logIndex.minus(BigInt.fromI32(INT_FIVE));
+  const logIndexMinus3 = event.logIndex.minus(BigInt.fromI32(INT_THREE));
 
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.lt(targetLogIndex)) {
-      // skip event with logIndex < targetLogIndex
+    if (thisLog.logIndex.lt(logIndexMinus5)) {
+      // skip event with logIndex < LogIndexMinus5
       continue;
     }
+    if (thisLog.logIndex.equals(logIndexMinus3)) {
+      // break if the logIndex = event.logIndex - 3
+      break;
+    }
+
     // topics[0] - signature
     const ADDRESS = "address";
     const logSignature = thisLog.topics[0];
+
     if (logSignature.equals(eventSignature)) {
       const from = ethereum.decode(ADDRESS, thisLog.topics.at(1))!.toAddress();
       const to = ethereum.decode(ADDRESS, thisLog.topics.at(2))!.toAddress();
+
       if (from.equals(Address.zero()) || to.equals(Address.zero())) {
         // this is a burn or mint event
         const tokenAddress = thisLog.address;
@@ -252,16 +254,18 @@ export function getInterestRateType(
           ]);
           return null;
         }
-        if (token._iavsTokenType === IavsTokenType.STOKEN) {
+
+        if (token._iavsTokenType == IavsTokenType.STOKEN) {
           return InterestRateType.STABLE;
         }
-        if (token._iavsTokenType === IavsTokenType.VTOKEN) {
+        if (token._iavsTokenType == IavsTokenType.VTOKEN) {
           return InterestRateType.VARIABLE;
         }
       }
     }
-    log.error(
-      "[getInterestRateType]event at logIndex {} signature {} not the exepected Transfer signature {}. tx {}-{} ",
+
+    log.info(
+      "[getInterestRateType]event at logIndex {} signature {} not match the exepected Transfer signature {}. tx {}-{} ",
       [
         thisLog.logIndex.toString(),
         logSignature.toHexString(),
@@ -270,7 +274,6 @@ export function getInterestRateType(
         event.transactionLogIndex.toString(),
       ]
     );
-    return null;
   }
   return null;
 }
