@@ -70,6 +70,8 @@ dataSources:
       eventHandlers:
         - event: AddGauge(address,address)
           handler: handleAddGauge
+        - event: RemoveGauge(address,address)
+          handler: handleRemoveGauge          
       file: ./src/mappings/handlers/liquidityGauge.ts
   {{/gaugeRegistry}}
 templates:
@@ -143,6 +145,8 @@ templates:
           handler: handleMinted
         - event: Burned(address,uint256,uint256,uint256,uint128)
           handler: handleBurned
+        - event: Rebalance(int24,int24,uint128,uint128)
+          handler: handleRebalance
         - event: FeesEarned(uint256,uint256)
           handler: handleFeesEarned
         - event: UpdateManagerParams(uint16,address,uint16,uint16,uint32)

@@ -71,7 +71,7 @@ If this is your first subgraph I would recommend starting with a log in the hand
 
 ```typescript
 export function handleDeposit(event: Deposit): void {
-  log.warning("transaction hash: {} Block number: {}", [
+  log.info("transaction hash: {} Block number: {}", [
     event.transaction.hash.toHexString(),
     event.block.number.toString(),
   ]);
@@ -79,6 +79,74 @@ export function handleDeposit(event: Deposit): void {
 ```
 
 Play around with this, compare hashes on etherscan and help yourself understand some of the behavior.
+
+## Using Logs in Subgraphs
+
+There is a standard logging format that we follow in subgraphs to ensure subgraph data consumers have a framework to understand what is happening in a subgraph. There are five different types of log severity levels that we use in subgraphs:
+
+- `log.debug`: This is only used for debugging purposes. It should not be found in any subgraph code in our `master` branch.
+- `log.info`: This is used for general information about the subgraph. It can be used to log handler execution, data processing, etc. This should never be used in the case of error handling.
+- `log.warning`: This is used for issues/warnings that may or may not be an issue. The issue will not create any major issues in a subgraph and should not affect downstream data consumers. This could be a divide by 0, but it may be the actual value so it is not an error that needs to be fixed.
+- `log.error`: This is used for errors that need to be addressed, but are not fatal to the subgraph's function. This should be cause for a fix, but the subgraph can continue to execute. This may cause a minor data issue that should be addressed soon. This would be synonymous to a [#minor](https://github.com/messari/subgraphs/blob/master/docs/CONTRIBUTING.md#minor) fix in our versioning system.
+- `log.critical`: This will be used for fatal errors. When this log is reached a subgraph will stop executing. This error will be cause for a major data issue that would create a major issue downstream if the data is consumed. This needs to be fixed ASAP and is synonymous to a [#major](https://github.com/messari/subgraphs/blob/master/docs/CONTRIBUTING.md#major) fix in our versioning system.
+
+> As a general rule, if a function cannot continue to execute it should either be an `error` or `critical`. The severity will be determined by the impact of the error.
+
+Each log severity has a different purpose and should be used accordingly.
+
+> The goal is to remove ambiguity of log meaning for devs, help downstream consumers understand what is happening on a subgraph-level, and use downtime judiciously.
+
+### Logging Format
+
+Logs should be descriptive and formatted as follows to remain easy to parse through and understand. There are some pieces of information your logs should have:
+
+- The function name that the log is found in
+- A description of what the log is
+- Any relevant information that is needed to understand the log
+- A prefix to differentiate messari subgraph logs
+- If possible, the transaction hash should also be included
+
+Examples:
+
+Setup see [logger.ts](../subgraphs/_reference_/src/common/utils/logger.ts):
+
+```typescript
+import { logger } from "./logger.ts";
+
+const logger = new Logger(event, "handlePriceOracleUpdated");
+```
+
+```typescript
+logger.info("New price oracle: {} updated from: {}", [
+  event.params.newOracle.toHexString(),
+  event.params.oldOracle.toHexString(),
+]);
+```
+
+```typescript
+logger.appendFuncName("getAavePriceUSD");
+logger.warning(
+  "Divide by 0 in liquidity pool used for pricing. Asset {} balance is 0 in this pool.",
+  [tokenOne.toHexString()]
+);
+```
+
+```typescript
+logger.appendFuncName("handleDeposit");
+logger.error(
+  "Market: {} not found. Market entity expected to be created. Transaction hash {}",
+  [event.address.toHexString(), event.transaction.hash.toHexString()]
+);
+```
+
+```typescript
+logger.appendFuncName("updateMarketData");
+// This is impossible, and something is seriously wrong if this occurs
+logger.critical(
+  "InputTokenBalance is negative in market {}. Transaction hash {}",
+  [market.id.toHexString(), event.transaction.hash.toHexString()]
+);
+```
 
 ## Deploy and Test
 

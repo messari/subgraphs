@@ -92,7 +92,7 @@ export class BiswapBscConfigurations implements Configurations {
       "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c", // BTCB
       "0x2170ed0880ac9a755fd29b2688956bd959f933f8", // WETH
       "0x250632378e573c6be1ac2f97fcdf00515d0aa91b", // BETH
-      "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1", // BSW
+      "0x965f527d9159dce6288a2219db51fc6eef120dd1", // BSW
     ];
   }
   getStableCoins(): string[] {

@@ -5,6 +5,7 @@ import {
   log,
   BigDecimal,
   Bytes,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import {
   AddAsset,
@@ -48,6 +49,7 @@ import {
   SECONDS_PER_YEAR,
   TokenType,
   TransactionType,
+  Network,
 } from "../../../src/sdk/constants";
 import { DataManager, RewardData } from "../../../src/sdk/manager";
 import {
@@ -57,14 +59,17 @@ import {
   getProtocolData,
   ZERO_ADDRESS,
   DEFAULT_DECIMALS,
-  REWARDS_ADDRESS,
   MARKET_PREFIX,
   USDC_COMET_WETH_MARKET_ID,
   WETH_COMET_ADDRESS,
+  getRewardAddress,
+  POLYGON_COMP_ORACLE_ADDRESS,
+  equalsIgnoreCase,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { Market, Token } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
+import { Chainlink } from "../../../generated/Configurator/Chainlink";
 import { TokenManager } from "../../../src/sdk/token";
 import { AccountManager } from "../../../src/sdk/account";
 import { PositionManager } from "../../../src/sdk/position";
@@ -118,6 +123,7 @@ export function handleCometDeployed(event: CometDeployed): void {
     market._baseTrackingSupplySpeed = BIGINT_ZERO;
     market.canBorrowFrom = true;
     market._baseBorrowIndex = BASE_INDEX_SCALE;
+    market._baseSupplyIndex = BASE_INDEX_SCALE;
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
@@ -708,7 +714,8 @@ export function handleTransfer(event: Transfer): void {
       .div(exponentToBigDecimal(token.decimals))
       .times(token.lastPriceUSD!),
     newBalance,
-    InterestRateType.VARIABLE
+    InterestRateType.VARIABLE,
+    getPrincipal(event.params.from, cometContract)
   );
 
   amount = ethereum.decode("uint256", supplyLog.data)!.toBigInt();
@@ -730,7 +737,8 @@ export function handleTransfer(event: Transfer): void {
       .div(exponentToBigDecimal(token.decimals))
       .times(token.lastPriceUSD!),
     newBalance,
-    InterestRateType.VARIABLE
+    InterestRateType.VARIABLE,
+    getPrincipal(toAddress, cometContract)
   );
 }
 
@@ -841,7 +849,8 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     baseMarket.getProtocol(),
     baseAssetBorrowBalance,
     TransactionType.LIQUIDATE,
-    priceUSD
+    priceUSD,
+    getPrincipal(borrower, cometContract)
   );
   const positionID = liquidateePosition.getPositionID();
   if (!positionID) return;
@@ -864,6 +873,7 @@ function createBaseTokenTransactions(
   positionSide: string,
   accountActorID: Bytes
 ): void {
+  const principal = getPrincipal(accountID, comet);
   const newBalance = getUserBalance(comet, accountID, null, positionSide);
   if (transactionType == TransactionType.DEPOSIT) {
     const deposit = market.createDeposit(
@@ -872,7 +882,8 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -884,7 +895,8 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     if (withdraw) {
       withdraw.accountActor = accountActorID;
@@ -899,7 +911,8 @@ function createBaseTokenTransactions(
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
       token.lastPriceUSD!,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     borrow.accountActor = accountActorID;
     borrow.save();
@@ -912,7 +925,8 @@ function createBaseTokenTransactions(
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
       token.lastPriceUSD!,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     if (repay) {
       repay.accountActor = accountActorID;
@@ -966,11 +980,11 @@ function updateRewards(
     return;
   }
 
-  const rewardContract = CometRewards.bind(Address.fromString(REWARDS_ADDRESS));
+  const rewardContract = CometRewards.bind(getRewardAddress());
   const tryRewardConfig = rewardContract.try_rewardConfig(cometAddress);
 
   if (tryTrackingIndexScale.reverted || tryRewardConfig.reverted) {
-    log.error("[updateRewards] Contract call(s) reverted on market: {}", [
+    log.warning("[updateRewards] Contract call(s) reverted on market: {}", [
       market.id.toHexString(),
     ]);
     return;
@@ -986,6 +1000,24 @@ function updateRewards(
   }
 
   const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
+
+  // Update price for reward token using Chainlink oracle on Polygon
+  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+    const chainlinkContract = Chainlink.bind(
+      Address.fromString(POLYGON_COMP_ORACLE_ADDRESS)
+    );
+    const tryPrice = chainlinkContract.try_latestAnswer();
+    if (tryPrice.reverted) {
+      log.error("[updateRewards] Chainlink price reverted on transaction: {}", [
+        event.transaction.hash.toHexString(),
+      ]);
+    } else {
+      rewardToken.updatePrice(
+        bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS)
+      );
+    }
+  }
+
   const decimals = rewardToken.getDecimals();
   const borrowRewardToken = rewardToken.getOrCreateRewardToken(
     RewardTokenType.VARIABLE_BORROW
@@ -1061,6 +1093,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     market._baseBorrowIndex!
   );
   market._baseBorrowIndex = newBaseBorrowIndex;
+  market._baseSupplyIndex = tryTotalsBasic.value.baseSupplyIndex;
 
   // the reserve factor is dynamic and is essentially
   // the spread between supply and borrow interest rates
@@ -1068,6 +1101,13 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const utilization = cometContract.getUtilization();
   const borrowRate = cometContract.getBorrowRate(utilization).toBigDecimal();
   const supplyRate = cometContract.getSupplyRate(utilization).toBigDecimal();
+  if (borrowRate.lt(supplyRate)) {
+    log.warning(
+      "[updateRevenue] Borrow rate is less than supply rate at transaction: {}",
+      [dataManager.event.transaction.hash.toHexString()]
+    );
+    return;
+  }
   const reserveFactor = borrowRate.minus(supplyRate).div(borrowRate);
   market.reserveFactor = reserveFactor;
   market.save();
@@ -1178,7 +1218,7 @@ function getPrice(priceFeed: Address, cometContract: Comet): BigDecimal {
   return bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS);
 }
 
-// get the price of WETH in USD
+// get the price of WETH in USD on Mainnet
 function getWETHPriceUSD(): BigDecimal {
   const market = Market.load(Bytes.fromHexString(USDC_COMET_WETH_MARKET_ID));
   if (!market) {
@@ -1249,4 +1289,19 @@ function findTransfer(event: ethereum.Event): ethereum.Log | null {
   }
 
   return null;
+}
+
+//
+//
+// Get the Position Principal
+function getPrincipal(account: Address, cometContract: Comet): BigInt {
+  const tryUserBasic = cometContract.try_userBasic(account);
+  if (tryUserBasic.reverted) {
+    log.error("[getPrincipal] Could not get userBasic({})", [
+      account.toHexString(),
+    ]);
+    return BIGINT_ZERO;
+  }
+
+  return tryUserBasic.value.getPrincipal();
 }

@@ -49,6 +49,7 @@ export class PoolRewardData {
 // when a masterchef staking pool is added or updated. It will not update
 // pool reward tokens, since that will happen on every deposit/withdrawal from the pool.
 export function setPoolRewarder(
+  event: ethereum.Event,
   addr: Address,
   pool: _MasterChefStakingPool
 ): void {
@@ -57,14 +58,18 @@ export function setPoolRewarder(
     return;
   }
 
-  replaceRewarder(addr, pool);
+  replaceRewarder(event, addr, pool);
 }
 
 // replaceRewarder will remove the current rewarder of a staking pool and add a new one.
 // Token emissions will be updated on the next deposit/withdrawal after the replacement.
-function replaceRewarder(addr: Address, pool: _MasterChefStakingPool): void {
+function replaceRewarder(
+  event: ethereum.Event,
+  addr: Address,
+  pool: _MasterChefStakingPool
+): void {
   removeRewarder(pool);
-  addRewarder(addr, pool);
+  addRewarder(event, addr, pool);
 }
 
 // removeRewarder will remove the rewarder assigned to some staking pool (if any).
@@ -75,8 +80,12 @@ function removeRewarder(sPool: _MasterChefStakingPool): void {
 
 // addRewarder adds a rewarder to a given staking pool and updates the pool
 // reward token and emission values.
-function addRewarder(addr: Address, sPool: _MasterChefStakingPool): void {
-  const rewarder = getOrCreateRewarder(addr, sPool);
+function addRewarder(
+  event: ethereum.Event,
+  addr: Address,
+  sPool: _MasterChefStakingPool
+): void {
+  const rewarder = getOrCreateRewarder(event, addr, sPool);
   sPool.rewarder = rewarder.id;
 }
 
@@ -95,7 +104,7 @@ export function getPoolRewardsWithBonus(
   }
 
   const rewarderAddr = Address.fromString(sPool.rewarder!);
-  const rewarder = getOrCreateRewarder(rewarderAddr, sPool);
+  const rewarder = getOrCreateRewarder(event, rewarderAddr, sPool);
 
   const calc = new RewarderCalculator(mc, rewarder);
   calc.calculateRewarderRate(event, user, isDeposit);
@@ -144,8 +153,11 @@ function buildRewards(
   rewarder: _MasterChefRewarder,
   rewarderHasFunds: boolean
 ): PoolRewardData {
-  const rewardToken = getOrCreateRewardToken(NetworkConfigs.getRewardToken());
-  const bonusToken = getOrCreateRewardToken(rewarder.rewardToken);
+  const rewardToken = getOrCreateRewardToken(
+    event,
+    NetworkConfigs.getRewardToken()
+  );
+  const bonusToken = getOrCreateRewardToken(event, rewarder.rewardToken);
 
   const bonus = calculateBonusRewardAmounts(event, rewarder, rewarderHasFunds);
 
@@ -202,7 +214,7 @@ function calculateBonusRewardAmounts(
     RewardIntervalType.TIMESTAMP
   );
 
-  const bonusToken = getOrCreateToken(rewarder.rewardToken);
+  const bonusToken = getOrCreateToken(event, rewarder.rewardToken);
 
   const bonusAmount = BigInt.fromString(
     roundToWholeNumber(bonusRewards).toString()
@@ -219,6 +231,7 @@ function calculateBonusRewardAmounts(
 }
 
 function getOrCreateRewarder(
+  event: ethereum.Event,
   addr: Address,
   pool: _MasterChefStakingPool | null
 ): _MasterChefRewarder {
@@ -232,7 +245,7 @@ function getOrCreateRewarder(
     }
 
     const c = Rewarder.bind(addr);
-    const token = getOrCreateRewardToken(c.rewardToken().toHexString());
+    const token = getOrCreateRewardToken(event, c.rewardToken().toHexString());
 
     rewarder = new _MasterChefRewarder(addr.toHexString());
     rewarder.pool = pool!.id;

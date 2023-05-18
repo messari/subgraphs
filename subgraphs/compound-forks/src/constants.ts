@@ -55,6 +55,8 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export type RewardTokenType = string;
+
 export namespace InterestRateType {
   export const STABLE = "STABLE";
   export const VARIABLE = "VARIABLE";

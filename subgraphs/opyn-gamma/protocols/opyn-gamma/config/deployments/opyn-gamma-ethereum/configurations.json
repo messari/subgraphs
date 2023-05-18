@@ -1,0 +1,23 @@
+{
+  "deployment": "OPYN_ETHEREUM",
+  "network": "mainnet",
+  "Controller": {
+    "address": "0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72",
+    "startBlock": 11544482
+  },
+  "Controller_V1": {
+    "address": "0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72",
+    "startBlock": 11544482
+  },
+  "OTokenFactory": {
+    "address": "0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E",
+    "startBlock": 11544447
+  },
+  "MarginPool": {
+    "address": "0x5934807cC0654d46755eBd2848840b616256C6Ef",
+    "startBlock": 11544469
+  },
+  "graftEnabled": false,
+  "subgraphId": "QmRjY9mcUsmaCrAJbsX1u2AXcVMuKCtVuCyFx8dmPbj8xX",
+  "graftStartBlock": 15327000
+}

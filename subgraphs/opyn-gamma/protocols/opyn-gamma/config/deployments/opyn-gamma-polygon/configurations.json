@@ -1,0 +1,19 @@
+{
+  "deployment": "OPYN_POLYGON",
+  "network": "matic",
+  "Controller": {
+    "address": "0x7a23c712bddde52b22d8ff52e4cdadb1bcb0b203",
+    "startBlock": 23813700
+  },
+  "OTokenFactory": {
+    "address": "0xedd70e045903d34fba7302b5094d37eaceb1397c",
+    "startBlock": 23813613
+  },
+  "MarginPool": {
+    "address": "0x30ae5debc9edf60a23cd19494492b1ef37afa56d",
+    "startBlock": 23813662
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

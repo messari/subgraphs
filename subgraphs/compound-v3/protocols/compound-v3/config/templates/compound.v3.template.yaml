@@ -37,6 +37,8 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
       eventHandlers:
         - event: CometDeployed(indexed address,indexed address)
           handler: handleCometDeployed
@@ -79,6 +81,8 @@ templates:
           file: ./abis/ERC20.json
         - name: CometRewards
           file: ./abis/CometRewards.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
       eventHandlers:
         - event: Supply(indexed address,indexed address,uint256)
           handler: handleSupply

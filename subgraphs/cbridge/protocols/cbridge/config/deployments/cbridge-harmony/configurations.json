@@ -1,0 +1,42 @@
+{
+  "network": "harmony",
+  "Bridge": {
+    "address": "0x78a21C1D3ED53A82d4247b9Ee5bF001f4620Ceec",
+    "startBlock": 20279574
+  },
+  "OriginalTokenVault": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "PeggedTokenBridge": {
+    "address": "0xdd90E5E87A2081Dcf0391920868eBc2FFB81a1aF",
+    "startBlock": 20884938
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "MessageBus": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 39881058
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

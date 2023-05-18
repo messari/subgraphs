@@ -13,7 +13,6 @@ export const schema = (version: string): string => {
   }
 };
 
-
 export const schema110 = (): string => {
   return `
     query Data($skipAmt: Int!) {

@@ -17,21 +17,21 @@ export const NetworkLogos: Record<string, string> = {
   cronos: "https://assets.coingecko.com/coins/images/7310/small/oCw2s3GI_400x400.jpeg?1645172042",
   harmony: "https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793",
   cosmos: "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
-  "boba": "https://assets.coingecko.com/coins/images/20285/small/BOBA.png?1636811576",
-  "near": "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
-  "osmosis": "https://assets.coingecko.com/coins/images/16724/small/osmo.png?1632763885",
+  boba: "https://assets.coingecko.com/coins/images/20285/small/BOBA.png?1636811576",
+  near: "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
+  osmosis: "https://assets.coingecko.com/coins/images/16724/small/osmo.png?1632763885",
   "arweave-mainnet": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
-  "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
+  arweave: "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
   "near-mainnet": "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
-  "clover": "https://assets.coingecko.com/coins/images/15278/small/photo_2022-03-24_10-22-33.jpg?1648531786",
-  "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566"
+  clover: "https://assets.coingecko.com/coins/images/15278/small/photo_2022-03-24_10-22-33.jpg?1648531786",
+  graph: "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
 };
 
 export const networkMapping: { [x: string]: string } = {
-  "mainnet": "ethereum",
-  "binance": "bsc",
-  "xdai": "celo"
-}
+  mainnet: "ethereum",
+  binance: "bsc",
+  xdai: "celo",
+};
 
 interface NetworkLogoProps {
   network: string;
@@ -49,5 +49,9 @@ export const NetworkLogo = ({ network, size, tooltip }: NetworkLogoProps) => {
     src = NetworkLogos.ethereum;
     opacity = 0;
   }
-  return <Tooltip style={{ whiteSpace: "pre-wrap" }} title={tooltip} placement="bottom"><Avatar sx={{ height: size, width: size, opacity }} src={src} /></Tooltip >;
+  return (
+    <Tooltip style={{ whiteSpace: "pre-wrap" }} title={tooltip} placement="bottom">
+      <Avatar sx={{ height: size, width: size, opacity }} src={src} />
+    </Tooltip>
+  );
 };

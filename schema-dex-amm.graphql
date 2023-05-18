@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.3.1
+# Version: 1.3.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -53,6 +53,16 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " amount of tokens in the protocol "
+  _totalSupply: BigInt!
+
+  " Total value locked in the protocol "
+  _totalValueLockedUSD: BigDecimal!
+
+  _largePriceChangeBuffer: Int!
+
+  _largeTVLImpactBuffer: Int!
 }
 
 enum RewardTokenType {
@@ -653,7 +663,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity {
+type Deposit @entity(immutable: true) {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -690,6 +700,9 @@ type Deposit implements Event @entity {
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
 
@@ -697,7 +710,7 @@ type Deposit implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw @entity(immutable: true) {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
@@ -734,6 +747,9 @@ type Withdraw implements Event @entity {
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
 
@@ -741,7 +757,7 @@ type Withdraw implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity {
+type Swap @entity(immutable: true) {
   " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -784,19 +800,22 @@ type Swap implements Event @entity {
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity(immutable: true) {
   " Address of the account "
   id: ID!
 }
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity {
+type ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }

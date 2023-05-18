@@ -1,0 +1,43 @@
+{
+  "network": "mainnet",
+  "Bridge": {
+    "address": "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820",
+    "startBlock": 13719989
+  },
+  "OriginalTokenVault": {
+    "address": "0xb37d31b2a74029b5951a2778f959282e2d518595",
+    "startBlock": 13808358
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x7510792a3b1969f9307f3845ce88e39578f2bae1",
+    "startBlock": 14710499
+  },
+  "PeggedTokenBridge": {
+    "address": "0x16365b45eb269b5b5dacb34b4a15399ec79b95eb",
+    "startBlock": 13810512
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0x52E4f244f380f8fA51816c8a10A63105dd4De084",
+    "startBlock": 14627208
+  },
+  "FarmingRewards": {
+    "address": "0x61f85fF2a2f4289Be4bb9B72Fc7010B3142B5f41",
+    "startBlock": 13670097
+  },
+  "MessageBus": {
+    "address": "0x4066d196a423b2b3b8b054f4f40efb47a74e200c",
+    "startBlock": 16017598
+  },
+  "Staking": {
+    "address": "0x8a4B4C2aCAdeAa7206Df96F00052e41d74a015CE",
+    "startBlock": 13670030
+  },
+  "StakingRewards": {
+    "address": "0xb01fd7Bc0B3c433e313bf92daC09FF3942212b42",
+    "startBlock": 13670076
+  },
+  "supportCallHandlers": true,
+  "graftEnabled": false,
+  "subgraphId": "QmSixG75WWAMGNsfMrcUYD2LBWckdTMWR5AbAQcnkqTovh",
+  "graftStartBlock": 16019469
+}

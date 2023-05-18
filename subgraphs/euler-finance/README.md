@@ -6,7 +6,7 @@ Lending protocols are the life-blood of Decentralized Finance (DeFi) and provide
 
 Euler follows in the footsteps of lending protocols like AAVE and Compound but focuses on the permissionless aspect i.e. it allows users to create their own markets for any Ethereum ERC20 token. This blog from the Euler team provides much more detailed info on the benefits provided by Euler — [https://blog.euler.finance/introducing-euler-8f4422f13848](https://blog.euler.finance/introducing-euler-8f4422f13848).
 
-## Calculation Methodology v1.2.1
+## Calculation Methodology v1.2.3
 
 ### Total Value Locked (TVL) USD
 
@@ -63,13 +63,24 @@ Euler Finance distributes EUL tokens by epoch (=every 100,000 blocks) to borrowe
 3. Distribute the total EUL amount for the epoch among the top 10 markets proportional to square root of block weighted EUL amount staked;
 4. If epoch > 96, exit, else go back to 1.
 
-#### Epoch 18 - 23
+#### [Epoch 18 - 23](https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93)
 
 1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (approximating time) the EUL is staked;
 2. At the end of the epoch, calcuate the sqrt of sum weighted EUL amount staked for all markets using the Chainlink Oracle and wstETH;
-3. The EUL amount each market receives is proportional to the sqrt of sum weighted EUL amount staked for the market.
+3. Total 8,000 EUL is distributed to markets proportional to the sqrt of sum weighted EUL amount staked for the market.
 4. 8000 EUL awarded to borrowers in the USDC, USDT, WETH, and wstETH market;
 5. 5000 EUL awarded to lenders staking their output token from USDC, USDT, and WETH market.
+
+#### [Epoch 24](https://snapshot.org/#/eulerdao.eth/proposal/0x551f9e6f3fba50a0fc2c69e361f7a81979189aa7f0ed923a1873bd578896942b)
+
+1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (approximating time) the EUL is staked;
+2. At the end of the epoch, calcuate the sqrt of sum weighted EUL amount staked for all markets using the Chainlink Oracle and wstETH;
+3. Total 8,000 EUL is distributed to markets proportional to the sqrt of sum weighted EUL amount staked for the market.
+4. 8000 EUL awarded to borrowers in the USDC, WETH, and wstETH market;
+5. EUL awarded to lenders staking their output token from these markets
+   - WETH market: 9,000
+   - USDC market: 5,000
+   - USDT market: 1,000
 
 ### Protocol Controlled Value
 
@@ -77,15 +88,19 @@ Not applicable to Euler Finance
 
 ### Collateral Factor & Borrow Factor
 
-Euler's collateral factor represents a risk-adjusted value of a user's collateral. In practice if a user deposits $1000 `USDC` and the collateral factor is `.9`, they have $900 `USDC` ($1000 \* .9) of collateral to borrow from.
+Euler's collateral factor represents a risk-adjusted value of a user's collateral. In practice if a user deposits \$1000 `USDC` and the collateral factor is `.9`, they have $900 `USDC` ($1000 \* .9) of collateral to borrow from.
 
-Where Euler differs from other protocols is in the 2-sided approach. There is also a borrow factor. So yes, the user has $900 to use as collateral, but they want to borrow `UNI`, and `UNI` has a borrow factor of `.7`.
+Where Euler differs from other protocols is in the 2-sided approach. There is also a borrow factor. So yes, the user has \$900 to use as collateral, but they want to borrow `UNI`, and `UNI` has a borrow factor of `.7`.
 
-In this example the user could borrow ($900 \* `.7` `UNI`) = $630 with their $1000 `USDC` deposit.
+In this example the user could borrow (\$900 \\\* `.7` `UNI`) = $630 with their $1000 `USDC` deposit.
 
 ### Liquidation Penalty (Incentive)
 
 On Euler the liquidation penalty is variable and decided on in a sort of Dutch Auction style. This reduces the opportunities of MEV and drives the "liquidation penalty" closer to the marginal operating cost of liquidating a borrow. [See more here](https://docs.euler.finance/getting-started/white-paper#mev-resistance)
+
+### Euler Hacked
+
+On 2023/03/13, [the Euler protocol was hacked on ](https://etherscan.io/tx/0xc310a0affe2169d1f6feec1c63dbc7f7c62a887fa48795d327d4d2da2d6b111d) and lost more than \$200M of its asset. Due to the hack, [the TVL and borrow balance were way off](https://github.com/messari/subgraphs/issues/1869). A special handling that gets borrow balance from `dToken.totalSupply` and deposit balance from `erc20(underlying token).balanceOf(Euler contract) + borrow balance`.
 
 ## Reference and Useful Links
 
