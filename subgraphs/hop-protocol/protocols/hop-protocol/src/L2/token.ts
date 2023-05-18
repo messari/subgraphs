@@ -21,7 +21,7 @@ import {
 } from '@graphprotocol/graph-ts'
 import { Transfer } from '../../../../generated/Token/Token'
 import { _ERC20 } from '../../../../generated/Token/_ERC20'
-import { Token, Pool } from '../../../../generated/schema'
+import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 import { reverseChainIDs } from '../../../../src/sdk/protocols/bridge/chainIds'

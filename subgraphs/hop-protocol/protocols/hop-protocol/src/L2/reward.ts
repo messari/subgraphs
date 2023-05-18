@@ -39,7 +39,7 @@ import {
 	HOP_REWARDS,
 	OP_REWARDS,
 	RewardTokens,
-} from '../../config/constants/constant'
+} from '../../../../src/common/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {

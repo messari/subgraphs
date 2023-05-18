@@ -33,7 +33,7 @@ import {
   XDAI_L2_SIGNATURE,
   OPTIMISM_L2_SIGNATURE,
   MESSENGER_EVENT_SIGNATURES,
-} from "../../config/constants/constant";
+} from "../../../../src/common/constants";
 import { BIGDECIMAL_ZERO, Network } from "../../../../src/sdk/util/constants";
 import { L2_Amm } from "../../../../generated/HopL2Amm/L2_Amm";
 import { BIGINT_ONE } from "../../../../src/common/constants";
