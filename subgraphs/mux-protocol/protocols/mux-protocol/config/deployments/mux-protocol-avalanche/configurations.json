@@ -1,0 +1,9 @@
+{
+  "network": "avalanche",
+  "pool": {
+    "address": "0x0bA2e492e8427fAd51692EE8958eBf936bEE1d84",
+    "startBlock": "14304145"
+  },
+  "isArbitrum": false,
+  "deployment": "MUX_AVALANCHE"
+}

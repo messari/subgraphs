@@ -1,0 +1,2368 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "id",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "symbol",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "decimals",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isStable",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "muxTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "AddAsset",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "tokenPrice",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "mlpPrice",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "mlpAmount",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "fee",
+        "type": "uint96"
+      }
+    ],
+    "name": "AddLiquidity",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "profitAssetId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "profitAssetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasProfit",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "pnlUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "remainPosition",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "remainCollateral",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.ClosePositionArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "ClosePosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "profitAssetId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "profitAssetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "entryPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasProfit",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "pnlUsd",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.ClosePositionArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "ClosePosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "fee",
+        "type": "uint96"
+      }
+    ],
+    "name": "CollectedFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "collateralId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rawAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "wadAmount",
+        "type": "uint96"
+      }
+    ],
+    "name": "DepositCollateral",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isStable",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "muxTokenAmount",
+        "type": "uint96"
+      }
+    ],
+    "name": "IssueMuxToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "profitAssetId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "profitAssetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasProfit",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "pnlUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "remainCollateral",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.LiquidateArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "Liquidate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "profitAssetId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "profitAssetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "entryPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasProfit",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "pnlUsd",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.LiquidateArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "Liquidate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "newEntryPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "remainPosition",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "remainCollateral",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.OpenPositionArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "OpenPosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "entryPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.OpenPositionArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "OpenPosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "pendingOwner",
+        "type": "address"
+      }
+    ],
+    "name": "PrepareToTransferOwnership",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "muxTokenAmount",
+        "type": "uint96"
+      }
+    ],
+    "name": "RedeemMuxToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "tokenPrice",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "mlpPrice",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "mlpAmount",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "fee",
+        "type": "uint96"
+      }
+    ],
+    "name": "RemoveLiquidity",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isTradable",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isOpenable",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isShortable",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "useStableTokenForProfit",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isEnabled",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isStrictStable",
+        "type": "bool"
+      }
+    ],
+    "name": "SetAssetFlags",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newInitialMarginRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newMaintenanceMarginRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newPositionFeeRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newMinProfitRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newMinProfitTime",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "newMaxLongPositionSize",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "newMaxShortPositionSize",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newSpotWeight",
+        "type": "uint32"
+      }
+    ],
+    "name": "SetAssetParams",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "symbol",
+        "type": "bytes32"
+      }
+    ],
+    "name": "SetAssetSymbol",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "oldFundingInterval",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newFundingInterval",
+        "type": "uint32"
+      }
+    ],
+    "name": "SetFundingInterval",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newBaseRate8H",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newLimitRate8H",
+        "type": "uint32"
+      }
+    ],
+    "name": "SetFundingParams",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newLiquidityBaseFeeRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newLiquidityDynamicFeeRate",
+        "type": "uint32"
+      }
+    ],
+    "name": "SetLiquidityFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "newLowerBound",
+        "type": "uint96"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "newUpperBound",
+        "type": "uint96"
+      }
+    ],
+    "name": "SetMlpPriceRange",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "referenceOracleType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "referenceOracle",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "referenceDeviation",
+        "type": "uint32"
+      }
+    ],
+    "name": "SetReferenceOracle",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TransferLiquidity",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "longFundingRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "longCumulativeFundingRate",
+        "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "shortFundingRate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "shortCumulativeFunding",
+        "type": "uint128"
+      }
+    ],
+    "name": "UpdateFundingRate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "collateralId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rawAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint96",
+        "name": "wadAmount",
+        "type": "uint96"
+      }
+    ],
+    "name": "WithdrawCollateral",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "subAccountId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "collateralId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "profitAssetId",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLong",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "withdrawRawAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint96",
+            "name": "assetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "collateralPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "profitAssetPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "entryPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "feeUsd",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Events.WithdrawProfitArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "WithdrawProfit",
+    "type": "event"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "symbol",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint8",
+        "name": "decimals",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "isStable",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "muxTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "addAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rawAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint96",
+        "name": "tokenPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "mlpPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "currentAssetValue",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "targetAssetValue",
+        "type": "uint96"
+      }
+    ],
+    "name": "addLiquidity",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint96",
+        "name": "amount",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint8",
+        "name": "profitAssetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint96",
+        "name": "collateralPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "assetPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "profitAssetPrice",
+        "type": "uint96"
+      }
+    ],
+    "name": "closePosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rawAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "depositCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllAssetInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "symbol",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "id",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "decimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isTradable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isOpenable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isShortable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "useStableTokenForProfit",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isEnabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStrictStable",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint24",
+            "name": "_flagsPadding",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint32",
+            "name": "initialMarginRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "maintenanceMarginRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "minProfitRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "minProfitTime",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "positionFeeRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "address",
+            "name": "referenceOracle",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "referenceDeviation",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "referenceOracleType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint128",
+            "name": "_reserved1",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "_reserved2",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "collectedFee",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint96",
+            "name": "spotLiquidity",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "maxLongPositionSize",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "totalLongPosition",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "averageLongPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "maxShortPositionSize",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "totalShortPosition",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "averageShortPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "address",
+            "name": "muxTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "spotWeight",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "longFundingBaseRate8H",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "longFundingLimitRate8H",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint128",
+            "name": "longCumulativeFundingRate",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "shortCumulativeFunding",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Asset[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      }
+    ],
+    "name": "getAssetAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      }
+    ],
+    "name": "getAssetInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "symbol",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "id",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "decimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isTradable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isOpenable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isShortable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "useStableTokenForProfit",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isEnabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isStrictStable",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint24",
+            "name": "_flagsPadding",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint32",
+            "name": "initialMarginRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "maintenanceMarginRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "minProfitRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "minProfitTime",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "positionFeeRate",
+            "type": "uint32"
+          },
+          {
+            "internalType": "address",
+            "name": "referenceOracle",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "referenceDeviation",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "referenceOracleType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint128",
+            "name": "_reserved1",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "_reserved2",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "collectedFee",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint96",
+            "name": "spotLiquidity",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "maxLongPositionSize",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "totalLongPosition",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "averageLongPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "maxShortPositionSize",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "totalShortPosition",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "averageShortPrice",
+            "type": "uint96"
+          },
+          {
+            "internalType": "address",
+            "name": "muxTokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "spotWeight",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "longFundingBaseRate8H",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "longFundingLimitRate8H",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint128",
+            "name": "longCumulativeFundingRate",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "shortCumulativeFunding",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Asset",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getLiquidityPoolStorage",
+    "outputs": [
+      {
+        "internalType": "uint32[6]",
+        "name": "u32s",
+        "type": "uint32[6]"
+      },
+      {
+        "internalType": "uint96[2]",
+        "name": "u96s",
+        "type": "uint96[2]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getSubAccount",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "collateral",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "size",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint32",
+        "name": "lastIncreasedTime",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint96",
+        "name": "entryPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint128",
+        "name": "entryFunding",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nextHop",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "mlp",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "orderBook",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "liquidityManager",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "weth",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint8",
+        "name": "profitAssetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint96",
+        "name": "collateralPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "assetPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "profitAssetPrice",
+        "type": "uint96"
+      }
+    ],
+    "name": "liquidate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint96",
+        "name": "amount",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "collateralPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "assetPrice",
+        "type": "uint96"
+      }
+    ],
+    "name": "openPosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pauseAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint96",
+        "name": "muxTokenAmount",
+        "type": "uint96"
+      }
+    ],
+    "name": "redeemMuxToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "internalType": "uint96",
+        "name": "mlpAmount",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint8",
+        "name": "tokenId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint96",
+        "name": "tokenPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "mlpPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "currentAssetValue",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "targetAssetValue",
+        "type": "uint96"
+      }
+    ],
+    "name": "removeLiquidity",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "isTradable",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isOpenable",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isShortable",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "useStableTokenForProfit",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isEnabled",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isStrictStable",
+        "type": "bool"
+      }
+    ],
+    "name": "setAssetFlags",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newInitialMarginRate",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newMaintenanceMarginRate",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newPositionFeeRate",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newMinProfitRate",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newMinProfitTime",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint96",
+        "name": "newMaxLongPositionSize",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "newMaxShortPositionSize",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newSpotWeight",
+        "type": "uint32"
+      }
+    ],
+    "name": "setAssetParams",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "symbol",
+        "type": "bytes32"
+      }
+    ],
+    "name": "setAssetSymbol",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newBaseRate8H",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newLimitRate8H",
+        "type": "uint32"
+      }
+    ],
+    "name": "setFundingParams",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "newFundingInterval",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint96",
+        "name": "newMlpPriceLowerBound",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "newMlpPriceUpperBound",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newLiquidityBaseFeeRate",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newLiquidityDynamicFeeRate",
+        "type": "uint32"
+      }
+    ],
+    "name": "setNumbers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "assetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ReferenceOracleType",
+        "name": "referenceOracleType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "referenceOracle",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "referenceDeviation",
+        "type": "uint32"
+      }
+    ],
+    "name": "setReferenceOracle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "takeOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8[]",
+        "name": "assetIds",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "transferLiquidityIn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8[]",
+        "name": "assetIds",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "transferLiquidityOut",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "stableUtilization",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint8[]",
+        "name": "unstableTokenIds",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "uint32[]",
+        "name": "unstableUtilizations",
+        "type": "uint32[]"
+      },
+      {
+        "internalType": "uint96[]",
+        "name": "unstablePrices",
+        "type": "uint96[]"
+      }
+    ],
+    "name": "updateFundingState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nextHop",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeChainedProxy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "withdrawAllCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rawAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint96",
+        "name": "collateralPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "assetPrice",
+        "type": "uint96"
+      }
+    ],
+    "name": "withdrawCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "subAccountId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rawAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "profitAssetId",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint96",
+        "name": "collateralPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "assetPrice",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "profitAssetPrice",
+        "type": "uint96"
+      }
+    ],
+    "name": "withdrawProfit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  }
+]
