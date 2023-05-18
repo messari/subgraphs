@@ -15,8 +15,8 @@ import {
  * This file contains the PoolSnapshot, which is used to
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.2
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -101,6 +101,14 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeProtocolSideRevenueUSD
         )
       : snapshot.cumulativeProtocolSideRevenueUSD;
+
+    snapshot.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD;
+    snapshot.hourlyStakeSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : snapshot.cumulativeStakeSideRevenueUSD;
 
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     snapshot.hourlyTotalRevenueUSD = previousSnapshot
@@ -298,6 +306,14 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeProtocolSideRevenueUSD
         )
       : snapshot.cumulativeProtocolSideRevenueUSD;
+
+    snapshot.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD;
+    snapshot.dailyStakeSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : snapshot.cumulativeStakeSideRevenueUSD;
 
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     snapshot.dailyTotalRevenueUSD = previousSnapshot

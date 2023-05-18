@@ -55,7 +55,7 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
       return true;
     }
   } else if (schema === "perpetual") {
-    if (["1.3.0"].includes(versionStr)) {
+    if (["1.3.1"].includes(versionStr)) {
       return true;
     }
   }
