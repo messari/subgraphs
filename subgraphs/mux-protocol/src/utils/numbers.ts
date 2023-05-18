@@ -1,5 +1,12 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_TWO, BIGINT_TEN, BIGINT_TWO, DEFAULT_DECIMALS, INT_NINE, INT_ZERO } from "./constants";
+import {
+  BIGDECIMAL_TWO,
+  BIGINT_TEN,
+  BIGINT_TWO,
+  DEFAULT_DECIMALS,
+  INT_NINE,
+  INT_ZERO,
+} from "./constants";
 
 export function bigDecimalToBigInt(input: BigDecimal): BigInt {
   const str = input.truncate(0).toString();
