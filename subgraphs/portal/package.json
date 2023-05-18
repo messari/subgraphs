@@ -1,0 +1,16 @@
+{
+  "name": "portal",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.28.0",
+    "@graphprotocol/graph-ts": "^0.26.0",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "prettier": "^2.7.1"
+  }
+}

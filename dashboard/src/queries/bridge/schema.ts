@@ -79,7 +79,7 @@ export const schema100 = (): Schema => {
       totalPoolRouteCount: "Int!",
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!"
+      totalSupportedTokenCount: "Int!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -204,11 +204,10 @@ export const schema100 = (): Schema => {
     let options = "";
     let fields = eventsFields.join(", ");
     if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
+      fields += ", amount, amountUSD, pool{id}";
       options = ", where: {pool: $poolId}";
     }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
     if (event === "bridgeTransfers" || event === "bridgeMessages") {
       fields += ", fromChainID, toChainID, crossTransactionID";
     } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
@@ -252,10 +251,10 @@ export const schema100 = (): Schema => {
     totalPoolRouteCount: "Int!",
     totalCanonicalRouteCount: "Int!",
     totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
+    totalSupportedTokenCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -471,7 +470,7 @@ export const schema110 = (): Schema => {
       totalPoolRouteCount: "Int!",
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!"
+      totalSupportedTokenCount: "Int!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -596,11 +595,10 @@ export const schema110 = (): Schema => {
     let options = "";
     let fields = eventsFields.join(", ");
     if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
+      fields += ", amount, amountUSD, pool{id}";
       options = ", where: {pool: $poolId}";
     }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
     if (event === "bridgeTransfers" || event === "bridgeMessages") {
       fields += ", fromChainID, toChainID, crossTransactionID";
     } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
@@ -644,10 +642,10 @@ export const schema110 = (): Schema => {
     totalPoolRouteCount: "Int!",
     totalCanonicalRouteCount: "Int!",
     totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
+    totalSupportedTokenCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -874,7 +872,7 @@ export const schema120 = (): Schema => {
       totalPoolRouteCount: "Int!",
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!"
+      totalSupportedTokenCount: "Int!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -1001,11 +999,10 @@ export const schema120 = (): Schema => {
     let options = "";
     let fields = eventsFields.join(", ");
     if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
+      fields += ", amount, amountUSD, pool{id}";
       options = ", where: {pool: $poolId}";
     }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
     if (event === "bridgeTransfers" || event === "bridgeMessages") {
       fields += ", fromChainID, toChainID, crossTransactionID";
     } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
@@ -1051,10 +1048,10 @@ export const schema120 = (): Schema => {
     totalPoolRouteCount: "Int!",
     totalCanonicalRouteCount: "Int!",
     totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
+    totalSupportedTokenCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {

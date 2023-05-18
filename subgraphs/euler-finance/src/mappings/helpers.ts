@@ -52,7 +52,7 @@ import {
   WETH_ADDRESS,
   USDC_ADDRESS,
   USDT_ADDRESS,
-  WSETH_ADDRESS,
+  WStETH_ADDRESS,
 } from "../common/constants";
 import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
@@ -204,13 +204,12 @@ export function createLiquidation(event: Liquidation): BigDecimal {
     seizedToken.lastPriceUSD!,
   );
 
-  const repayUSD = bigIntToBDUseDecimals(event.params.repay, underlyingToken.decimals).times(
-    underlyingToken.lastPriceUSD!,
-  );
+  const repayUSD = bigIntToBDUseDecimals(event.params.repay, DEFAULT_DECIMALS).times(underlyingToken.lastPriceUSD!);
   liquidation.profitUSD = liquidation.amountUSD.minus(repayUSD);
   liquidation.save();
 
   collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
+  collateralMarket.liquidationPenalty = liquidation.profitUSD.div(liquidation.amountUSD).times(BIGDECIMAL_HUNDRED);
   collateralMarket.save();
 
   const protocol = getOrCreateLendingProtocol();
@@ -899,7 +898,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
       const rewardTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
       const rewardTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       // eIP24: 8000 EUL borrower rewards each for USDC, USDT, WETH, and WstETH
-      if ([USDC_ADDRESS, USDT_ADDRESS, WETH_ADDRESS, WSETH_ADDRESS].includes(mkt.inputToken)) {
+      if ([USDC_ADDRESS, USDT_ADDRESS, WETH_ADDRESS, WStETH_ADDRESS].includes(mkt.inputToken)) {
         rewardTokens.push(borrowerRewardToken.id);
         rewardTokenAmount[0] = BigDecimalTruncateToBigInt(
           BigDecimal.fromString("8000").times(EUL_DECIMALS_BD).times(dailyScaler),
@@ -935,6 +934,138 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
         mkt.rewardTokenEmissionsUSD = rewardTokenUSD;
 
         log.info("[processRewardEpoch18_23]mkt {} rewarded {} EUL tokens ${} for epoch {}", [
+          mkt.name!,
+          rewardTokenAmount.toString(),
+          rewardTokenUSD.toString(),
+          epoch.id,
+        ]);
+      }
+
+      // reset mkt._weightedStakedAmount for the new epoch
+      mkt._weightedStakedAmount = BIGINT_ZERO;
+      // EUL staked remains staked for the market until unstaked
+      // so not reset mkt._stakedAmount
+      mkt.save();
+    }
+  }
+}
+
+export function processRewardEpoch24Onward(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
+  // eIP51 changes the reward distribution from epoch 24 onward
+  // https://snapshot.org/#/eulerdao.eth/proposal/0x551f9e6f3fba50a0fc2c69e361f7a81979189aa7f0ed923a1873bd578896942b
+  const epochID = epoch.epoch;
+  const prevEpochID = epochID - 1;
+  const prevEpoch = _Epoch.load(prevEpochID.toString());
+  if (prevEpoch) {
+    const protocol = getOrCreateLendingProtocol();
+    let sumAccumulator = BIGDECIMAL_ZERO;
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mktID = protocol._marketIDs![i];
+      const mkt = Market.load(mktID);
+      if (!mkt) {
+        log.error("[processRewardEpoch24Onward]market {} doesn't exist, but this should not happen at tx ={}", [
+          mktID,
+          event.transaction.hash.toHexString(),
+        ]);
+        continue;
+      }
+
+      // eIP28 blacklist FTT market from EUL distribution
+      // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
+      if (epochID >= 16 && mkt.inputToken == FTT_ADDRESS) {
+        mkt._stakedAmount = BIGINT_ZERO;
+        mkt._weightedStakedAmount = BIGINT_ZERO;
+      }
+
+      const stakedAmount = mkt._stakedAmount;
+      let mktWeightedStakedAmount = BIGINT_ZERO;
+      if (isMarketEligible(mkt) && stakedAmount.gt(BIGINT_ZERO)) {
+        // finalized mkt._weightedStakedAmount for the epoch just ended
+        // epochStartBlock.minus(BIGINT_ONE) is the end block of prev epoch
+        updateWeightedStakedAmount(mkt, epochStartBlock.minus(BIGINT_ONE));
+        mktWeightedStakedAmount = mkt._weightedStakedAmount!;
+      }
+      mkt.save();
+
+      sumAccumulator = sumAccumulator.plus(mktWeightedStakedAmount.sqrt().toBigDecimal());
+    }
+
+    const EULPriceUSD = getEULPriceUSD(event);
+    const borrowerRewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
+    const lenderRewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.DEPOSIT);
+    const GAUGE_REWARD_AMOUNT = BigDecimal.fromString("8000");
+
+    // scale to daily emission amount
+    const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
+    const EUL_DECIMALS_BD = BigDecimal.fromString(EUL_DECIMALS.toString());
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mktID = protocol._marketIDs![i];
+      const mkt = Market.load(mktID);
+      if (!mkt) {
+        log.error("[processRewardEpoch24Onward]market {} doesn't exist, but this should not happen | tx ={}", [
+          mktID,
+          event.transaction.hash.toHexString(),
+        ]);
+        continue;
+      }
+      if (mkt.rewardTokens && mkt.rewardTokens!.length > 0) {
+        // reset reward emissions for the epoch
+        mkt.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+        mkt.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      }
+
+      const rewardTokens: string[] = [];
+      const rewardTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
+      const rewardTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      // eIP51: 8000 EUL borrower rewards each for USDC, WETH, and WstETH
+      if ([USDC_ADDRESS, WETH_ADDRESS, WStETH_ADDRESS].includes(mkt.inputToken)) {
+        const BORROWER_REWARD_AMOUNT = BigDecimal.fromString("8000");
+        rewardTokens.push(borrowerRewardToken.id);
+        rewardTokenAmount[0] = BigDecimalTruncateToBigInt(
+          BORROWER_REWARD_AMOUNT.times(EUL_DECIMALS_BD).times(dailyScaler),
+        );
+        rewardTokenUSD[0] = rewardTokenAmount[0].divDecimal(EUL_DECIMALS_BD).times(EULPriceUSD);
+      }
+
+      // eIP51: 5000 EUL lender staking rewards each for USDC,
+      //        1000 for USDT, 9000 for WETH
+      let STAKING_REWARD_AMOUNT = BIGDECIMAL_ZERO;
+      if (mkt.inputToken === USDC_ADDRESS) {
+        STAKING_REWARD_AMOUNT = BigDecimal.fromString("5000");
+      } else if (mkt.inputToken === USDT_ADDRESS) {
+        STAKING_REWARD_AMOUNT = BigDecimal.fromString("1000");
+      } else if (mkt.inputToken === WETH_ADDRESS) {
+        STAKING_REWARD_AMOUNT = BigDecimal.fromString("9000");
+      }
+
+      if (STAKING_REWARD_AMOUNT.gt(BIGDECIMAL_ZERO)) {
+        rewardTokens.push(lenderRewardToken.id);
+        rewardTokenAmount[1] = BigDecimalTruncateToBigInt(
+          STAKING_REWARD_AMOUNT.times(EUL_DECIMALS_BD).times(dailyScaler),
+        );
+        rewardTokenUSD[1] = rewardTokenAmount[1].divDecimal(EUL_DECIMALS_BD).times(EULPriceUSD);
+      }
+
+      // distribute the 8000 rewards proportinally among eligible markets
+      // "8,000 EUL per epoch shared proportionally among assets with Chainlink oracle"
+      const _weightedStakedAmount = mkt._weightedStakedAmount;
+      if (isMarketEligible(mkt) && _weightedStakedAmount) {
+        if (rewardTokens.length == 0) {
+          rewardTokens.push(borrowerRewardToken.id);
+        }
+        mkt.rewardTokens = rewardTokens;
+        rewardTokenAmount[0] = rewardTokenAmount[0].plus(
+          BigDecimalTruncateToBigInt(
+            _weightedStakedAmount.sqrt().divDecimal(sumAccumulator).times(GAUGE_REWARD_AMOUNT).times(dailyScaler),
+          ),
+        );
+        rewardTokenUSD[0] = rewardTokenAmount[0]
+          .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+          .times(EULPriceUSD);
+        mkt.rewardTokenEmissionsAmount = rewardTokenAmount;
+        mkt.rewardTokenEmissionsUSD = rewardTokenUSD;
+
+        log.info("[processRewardEpoch24Onward]mkt {} rewarded {} EUL tokens ${} for epoch {}", [
           mkt.name!,
           rewardTokenAmount.toString(),
           rewardTokenUSD.toString(),

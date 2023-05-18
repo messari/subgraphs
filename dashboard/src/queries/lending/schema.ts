@@ -196,7 +196,7 @@ export const schema130 = (): Schema => {
     cumulativeLiquidateUSD: "BigDecimal!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -469,7 +469,7 @@ export const schema201 = (): Schema => {
     cumulativePositionCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
   query Data {
@@ -829,7 +829,7 @@ export const schema300 = (): Schema => {
     flashloanCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
   query Data {

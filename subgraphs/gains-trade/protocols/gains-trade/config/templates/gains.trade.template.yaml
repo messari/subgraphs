@@ -1,0 +1,164 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: Vault
+    network: {{ network }}
+    source:
+      address: "{{ vault.address }}"
+      abi: Vault
+      startBlock: {{ vault.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DerivPerpProtocol
+      abis:
+        - name: Storage
+          file: ./abis/Gains/Storage.json
+        - name: PairInfo
+          file: ./abis/Gains/PairInfo.json
+        - name: PairStorage
+          file: ./abis/Gains/PairStorage.json
+        - name: Vault
+          file: ./abis/Gains/Vault.json
+        - name: Callbacks
+          file: ./abis/Gains/Callbacks.json
+
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: DepositLocked(indexed address,indexed address,uint256,(address,uint256,uint256,uint256,uint256,uint256))
+          handler: handleDepositLocked
+        - event: DepositUnlocked(indexed address,indexed address,indexed address,uint256,(address,uint256,uint256,uint256,uint256,uint256))
+          handler: handleDepositUnlocked
+        - event: RewardDistributed(indexed address,uint256)
+          handler: handleRewardDistributed
+      file: {{{ file }}}
+  {{#callbacks}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: Callbacks
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DerivPerpProtocol
+      abis:
+        - name: Storage
+          file: ./abis/Gains/Storage.json
+        - name: PairInfo
+          file: ./abis/Gains/PairInfo.json
+        - name: PairStorage
+          file: ./abis/Gains/PairStorage.json
+        - name: Vault
+          file: ./abis/Gains/Vault.json
+        - name: Callbacks
+          file: ./abis/Gains/Callbacks.json
+
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: MarketExecuted(indexed uint256,(address,uint256,uint256,uint256,uint256,uint256,bool,uint256,uint256,uint256),bool,uint256,uint256,uint256,int256,uint256)
+          handler: handleMarketExecuted
+        - event: LimitExecuted(indexed uint256,uint256,(address,uint256,uint256,uint256,uint256,uint256,bool,uint256,uint256,uint256),indexed address,uint8,uint256,uint256,uint256,int256,uint256)
+          handler: handleLimitExecuted
+        - event: DevGovFeeCharged(indexed address,uint256)
+          handler: handleDevGovFeeCharged
+        - event: LpFeeCharged(indexed address,uint256)
+          handler: handleLpFeeCharged
+        - event: DaiVaultFeeCharged(indexed address,uint256)
+          handler: handleDaiVaultFeeCharged
+        - event: SssFeeCharged(indexed address,uint256)
+          handler: handleSssFeeCharged
+      file: {{{ file }}}
+  {{/callbacks}}

@@ -93,6 +93,12 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
           currentData.tokenOut = "N/A";
           currentData.amountOut = "0";
         }
+        if (currentData?.reserveAmounts) {
+          const reserveAmountsDecimal = currentData.reserveAmounts.map((amt: string, idx: number) => {
+            return convertTokenDecimals(amt, data[poolName].inputTokens[idx].decimals).toFixed(2);
+          });
+          currentData.reserveAmounts = reserveAmountsDecimal.join(", ");
+        }
         tableData.push({ id: `${eventName}-${i}`, date: toDate(currentData.timestamp), ...currentData });
       }
     }

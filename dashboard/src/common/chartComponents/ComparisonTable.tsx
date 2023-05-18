@@ -2,7 +2,14 @@ import { Box, Button } from "@mui/material";
 import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import moment, { Moment } from "moment";
 import { useState } from "react";
-import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, toUnitsSinceEpoch, upperCaseFirstOfString } from "../../../src/utils/index";
+import {
+  downloadCSV,
+  formatIntToFixed2,
+  tableCellTruncate,
+  toDate,
+  toUnitsSinceEpoch,
+  upperCaseFirstOfString,
+} from "../../../src/utils/index";
 import { DatePicker } from "../utilComponents/DatePicker";
 
 interface ComparisonTableProps {
@@ -14,7 +21,14 @@ interface ComparisonTableProps {
   overlayKey: string;
 }
 
-export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
+export const ComparisonTable = ({
+  datasetLabel,
+  dataTable,
+  isHourly,
+  jpegDownloadHandler,
+  baseKey,
+  overlayKey,
+}: ComparisonTableProps) => {
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -35,9 +49,9 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
     }
 
     if (sortOrderAsc) {
-      return (aVal - bVal);
+      return aVal - bVal;
     } else {
-      return (bVal - aVal);
+      return bVal - aVal;
     }
   }
 
@@ -47,7 +61,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
         {
           field: "date",
           headerName: "Date",
-          minWidth: (isHourly ? 130 : 100),
+          minWidth: isHourly ? 130 : 100,
           headerAlign: "right" as GridAlignment,
           align: "right" as GridAlignment,
         },
@@ -77,9 +91,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
             const cellStyle = { ...tableCellTruncate };
             cellStyle.width = "100%";
             cellStyle.textAlign = "right";
-            return (
-              <span style={cellStyle}>{value + (isNaN(Number(value)) ? "" : "%")}</span>
-            );
+            return <span style={cellStyle}>{value + (isNaN(Number(value)) ? "" : "%")}</span>;
           },
         },
       ];
@@ -137,43 +149,66 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
               Date Filter
             </Button>
             <Button onClick={() => jpegDownloadHandler()}>Save Chart</Button>
-            <Button className="Hover-Underline" onClick={() => {
-              if (!Array.isArray(dataTableCopy)) {
-                let length = dataTableCopy[Object.keys(dataTableCopy)[0]].length;
-                const arrayToSend: any = [];
-                for (let iteration = 0; iteration < length; iteration++) {
-                  let objectIteration: any = {};
-                  let hasUndefined = false;
-                  objectIteration.date = dataTableCopy[Object.keys(dataTableCopy)[0]][iteration].date;
-                  Object.keys(dataTableCopy).forEach((key: string) => {
-                    if (dataTableCopy[key][iteration]?.value) {
-                      objectIteration[key] = dataTableCopy[key][iteration]?.value;
-                    } else {
-                      hasUndefined = true;
+            <Button
+              className="Hover-Underline"
+              onClick={() => {
+                if (!Array.isArray(dataTableCopy)) {
+                  let length = dataTableCopy[Object.keys(dataTableCopy)[0]].length;
+                  const arrayToSend: any = [];
+                  for (let iteration = 0; iteration < length; iteration++) {
+                    let objectIteration: any = {};
+                    let hasUndefined = false;
+                    objectIteration.date = dataTableCopy[Object.keys(dataTableCopy)[0]][iteration].date;
+                    Object.keys(dataTableCopy).forEach((key: string) => {
+                      if (dataTableCopy[key][iteration]?.value) {
+                        objectIteration[key] = dataTableCopy[key][iteration]?.value;
+                      } else {
+                        hasUndefined = true;
+                      }
+                    });
+                    if (differencePercentageArr[iteration]) {
+                      objectIteration.differencePercentage = differencePercentageArr[iteration].value;
                     }
-                  });
-                  if (differencePercentageArr[iteration]) {
-                    objectIteration.differencePercentage = differencePercentageArr[iteration].value;
+                    if (!hasUndefined) {
+                      arrayToSend.push(objectIteration);
+                    }
                   }
-                  if (!hasUndefined) {
-                    arrayToSend.push(objectIteration);
-                  }
+                  return downloadCSV(
+                    arrayToSend
+                      .sort(sortFunction)
+                      .filter((obj: { [x: string]: any }) => {
+                        if (datesSelectedTimestamps.length > 0) {
+                          return datesSelectedTimestamps.includes(moment.utc(obj.date * 1000).format("YYYY-MM-DD"));
+                        }
+                        return true;
+                      })
+                      .map((json: { [x: string]: any }) => ({
+                        ...json,
+                        date: moment.utc(json.date * 1000).format("YYYY-MM-DD"),
+                      })),
+                    datasetLabel + "-csv",
+                    datasetLabel,
+                  );
+                } else {
+                  return downloadCSV(
+                    dataTableCopy
+                      .sort(sortFunction)
+                      .filter((json: { [x: string]: any }) => {
+                        if (datesSelectedTimestamps.length > 0) {
+                          return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format("YYYY-MM-DD"));
+                        }
+                        return true;
+                      })
+                      .map((json: { [x: string]: any }) => ({
+                        date: moment.utc(json.date * 1000).format("YYYY-MM-DD"),
+                        [datasetLabel]: json.value,
+                      })),
+                    datasetLabel + "-csv",
+                    datasetLabel,
+                  );
                 }
-                return downloadCSV(arrayToSend.sort(sortFunction).filter((obj: { [x: string]: any }) => {
-                  if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(obj.date * 1000).format("YYYY-MM-DD"));
-                  }
-                  return true;
-                }).map((json: { [x: string]: any }) => ({ ...json, date: moment.utc(json.date * 1000).format("YYYY-MM-DD") })), datasetLabel + '-csv', datasetLabel);
-              } else {
-                return downloadCSV(dataTableCopy.sort(sortFunction).filter((json: { [x: string]: any }) => {
-                  if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format("YYYY-MM-DD"));
-                  }
-                  return true;
-                }).map((json: { [x: string]: any }) => ({ date: moment.utc(json.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: json.value })), datasetLabel + '-csv', datasetLabel);
-              }
-            }}>
+              }}
+            >
               Save CSV
             </Button>
           </Box>
@@ -184,10 +219,10 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
                 sortModel: [{ field: "date", sort: "desc" }],
               },
             }}
-            onSortModelChange={((data: any[]) => {
+            onSortModelChange={(data: any[]) => {
               setSortColumn(data[0].field);
               setSortOrderAsc(data[0].sort === "asc");
-            })}
+            }}
             rows={tableData}
             columns={columns}
           />

@@ -1,4 +1,9 @@
-import { BigInt, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  BigDecimal,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
@@ -6,37 +11,54 @@ import { getPriceUsdc as getPriceUsdcSushi } from "./SushiSwapRouter";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/templates/ArrakisVault/CurveRegistry";
 import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/templates/ArrakisVault/CurvePoolRegistry";
 
-export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string): CustomPriceType {
-  let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
+export function getCurvePriceUsdc(
+  curveLpTokenAddress: Address,
+  network: string
+): CustomPriceType {
+  const tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
 
-  const curveRegistry = CurveRegistryContract.bind(constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!);
+  const curveRegistry = CurveRegistryContract.bind(
+    constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!
+  );
 
-  let basePrice = getBasePrice(curveLpTokenAddress, curveRegistry, network);
-  let virtualPrice = getVirtualPrice(curveLpTokenAddress);
+  const basePrice = getBasePrice(curveLpTokenAddress, curveRegistry, network);
+  const virtualPrice = getVirtualPrice(curveLpTokenAddress);
 
-  let usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
-  let decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
+  const usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
+  const decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
 
-  let price = virtualPrice
+  const price = virtualPrice
     .times(basePrice.usdPrice)
-    .times(constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal())
-    .div(constants.BIGINT_TEN.pow(decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8).toBigDecimal());
+    .times(
+      constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
+    )
+    .div(
+      constants.BIGINT_TEN.pow(
+        decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8
+      ).toBigDecimal()
+    );
 
   return CustomPriceType.initialize(price, constants.DEFAULT_USDC_DECIMALS);
 }
 
-export function getPoolFromLpToken(lpAddress: Address, curveRegistry: CurveRegistryContract, network: string): Address {
+export function getPoolFromLpToken(
+  lpAddress: Address,
+  curveRegistry: CurveRegistryContract,
+  network: string
+): Address {
   let poolAddress = utils.readValue<Address>(
     curveRegistry.try_get_pool_from_lp_token(lpAddress),
-    constants.ZERO_ADDRESS,
+    constants.ZERO_ADDRESS
   );
 
   if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
-    const curvePoolRegistry = CurvePoolRegistryContract.bind(constants.CURVE_POOL_REGISTRY_ADDRESS_MAP.get(network)!);
+    const curvePoolRegistry = CurvePoolRegistryContract.bind(
+      constants.CURVE_POOL_REGISTRY_ADDRESS_MAP.get(network)!
+    );
 
     poolAddress = utils.readValue<Address>(
       curvePoolRegistry.try_get_pool_from_lp_token(lpAddress),
-      constants.ZERO_ADDRESS,
+      constants.ZERO_ADDRESS
     );
   }
 
@@ -46,17 +68,25 @@ export function getPoolFromLpToken(lpAddress: Address, curveRegistry: CurveRegis
 export function getBasePrice(
   curveLpTokenAddress: Address,
   curveRegistry: CurveRegistryContract,
-  network: string,
+  network: string
 ): CustomPriceType {
-  const poolAddress = getPoolFromLpToken(curveLpTokenAddress, curveRegistry, network);
+  const poolAddress = getPoolFromLpToken(
+    curveLpTokenAddress,
+    curveRegistry,
+    network
+  );
 
   if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();
   }
 
-  let underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress, curveRegistry, network);
+  const underlyingCoinAddress = getUnderlyingCoinFromPool(
+    poolAddress,
+    curveRegistry,
+    network
+  );
 
-  let basePrice = getPriceUsdcRecommended(underlyingCoinAddress, network);
+  const basePrice = getPriceUsdcRecommended(underlyingCoinAddress, network);
 
   return basePrice;
 }
@@ -64,9 +94,9 @@ export function getBasePrice(
 export function getUnderlyingCoinFromPool(
   poolAddress: Address,
   curveRegistry: CurveRegistryContract,
-  network: string,
+  network: string
 ): Address {
-  let coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
+  const coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
 
   let coins: Address[];
 
@@ -101,26 +131,42 @@ export function getUnderlyingCoinFromPool(
 }
 
 export function getVirtualPrice(curveLpTokenAddress: Address): BigDecimal {
-  let network = dataSource.network();
-  const curveRegistry = CurveRegistryContract.bind(constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!);
+  const network = dataSource.network();
+  const curveRegistry = CurveRegistryContract.bind(
+    constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!
+  );
 
-  let virtualPrice = utils
-    .readValue<BigInt>(curveRegistry.try_get_virtual_price_from_lp_token(curveLpTokenAddress), constants.BIGINT_ZERO)
+  const virtualPrice = utils
+    .readValue<BigInt>(
+      curveRegistry.try_get_virtual_price_from_lp_token(curveLpTokenAddress),
+      constants.BIGINT_ZERO
+    )
     .toBigDecimal();
 
   return virtualPrice;
 }
 
-export function getPriceUsdcRecommended(tokenAddress: Address, network: string): CustomPriceType {
+export function getPriceUsdcRecommended(
+  tokenAddress: Address,
+  network: string
+): CustomPriceType {
   return getPriceUsdcSushi(tokenAddress, network);
 }
 
 export function isBasicToken(tokenAddress: Address, network: string): bool {
-  for (let basicTokenIdx = 0; basicTokenIdx < constants.WHITELIST_TOKENS_LIST.length; basicTokenIdx++) {
-    let basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
-    let basicTokenAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
+  for (
+    let basicTokenIdx = 0;
+    basicTokenIdx < constants.WHITELIST_TOKENS_LIST.length;
+    basicTokenIdx++
+  ) {
+    const basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
+    const basicTokenAddress =
+      constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
 
-    if (basicTokenAddress && tokenAddress.toHex() == basicTokenAddress.toHex()) {
+    if (
+      basicTokenAddress &&
+      tokenAddress.toHex() == basicTokenAddress.toHex()
+    ) {
       return true;
     }
   }

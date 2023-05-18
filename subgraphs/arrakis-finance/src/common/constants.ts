@@ -62,6 +62,7 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export declare type RewardTokenType = string;
 export namespace LendingType {
   export const CDP = "CDP";
   export const POOLED = "POOLED";
@@ -94,9 +95,9 @@ export namespace UsageType {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export const UNISWAP_V2_FACTORY = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
 
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
@@ -163,15 +164,15 @@ export const PROTOCOL_PERFORMANCE_FEE = BigDecimal.fromString("2.5"); // Hardcod
 export const REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
 REGISTRY_ADDRESS_MAP.set(
   "mainnet",
-  Address.fromString("0xEA1aFf9dbFfD1580F6b81A3ad3589E66652dB7D9")
+  Address.fromString("0xea1aff9dbffd1580f6b81a3ad3589e66652db7d9")
 );
 REGISTRY_ADDRESS_MAP.set(
   "matic",
-  Address.fromString("0x37265A834e95D11c36527451c7844eF346dC342a")
+  Address.fromString("0x37265a834e95d11c36527451c7844ef346dc342a")
 );
 REGISTRY_ADDRESS_MAP.set(
   "optimism",
-  Address.fromString("0x2845c6929d621e32B7596520C8a1E5a37e616F09")
+  Address.fromString("0x2845c6929d621e32b7596520c8a1e5a37e616f09")
 );
 
 export namespace PriceSource {
@@ -201,9 +202,12 @@ TOKEN_PRICE_SOURCE_SKIPS.set(
   ]
 );
 TOKEN_PRICE_SOURCE_SKIPS.set(
-  Address.fromString("0x956F47F50A910163D8BF957Cf5846D573E7f87CA"), // FEI
+  Address.fromString("0x956f47f50a910163d8bf957cf5846d573e7f87ca"), // FEI
   // Skip all as bad price is being returned
   [
     PriceSource.YEARN, // Yearn is returning incorrect price
   ]
 );
+
+// duration to refresh prices
+export const THIRTY_MINUTES_IN_SECONDS = BigInt.fromI32(30 * 60);

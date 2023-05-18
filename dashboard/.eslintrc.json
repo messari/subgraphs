@@ -1,25 +1,18 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
-    },
-    "extends": [
-        "react-app",
-        "react-app/jest"
-    ],
-    "overrides": [],
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module",
-        "project": [
-            "tsconfig.json"
-        ],
-        "warnOnUnsupportedTypeScriptVersion": false
-    },
-    "plugins": [
-        "react"
-    ],
-    "rules": {
-        "emitWarning": 0
-    }
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["react-app", "react-app/jest"],
+  "overrides": [],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": ["tsconfig.json"],
+    "warnOnUnsupportedTypeScriptVersion": false
+  },
+  "plugins": ["react"],
+  "rules": {
+    "emitWarning": 0
+  }
 }

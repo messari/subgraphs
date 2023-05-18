@@ -2,12 +2,9 @@ import axios from "axios";
 import { errorNotification } from "./messageDiscord.js";
 import { formatIntToFixed2, ProtocolTypeEntityName } from "./util.js";
 
-export const protocolLevel = async (deployments, invalidDeployments) => {
+export const protocolLevel = async (deployments) => {
     const endpointsList = [];
     Object.keys(deployments).forEach((key) => {
-        if (invalidDeployments.includes(key)) {
-            return;
-        }
         const depo = deployments[key];
         if (!depo.indexingError) {
             endpointsList.push(depo.url);
@@ -377,11 +374,18 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
     return deploymentsObjToReturn;
 }
 
-export const protocolDerivedFields = async (deployments, invalidDeployments) => {
+export const protocolDerivedFields = async (deployments) => {
 
-    const derivedFieldQueries = {
-        "lendingProtocol": (depo) => `{
-            ${depo}: lendingProtocols {
+    const derivedFieldQuery = (depo, type) => {
+        const protocolEntityType = {
+            "lendingProtocol": "markets",
+            "dexAmmProtocol": "pools",
+            "yieldAggregator": "vaults",
+            "protocol": "pools"
+        }
+        const entityToUse = protocolEntityType[type];
+        return `{
+            ${depo}: ${type}s {
                 dailyUsageMetrics (first: 1){
                   id
                 }
@@ -391,72 +395,21 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                 financialMetrics (first: 1){
                   id
                 }
-                markets (first: 1){
+                ${entityToUse} (first: 1){
                   id
                 }
             }
-        }`,
-        "dexAmmProtocol": (depo) => `{
-            ${depo}: dexAmmProtocols {
-                dailyUsageMetrics (first: 1){
-                  id
-                }
-                hourlyUsageMetrics (first: 1){
-                  id
-                }
-                financialMetrics (first: 1){
-                  id
-                }
-                pools (first: 1){
-                  id
-                }
-            }
-        }`,
-        "yieldAggregator": (depo) => `{
-            ${depo}: yieldAggregators {
-                dailyUsageMetrics (first: 1){
-                  id
-                }
-                hourlyUsageMetrics (first: 1){
-                  id
-                }
-                financialMetrics (first: 1){
-                  id
-                }
-                vaults (first: 1){
-                  id
-                }
-            }
-        }`,
-        "protocol": (depo) => `{
-            ${depo}: protocols {
-                dailyUsageMetrics (first: 1){
-                  id
-                }
-                hourlyUsageMetrics (first: 1){
-                  id
-                }
-                financialMetrics (first: 1){
-                  id
-                }
-                pools (first: 1){
-                  id
-                }
-            }
-        }`
+        }`;
     };
 
     const derivedFieldQueriesToMake = [];
     Object.keys(deployments).forEach((key) => {
-        if (invalidDeployments.includes(key)) {
-            return;
-        }
         const depo = deployments[key];
         const queryKey = ProtocolTypeEntityName[depo.protocolType];
         if (!queryKey) {
             return;
         }
-        const depoQuery = derivedFieldQueries[queryKey](key.split("-").join("_"));
+        const depoQuery = derivedFieldQuery(key.split("-").join("_"), queryKey);
         derivedFieldQueriesToMake.push(
             axios.post(
                 depo.url,
@@ -487,7 +440,8 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                         // alert for no protocol entity found
                         deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push(ProtocolTypeEntityName[deploymentsToReturn[depoKey].protocolType]);
                     } else {
-                        const emptyFields = Object.keys(returnedData[key][0]).filter(field => !returnedData[key][0][field] || returnedData[key][0][field]?.length === 0);
+                        const firstVal = returnedData[key][0];
+                        const emptyFields = Object.keys(firstVal).filter(field => !firstVal[field] || firstVal[field]?.length === 0);
                         if (emptyFields.length > 0 && !depoKey.toUpperCase().includes('THE-GRAPH')) {
                             deploymentsToReturn[depoKey].protocolErrors.relatedField.push(emptyFields.join(', '));
                         }
@@ -495,7 +449,7 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                 }
 
                 if (returnedError?.length > 0) {
-                    const alertArr = returnedError?.filter(errObj => errObj.message !== "indexing_error")?.map(errObj => errObj.message)?.filter(alert => !alert.includes("Store error: database unavailable"));
+                    const alertArr = returnedError?.filter(errObj => errObj.message !== "indexing_error" && !errObj.message.includes("Store error: database unavailable"))?.map(errObj => errObj.message);
                     if (alertArr.length > 0) {
                         alert = alertArr.join(" --- ");
                         errorNotification("ERROR LOCATION 28 " + alert);

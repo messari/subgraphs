@@ -56,6 +56,8 @@ There are two use cases for `schemaVersion`:
 
 The field `subgraphVersion` this is mainly used for the specific subgraph developer to keep track the implementation. For example, if there is a major refactor, we should bump this version, but this has nothing to do with the schema and will no impact on downstream consumers. There may also be repository-wide implementation upgrades. For example, we might need to reimplement everything in Rust somewhere down the road (for substream upgrades), they it'll be a major upgrade on the implementation (major version bump) but again, no impact on schema or downstream consumer.
 
+> Read more about how to upgrade schema version in [`./CONTIBUTING.md`](CONTRIBUTING.md)
+
 ### Methodology Version
 
 The field `methodologyVersion` is mainly used for data consumers to track how we calculate our metrics, and to which version of the code/subgraph that methodology corresponds to. For example, if Yahoo Finance uses our data and wants to know when we changed the definition of TVL, this is the best way to diff against that. With a single version, you can't immediately tell if the methodology has been changed
@@ -209,3 +211,17 @@ In general, feel free to add extra entities that tracks the internal state of th
 Make sure these changes are **strictly** additive. If you need to **modify** existing entities, please let me know and we can go through it together.
 
 When adding entities, make sure you document them with comments in your schema. User-facing comments should be done in double quotes and developer-facing comments should be done with hash tags.
+
+## Immutable Field Assumptions
+
+There are some fields that we (and subgraph consumers) are going to expect to be immutable. There are technical limitations as to why we cannot force this on a subgraph level, but we want to be very cautious when we change these fields in `prod` subgraphs especially.
+
+> In this case immutability is case-sensitive. Changing the casing of an ID will result in a different perceived entity in some downstream systems.
+
+Scenario: We expect the `market.id` field to not change on deployments, and a DB ingesting our subgraph will expect this to be the case. But then we change `market.id` and the DB thinks there is a new `market` when in actuality, we just updated the identifier.
+
+In general you should not change the following fields across deployments before consulting with the downstream users:
+
+- IDs
+- Names (market names, protocol names, etc.)
+- Static protocol/market metadata
