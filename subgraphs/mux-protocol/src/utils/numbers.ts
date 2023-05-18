@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { DEFAULT_DECIMALS, INT_ZERO } from "./constants";
+import { BIGDECIMAL_TWO, BIGINT_TEN, BIGINT_TWO, DEFAULT_DECIMALS, INT_NINE, INT_ZERO } from "./constants";
 
 export function bigDecimalToBigInt(input: BigDecimal): BigInt {
   const str = input.truncate(0).toString();
@@ -46,7 +46,7 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 
   const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
-    return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
+    return sorted[mid].plus(sorted[mid - 1]).div(BIGDECIMAL_TWO);
   }
 
   return sorted[mid - 1];
@@ -74,12 +74,12 @@ export function insert<Type>(
 // https://docs.aave.com/developers/v/2.0/glossary
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
-  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+  const halfRatio = BIGINT_TEN.pow(INT_NINE).div(BIGINT_TWO);
+  return halfRatio.plus(a).div(BIGINT_TEN.pow(INT_NINE));
 }
 
 export function wadToRay(a: BigInt): BigInt {
-  const result = a.times(BigInt.fromI32(10).pow(9));
+  const result = a.times(BIGINT_TEN.pow(INT_NINE));
   return result;
 }
 

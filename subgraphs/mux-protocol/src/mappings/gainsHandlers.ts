@@ -3,7 +3,6 @@ import {
   BigDecimal,
   BigInt,
   ethereum,
-  log,
 } from "@graphprotocol/graph-ts";
 import {
   LimitExecuted,
@@ -37,6 +36,8 @@ import {
   GAINS_VAULT_ADDRESS,
   GAINS_REFERRALS_ADDRESS,
   GAINS_MUX_REFERRER_ADDRESS,
+  INT_THREE,
+  INT_TWO,
 } from "../utils/constants";
 import { convertToDecimal, exponentToBigDecimal } from "../utils/numbers";
 import { RewardIntervalType, getRewardsPerDay } from "../entities/rewards";
@@ -68,9 +69,9 @@ export function handleLimitExecuted(event: LimitExecuted): void {
   const daiAddress = Address.fromString(DAI_ADDRESS_ARBITRUM);
   // orderType [TP, SL, LIQ, OPEN] (0-index)
   let eventType = EventType.CollateralOut;
-  if (event.params.orderType == 3) {
+  if (event.params.orderType == INT_THREE) {
     eventType = EventType.CollateralIn;
-  } else if (event.params.orderType == 2) {
+  } else if (event.params.orderType == INT_TWO) {
     eventType = EventType.Liquidated;
   }
   handleGainsUpdatePositionEvent(

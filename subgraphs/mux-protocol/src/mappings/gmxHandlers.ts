@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { _ProxyMap } from "../../generated/schema";
 import { CreateProxy } from "../../generated/ProxyFactory/ProxyFactory";
 import {
