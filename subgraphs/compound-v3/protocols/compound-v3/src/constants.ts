@@ -51,6 +51,7 @@ export const COLATERALIZATION_TYPE = CollateralizationType.OVER_COLLATERALIZED;
 export const RISK_TYPE = RiskType.GLOBAL;
 export const COMPOUND_DECIMALS = 8;
 export const BASE_INDEX_SCALE = BigInt.fromI64(1000000000000000);
+export const NORMALIZE_DECIMALS = 16;
 
 export function getProtocolData(): ProtocolData {
   const network = dataSource.network();
