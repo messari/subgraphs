@@ -26,8 +26,12 @@ export function getTokenPriceUSDC(
   const config = utils.getConfig();
   if (!config) return new CustomPriceType();
 
-  const ethAddress = config.whitelistedTokens().mustGet("WETH").address;
-  const usdcAddress = config.whitelistedTokens().mustGet("USDC").address;
+  const ethAddress = config
+    .whitelistedTokens()
+    .mustGet(constants.STABLE_TOKENS_STRINGS.WETH).address;
+  const usdcAddress = config
+    .whitelistedTokens()
+    .mustGet(constants.STABLE_TOKENS_STRINGS.USDC).address;
 
   if (isLpToken(tokenAddress, ethAddress)) {
     return getLpTokenPriceUsdc(tokenAddress, block);
@@ -50,10 +54,12 @@ export function getPriceFromRouter(
 ): CustomPriceType {
   const config = utils.getConfig();
 
-  const wethAddress = config.whitelistedTokens().mustGet("WETH").address;
+  const wethAddress = config
+    .whitelistedTokens()
+    .mustGet(constants.STABLE_TOKENS_STRINGS.WETH).address;
   const nativeTokenAddress = config
     .whitelistedTokens()
-    .mustGet("NATIVE_TOKEN").address;
+    .mustGet(constants.NATIVE_TOKEN_STRING).address;
 
   // Construct swap path
   const path: Address[] = [];
@@ -100,7 +106,7 @@ export function getPriceFromRouter(
     }
   }
 
-  const feeBips = BigInt.fromI32(30);
+  const feeBips = constants.BIGINT_THIRTY;
 
   const amountOutBigDecimal = amountOut
     .times(constants.BIGINT_TEN_THOUSAND)
@@ -109,7 +115,8 @@ export function getPriceFromRouter(
 
   return CustomPriceType.initialize(
     amountOutBigDecimal,
-    config.whitelistedTokens().mustGet("USDC").decimals as u8,
+    config.whitelistedTokens().mustGet(constants.STABLE_TOKENS_STRINGS.USDC)
+      .decimals as u8,
     constants.OracleType.UNISWAP_FORKS_ROUTER
   );
 }

@@ -8095,7 +8095,7 @@
   },
   "gmx": {
     "schema": "derivatives-perpfutures",
-    "base": "gmx",
+    "base": "gmx-forks",
     "protocol": "gmx",
     "project": "gmx",
     "deployments": {

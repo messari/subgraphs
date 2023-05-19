@@ -32,7 +32,6 @@ dataSources:
         - LiquidatePosition
         - SellUSDG
         - Swap
-        - UpdateFundingRate
         - UpdatePnl
         - UpdatePosition
       abis:
@@ -79,8 +78,6 @@ dataSources:
           file: ./abis/Prices/Uniswap/Pair.json   
 
       eventHandlers:
-        - event: UpdateFundingRate(address,uint256)
-          handler: handleUpdateFundingRate
         - event: Swap(address,address,address,uint256,uint256,uint256,uint256)
           handler: handleSwap
         - event: IncreasePosition(bytes32,address,address,address,uint256,uint256,bool,uint256,uint256)

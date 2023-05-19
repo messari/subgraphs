@@ -48,7 +48,18 @@ export const DEFAULT_AAVE_ORACLE_DECIMALS = 8;
 export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
+export const INT_EIGHT = 8;
+export const INT_SEVEN = 7;
+export const BIGINT_THIRTY = BigInt.fromI32(30);
+
+export namespace STABLE_TOKENS_STRINGS {
+  export const USDC = "USDC";
+  export const WETH = "WETH";
+  export const USDT = "USDT";
+  export const DAI = "DAI";
+}
 export const STABLE_TOKENS: string[] = ["DAI", "USDT", "USDC", "WETH"];
+export const NATIVE_TOKEN_STRING = "NATIVE_TOKEN";
 
 export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x0000000000000000000000000000000000000000"), // Null Address

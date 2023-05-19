@@ -3,25 +3,24 @@ import {
   updatePositionRealisedPnlUSD,
 } from "../modules/position";
 import {
-  ClosePosition as ClosePositionEvent,
-  CollectMarginFees as CollectMarginFeesEvent,
-  CollectSwapFees as CollectSwapFeesEvent,
-  DecreasePoolAmount as DecreasePoolAmountEvent,
-  DecreasePosition as DecreasePositionEvent,
-  IncreasePoolAmount as IncreasePoolAmountEvent,
-  IncreasePosition as IncreasePositionEvent,
-  LiquidatePosition as LiquidatePositionEvent,
   Swap as SwapEvent,
-  UpdateFundingRate as UpdateFundingRateEvent,
+  ClosePosition as ClosePositionEvent,
+  CollectSwapFees as CollectSwapFeesEvent,
+  IncreasePosition as IncreasePositionEvent,
+  DecreasePosition as DecreasePositionEvent,
+  CollectMarginFees as CollectMarginFeesEvent,
+  LiquidatePosition as LiquidatePositionEvent,
+  DecreasePoolAmount as DecreasePoolAmountEvent,
+  IncreasePoolAmount as IncreasePoolAmountEvent,
 } from "../../generated/Vault/Vault";
 import { swap } from "../modules/swap";
 import * as utils from "../common/utils";
 import { collectFees } from "../modules/fees";
 import * as constants from "../common/constants";
+import { updatePoolAmount } from "../modules/amount";
 import { increasePoolVolume } from "../modules/volume";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
-import { updatePoolAmount } from "../modules/amount";
 
 export function handleClosePosition(event: ClosePositionEvent): void {
   const sdk = initializeSDK(event);
@@ -119,25 +118,4 @@ export function handleSwap(event: SwapEvent): void {
     event.params.tokenOut,
     event.params.amountOutAfterFees
   );
-}
-
-export function handleUpdateFundingRate(event: UpdateFundingRateEvent): void {
-  const tokenAddress = event.params.token;
-  // const fundingrate = event.params.fundingRate;
-  const sdk = initializeSDK(event);
-  // const pool = getOrCreatePool(sdk);
-
-  // const token =
-  sdk.Tokens.getOrCreateToken(tokenAddress);
-
-  // const inputTokens = pool.getInputTokens();
-  // const fundingTokenIndex = inputTokens.indexOf(token.id);
-  // const fundingrates = pool.pool.fundingrate;
-  // if (fundingTokenIndex >= 0) {
-  //   fundingrates[fundingTokenIndex] = utils.bigIntToBigDecimal(
-  //     fundingrate,
-  //     constants.FUNDING_PRECISION_DECIMALS
-  //   );
-  // }
-  // pool.setFundingRate(fundingrates);
 }

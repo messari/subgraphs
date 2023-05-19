@@ -153,3 +153,29 @@ export function checkAndUpdateInputTokens(
   if (pool.tokenExists(token)) return;
   pool.addInputToken(token, newTokenBalance);
 }
+
+export function getFundingRate(tokenAddress: Address): BigDecimal {
+  const vaultContract = Vault.bind(constants.VAULT_ADDRESS);
+  const fundingRate = bigIntToBigDecimal(
+    readValue(
+      vaultContract.try_cumulativeFundingRates(tokenAddress),
+      constants.BIGINT_ZERO
+    ),
+    constants.FUNDING_PRECISION_DECIMALS
+  );
+  return fundingRate;
+}
+
+export function updateFundingRate(
+  pool: Pool,
+  fundingToken: TokenSchema,
+  fundingRate: BigDecimal
+): void {
+  const inputTokens = pool.getInputTokens();
+  const fundingTokenIndex = inputTokens.indexOf(fundingToken.id);
+  const fundingrates = pool.pool.fundingrate;
+  if (fundingTokenIndex >= 0) {
+    fundingrates[fundingTokenIndex] = fundingRate;
+  }
+  pool.setFundingRate(fundingrates);
+}

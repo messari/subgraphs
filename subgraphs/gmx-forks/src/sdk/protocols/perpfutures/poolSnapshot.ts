@@ -467,7 +467,9 @@ export class PoolSnapshot {
     snapshot.cumulativeUniqueUsers = this.pool.cumulativeUniqueUsers;
 
     const dailyActivityHelper = initActivityHelper(
-      Bytes.fromUTF8("daily-".concat(day.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.DAILY.concat("-").concat(day.toString())
+      )
     );
     snapshot.dailyActiveUsers = dailyActivityHelper.activeUsers;
     snapshot.dailyActiveDepositors = dailyActivityHelper.activeDepositors;

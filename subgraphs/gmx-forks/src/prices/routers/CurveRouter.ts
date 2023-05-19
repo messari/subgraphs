@@ -80,7 +80,9 @@ export function getCurvePriceUsdc(
   const virtualPrice = getVirtualPrice(lpAddress, block).toBigDecimal();
 
   const config = utils.getConfig();
-  const usdcTokenDecimals = config.whitelistedTokens().mustGet("USDC").decimals;
+  const usdcTokenDecimals = config
+    .whitelistedTokens()
+    .mustGet(constants.STABLE_TOKENS_STRINGS.USDC).decimals;
 
   const decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(
     BigInt.fromI32(usdcTokenDecimals)
@@ -141,7 +143,7 @@ export function getUnderlyingCoinFromPool(
 
 export function getPreferredCoinFromCoins(coins: Address[]): Address {
   let preferredCoinAddress = constants.NULL.TYPE_ADDRESS;
-  for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
+  for (let coinIdx = 0; coinIdx < constants.INT_EIGHT; coinIdx++) {
     const coinAddress = coins[coinIdx];
 
     if (coinAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
@@ -151,7 +153,7 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
     if (
       (preferredCoinAddress.notEqual(constants.NULL.TYPE_ADDRESS) &&
         coinAddress.equals(constants.NULL.TYPE_ADDRESS)) ||
-      coinIdx == 7
+      coinIdx == constants.INT_SEVEN
     ) {
       break;
     }
@@ -307,7 +309,7 @@ export function getPriceUsdc(
     .toBigDecimal();
 
   const coins: Address[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < constants.INT_EIGHT; i++) {
     const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(i)),
       constants.NULL.TYPE_ADDRESS
