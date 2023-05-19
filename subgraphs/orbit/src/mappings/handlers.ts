@@ -54,12 +54,16 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
-
-    // const decimalResult = erc20.try_decimals();
-    // if (!decimalResult.reverted) {
-    //   log.debug("This token sucks: {}", [address.toHexString()]);
-    // }
-    const decimals = fetchTokenDecimals(address);
+    const decimalsResult = erc20.try_decimals();
+    let decimals: i32 = 18;
+    if (!decimalsResult.reverted) {
+      decimals = decimalsResult.value.toI32();
+    } else {
+      log.warning(
+        "[getTokenParams]token {} decimals() call reverted; default to 18 decimals",
+        [address.toHexString()]
+      );
+    }
 
     let name = "Unknown Token";
     const nameResult = erc20.try_name();
@@ -71,9 +75,10 @@ class TokenInit implements TokenInitializer {
       if (!nameResult.reverted) {
         name = nameResult.value.toString();
       } else {
-        log.warning("[getTokenParams]Fail to get name for token {}", [
-          address.toHexString(),
-        ]);
+        log.warning(
+          "[getTokenParams]Fail to get name for token {}; default to 'Unknown Token'",
+          [address.toHexString()]
+        );
       }
     }
 
@@ -87,11 +92,13 @@ class TokenInit implements TokenInitializer {
       if (!symbolResult.reverted) {
         symbol = symbolResult.value.toString();
       } else {
-        log.warning("[getTokenParams]Fail to get symbol for token {}", [
-          address.toHexString(),
-        ]);
+        log.warning(
+          "[getTokenParams]Fail to get symbol for token {}; default to 'Unknown'",
+          [address.toHexString()]
+        );
       }
     }
+
     return {
       name,
       symbol,
@@ -291,6 +298,7 @@ function _handleTransferOut(
     return;
   }
   log.debug("Made it here 1: {}", [refId.toString()]);
+  log.debug("Made it here 1.5: {}", [event.transaction.hash.toHexString()]);
   const sdk = _getSDK(event)!;
   const pool = sdk.Pools.loadPool(
     poolId,
