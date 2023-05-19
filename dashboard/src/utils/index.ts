@@ -33,7 +33,9 @@ export const schemaMapping: { [x: string]: any } = {
   network: "network",
   "nft-marketplace": "nft-marketplace",
   "derivatives-options": "derivatives-options",
+  OPTION: "derivatives-options",
   "derivatives-perpfutures": "derivatives-perpfutures",
+  PERPETUAL: "derivatives-perpfutures",
 };
 
 export function toDate(timestamp: number, hour: boolean = false) {
