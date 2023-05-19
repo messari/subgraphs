@@ -4,11 +4,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: OptimismGovernorV2
+    name: OptimismGovernorV5
     network: {{ network }}
     source:
       address: "{{ governorContractAddress }}"
-      abi: OptimismGovernorV2
+      abi: OptimismGovernorV5
       startBlock: {{ governorContractStartBlock }}
     mapping:
       kind: ethereum/events
@@ -21,14 +21,15 @@ dataSources:
         - TokenHolder
         - Delegate
       abis:
-        - name: OptimismGovernorV2
-          file: ./abis/optimism-governance/OptimismGovernorV2.json
+        - name: OptimismGovernorV5
+          file: ./abis/optimism-governance/OptimismGovernorV5.json
       eventHandlers:
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
         - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
           handler: handleProposalCreated
-        #- event: ProposalDeadlineUpdated
+        - event: ProposalCreated(uint256,address,address,bytes,uint256,uint256,string)
+          handler: handleProposalCreatedV2
         - event: ProposalExecuted(uint256)
           handler: handleProposalExecuted
         - event: ProposalThresholdSet(uint256,uint256)

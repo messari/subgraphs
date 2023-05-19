@@ -1,7 +1,8 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
-  ProposalCreated,
+  ProposalCreated as ProposalCreatedV2,
+  ProposalCreated1 as ProposalCreated,
   ProposalExecuted,
   ProposalThresholdSet,
   QuorumNumeratorUpdated,
@@ -9,7 +10,7 @@ import {
   VoteCastWithParams,
   VotingDelaySet,
   VotingPeriodSet,
-} from "../../../generated/OptimismGovernorV2/OptimismGovernorV2";
+} from "../../../generated/OptimismGovernorV5/OptimismGovernorV5";
 import {
   _handleProposalCreated,
   _handleProposalCanceled,
@@ -18,7 +19,7 @@ import {
   getProposal,
   getGovernance,
 } from "../../../src/handlers";
-import { OptimismGovernorV2 } from "../../../generated/OptimismGovernorV2/OptimismGovernorV2";
+import { OptimismGovernorV5 } from "../../../generated/OptimismGovernorV5/OptimismGovernorV5";
 import { GovernanceFramework, Proposal } from "../../../generated/schema";
 import {
   BIGINT_ONE,
@@ -38,9 +39,6 @@ export function handleProposalCreated(event: ProposalCreated): void {
     event.block.number.minus(BIGINT_ONE)
   );
 
-  // FIXME: Prefer to use a single object arg for params
-  // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
-  // but graph wasm compilation breaks for unknown reasons
   _handleProposalCreated(
     event.params.proposalId.toString(),
     event.params.proposer.toHexString(),
@@ -48,6 +46,27 @@ export function handleProposalCreated(event: ProposalCreated): void {
     event.params.values,
     event.params.signatures,
     event.params.calldatas,
+    event.params.startBlock,
+    event.params.endBlock,
+    event.params.description,
+    quorumVotes,
+    event
+  );
+}
+
+export function handleProposalCreatedV2(event: ProposalCreatedV2): void {
+  const quorumVotes = getQuorumFromContract(
+    event.address,
+    event.block.number.minus(BIGINT_ONE)
+  );
+
+  _handleProposalCreated(
+    event.params.proposalId.toString(),
+    event.params.proposer.toHexString(),
+    [],
+    [],
+    [],
+    [],
     event.params.startBlock,
     event.params.endBlock,
     event.params.description,
@@ -161,7 +180,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    const contract = OptimismGovernorV2.bind(
+    const contract = OptimismGovernorV5.bind(
       Address.fromString(contractAddress)
     );
 
@@ -187,7 +206,7 @@ function getQuorumFromContract(
   contractAddress: Address,
   blockNumber: BigInt
 ): BigInt {
-  const contract = OptimismGovernorV2.bind(contractAddress);
+  const contract = OptimismGovernorV5.bind(contractAddress);
   const quorumVotes = contract.quorum(blockNumber);
 
   const governanceFramework = getGovernanceFramework(

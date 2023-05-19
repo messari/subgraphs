@@ -1,4 +1,5 @@
 [
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
   { "inputs": [], "name": "Empty", "type": "error" },
   {
     "anonymous": false,
@@ -24,6 +25,55 @@
       }
     ],
     "name": "ProposalCanceled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "proposer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "votingModule",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "proposalData",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startBlock",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endBlock",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      }
+    ],
+    "name": "ProposalCreated",
     "type": "event"
   },
   {
@@ -298,6 +348,37 @@
   },
   {
     "inputs": [
+      { "internalType": "address[]", "name": "targets", "type": "address[]" },
+      { "internalType": "uint256[]", "name": "values", "type": "uint256[]" },
+      { "internalType": "bytes[]", "name": "calldatas", "type": "bytes[]" },
+      {
+        "internalType": "bytes32",
+        "name": "descriptionHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "cancel",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "module", "type": "address" },
+      { "internalType": "bytes", "name": "proposalData", "type": "bytes" },
+      {
+        "internalType": "bytes32",
+        "name": "descriptionHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "cancelWithModule",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "uint256", "name": "proposalId", "type": "uint256" },
       { "internalType": "uint8", "name": "support", "type": "uint8" }
     ],
@@ -375,6 +456,25 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "contract VotingModule",
+        "name": "module",
+        "type": "address"
+      },
+      { "internalType": "bytes", "name": "proposalData", "type": "bytes" },
+      {
+        "internalType": "bytes32",
+        "name": "descriptionHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "executeWithModule",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "address", "name": "account", "type": "address" },
       { "internalType": "uint256", "name": "blockNumber", "type": "uint256" }
     ],
@@ -418,6 +518,21 @@
     "name": "hashProposal",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "module", "type": "address" },
+      { "internalType": "bytes", "name": "proposalData", "type": "bytes" },
+      {
+        "internalType": "bytes32",
+        "name": "descriptionHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "hashProposalWithData",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -532,6 +647,21 @@
       { "internalType": "string", "name": "description", "type": "string" }
     ],
     "name": "propose",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract VotingModule",
+        "name": "module",
+        "type": "address"
+      },
+      { "internalType": "bytes", "name": "proposalData", "type": "bytes" },
+      { "internalType": "string", "name": "description", "type": "string" }
+    ],
+    "name": "proposeWithModule",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
