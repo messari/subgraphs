@@ -43,7 +43,7 @@ function IndexingCalls({
   let currentErc20Query = indexingStatusQueries?.erc20?.fullCurrentQueryArray?.join("");
   let currentErc721Query = indexingStatusQueries?.erc721?.fullCurrentQueryArray?.join("");
   let currentGovernanceQuery = indexingStatusQueries?.governance?.fullCurrentQueryArray?.join("");
-  let currentNetworkQuery = indexingStatusQueries?.network?.fullCurrentQueryArray?.join("");
+  // let currentNetworkQuery = indexingStatusQueries?.network?.fullCurrentQueryArray?.join("");
   let currentNFTQuery = indexingStatusQueries?.["nft-marketplace"]?.fullCurrentQueryArray?.join("");
   let currentOptionsQuery = indexingStatusQueries?.["derivatives-options"]?.fullCurrentQueryArray?.join("");
   let currentPerpFuturesQuery = indexingStatusQueries?.["derivatives-perpfutures"]?.fullCurrentQueryArray?.join("");
@@ -129,15 +129,15 @@ function IndexingCalls({
     },
   );
 
-  const [fetchStatusNetwork, { data: statusNetwork, loading: statusNetworkLoading, error: statusNetworkError }] =
-    useLazyQuery(
-      gql`
-        ${currentNetworkQuery}
-      `,
-      {
-        client: clientIndexing,
-      },
-    );
+  // const [fetchStatusNetwork, { data: statusNetwork, loading: statusNetworkLoading, error: statusNetworkError }] =
+  //   useLazyQuery(
+  //     gql`
+  //       ${currentNetworkQuery}
+  //     `,
+  //     {
+  //       client: clientIndexing,
+  //     },
+  //   );
 
   const [fetchStatusNFT, { data: statusNFT, loading: statusNFTLoading, error: statusNFTError }] = useLazyQuery(
     gql`
@@ -178,7 +178,7 @@ function IndexingCalls({
   let pendingErc20Query = indexingStatusQueries?.erc20?.fullPendingQueryArray?.join("");
   let pendingErc721Query = indexingStatusQueries?.erc721?.fullPendingQueryArray?.join("");
   let pendingGovernanceQuery = indexingStatusQueries?.governance?.fullPendingQueryArray?.join("");
-  let pendingNetworkQuery = indexingStatusQueries?.network?.fullPendingQueryArray?.join("");
+  // let pendingNetworkQuery = indexingStatusQueries?.network?.fullPendingQueryArray?.join("");
   let pendingNFTQuery = indexingStatusQueries?.["nft-marketplace"]?.fullPendingQueryArray?.join("");
   let pendingOptionsQuery = indexingStatusQueries?.["derivatives-options"]?.fullPendingQueryArray?.join("");
   let pendingPerpFuturesQuery = indexingStatusQueries?.["derivatives-perpfutures"]?.fullPendingQueryArray?.join("");
@@ -279,17 +279,17 @@ function IndexingCalls({
     },
   );
 
-  const [
-    fetchStatusNetworkPending,
-    { data: statusNetworkPending, loading: statusNetworkPendingLoading, error: statusNetworkPendingError },
-  ] = useLazyQuery(
-    gql`
-      ${pendingNetworkQuery}
-    `,
-    {
-      client: clientIndexing,
-    },
-  );
+  // const [
+  //   fetchStatusNetworkPending,
+  //   { data: statusNetworkPending, loading: statusNetworkPendingLoading, error: statusNetworkPendingError },
+  // ] = useLazyQuery(
+  //   gql`
+  //     ${pendingNetworkQuery}
+  //   `,
+  //   {
+  //     client: clientIndexing,
+  //   },
+  // );
 
   const [
     fetchStatusNFTPending,
@@ -336,7 +336,7 @@ function IndexingCalls({
     fetchStatusErc20();
     fetchStatusErc721();
     fetchStatusGovernance();
-    fetchStatusNetwork();
+    // fetchStatusNetwork();
     fetchStatusNFT();
     fetchStatusOptions();
     fetchStatusPerpFutures();
@@ -348,7 +348,7 @@ function IndexingCalls({
     fetchStatusErc20Pending();
     fetchStatusErc721Pending();
     fetchStatusGovernancePending();
-    fetchStatusNetworkPending();
+    // fetchStatusNetworkPending();
     fetchStatusNFTPending();
     fetchStatusOptionsPending();
     fetchStatusPerpFuturesPending();
@@ -364,7 +364,7 @@ function IndexingCalls({
       statusErc20 &&
       statusErc721 &&
       statusGovernance &&
-      statusNetwork &&
+      // statusNetwork &&
       statusNFT &&
       statusOptions &&
       statusPerpFutures
@@ -378,7 +378,7 @@ function IndexingCalls({
         ...statusErc20,
         ...statusErc721,
         ...statusGovernance,
-        ...statusNetwork,
+        // ...statusNetwork,
         ...statusNFT,
         ...statusOptions,
         ...statusPerpFutures,
@@ -393,7 +393,7 @@ function IndexingCalls({
     statusErc20,
     statusErc721,
     statusGovernance,
-    statusNetwork,
+    // statusNetwork,
     statusNFT,
     statusOptions,
     statusPerpFutures,
@@ -409,7 +409,7 @@ function IndexingCalls({
       statusErc20Pending &&
       statusErc721Pending &&
       statusGovernancePending &&
-      statusNetworkPending &&
+      // statusNetworkPending &&
       statusNFTPending &&
       statusOptionsPending &&
       statusPerpFuturesPending
@@ -423,7 +423,7 @@ function IndexingCalls({
         ...statusErc20Pending,
         ...statusErc721Pending,
         ...statusGovernancePending,
-        ...statusNetworkPending,
+        // ...statusNetworkPending,
         ...statusNFTPending,
         ...statusOptionsPending,
         ...statusPerpFuturesPending,
@@ -438,7 +438,7 @@ function IndexingCalls({
     statusErc20Pending,
     statusErc721Pending,
     statusGovernancePending,
-    statusNetworkPending,
+    // statusNetworkPending,
     statusNFTPending,
     statusOptionsPending,
     statusPerpFuturesPending,
@@ -454,7 +454,7 @@ function IndexingCalls({
       (statusErc20 || statusErc20Error) &&
       (statusErc721 || statusErc721Error) &&
       (statusGovernance || statusGovernanceError) &&
-      (statusNetwork || statusNetworkError) &&
+      // (statusNetwork || statusNetworkError) &&
       (statusNFT || statusNFTError) &&
       (statusOptions || statusOptionsError) &&
       (statusPerpFutures || statusPerpFuturesError)
@@ -468,7 +468,7 @@ function IndexingCalls({
         erc20: true,
         erc721: true,
         governance: true,
-        network: true,
+        // network: true,
         ["nft-marketplace"]: true,
         ["derivatives-options"]: true,
         ["derivatives-perpfutures"]: true,
@@ -498,9 +498,9 @@ function IndexingCalls({
       if (statusGovernanceError && !indexingStatusError.governance) {
         newErrorObject.governance = true;
       }
-      if (statusNetworkError && !indexingStatusError.network) {
-        newErrorObject.network = true;
-      }
+      // if (statusNetworkError && !indexingStatusError.network) {
+      //   newErrorObject.network = true;
+      // }
       if (statusNFTError && !indexingStatusError?.["nft-marketplace"]) {
         newErrorObject["nft-marketplace"] = true;
       }
@@ -521,7 +521,7 @@ function IndexingCalls({
     statusErc20Loading,
     statusErc721Loading,
     statusGovernanceLoading,
-    statusNetworkLoading,
+    // statusNetworkLoading,
     statusNFTLoading,
     statusOptionsLoading,
     statusPerpFuturesLoading,
@@ -537,7 +537,7 @@ function IndexingCalls({
       (statusErc20Pending || statusErc20PendingError) &&
       (statusErc721Pending || statusErc721PendingError) &&
       (statusGovernancePending || statusGovernancePendingError) &&
-      (statusNetworkPending || statusNetworkPendingError) &&
+      // (statusNetworkPending || statusNetworkPendingError) &&
       (statusNFTPending || statusNFTPendingError) &&
       (statusOptionsPending || statusOptionsPendingError) &&
       (statusPerpFuturesPending || statusPerpFuturesPendingError)
@@ -551,7 +551,7 @@ function IndexingCalls({
         erc20: true,
         erc721: true,
         governance: true,
-        network: true,
+        // network: true,
         ["nft-marketplace"]: true,
         ["derivatives-options"]: true,
         ["derivatives-perpfutures"]: true,
@@ -581,9 +581,9 @@ function IndexingCalls({
       if (statusGovernanceError && !indexingStatusErrorPending.governance) {
         newErrorObject.governance = true;
       }
-      if (statusNetworkError && !indexingStatusErrorPending.network) {
-        newErrorObject.network = true;
-      }
+      // if (statusNetworkError && !indexingStatusErrorPending.network) {
+      //   newErrorObject.network = true;
+      // }
       if (statusNFTError && !indexingStatusErrorPending?.["nft-marketplace"]) {
         newErrorObject["nft-marketplace"] = true;
       }
@@ -604,7 +604,7 @@ function IndexingCalls({
     statusErc20PendingLoading,
     statusErc721PendingLoading,
     statusGovernancePendingLoading,
-    statusNetworkPendingLoading,
+    // statusNetworkPendingLoading,
     statusNFTPendingLoading,
     statusOptionsPendingLoading,
     statusPerpFuturesPendingLoading,
