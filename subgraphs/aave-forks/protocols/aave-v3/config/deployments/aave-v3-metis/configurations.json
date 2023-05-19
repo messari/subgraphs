@@ -1,0 +1,18 @@
+{
+  "network": "metis",
+  "PoolAddressesProviderRegistry": {
+    "address": "0xB9FABd7500B2C6781c35Dd48d54f81fc2299D7AF",
+    "startBlock": 5445203
+  },
+  "RewardsController": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 5445224
+  },
+  "LendingPool": {
+    "address": "0x90df02551bB792286e8D4f13E0e357b4Bf1D6a57",
+    "startBlock": 5445224
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
