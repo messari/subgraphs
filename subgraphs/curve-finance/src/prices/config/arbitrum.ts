@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable rulesdir/no-string-literals */
+
 import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Configurations, TokenInfo, ContractInfo } from "../common/types";
 
@@ -68,7 +71,6 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x64343594ab9b56e99087bfa6f2335db24c2d1f17"), // vesta stable
   Address.fromString("0xf0b5ceefc89684889e5f7e0a7775bd100fcd3709"), // digital dollar
   Address.fromString("0xdbcd16e622c95acb2650b38ec799f76bfc557a0b"), // Curve.fi ETH/wstETH
-
 ];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0x5979d7b546e38e414f7e9822514be443a4800529"), // Wrapped liquid staked Ether 2.0 token

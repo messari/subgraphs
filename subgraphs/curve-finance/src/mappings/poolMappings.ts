@@ -36,7 +36,7 @@ export function handleTokenExchange(event: TokenExchange): void {
     amountOut,
     buyer,
     event.transaction,
-    event.block,
+    event.block
   );
 
   updateUsageMetrics(event.block, buyer);

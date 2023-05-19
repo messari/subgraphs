@@ -26,6 +26,7 @@ export function enumToPrefix(snake: string): string {
 }
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
+  // eslint-disable-next-line rulesdir/no-string-literals
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
 
@@ -206,6 +207,7 @@ export function getPoolFromCoins(
 
   if (coins.length < 2) return null;
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   for (let idx = 0; idx <= 8; idx++) {
     const poolAddress = readValue<Address>(
       registryContract.try_find_pool_for_coins1(

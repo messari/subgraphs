@@ -28,6 +28,7 @@ import {
 import { Versions } from "../versions";
 import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
+import { protocolLevelPriceValidation } from "../prices/common/validation";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
 
@@ -164,10 +165,14 @@ export function getOrCreateToken(
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    const tokenPrice = getUsdPricePerToken(address, block);
-    token.oracleType = tokenPrice.oracleType;
-    token.lastPriceUSD = tokenPrice.usdPrice;
+    const latestPrice = getUsdPricePerToken(address, block);
+
+    token.lastPriceUSD = protocolLevelPriceValidation(
+      token,
+      latestPrice.usdPrice
+    );
     token.lastPriceBlockNumber = block.number;
+    token.oracleType = latestPrice.oracleType;
 
     token.save();
   }
@@ -480,6 +485,7 @@ export function getOrCreateLiquidityPool(
 
     pool._registryAddress = constants.NULL.TYPE_STRING;
     pool._gaugeAddress = constants.NULL.TYPE_STRING;
+    pool._isMetapool = false;
     pool.save();
 
     PoolTemplate.create(poolAddress);

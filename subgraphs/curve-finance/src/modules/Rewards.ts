@@ -11,7 +11,6 @@ import {
   getOrCreateLiquidityPool,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { getRewardsPerDay } from "../common/rewards";
 import { RewardData, RewardsInfoType } from "../common/types";
@@ -97,6 +96,7 @@ export function getRewardsData_v3(
 
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   for (let idx = 0; idx < 5; idx++) {
     const rewardToken = utils.readValue<Address>(
       gaugeContract.try_reward_tokens(BigInt.fromI32(idx)),

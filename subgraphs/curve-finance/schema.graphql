@@ -493,6 +493,8 @@ type LiquidityPool @entity {
 
   " Liquidity Gauge assocaited with this pool "
   _gaugeAddress: String!
+
+  _isMetapool: Boolean!
 }
 
 #################################

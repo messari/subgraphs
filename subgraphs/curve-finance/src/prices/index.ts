@@ -25,7 +25,7 @@ export function getUsdPricePerToken(
 
   if (tokenAddr.equals(constants.ETH_ADDRESS))
     return getUsdPricePerToken(
-      config.whitelistedTokens().mustGet("WETH").address,
+      config.whitelistedTokens().mustGet(constants.WETH).address,
       block
     );
 

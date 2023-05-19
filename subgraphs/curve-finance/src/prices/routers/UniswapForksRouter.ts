@@ -1,3 +1,5 @@
+/* eslint-disable rulesdir/no-string-literals */
+
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
@@ -100,6 +102,7 @@ export function getPriceFromRouter(
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   const feeBips = BigInt.fromI32(30);
 
   const amountOutBigDecimal = amountOut

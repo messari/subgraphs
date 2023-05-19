@@ -116,6 +116,9 @@ export function Swap(
 
     tokenIn = underlyingCoins[soldId.toI32()].toHexString();
     tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
+
+    if (pool._isMetapool && boughtId.equals(constants.BIGINT_ZERO))
+      tokenIn = pool._inputTokensOrdered[-1];
   }
 
   const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);

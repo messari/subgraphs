@@ -107,6 +107,8 @@ export function getWithdrawnTokenAmounts(
     if (log.topics.length == 0) continue;
 
     const topic_signature = log.topics.at(0);
+
+    /* eslint-disable rulesdir/no-string-literals */
     if (
       crypto
         .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
