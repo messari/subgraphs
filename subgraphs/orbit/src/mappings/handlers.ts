@@ -55,10 +55,10 @@ class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
 
-    const decimalResult = erc20.try_decimals();
-    if (decimalResult.reverted) {
-      log.debug("This token sucks: {}", [address.toHexString()]);
-    }
+    // const decimalResult = erc20.try_decimals();
+    // if (!decimalResult.reverted) {
+    //   log.debug("This token sucks: {}", [address.toHexString()]);
+    // }
     const decimals = fetchTokenDecimals(address);
 
     let name = "Unknown Token";
@@ -92,7 +92,6 @@ class TokenInit implements TokenInitializer {
         ]);
       }
     }
-
     return {
       name,
       symbol,
