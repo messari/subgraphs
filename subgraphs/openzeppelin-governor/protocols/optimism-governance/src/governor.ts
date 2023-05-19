@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated as ProposalCreatedV2,
@@ -59,14 +59,18 @@ export function handleProposalCreatedV2(event: ProposalCreatedV2): void {
     event.address,
     event.block.number.minus(BIGINT_ONE)
   );
+  const targets: Address[] = [];
+  const values: BigInt[] = [];
+  const signatures: string[] = [];
+  const calldatas: Bytes[] = [];
 
   _handleProposalCreated(
     event.params.proposalId.toString(),
     event.params.proposer.toHexString(),
-    [],
-    [],
-    [],
-    [],
+    targets,
+    values,
+    signatures,
+    calldatas,
     event.params.startBlock,
     event.params.endBlock,
     event.params.description,
