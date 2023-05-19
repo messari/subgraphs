@@ -37,6 +37,7 @@ import {
   Deposit, Withdraw
 } from "../../generated/Vault/Vault";
 import { Swap, SwapRequest} from "../../generated/Minter/Minter";
+import { fetchTokenDecimals } from "../common/tokens";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -53,7 +54,12 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
-    const decimals = erc20.decimals().toI32();
+
+    const decimalResult = erc20.try_decimals();
+    if (decimalResult.reverted) {
+      log.debug("This token sucks: {}", [address.toHexString()]);
+    }
+    const decimals = fetchTokenDecimals(address);
 
     let name = "Unknown Token";
     const nameResult = erc20.try_name();
@@ -285,6 +291,7 @@ function _handleTransferOut(
     log.error("dstPoolId is null for transaction: {}", [refId.toString()]);
     return;
   }
+  log.debug("Made it here 1: {}", [refId.toString()]);
   const sdk = _getSDK(event)!;
   const pool = sdk.Pools.loadPool(
     poolId,
@@ -292,23 +299,30 @@ function _handleTransferOut(
     bridgePoolType,
     token.toHexString()
   );
+
+  log.debug("Made it here 2: {}", [refId.toString()]);
   const context = dataSource.context();
-  const taxReceiver = Address.fromString(context.getString("taxReceiver"));
-  
-  // If Receiver is taxReceiver, this is the tax fee
-  if (Address.fromBytes(receiver) == taxReceiver) {
-    pool.addRevenueNative(amount, BIGINT_ZERO);
-    return;
-  }
+  log.debug("Made it here abc: {}", [refId.toString()]);
+  // const taxReceiver = Address.fromString(context.getString("taxReceiver"));
+  // log.debug("Made it here xyz: {}", [refId.toString()]);
+  // // If Receiver is taxReceiver, this is the tax fee
+  // if (Address.fromBytes(receiver) == taxReceiver) {
+  //   log.debug("Made it here 3: {}", [refId.toString()]);
+  //   pool.addRevenueNative(amount, BIGINT_ZERO);
+  //   return;
+  // }
+  log.debug("Made it here 4: {}", [refId.toString()]);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(toChain),
     dstPoolId,
     crosschainTokenType,
     token
   );
+  log.debug("Made it here 5: {}", [refId.toString()]);
   pool.addDestinationToken(crossToken);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(sender))
   account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(receiver), amount);
+  log.debug("Made it here 6: {}", [refId.toString()]);
 }
 
 

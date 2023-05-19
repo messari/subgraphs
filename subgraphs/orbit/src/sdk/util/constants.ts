@@ -514,7 +514,7 @@ export function getNetworkSpecificConstant(
       toChainMapping
     );
   }
-  log.error("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
+  log.debug("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
   return new NetworkSpecificConstant(
     "UNKNOWN",
     Address.zero(),
