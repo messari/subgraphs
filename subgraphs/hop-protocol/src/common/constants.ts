@@ -446,4 +446,16 @@ export const HOP_REWARDS = [
 	XdaiRewardToken.ETH_B,
 	XdaiRewardToken.USDT_B,
 ]
+
+export const SIX_DECIMAL_TOKENS = [
+	ArbitrumToken.USDT,
+	ArbitrumToken.USDC,
+	OptimismToken.USDC,
+	OptimismToken.USDT,
+	PolygonToken.USDC,
+	PolygonToken.USDT,
+	XdaiToken.USDT,
+	XdaiToken.USDC,
+]
+
 export const OP_REWARDS = [OptimismRewardToken.SNX_B]

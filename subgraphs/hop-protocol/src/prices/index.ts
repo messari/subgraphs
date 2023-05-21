@@ -35,18 +35,17 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
 		return new CustomPriceType()
 	}
-	if (tokenAddr.toHexString() == OptimismHtoken.ETH) {
-		tokenAddr = Address.fromString(OptimismToken.ETH)
-	}
-	if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
-		tokenAddr = Address.fromString(OptimismToken.SNX)
-	}
-
 	if (tokenAddr == Address.fromString(PolygonHtoken.MATIC)) {
 		tokenAddr = Address.fromString(PolygonToken.MATIC)
 	}
 	if (tokenAddr == Address.fromString(PolygonHtoken.ETH)) {
 		tokenAddr = Address.fromString(PolygonToken.ETH)
+	}
+	if (tokenAddr.toHexString() == OptimismHtoken.ETH) {
+		tokenAddr = Address.fromString(OptimismToken.ETH)
+	}
+	if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
+		tokenAddr = Address.fromString(OptimismToken.SNX)
 	}
 
 	if (tokenAddr.toHexString() == XdaiHtoken.ETH) {

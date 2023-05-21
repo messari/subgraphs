@@ -35,7 +35,11 @@ import {
 	BIGINT_TEN_TO_EIGHTEENTH,
 } from '../../../../src/sdk/util/constants'
 import { BIGINT_TEN } from '../../../../src/prices/common/constants'
-import { BIGINT_TEN_TO_EIGHTEENTH } from '../../../../src/common/constants'
+import {
+	BIGINT_TEN_TO_EIGHTEENTH,
+	BIGINT_TEN_TO_SIX,
+	SIX_DECIMAL_TOKENS,
+} from '../../../../src/common/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -150,23 +154,41 @@ export function handleTokenSwap(event: TokenSwap): void {
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
 			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
-			let poolTVE = inputBalanceCallA.value
-				.plus(inputBalanceCallB.value)
-				.minus(pool.pool._inputTokenLiquidityBalance!)
-			pool.setNetValueExportedUSD(
-				poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-			)
-
-			log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-				poolTVE.toString(),
-				poolTVE
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
-					.toBigDecimal()
-					.toString(),
-				inputBalanceCallA.value.toString(),
-				inputBalanceCallB.value.toString(),
-				pool.pool._inputTokenLiquidityBalance!.toString(),
-			])
+			if (SIX_DECIMAL_TOKENS.includes(tokenOne.id.toHexString())) {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_SIX)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			} else {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_EIGHTEENTH)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			}
 		} else {
 			log.warning('inputBalanceCallB reverted', [])
 		}
@@ -258,23 +280,41 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
 			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
-			let poolTVE = inputBalanceCallA.value
-				.plus(inputBalanceCallB.value)
-				.minus(pool.pool._inputTokenLiquidityBalance!)
-			pool.setNetValueExportedUSD(
-				poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-			)
-
-			log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-				poolTVE.toString(),
-				poolTVE
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
-					.toBigDecimal()
-					.toString(),
-				inputBalanceCallA.value.toString(),
-				inputBalanceCallB.value.toString(),
-				pool.pool._inputTokenLiquidityBalance!.toString(),
-			])
+			if (SIX_DECIMAL_TOKENS.includes(token.id.toHexString())) {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_SIX)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			} else {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_EIGHTEENTH)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			}
 		} else {
 			log.warning('inputBalanceCallB reverted', [])
 		}
@@ -358,27 +398,44 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
 			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
-			let poolTVE = inputBalanceCallA.value
-				.plus(inputBalanceCallB.value)
-				.minus(pool.pool._inputTokenLiquidityBalance!)
-			pool.setNetValueExportedUSD(
-				poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-			)
-
-			log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-				poolTVE.toString(),
-				poolTVE
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
-					.toBigDecimal()
-					.toString(),
-				inputBalanceCallA.value.toString(),
-				inputBalanceCallB.value.toString(),
-				pool.pool._inputTokenLiquidityBalance!.toString(),
-			])
+			if (SIX_DECIMAL_TOKENS.includes(token.id.toHexString())) {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_SIX)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			} else {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_EIGHTEENTH)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			}
 		} else {
 			log.warning('inputBalanceCallB reverted', [])
 		}
-
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
 
@@ -467,30 +524,45 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 		if (!inputBalanceCallA.reverted && !inputBalanceCallB.reverted) {
 			pool.setInputTokenBalance(inputBalanceCallA.value)
-			pool.pool._inputTokenLiquidityBalance = inputBalanceCallA.value.plus(
-				inputBalanceCallB.value
-			)
 
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
 			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
-			let poolTVE = inputBalanceCallA.value
-				.plus(inputBalanceCallB.value)
-				.minus(pool.pool._inputTokenLiquidityBalance!)
-			pool.setNetValueExportedUSD(
-				poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-			)
-
-			log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-				poolTVE.toString(),
-				poolTVE
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
-					.toBigDecimal()
-					.toString(),
-				inputBalanceCallA.value.toString(),
-				inputBalanceCallB.value.toString(),
-				pool.pool._inputTokenLiquidityBalance!.toString(),
-			])
+			if (SIX_DECIMAL_TOKENS.includes(token.id.toHexString())) {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_SIX)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			} else {
+				let poolTVE = inputBalanceCallA.value
+					.plus(inputBalanceCallB.value)
+					.minus(pool.pool._inputTokenLiquidityBalance!)
+				pool.setNetValueExportedUSD(
+					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
+				)
+				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
+					poolTVE.toString(),
+					poolTVE
+						.div(BIGINT_TEN_TO_EIGHTEENTH)
+						.toBigDecimal()
+						.toString(),
+					inputBalanceCallA.value.toString(),
+					inputBalanceCallB.value.toString(),
+					pool.pool._inputTokenLiquidityBalance!.toString(),
+				])
+			}
 		} else {
 			log.warning('inputBalanceCallB reverted', [])
 		}
