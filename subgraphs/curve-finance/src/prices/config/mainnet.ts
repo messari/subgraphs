@@ -178,9 +178,9 @@ WHITELISTED_TOKENS.set(
 WHITELISTED_TOKENS.set(
   "NATIVE_TOKEN",
   TokenInfo.set(
-    "ETH",
+    "WETH",
     18,
-    Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+    Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
   )
 );
 

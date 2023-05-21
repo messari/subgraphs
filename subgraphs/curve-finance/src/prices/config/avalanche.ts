@@ -17,7 +17,7 @@ export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
   Address.fromString("0xebd36016b3ed09d4693ed4251c67bd858c3c7c9c"),
-  BigInt.fromI32(11970477)
+  BigInt.fromI32(0)
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "USDC",
     6,
-    Address.fromString("0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e")
+    Address.fromString("0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664")
   )
 );
 

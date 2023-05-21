@@ -49,6 +49,7 @@ export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
 export const WETH = "WETH";
+export const NATIVE_TOKEN = "NATIVE_TOKEN";
 export const STABLE_TOKENS: string[] = ["WETH", "DAI", "USDT", "USDC"];
 
 export const BLACKLISTED_TOKENS: Address[] = [
@@ -58,4 +59,5 @@ export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x37c9be6c81990398e9b87494484afc6a4608c25d"), // Curve.fi Factory Plain Pool: blizz
   Address.fromString("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10"), // Curve.fi Factory USD Metapool: Defrost H2O
   Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
+  Address.fromString("0xaa9dfbf31d2f807ca4d9f7be281d75ca7bdce64d"), // Curve.fi Factory Plain Pool: Curve DD2Pool
 ];

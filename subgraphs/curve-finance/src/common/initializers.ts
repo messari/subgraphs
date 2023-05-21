@@ -142,7 +142,10 @@ export function getOrCreateToken(
     token.decimals = utils
       .readValue<BigInt>(contract.try_decimals(), constants.DEFAULT_DECIMALS)
       .toI32();
+
+    token.lastPriceUSD = constants.BIGDECIMAL_ZERO;
     token.isBasePoolLpToken = false;
+
     token._totalSupply = constants.BIGINT_ZERO;
     token._totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     token._largePriceChangeBuffer = 0;
@@ -398,6 +401,7 @@ export function getOrCreateLiquidityGauge(
 
     if (poolAddress) {
       const context = new DataSourceContext();
+      // eslint-disable-next-line rulesdir/no-string-literals
       context.setString("poolAddress", poolAddress.toHexString());
 
       LiquidityGaugeTemplate.createWithContext(gaugeAddress, context);
