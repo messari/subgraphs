@@ -16,16 +16,13 @@ import {
 	Address,
 	BigDecimal,
 	BigInt,
-	ByteArray,
 	Bytes,
 	dataSource,
-	ethereum,
 	log,
 } from '@graphprotocol/graph-ts'
 import {
 	TransferSentToL2,
 	BonderAdded,
-	WithdrawalBonded,
 } from '../../../../generated/HopL1Bridge/L1_Bridge'
 
 import { Token } from '../../../../generated/schema'
@@ -36,7 +33,7 @@ import {
 	MESSENGER_EVENT_SIGNATURES,
 	OPTIMISM_L1_SIGNATURE,
 	XDAI_L1_SIGNATURE,
-} from '../../config/constants/constant'
+} from '../../../../src/common/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {

@@ -29,12 +29,7 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import {
-	BIGDECIMAL_ZERO,
-	BIGINT_ONE,
-	BIGINT_TEN_TO_EIGHTEENTH,
-} from '../../../../src/sdk/util/constants'
-import { BIGINT_TEN } from '../../../../src/prices/common/constants'
+import { BIGDECIMAL_ZERO, BIGINT_ONE } from '../../../../src/sdk/util/constants'
 import {
 	BIGINT_TEN_TO_EIGHTEENTH,
 	BIGINT_TEN_TO_SIX,
@@ -190,7 +185,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 				])
 			}
 		} else {
-			log.warning('inputBalanceCallB reverted', [])
+			log.warning('InputBalanceCall Reverted', [])
 		}
 
 		pool.pool.relation = hPool.getBytesID()
@@ -316,7 +311,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 				])
 			}
 		} else {
-			log.warning('inputBalanceCallB reverted', [])
+			log.warning('InputBalanceCall Reverted', [])
 		}
 
 		log.warning(
@@ -434,7 +429,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 				])
 			}
 		} else {
-			log.warning('inputBalanceCallB reverted', [])
+			log.warning('InputBalanceCall Reverted', [])
 		}
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
@@ -564,7 +559,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 				])
 			}
 		} else {
-			log.warning('inputBalanceCallB reverted', [])
+			log.warning('InputBalanceCall Reverted', [])
 		}
 
 		pool.pool.relation = hPool.getBytesID()

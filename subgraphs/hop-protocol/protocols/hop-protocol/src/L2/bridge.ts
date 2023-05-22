@@ -34,9 +34,7 @@ import {
 	OPTIMISM_L2_SIGNATURE,
 	MESSENGER_EVENT_SIGNATURES,
 } from '../../../../src/common/constants'
-import { BIGDECIMAL_ZERO, Network } from '../../../../src/sdk/util/constants'
-import { L2_Amm } from '../../../../generated/HopL2Amm/L2_Amm'
-import { BIGINT_ONE } from '../../../../src/common/constants'
+import { Network } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
