@@ -17,7 +17,7 @@ import { Configurations } from "../../../../../configurations/configurations/int
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
 import { stringToBytesList } from "../../../../../src/common/utils/utils";
 
-export class SushiswapV3MainnetConfigurations implements Configurations {
+export class SushiswapV3EthereumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
   }
@@ -128,6 +128,6 @@ export class SushiswapV3MainnetConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return BigDecimal.fromString("2500");
+    return BigDecimal.fromString("1000");
   }
 }
