@@ -19,10 +19,11 @@ import {
  * daily and hourly snapshots.
  *
  * Schema Version:  1.3.1
- * SDK Version:     1.1.3
+ * SDK Version:     1.1.4
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class ProtocolSnapshot {

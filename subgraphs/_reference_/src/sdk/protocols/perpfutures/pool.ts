@@ -23,10 +23,11 @@ import {
  * initialize new pools in the protocol.
  *
  * Schema Version:  1.3.1
- * SDK Version:     1.1.3
+ * SDK Version:     1.1.4
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class PoolManager {
