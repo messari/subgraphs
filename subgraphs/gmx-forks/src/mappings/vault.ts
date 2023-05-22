@@ -33,10 +33,12 @@ export function handleClosePosition(event: ClosePositionEvent): void {
   if (event.params.realisedPnl < constants.BIGINT_ZERO) {
     increasePoolVolume(
       pool,
-
+      constants.BIGDECIMAL_ZERO,
       constants.NULL.TYPE_ADDRESS,
       constants.BIGINT_ZERO,
       TransactionType.LIQUIDATE,
+      constants.BIGINT_NEGONE.toBigDecimal().times(realisedPnlUSD),
+      true,
       sdk
     );
   }

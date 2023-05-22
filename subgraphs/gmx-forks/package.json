@@ -2,9 +2,6 @@
   "name": "mummy-finance",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ shashwats22/gmx-arbitrum",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json src/common/constants.mustache > src/common/constants.ts"
   },
   "dependencies": {

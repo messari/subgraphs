@@ -368,12 +368,21 @@ export class Perpetual {
    *
    * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
    */
-  updateLongOpenInterestUSD(amountChangeUSD: BigDecimal): void {
-    this.protocol.totalOpenInterestUSD =
-      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
-    this.protocol.longOpenInterestUSD =
-      this.protocol.longOpenInterestUSD.plus(amountChangeUSD);
-
+  updateLongOpenInterestUSD(
+    amountChangeUSD: BigDecimal,
+    isIncrease: bool
+  ): void {
+    if (isIncrease) {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+      this.protocol.longOpenInterestUSD =
+        this.protocol.longOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.minus(amountChangeUSD);
+      this.protocol.longOpenInterestUSD =
+        this.protocol.longOpenInterestUSD.minus(amountChangeUSD);
+    }
     this.save();
   }
 
@@ -382,11 +391,21 @@ export class Perpetual {
    *
    * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
    */
-  updateShortOpenInterestUSD(amountChangeUSD: BigDecimal): void {
-    this.protocol.totalOpenInterestUSD =
-      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
-    this.protocol.shortOpenInterestUSD =
-      this.protocol.shortOpenInterestUSD.plus(amountChangeUSD);
+  updateShortOpenInterestUSD(
+    amountChangeUSD: BigDecimal,
+    isIncrease: bool
+  ): void {
+    if (isIncrease) {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+      this.protocol.shortOpenInterestUSD =
+        this.protocol.shortOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.minus(amountChangeUSD);
+      this.protocol.shortOpenInterestUSD =
+        this.protocol.shortOpenInterestUSD.minus(amountChangeUSD);
+    }
 
     this.save();
   }

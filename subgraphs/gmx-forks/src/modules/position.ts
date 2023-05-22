@@ -103,9 +103,12 @@ export function updatePosition(
 
   increasePoolVolume(
     pool,
+    sizeUSDDelta,
     collateralTokenAddress,
     collateralTokenAmountDelta,
     transactionType,
+    constants.BIGDECIMAL_ZERO,
+    false,
     sdk
   );
 

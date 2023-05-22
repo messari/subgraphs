@@ -506,7 +506,7 @@ export class Pool {
         this.pool.longOpenInterestUSD.minus(amountChangeUSD);
     }
     this.save();
-    this.protocol.updateLongOpenInterestUSD(amountChangeUSD);
+    this.protocol.updateLongOpenInterestUSD(amountChangeUSD, isIncrease);
   }
 
   /**
@@ -530,7 +530,7 @@ export class Pool {
         this.pool.shortOpenInterestUSD.minus(amountChangeUSD);
     }
     this.save();
-    this.protocol.updateShortOpenInterestUSD(amountChangeUSD);
+    this.protocol.updateShortOpenInterestUSD(amountChangeUSD, isIncrease);
   }
 
   /**
@@ -972,6 +972,37 @@ export class Pool {
 
     this.save();
     this.addVolume(amountUSD);
+  }
+
+  /**
+   * Adds the volume of a given input token by its amount and its USD value.
+   * It will also add the amount to the total volume of the pool and the protocol
+   * @param token The input token
+   * @param amount The amount of the token
+   */
+  addCumulativeVolumeByTokenAmount(token: TokenSchema, amount: BigInt): void {
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
+
+    const tokenIndex = this.pool.inputTokens.indexOf(token.id);
+    if (tokenIndex == -1) return;
+
+    const cumulativeVolumeByTokenAmount =
+      this.pool.cumulativeVolumeByTokenAmount;
+    const cumulativeVolumeByTokenUSD = this.pool.cumulativeVolumeByTokenUSD;
+
+    cumulativeVolumeByTokenAmount[tokenIndex] =
+      cumulativeVolumeByTokenAmount[tokenIndex].plus(amount);
+    cumulativeVolumeByTokenUSD[tokenIndex] =
+      cumulativeVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    this.pool.cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
+    this.pool.cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
+
+    this.save();
   }
 
   /**
