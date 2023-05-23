@@ -13,4 +13,5 @@ export namespace Deploy {
   export const SUSHISWAP_V3_BSC = 11;
   export const SUSHISWAP_V3_FANTOM = 12;
   export const SUSHISWAP_V3_FUSE = 13;
+  export const SUSHISWAP_V3_GNOSIS = 14;
 }
