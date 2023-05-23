@@ -67,6 +67,7 @@ export const DeploymentOverlayDropDown = ({
     }
   } catch (err) {
     componentRenderOverwrite = null;
+    console.log(err)
   }
   const [textInput, setTextInput] = useState<string>(currentDeploymentLabel);
   if (componentRenderOverwrite === null) {

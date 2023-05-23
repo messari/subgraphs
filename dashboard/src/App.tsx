@@ -24,7 +24,6 @@ function App() {
       method: "GET",
       headers: {
         Accept: "*/*",
-        Authorization: "Bearer " + process.env.REACT_APP_GITHUB_API_KEY,
       },
     })
       .then(function (res) {
