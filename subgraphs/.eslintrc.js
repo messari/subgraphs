@@ -21,7 +21,6 @@ module.exports = {
       files: ["**/constants.ts", "**/constant.ts"],
       rules: {
         "@typescript-eslint/no-magic-numbers": ["off"],
-        "rulesdir/no-string-literals": ["off"],
       },
     },
   ],
@@ -70,6 +69,5 @@ module.exports = {
 
     // encourage address literals to be all lowercase to comparison errors when using strings.
     "rulesdir/no-checksum-addresses": "error",
-    "rulesdir/no-string-literals": "error",
   },
 };
