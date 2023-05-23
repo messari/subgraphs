@@ -1,5 +1,5 @@
 # Subgraph Schema: Bridge
-# Version: 1.2.1
+# Version: 1.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 enum Network {
   ARBITRUM_ONE
@@ -982,7 +982,7 @@ type PoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type PoolRouteSnapshot @entity(immutable: true) @regularPolling {
+type PoolRouteSnapshot @entity(immutable: true) @hourlySnapshot {
   " poolRouteID.concat(poolSnapshotID) "
   id: Bytes!
 

@@ -1,5 +1,5 @@
 # Subgraph Schema: Network
-# Version: 1.2.1
+# Version: 1.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum SubgraphNetwork {
