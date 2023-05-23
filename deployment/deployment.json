@@ -2088,6 +2088,28 @@
             "query-id": "compound-v3-polygon"
           }
         }
+      },
+      "compound-v3-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "compound.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-v3-arbitrum",
+            "query-id": "compound-v3-arbitrum"
+          }
+        }
       }
     }
   },
