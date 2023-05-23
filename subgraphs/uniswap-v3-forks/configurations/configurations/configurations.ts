@@ -15,6 +15,7 @@ import { SushiswapV3FuseConfigurations } from "../../protocols/sushiswap-v3/conf
 import { SushiswapV3GnosisConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-gnosis/configurations";
 import { SushiswapV3MoonriverConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-moonriver/configurations";
 import { SushiswapV3OptimismConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-optimism/configurations";
+import { SushiswapV3PolygonConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-polygon/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -71,6 +72,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.SUSHISWAP_V3_OPTIMISM: {
       return new SushiswapV3OptimismConfigurations();
+    }
+    case Deploy.SUSHISWAP_V3_POLYGON: {
+      return new SushiswapV3PolygonConfigurations();
     }
     default: {
       log.critical(
