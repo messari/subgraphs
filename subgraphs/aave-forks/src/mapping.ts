@@ -350,6 +350,7 @@ export function _handleReserveUsedAsCollateralEnabled(
     : [];
   markets.push(market.id);
   account._enabledCollaterals = markets;
+
   account.save();
 }
 
@@ -693,7 +694,7 @@ export function _handleDeposit(
   );
   if (
     !account._enabledCollaterals ||
-    account._enabledCollaterals!.indexOf(asset) == -1
+    account._enabledCollaterals!.indexOf(market.id) == -1
   ) {
     // Supply in isolated mode won't have ReserveUsedAsCollateralEnabled set
     // https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/protocol/libraries/logic/SupplyLogic.sol#L76-L88
