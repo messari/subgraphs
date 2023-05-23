@@ -9,4 +9,5 @@ export namespace Deploy {
   export const PANCAKE_V3_ETHEREUM = 7;
   export const SUSHISWAP_V3_ETHEREUM = 8;
   export const SUSHISWAP_V3_ARBITRUM = 9;
+  export const SUSHISWAP_V3_AVALANCHE = 10;
 }
