@@ -10,5 +10,6 @@ export namespace Deploy {
   export const SUSHISWAP_V3_ETHEREUM = 8;
   export const SUSHISWAP_V3_ARBITRUM = 9;
   export const SUSHISWAP_V3_AVALANCHE = 10;
-  export const SUSHISWAP_V3_BSC = 10;
+  export const SUSHISWAP_V3_BSC = 11;
+  export const SUSHISWAP_V3_FANTOM = 12;
 }
