@@ -6561,6 +6561,94 @@
     "protocol": "multichain",
     "project": "multichain",
     "deployments": {
+      "multichain-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-arbitrum",
+            "query-id": "multichain-arbitrum"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-avalanche",
+            "query-id": "multichain-avalanche"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-bsc",
+            "query-id": "multichain-bsc"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-celo": {
+        "network": "celo",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-celo",
+            "query-id": "multichain-celo"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
       "multichain-ethereum": {
         "network": "ethereum",
         "status": "prod",
@@ -6588,13 +6676,79 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
           "hosted-service": {
             "slug": "multichain-fantom",
             "query-id": "multichain-fantom"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-gnosis": {
+        "network": "gnosis",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-gnosis",
+            "query-id": "multichain-gnosis"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-optimism",
+            "query-id": "multichain-optimism"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-polygon",
+            "query-id": "multichain-polygon"
           }
         },
         "files": {

@@ -1,0 +1,48 @@
+{
+  "deployment": "MULTICHAIN_GNOSIS",
+  "network": "xdai",
+  "file": "./src/mappings/handlers.ts",
+  "bridgeConfig": [
+    {
+      "name": "BridgeV2-0",
+      "address": "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+      "abi": "anyToken",
+      "startBlock": 15049302
+    },
+    {
+      "name": "BridgeV2-1",
+      "address": "0xd185c16756873b907df064bd7b4815839de4e6b9",
+      "abi": "anyToken",
+      "startBlock": 15158757
+    },
+    {
+      "name": "BridgeV2-2",
+      "address": "0x59676af932247d48755aab7a7b94f8bb4bea2a6e",
+      "abi": "anyToken",
+      "startBlock": 15158771
+    },
+    {
+      "name": "BridgeV2-3",
+      "address": "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454",
+      "abi": "anyToken",
+      "startBlock": 20580476
+    }
+  ],
+  "routerConfig": [
+    {
+      "name": "Router-0",
+      "address": "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",
+      "abi": "Router",
+      "startBlock": 19144162
+    },
+    {
+      "name": "Router-1",
+      "address": "0xDAe6c2A48BFAA66b43815c5548b10800919c993E",
+      "abi": "Router",
+      "startBlock": 26269897
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
