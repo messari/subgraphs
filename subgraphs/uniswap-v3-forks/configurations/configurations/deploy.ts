@@ -15,4 +15,5 @@ export namespace Deploy {
   export const SUSHISWAP_V3_FUSE = 13;
   export const SUSHISWAP_V3_GNOSIS = 14;
   export const SUSHISWAP_V3_MOONRIVER = 15;
+  export const SUSHISWAP_V3_OPTIMISM = 16;
 }
