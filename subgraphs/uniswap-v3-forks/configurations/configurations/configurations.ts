@@ -7,6 +7,7 @@ import { UniswapV3BSCConfigurations } from "../../protocols/uniswap-v3/config/de
 import { PancakeV3BSCConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-bsc/configurations";
 import { PancakeV3EthereumConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-ethereum/configurations";
 import { SushiswapV3EthereumConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-ethereum/configurations";
+import { SushiswapV3ArbitrumConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-arbitrum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -39,6 +40,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.SUSHISWAP_V3_ETHEREUM: {
       return new SushiswapV3EthereumConfigurations();
+    }
+    case Deploy.SUSHISWAP_V3_ARBITRUM: {
+      return new SushiswapV3ArbitrumConfigurations();
     }
     default: {
       log.critical(
