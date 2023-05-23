@@ -21,7 +21,6 @@ import {
 } from '@graphprotocol/graph-ts'
 import {
 	TokenSwap,
-	L2_Amm,
 	AddLiquidity,
 	RemoveLiquidity,
 	RemoveLiquidityOne,
@@ -29,12 +28,8 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import { BIGDECIMAL_ZERO, BIGINT_ONE } from '../../../../src/sdk/util/constants'
-import {
-	BIGINT_TEN_TO_EIGHTEENTH,
-	BIGINT_TEN_TO_SIX,
-	SIX_DECIMAL_TOKENS,
-} from '../../../../src/common/constants'
+import { BIGINT_TEN_TO_EIGHTEENTH } from '../../../../src/common/constants'
+import { updateAMMTVE } from '../../../../src/common/tokens'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -139,54 +134,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 			)
 		}
 
-		const Amm = L2_Amm.bind(event.address)
-		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
-		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
-
-		if (!inputBalanceCallA.reverted && !inputBalanceCallB.reverted) {
-			pool.setInputTokenBalance(inputBalanceCallA.value)
-
-			hPool.setInputTokenBalance(inputBalanceCallB.value)
-			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
-
-			if (SIX_DECIMAL_TOKENS.includes(tokenOne.id.toHexString())) {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_SIX)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			} else {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_EIGHTEENTH)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			}
-		} else {
-			log.warning('InputBalanceCall Reverted', [])
-		}
+		updateAMMTVE(event.address, tokenOne.id, hPool, pool)
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
@@ -265,54 +213,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
 
-		const Amm = L2_Amm.bind(event.address)
-		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
-		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
-
-		if (!inputBalanceCallA.reverted && !inputBalanceCallB.reverted) {
-			pool.setInputTokenBalance(inputBalanceCallA.value)
-
-			hPool.setInputTokenBalance(inputBalanceCallB.value)
-			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
-
-			if (SIX_DECIMAL_TOKENS.includes(token.id.toHexString())) {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_SIX)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			} else {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_EIGHTEENTH)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			}
-		} else {
-			log.warning('InputBalanceCall Reverted', [])
-		}
+		updateAMMTVE(event.address, token.id, hPool, pool)
 
 		log.warning(
 			`LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
@@ -383,54 +284,8 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 		acc.liquidityWithdraw(pool, liquidity)
 
-		const Amm = L2_Amm.bind(event.address)
-		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
-		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
+		updateAMMTVE(event.address, token.id, hPool, pool)
 
-		if (!inputBalanceCallA.reverted && !inputBalanceCallB.reverted) {
-			pool.setInputTokenBalance(inputBalanceCallA.value)
-
-			hPool.setInputTokenBalance(inputBalanceCallB.value)
-			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
-
-			if (SIX_DECIMAL_TOKENS.includes(token.id.toHexString())) {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_SIX)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			} else {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_EIGHTEENTH)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			}
-		} else {
-			log.warning('InputBalanceCall Reverted', [])
-		}
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
 
@@ -513,54 +368,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 		acc.liquidityWithdraw(pool, amount.div(BIGINT_TEN_TO_EIGHTEENTH))
 
-		const Amm = L2_Amm.bind(event.address)
-		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
-		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
-
-		if (!inputBalanceCallA.reverted && !inputBalanceCallB.reverted) {
-			pool.setInputTokenBalance(inputBalanceCallA.value)
-
-			hPool.setInputTokenBalance(inputBalanceCallB.value)
-			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
-
-			if (SIX_DECIMAL_TOKENS.includes(token.id.toHexString())) {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_SIX)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			} else {
-				let poolTVE = inputBalanceCallA.value
-					.plus(inputBalanceCallB.value)
-					.minus(pool.pool._inputTokenLiquidityBalance!)
-				pool.setNetValueExportedUSD(
-					poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
-				)
-				log.warning('TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}', [
-					poolTVE.toString(),
-					poolTVE
-						.div(BIGINT_TEN_TO_EIGHTEENTH)
-						.toBigDecimal()
-						.toString(),
-					inputBalanceCallA.value.toString(),
-					inputBalanceCallB.value.toString(),
-					pool.pool._inputTokenLiquidityBalance!.toString(),
-				])
-			}
-		} else {
-			log.warning('InputBalanceCall Reverted', [])
-		}
+		updateAMMTVE(event.address, token.id, hPool, pool)
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
