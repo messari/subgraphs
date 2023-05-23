@@ -20,10 +20,11 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * make all of the storage changes that occur in a protocol.
  *
  * Schema Version:  1.3.1
- * SDK Version:     1.1.3
+ * SDK Version:     1.1.4
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 /**
@@ -130,10 +131,12 @@ export class Perpetual {
     protocol.subgraphVersion = versions.getSubgraphVersion();
     protocol.methodologyVersion = versions.getMethodologyVersion();
 
+    const proto = new Perpetual(protocol, pricer, event);
+
     protocol._lastUpdateTimestamp = event.block.timestamp;
     protocol.save();
 
-    return new Perpetual(protocol, pricer, event);
+    return proto;
   }
 
   /**
