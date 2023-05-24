@@ -1,5 +1,5 @@
-import { Address, log } from "@graphprotocol/graph-ts";
-import { Submitted, Transfer } from "../../generated/Lido/Lido";
+import { Address, log, BigInt } from "@graphprotocol/graph-ts";
+import { Submitted, Transfer, ETHDistributed } from "../../generated/Lido/Lido";
 import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
 import { getOrCreateToken } from "../entities/token";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
@@ -7,6 +7,7 @@ import {
   updateProtocolAndPoolTvl,
   updateSupplySideRevenueMetrics,
   updateProtocolSideRevenueMetrics,
+  updateTotalRevenueMetrics,
 } from "../entityUpdates/financialMetrics";
 import {
   PROTOCOL_TREASURY_ID,
@@ -15,6 +16,7 @@ import {
   ETH_ADDRESS,
   PROTOCOL_ID,
   BIGINT_ZERO,
+  LIDO_V2_UPGRADE_BLOCK,
 } from "../utils/constants";
 import { getOrCreatePool } from "../entities/pool";
 import { Lido } from "../../generated/Lido/Lido";
@@ -73,4 +75,31 @@ export function handleTransfer(event: Transfer): void {
     updateSupplySideRevenueMetrics(event.block);
     updateProtocolAndPoolTvl(event.block, BIGINT_ZERO);
   }
+}
+
+export function handleETHDistributed(event: ETHDistributed): void {
+  if (event.block.number < BigInt.fromString(LIDO_V2_UPGRADE_BLOCK)) {
+    return;
+  }
+
+  // Don’t mint/distribute any protocol fee on the non-profitable Lido oracle report
+  // (when beacon chain balance delta is zero or negative).
+  // See ADR #3 for details: https://research.lido.fi/t/rewards-distribution-after-the-merge-architecture-decision-record/1535
+  const postCLTotalBalance = event.params.postCLBalance.plus(
+    event.params.withdrawalsWithdrawn
+  );
+  if (postCLTotalBalance <= event.params.preCLBalance) {
+    return;
+  }
+
+  const totalRewards = postCLTotalBalance
+    .minus(event.params.preCLBalance)
+    .plus(event.params.executionLayerRewardsWithdrawn);
+
+  const lido = Lido.bind(Address.fromString(PROTOCOL_ID));
+  const supply = lido.totalSupply();
+
+  updateTotalRevenueMetrics(event.block, totalRewards, supply);
+  updateSupplySideRevenueMetrics(event.block);
+  updateProtocolAndPoolTvl(event.block, BIGINT_ZERO);
 }
