@@ -8406,11 +8406,11 @@
         }
       },
       "axelar-avalanche": {
-        "network": "arbitrum",
+        "network": "avalanche",
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.1"
         },
         "files": {
@@ -8580,7 +8580,7 @@
         "status": "dev",
         "versions": {
           "schema": "3.0.4",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {

@@ -116,7 +116,7 @@ export function getUnderlyingCoinFromPool(poolAddress: Address): Address {
 
 export function getPreferredCoinFromCoins(coins: Address[]): Address {
   let preferredCoinAddress = constants.NULL.TYPE_ADDRESS;
-  for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
+  for (let coinIdx = 0; coinIdx < constants.INT_EIGHT; coinIdx++) {
     const coinAddress = coins[coinIdx];
 
     if (coinAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
@@ -126,7 +126,7 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
     if (
       (preferredCoinAddress.notEqual(constants.NULL.TYPE_ADDRESS) &&
         coinAddress.equals(constants.NULL.TYPE_ADDRESS)) ||
-      coinIdx == 7
+      coinIdx == constants.INT_SEVEN
     ) {
       break;
     }
@@ -261,7 +261,7 @@ export function getPriceUsdc(tokenAddress: Address): CustomPriceType {
     .toBigDecimal();
 
   const coins: Address[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < constants.INT_EIGHT; i++) {
     const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(i)),
       constants.NULL.TYPE_ADDRESS
