@@ -1,4 +1,4 @@
-import { Address, log, BigInt } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { Submitted, Transfer, ETHDistributed } from "../../generated/Lido/Lido";
 import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
 import { getOrCreateToken } from "../entities/token";

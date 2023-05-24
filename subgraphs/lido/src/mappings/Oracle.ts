@@ -10,7 +10,7 @@ import {
   PROTOCOL_ID,
 } from "../utils/constants";
 import { Lido } from "../../generated/Lido/Lido";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 
 export function handlePostTotalShares(event: PostTotalShares): void {
   // In Lido v2, PostTotalShares has been deprecated.
