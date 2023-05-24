@@ -159,7 +159,8 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
+/* eslint-disable-next-line rulesdir/no-checksum-addresses */
+export const PROTOCOL_ID = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84";
 export const PROTOCOL_TREASURY_ID =
   "0x3e40d73eb977dc6a537af587d48316fee66e9c8c";
 export const PROTOCOL_NODE_OPERATORS_REGISTRY_ID =
