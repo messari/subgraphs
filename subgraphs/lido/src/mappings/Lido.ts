@@ -78,7 +78,7 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleETHDistributed(event: ETHDistributed): void {
-  if (event.block.number < BigInt.fromString(LIDO_V2_UPGRADE_BLOCK)) {
+  if (event.block.number < LIDO_V2_UPGRADE_BLOCK) {
     return;
   }
 

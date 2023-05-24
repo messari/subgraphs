@@ -16,7 +16,7 @@ export function handlePostTotalShares(event: PostTotalShares): void {
   // In Lido v2, PostTotalShares has been deprecated.
   // The new ETHDistributed event emitted from the main Lido contract is used instead for calculating revenue.
   // Ref: https://docs.lido.fi/integrations/api/#last-lido-apr-for-steth
-  if (event.block.number >= BigInt.fromString(LIDO_V2_UPGRADE_BLOCK)) {
+  if (event.block.number >= LIDO_V2_UPGRADE_BLOCK) {
     return;
   }
 
