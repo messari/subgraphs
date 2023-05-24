@@ -75,6 +75,8 @@ type Token @entity {
   _largePriceChangeBuffer: Int!
 
   _largeTVLImpactBuffer: Int!
+
+  _lastPricedPool: LiquidityPool
 }
 
 enum RewardTokenType {
