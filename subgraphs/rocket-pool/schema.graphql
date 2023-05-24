@@ -488,7 +488,7 @@ type RocketPoolProtocol @entity @regularPolling {
 }
 
 # An address that is/was associated with an rETH balance.
-type Staker @entity @regularPolling {
+type Staker @entity {
   # Address that holds rETH.
   id: ID!
 
@@ -515,7 +515,7 @@ type Staker @entity @regularPolling {
 }
 
 # Tracks the mint, burn and transfers of rETH.
-type RocketETHTransaction @entity(immutable: true) @transaction {
+type RocketETHTransaction @entity(immutable: true) {
   # Composite key based on transaction hash of the triggered event and its log index.
   id: ID!
 
@@ -1021,7 +1021,7 @@ type NodeBalanceCheckpoint @entity {
 }
 
 # Represents a minipool for a node.
-type Minipool @entity {
+type Minipool @entity @regularPolling {
   # Address of the minipool.
   id: ID!
 
