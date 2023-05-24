@@ -8395,7 +8395,7 @@
   },
   "thena-v1": {
     "schema": "dex-amm",
-    "base": "velodrome-finance-forks",
+    "base": "solidly-forks",
     "protocol": "thena-v1",
     "project": "thena",
     "deployments": {
