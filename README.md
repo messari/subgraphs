@@ -12,7 +12,7 @@ Utilizing [The Graph](https://thegraph.com/) these subgraphs extract raw blockch
 
 We aim to make sense of DEFI protocols in an open, holistic approach capturing every piece of data from a given protocol type.
 
-> Protocol types supported: [Lending](./schema-lending.graphql), [CDP](./schema-lending.graphql), [DEX](./schema-dex-amm.graphql), [Yield Aggregator](./schema-yield.graphql), [NFT Marketplace](./schema-nft-marketplace.graphql), [Network](./schema-network.graphql), [Bridge](./schema-bridge.graphql), [Perpetual Futures](./schema-derivatives-perpfutures.graphql), [Options](./schema-derivatives-options.graphql) Governance
+> Protocol types supported: [Lending](./schema-lending.graphql), [CDP](./schema-lending.graphql), [DEX](./schema-dex-amm.graphql), [Yield Aggregator](./schema-yield.graphql), [NFT Marketplace](./schema-nft-marketplace.graphql), [Network](./schema-network.graphql), [Bridge](./schema-bridge.graphql), [Perpetual Futures](./schema-derivatives-perpfutures.graphql), [Options](./schema-derivatives-options.graphql), Governance
 
 <sub>If you are a protocol and want to collaborate please visit [messari.io/web3-data-collaboration](https://messari.io/web3-data-collaboration)</sub>
 
