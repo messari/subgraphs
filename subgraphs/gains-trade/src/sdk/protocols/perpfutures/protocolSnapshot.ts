@@ -129,6 +129,7 @@ export class ProtocolSnapshot {
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
 
@@ -256,6 +257,7 @@ export class ProtocolSnapshot {
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.dailyActiveUsers = activity.activeUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
@@ -342,6 +344,7 @@ export class ProtocolSnapshot {
 
     snapshot.hours = hour;
     snapshot.protocol = this.protocol.id;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.hourlyActiveUsers = activity.activeUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
