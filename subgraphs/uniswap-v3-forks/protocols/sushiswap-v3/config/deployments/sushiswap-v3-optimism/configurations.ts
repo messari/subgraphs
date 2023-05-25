@@ -36,7 +36,7 @@ export class SushiswapV3OptimismConfigurations implements Configurations {
     );
   }
   getProtocolFeeOnOff(): string {
-    return FeeSwitch.OFF;
+    return FeeSwitch.ON;
   }
   getInitialProtocolFeeProportion(fee: i64): BigDecimal {
     log.warning("getProtocolFeeRatio is not implemented: {}", [fee.toString()]);
