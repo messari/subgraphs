@@ -72,8 +72,7 @@ export class ThenaFusionBSCConfigurations implements Configurations {
   }
   getStableOraclePools(): Bytes[] {
     return stringToBytesList([
-      "0x36696169c63e42cd08ce11f5deebbcebae652050", // wBNB/Tether - 0.05
-      "0x81a9b5f18179ce2bf8f001b8a634db80771f1824", // wBNB/USDC - 0.05
+      "0xd405b976ac01023c9064024880999fc450a8668b", // USDT/WBNB
     ]);
   }
   getUntrackedPairs(): Bytes[] {
