@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Options
-# Version: 1.3.1
+# Version: 1.3.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -406,6 +406,9 @@ type UsageMetricsDailySnapshot @entity(immutable: true) {
 
   " Total number of pools "
   totalPoolCount: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 type UsageMetricsHourlySnapshot @entity(immutable: true) {
@@ -441,6 +444,9 @@ type UsageMetricsHourlySnapshot @entity(immutable: true) {
 
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 type FinancialsDailySnapshot @entity(immutable: true) {
@@ -587,6 +593,9 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 
   " Total number of closed positions "
   closedPositionCount: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 ###############################
@@ -788,6 +797,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 
   ##### Quantitative Data #####
 
@@ -1008,6 +1020,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 
   ##### Quantitative Data #####
 
