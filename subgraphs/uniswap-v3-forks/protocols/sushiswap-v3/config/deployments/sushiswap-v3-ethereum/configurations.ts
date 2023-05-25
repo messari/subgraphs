@@ -49,7 +49,7 @@ export class SushiswapV3EthereumConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
+    return Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"); // WETH
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");

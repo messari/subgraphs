@@ -49,14 +49,14 @@ export class SushiswapV3BscConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c");
+    return Bytes.fromHexString("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"); // WBNB
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // NATIVE
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
       "0x2170ed0880ac9a755fd29b2688956bd959f933f8", // WETH
       "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c", // WBTC
       "0x55d398326f99059ff775485246999027b3197955", // USDT

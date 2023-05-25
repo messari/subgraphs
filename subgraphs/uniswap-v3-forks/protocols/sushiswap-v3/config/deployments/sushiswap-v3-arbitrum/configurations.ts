@@ -49,14 +49,14 @@ export class SushiswapV3ArbitrumConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1");
+    return Bytes.fromHexString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1"); // WETH
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // NATIVE
+      "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // WETH
       "0xd4d42f0b6def4ce0383636770ef773390d85c61a", // SUSHI
       "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // WETH
       "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // WBTC

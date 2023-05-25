@@ -49,14 +49,14 @@ export class SushiswapV3GnosisConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0xe91d153e0b41518a2ce8dd3d7944fa863463a97d");
+    return Bytes.fromHexString("0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"); // WXDAI
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // NATIVE
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // WXDAI
       "0x2995d1317dcd4f0ab89f4ae60f3f020a4f17c7ce", // SUSHI
       "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1", // WETH
       "0x8e5bbbb09ed1ebde8674cda39a0c169401db4252", // WBTC
@@ -71,6 +71,7 @@ export class SushiswapV3GnosisConfigurations implements Configurations {
   }
   getStableCoins(): Bytes[] {
     return stringToBytesList([
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // WXDAI
       "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
       "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // USDT
       "0x44fa8e6f47987339850636f88629646662444217", // DAI

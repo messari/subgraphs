@@ -49,14 +49,14 @@ export class SushiswapV3OptimismConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0x4200000000000000000000000000000000000006");
+    return Bytes.fromHexString("0x4200000000000000000000000000000000000006"); // WETH
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0x4200000000000000000000000000000000000006", // NATIVE
+      "0x4200000000000000000000000000000000000006", // WETH
       "0x4200000000000000000000000000000000000042", // OP
       "0x68f180fcce6836688e9084f035309e29bf0a2095", // WBTC
       "0x7f5c764cbc14f9669b88837ca1490cca17c31607", // USDC

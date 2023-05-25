@@ -49,14 +49,14 @@ export class SushiswapV3MoonriverConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0xf50225a84382c74cbdea10b0c176f71fc3de0c4d");
+    return Bytes.fromHexString("0xf50225a84382c74cbdea10b0c176f71fc3de0c4d"); // WMOVR
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0xf50225a84382c74cbdea10b0c176f71fc3de0c4d", // NATIVE
+      "0xf50225a84382c74cbdea10b0c176f71fc3de0c4d", // WMOVR
       "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c", // WETH
       "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
       "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
