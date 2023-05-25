@@ -18,8 +18,8 @@ import {
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  1.3.1
- * SDK Version:     1.1.4
+ * Schema Version:  1.3.2
+ * SDK Version:     1.1.5
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -145,6 +145,7 @@ export class ProtocolSnapshot {
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
 
@@ -274,6 +275,7 @@ export class ProtocolSnapshot {
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.dailyActiveUsers = activity.activeUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
@@ -362,6 +364,7 @@ export class ProtocolSnapshot {
 
     snapshot.hours = hour;
     snapshot.protocol = this.protocol.id;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.hourlyActiveUsers = activity.activeUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;

@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Perpetual Futures
-# Version: 1.2.1
+# Version: 1.2.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -527,6 +527,9 @@ type UsageMetricsDailySnapshot @entity(immutable: true) @dailySnapshot {
 
   " Total number of pools "
   totalPoolCount: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 type UsageMetricsHourlySnapshot @entity(immutable: true) @hourlySnapshot {
@@ -559,6 +562,9 @@ type UsageMetricsHourlySnapshot @entity(immutable: true) @hourlySnapshot {
 
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 type _TempUsageMetricsDailySnapshot @entity {
@@ -760,6 +766,9 @@ type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 ###############################
@@ -976,6 +985,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
 
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 
   ##### Quantitative Data #####
 
@@ -1217,6 +1229,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
 
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 
   ##### Quantitative Data #####
 

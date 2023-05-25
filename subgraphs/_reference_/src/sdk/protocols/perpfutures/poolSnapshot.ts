@@ -15,8 +15,8 @@ import {
  * This file contains the PoolSnapshot, which is used to
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
- * Schema Version:  1.3.1
- * SDK Version:     1.1.4
+ * Schema Version:  1.3.2
+ * SDK Version:     1.1.5
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -84,6 +84,7 @@ export class PoolSnapshot {
     snapshot.hours = hour;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
 
@@ -289,6 +290,7 @@ export class PoolSnapshot {
     snapshot.days = day;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
 
