@@ -1,6 +1,6 @@
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
-import { ERC20 } from "../../../generated/Factory/ERC20";
+import { ERC20 } from "../../../generated/templates/Pool/ERC20";
 import {
   Token,
   _TokenWhitelist,

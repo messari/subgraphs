@@ -1,5 +1,5 @@
+import { Factory } from "../../generated/templates/Pool/Factory";
 import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Factory } from "../../generated/Factory/Factory";
 
 export interface Configurations {
   getNetwork(): string;

@@ -7,4 +7,5 @@ export namespace Deploy {
   export const UNISWAP_V3_BSC = 5;
   export const PANCAKE_V3_BSC = 6;
   export const PANCAKE_V3_ETHEREUM = 7;
+  export const THENA_FUSION_BSC = 8;
 }

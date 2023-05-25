@@ -1,5 +1,5 @@
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { Factory } from "../../../../../generated/Factory/Factory";
+import { Factory } from "../../../../../generated/templates/Pool/Factory";
 import {
   BIGDECIMAL_TEN_THOUSAND,
   FeeSwitch,

@@ -5,7 +5,7 @@ import {
   Bytes,
   log,
 } from "@graphprotocol/graph-ts";
-import { Factory } from "../../../../../generated/Factory/Factory";
+import { Factory } from "../../../../../generated/templates/Pool/Factory";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,

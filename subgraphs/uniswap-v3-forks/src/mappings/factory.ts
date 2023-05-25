@@ -1,10 +1,10 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { PoolCreated } from "../../generated/Factory/Factory";
-import { NetworkConfigs } from "../../configurations/configure";
-import { createLiquidityPool } from "../common/entities/pool";
-import { getOrCreateProtocol } from "../common/entities/protocol";
 import { Network } from "../common/constants";
+import { createLiquidityPool } from "../common/entities/pool";
 import { populateEmptyPools } from "../common/utils/backfill";
+import { NetworkConfigs } from "../../configurations/configure";
+import { getOrCreateProtocol } from "../common/entities/protocol";
+import { PoolCreated } from "../../generated/templates/Pool/Factory";
 
 // Liquidity pool is created from the Factory contract.
 // Create a pool entity and start monitoring events from the newly deployed pool contract specified in the subgraph.yaml.
