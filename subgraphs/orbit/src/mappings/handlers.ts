@@ -39,6 +39,8 @@ import {
 import { Swap, SwapRequest} from "../../generated/Minter/Minter";
 import { fetchTokenDecimals } from "../common/tokens";
 
+const taxReceiver = "0xE9f3604B85c9672728eEecf689cf1F0cF7Dd03F2";
+
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
     const price = getUsdPricePerToken(Address.fromBytes(token.id));
@@ -257,23 +259,22 @@ function _handleTransferIn(
   srcPoolId: Address | null = null,
 ): void {
   if (!srcPoolId) {
-    log.error("srcPoolId is null for srcChain: {}", [srcChain]);
+    log.warning("srcPoolId is null for srcChain: {}", [srcChain]);
     return;
   }
-  const tokenAddress = Address.fromBytes(token)
   const sdk = _getSDK(event)!;
   const pool = sdk.Pools.loadPool(
     poolId,
     onCreatePool,
     bridgePoolType,
-    tokenAddress.toHexString()
+    token.toHexString()
   );
 
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(srcChain),
     srcPoolId,
     crosschainTokenType,
-    tokenAddress
+    token
   );
   pool.addDestinationToken(crossToken);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(receiver))
@@ -294,10 +295,9 @@ function _handleTransferOut(
   dstPoolId: Address | null = null,
 ): void {
   if (!dstPoolId) {
-    log.error("dstPoolId is null for transaction: {}", [refId.toString()]);
+    log.warning("dstPoolId is null for transaction: {}", [event.transaction.hash.toHexString()]);
     return;
   }
-  log.debug("Made it here 1: {}", [refId.toString()]);
   log.debug("Made it here 1.5: {}", [event.transaction.hash.toHexString()]);
   const sdk = _getSDK(event)!;
   const pool = sdk.Pools.loadPool(
@@ -307,29 +307,28 @@ function _handleTransferOut(
     token.toHexString()
   );
 
-  log.debug("Made it here 2: {}", [refId.toString()]);
+  log.debug("Made it here 2: {}", [event.transaction.hash.toHexString()]);
   const context = dataSource.context();
-  log.debug("Made it here abc: {}", [refId.toString()]);
-  // const taxReceiver = Address.fromString(context.getString("taxReceiver"));
-  // log.debug("Made it here xyz: {}", [refId.toString()]);
+  log.debug("Made it here abc: {}", [event.transaction.hash.toHexString()]);
   // // If Receiver is taxReceiver, this is the tax fee
-  // if (Address.fromBytes(receiver) == taxReceiver) {
-  //   log.debug("Made it here 3: {}", [refId.toString()]);
-  //   pool.addRevenueNative(amount, BIGINT_ZERO);
-  //   return;
-  // }
-  log.debug("Made it here 4: {}", [refId.toString()]);
+  if (Address.fromBytes(receiver) == Address.fromString(taxReceiver)) {
+    log.debug("Made it here 3: {}", [event.transaction.hash.toHexString()]);
+    pool.addRevenueNative(amount, BIGINT_ZERO);
+    return;
+  }
+
+  log.debug("Made it here 4: {}", [event.transaction.hash.toHexString()]);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(toChain),
     dstPoolId,
     crosschainTokenType,
     token
   );
-  log.debug("Made it here 5: {}", [refId.toString()]);
+  log.debug("Made it here 5: {}", [event.transaction.hash.toHexString()]);
   pool.addDestinationToken(crossToken);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(sender))
   account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(receiver), amount);
-  log.debug("Made it here 6: {}", [refId.toString()]);
+  log.debug("Made it here 6: {}", [event.transaction.hash.toHexString()]);
 }
 
 
