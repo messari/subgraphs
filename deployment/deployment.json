@@ -3751,7 +3751,7 @@
     "deployments": {
       "sushiswap-v3-ethereum": {
         "network": "ethereum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3773,7 +3773,7 @@
       },
       "sushiswap-v3-arbitrum": {
         "network": "arbitrum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3795,7 +3795,7 @@
       },
       "sushiswap-v3-avalanche": {
         "network": "avalanche",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3817,7 +3817,7 @@
       },
       "sushiswap-v3-bsc": {
         "network": "bsc",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3839,7 +3839,7 @@
       },
       "sushiswap-v3-fantom": {
         "network": "fantom",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3861,7 +3861,7 @@
       },
       "sushiswap-v3-fuse": {
         "network": "fuse",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3883,7 +3883,7 @@
       },
       "sushiswap-v3-gnosis": {
         "network": "gnosis",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3905,7 +3905,7 @@
       },
       "sushiswap-v3-moonriver": {
         "network": "moonriver",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3927,7 +3927,7 @@
       },
       "sushiswap-v3-optimism": {
         "network": "optimism",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
@@ -3949,7 +3949,7 @@
       },
       "sushiswap-v3-polygon": {
         "network": "polygon",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.4",
           "subgraph": "1.1.2",
