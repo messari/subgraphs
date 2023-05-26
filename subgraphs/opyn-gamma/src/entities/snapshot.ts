@@ -80,6 +80,7 @@ function takePoolDailySnapshot(
   snapshot.days = days;
   snapshot.protocol = protocol.id;
   snapshot.pool = pool.id;
+  snapshot.timestamp = event.block.timestamp;
 
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.openInterestUSD = pool.openInterestUSD;
@@ -275,6 +276,7 @@ function takePoolHourlySnapshot(
   snapshot.hours = hours;
   snapshot.protocol = protocol.id;
   snapshot.pool = pool.id;
+  snapshot.timestamp = event.block.timestamp;
 
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.openInterestUSD = pool.openInterestUSD;
@@ -424,6 +426,7 @@ function takeFinancialsDailySnapshot(
   const snapshot = new FinancialsDailySnapshot(id);
   snapshot.days = days;
   snapshot.protocol = protocol.id;
+  snapshot.timestamp = event.block.timestamp;
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   snapshot.openInterestUSD = protocol.openInterestUSD;
   snapshot.openPositionCount = protocol.openPositionCount;
@@ -547,6 +550,7 @@ export function takeUsageMetricsDailySnapshot(
   const usageMetrics = new UsageMetricsDailySnapshot(id);
   usageMetrics.days = days;
   usageMetrics.protocol = protocol.id;
+  usageMetrics.timestamp = event.block.timestamp;
 
   usageMetrics.dailyActiveUsers = activityHelper.dailyActiveUsers;
   usageMetrics.dailyUniqueLP = activityHelper.dailyUniqueLP;
@@ -585,6 +589,7 @@ export function takeUsageMetricsHourlySnapshot(
   const usageMetrics = new UsageMetricsHourlySnapshot(id);
   usageMetrics.hours = hours;
   usageMetrics.protocol = protocol.id;
+  usageMetrics.timestamp = event.block.timestamp;
 
   usageMetrics.hourlyActiveUsers = activityHelper.hourlyActiveUsers;
   usageMetrics.hourlyTransactionCount = activityHelper.hourlyTransactionCount;
