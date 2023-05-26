@@ -1,17 +1,10 @@
-// import { log } from '@graphprotocol/graph-ts'
 import {
   _HelperStore,
   _LiquidityPoolAmount,
   Token,
   LiquidityPool,
 } from "../../../generated/schema";
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
@@ -140,13 +133,13 @@ export function findUSDPricePerToken(
     priceSoFar = BIGDECIMAL_ZERO;
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
-      const poolAddress = Address.fromBytes(whiteList[i]);
-      const poolAmounts = getLiquidityPoolAmounts(poolAddress)!;
-      const pool = getLiquidityPool(poolAddress)!;
+      const poolAmounts = getLiquidityPoolAmounts(whiteList[i])!;
+      const pool = getLiquidityPool(whiteList[i])!;
 
       if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
         const token_index: i32 = get_token_index(pool, token);
         if (token_index == -1) {
+          log.critical("Token not found in pool", []);
           continue;
         }
         const whitelistTokenIndex = 0 == token_index ? 1 : 0;
@@ -168,6 +161,7 @@ export function findUSDPricePerToken(
         ) {
           const newPriceSoFar = computePriceFromConvertedSqrtX96Ratio(
             pool,
+            token,
             whitelistToken,
             poolAmounts.tokenPrices[whitelistTokenIndex]
           );
@@ -243,23 +237,24 @@ function get_token_index(pool: LiquidityPool, token: Token): i32 {
 
 function computePriceFromConvertedSqrtX96Ratio(
   pool: LiquidityPool,
-  token: Token,
+  tokenToBePriced: Token,
+  whitelistToken: Token,
   convertedSqrtX96Ratio: BigDecimal
 ): BigDecimal | null {
   // Calculate new price of a token and TVL of token in this pool.
   const newPriceSoFar = convertedSqrtX96Ratio.times(
-    token.lastPriceUSD as BigDecimal
+    whitelistToken.lastPriceUSD as BigDecimal
   );
 
   const newTokenTotalValueLocked = convertTokenToDecimal(
-    token._totalSupply,
-    token.decimals
+    tokenToBePriced._totalSupply,
+    tokenToBePriced.decimals
   ).times(newPriceSoFar);
 
   // If price is too high, skip this pool
   if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
     log.warning("Price too high for token: {} from pool: {}", [
-      token.id.toHexString(),
+      tokenToBePriced.id.toHexString(),
       pool.id.toHexString(),
     ]);
     return null;
