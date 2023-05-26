@@ -52,7 +52,7 @@ export function updatePosition(
   );
   const sizeUSDDelta = utils.bigIntToBigDecimal(
     sizeDelta,
-    constants.PRICE_PRECISION_DECIMALS
+    constants.VALUE_DECIMALS
   );
   const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
   const collateralUSDDelta = utils.bigIntToBigDecimal(
@@ -84,7 +84,7 @@ export function updatePosition(
   if (isLong) {
     positionSide = constants.PositionSide.LONG;
   }
-
+  //update position
   const position = updateUserPosition(
     positionKey,
     account,
@@ -95,12 +95,12 @@ export function updatePosition(
     transactionType,
     sdk
   );
-
+  //update premium
   pool.addUsdPremium(
     utils.bigIntToBigDecimal(fee, constants.VALUE_DECIMALS),
     transactionType
   );
-
+  //update volume
   increasePoolVolume(
     pool,
     sizeUSDDelta,
@@ -111,7 +111,8 @@ export function updatePosition(
     false,
     sdk
   );
-
+  //update openInterest
+  //create transaction
   if (transactionType == TransactionType.COLLATERAL_IN) {
     updatePoolOpenInterestUSD(pool, sizeUSDDelta, true, isLong);
     account.collateralIn(

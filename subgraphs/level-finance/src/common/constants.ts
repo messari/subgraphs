@@ -175,7 +175,7 @@ export const VAULT_ADDRESS = Address.fromString(
   "0xd152c7f25db7f4b95b7658323c5f33d176818ee4"
 );
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
-export const PRICE_PRECISION_DECIMALS = 30;
+export const PRICE_PRECISION_DECIMALS = 12;
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
 export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.15");

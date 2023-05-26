@@ -12,13 +12,13 @@ import {
   TokenWhitelisted,
   UpdatePosition,
 } from "../../generated/Pool/Pool";
-import { getOrCreatePool, initializeSDK } from "../common/initializers";
-import { collectFees } from "../modules/fee";
 import { swap } from "../modules/swap";
+import { collectFees } from "../modules/fee";
 import * as constants from "../common/constants";
 import { updatePosition } from "../modules/position";
-import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { transaction } from "../modules/transaction";
+import { TransactionType } from "../sdk/protocols/perpfutures/enums";
+import { getOrCreatePool, initializeSDK } from "../common/initializers";
 
 export function handlePositionIncreased(event: IncreasePosition): void {
   const accountAddress = event.params.account;
@@ -57,7 +57,13 @@ export function handlePositionDecreased(event: DecreasePosition): void {
   const key = event.params.key;
   const side = event.params.side;
   const sizeChange = event.params.sizeChanged;
-
+  const pnl = event.params.pnl;
+  //how to use pnl[]
+  // _storePnl(
+  //   ev.block.timestamp,
+  //   ev.params.pnl.abs.times(ev.params.pnl.sig.equals(ZERO) ? NEGATIVE_ONE : ONE),
+  //   ev.params.feeValue
+  // );
   updatePosition(
     event,
     key,
@@ -101,9 +107,24 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
   );
 }
 
-export function handleUpdatePosition(event: UpdatePosition): void {}
+export function handleUpdatePosition(event: UpdatePosition): void {
+  // event.params.collateralValue
+  // event.params.entryInterestRate
+  // event.params.entryPrice
+  // event.params.indexPrice
+  // event.params.key
+  // event.params.reserveAmount
+  // event.params.size;
+}
 
-export function handleClosePosition(event: ClosePosition): void {}
+export function handleClosePosition(event: ClosePosition): void {
+  event.params.collateralValue;
+  event.params.entryInterestRate;
+  event.params.entryPrice;
+  event.params.key;
+  event.params.reserveAmount;
+  event.params.size;
+}
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
   const amount = event.params.amount;
@@ -172,7 +193,6 @@ export function handleSwap(event: Swap): void {
     pool
   );
   collectFees(fee, tokenInAddress, sdk, pool);
-  //
 }
 
 export function handleInterestAccrued(event: InterestAccrued): void {
