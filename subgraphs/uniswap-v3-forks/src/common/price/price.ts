@@ -281,7 +281,7 @@ export function getTrackedVolumeUSD(
   tokens: Token[],
   amountsUSD: BigDecimal[]
 ): BigDecimal[] {
-  // dont count tracked volume on these pairs - usually rebass tokens
+  // dont count tracked volume on these pairs - usually rebase tokens
   if (NetworkConfigs.getUntrackedPairs().includes(pool.id)) {
     return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   }

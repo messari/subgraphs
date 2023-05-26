@@ -200,6 +200,7 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_TWENTY_SIX = 26 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -226,6 +227,11 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 ////////////////
 ///// Misc /////
 ////////////////
+
+export const POOL_PREFIX = "Axelar Bridge: ";
+export const TRANSFER = "Transfer(address,address,uint256)";
+export const ADDRESS = "address";
+export const UINT256 = "uint256";
 
 export const ETH_SYMBOL = "ETH";
 export const ETH_NAME = "Ether";

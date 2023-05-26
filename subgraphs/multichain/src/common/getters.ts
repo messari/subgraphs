@@ -16,7 +16,7 @@ import {
   INT_ZERO,
   BIGINT_ZERO,
   BIGDECIMAL_ZERO,
-  NetworkByID,
+  NETWORK_BY_ID,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   ProtocolType,
@@ -28,6 +28,9 @@ import {
   ZERO_ADDRESS,
   BridgePermissionType,
   BIGDECIMAL_ONE,
+  CONTEXT_KEY_POOLID,
+  CONTEXT_KEY_CHAINID,
+  CONTEXT_KEY_CROSSCHAINID,
 } from "./constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 import { Versions } from "../versions";
@@ -49,7 +52,7 @@ import {
   Account,
 } from "../../generated/schema";
 import { LiquidityPoolTemplate } from "../../generated/templates";
-import { anyTOKEN } from "../../generated/RouterV6/anyTOKEN";
+import { anyToken } from "../../generated/Router-0/anyToken";
 
 export function getOrCreateProtocol(): BridgeProtocol {
   let protocol = BridgeProtocol.load(
@@ -123,8 +126,8 @@ export function getOrCreateToken(
   if (!token.lastPriceUSD || token.lastPriceBlockNumber! < block.number) {
     token.lastPriceUSD = BIGDECIMAL_ZERO;
 
-    const network = NetworkByID.get(chainID.toString())
-      ? NetworkByID.get(chainID.toString())!
+    const network = NETWORK_BY_ID.get(chainID.toString())
+      ? NETWORK_BY_ID.get(chainID.toString())!
       : Network.UNKNOWN_NETWORK;
 
     if (
@@ -148,7 +151,7 @@ export function getOrCreateToken(
       } else {
         let pricedTokenAddress = tokenAddress;
 
-        const anyTokenContract = anyTOKEN.bind(tokenAddress);
+        const anyTokenContract = anyToken.bind(tokenAddress);
         const underlyingTokenCall = anyTokenContract.try_underlying();
         if (
           !underlyingTokenCall.reverted &&
@@ -157,9 +160,9 @@ export function getOrCreateToken(
           pricedTokenAddress = underlyingTokenCall.value;
         }
 
-        const price = getUsdPricePerToken(pricedTokenAddress);
+        const price = getUsdPricePerToken(pricedTokenAddress, block);
         if (!price.reverted) {
-          token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+          token.lastPriceUSD = price.usdPrice;
         }
       }
     }
@@ -184,8 +187,8 @@ export function getOrCreateCrosschainToken(
     crosschainToken = new CrosschainToken(crosschainTokenID);
 
     crosschainToken.chainID = crosschainID;
-    const network = NetworkByID.get(crosschainID.toString())
-      ? NetworkByID.get(crosschainID.toString())!
+    const network = NETWORK_BY_ID.get(crosschainID.toString())
+      ? NETWORK_BY_ID.get(crosschainID.toString())!
       : Network.UNKNOWN_NETWORK;
 
     crosschainToken.network = network;
@@ -215,9 +218,12 @@ export function getOrCreatePool(
     pool.type = poolType;
     if (poolType == BridgePoolType.LIQUIDITY) {
       const context = new DataSourceContext();
-      context.setString("poolID", pool.id.toHexString());
-      context.setString("chainID", NetworkConfigs.getChainID().toString());
-      context.setString("crosschainID", crosschainID.toString());
+      context.setString(CONTEXT_KEY_POOLID, pool.id.toHexString());
+      context.setString(
+        CONTEXT_KEY_CHAINID,
+        NetworkConfigs.getChainID().toString()
+      );
+      context.setString(CONTEXT_KEY_CROSSCHAINID, crosschainID.toString());
 
       LiquidityPoolTemplate.createWithContext(
         Address.fromBytes(pool.id),
@@ -314,7 +320,7 @@ function addCrosschainTokenToPoolIfNotExists(
   pool: Pool,
   crossToken: CrosschainToken
 ): void {
-  if (pool.destinationTokens.indexOf(crossToken.id) >= 0) {
+  if (pool.destinationTokens.indexOf(crossToken.id) >= INT_ZERO) {
     return;
   }
 

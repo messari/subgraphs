@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-string-literals */
 import {
   Address,
   ethereum,
@@ -63,8 +64,9 @@ import {
   USDC_COMET_WETH_MARKET_ID,
   WETH_COMET_ADDRESS,
   getRewardAddress,
-  POLYGON_COMP_ORACLE_ADDRESS,
   equalsIgnoreCase,
+  getCOMPChainlinkFeed,
+  NORMALIZE_DECIMALS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { Market, Token } from "../../../generated/schema";
@@ -157,14 +159,17 @@ export function handleCometDeployed(event: CometDeployed): void {
     market.canUseAsCollateral = true;
     market.maximumLTV = bigIntToBigDecimal(
       tryAssetInfo.value.borrowCollateralFactor,
-      16
+      NORMALIZE_DECIMALS
     );
     market.liquidationThreshold = bigIntToBigDecimal(
       tryAssetInfo.value.liquidateCollateralFactor,
-      16
+      NORMALIZE_DECIMALS
     );
     market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-      bigIntToBigDecimal(tryAssetInfo.value.liquidationFactor, 16)
+      bigIntToBigDecimal(
+        tryAssetInfo.value.liquidationFactor,
+        NORMALIZE_DECIMALS
+      )
     );
     market.supplyCap = tryAssetInfo.value.supplyCap;
     market.relation = event.params.cometProxy;
@@ -198,14 +203,17 @@ export function handleAddAsset(event: AddAsset): void {
   market.canUseAsCollateral = true;
   market.maximumLTV = bigIntToBigDecimal(
     event.params.assetConfig.borrowCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationThreshold = bigIntToBigDecimal(
     event.params.assetConfig.liquidateCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-    bigIntToBigDecimal(event.params.assetConfig.liquidationFactor, 16)
+    bigIntToBigDecimal(
+      event.params.assetConfig.liquidationFactor,
+      NORMALIZE_DECIMALS
+    )
   );
   market.supplyCap = event.params.assetConfig.supplyCap;
   market.relation = event.params.cometProxy;
@@ -332,14 +340,17 @@ export function handleUpdateAsset(event: UpdateAsset): void {
   market.canUseAsCollateral = true;
   market.maximumLTV = bigIntToBigDecimal(
     event.params.newAssetConfig.borrowCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationThreshold = bigIntToBigDecimal(
     event.params.newAssetConfig.liquidateCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-    bigIntToBigDecimal(event.params.newAssetConfig.liquidationFactor, 16)
+    bigIntToBigDecimal(
+      event.params.newAssetConfig.liquidationFactor,
+      NORMALIZE_DECIMALS
+    )
   );
   market.supplyCap = event.params.newAssetConfig.supplyCap;
   market.save();
@@ -360,7 +371,10 @@ export function handleUpdateAssetBorrowCollateralFactor(
   );
   const market = manager.getMarket();
 
-  market.maximumLTV = bigIntToBigDecimal(event.params.newBorrowCF, 16);
+  market.maximumLTV = bigIntToBigDecimal(
+    event.params.newBorrowCF,
+    NORMALIZE_DECIMALS
+  );
   market.save();
 }
 
@@ -381,7 +395,7 @@ export function handleUpdateAssetLiquidateCollateralFactor(
 
   market.liquidationThreshold = bigIntToBigDecimal(
     event.params.newLiquidateCF,
-    16
+    NORMALIZE_DECIMALS
   );
   market.save();
 }
@@ -402,7 +416,7 @@ export function handleUpdateAssetLiquidationFactor(
   const market = manager.getMarket();
 
   market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-    bigIntToBigDecimal(event.params.newLiquidationFactor, 16)
+    bigIntToBigDecimal(event.params.newLiquidationFactor, NORMALIZE_DECIMALS)
   );
   market.save();
 }
@@ -999,12 +1013,20 @@ function updateRewards(
     );
   }
 
+  if (tryRewardConfig.value.value0 == ZERO_ADDRESS) {
+    log.warning("[updateRewards] Reward token address is zero address", []);
+    return;
+  }
+
   const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
 
   // Update price for reward token using Chainlink oracle on Polygon
-  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+  if (
+    equalsIgnoreCase(dataSource.network(), Network.MATIC) ||
+    equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE)
+  ) {
     const chainlinkContract = Chainlink.bind(
-      Address.fromString(POLYGON_COMP_ORACLE_ADDRESS)
+      getCOMPChainlinkFeed(dataSource.network())
     );
     const tryPrice = chainlinkContract.try_latestAnswer();
     if (tryPrice.reverted) {
