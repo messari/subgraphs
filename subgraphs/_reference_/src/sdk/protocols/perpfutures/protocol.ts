@@ -19,8 +19,8 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * This file contains the Perpetual class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  1.3.1
- * SDK Version:     1.1.4
+ * Schema Version:  1.3.2
+ * SDK Version:     1.1.5
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan

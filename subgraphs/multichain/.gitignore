@@ -2,3 +2,4 @@
 configure.ts
 src/versions*
 docs/
+protocols/multichain/config/deployments/out.json

@@ -77,6 +77,7 @@ export class PoolSnapshot {
     snapshot.hours = hour;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
 
@@ -274,6 +275,7 @@ export class PoolSnapshot {
     snapshot.days = day;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
 

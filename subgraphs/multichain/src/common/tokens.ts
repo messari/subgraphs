@@ -1,14 +1,15 @@
 /* eslint-disable prefer-const */
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { BIGINT_ZERO } from "./constants";
+import {
+  BIGINT_ZERO,
+  INVALID_TOKEN_DECIMALS,
+  UNKNOWN_TOKEN_VALUE,
+} from "./constants";
 
-import { ERC20 } from "../../generated/RouterV6/ERC20";
-import { ERC20SymbolBytes } from "../../generated/RouterV6/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/RouterV6/ERC20NameBytes";
-
-export const INVALID_TOKEN_DECIMALS = 0;
-export const UNKNOWN_TOKEN_VALUE = "unknown";
+import { ERC20 } from "../../generated/Router-0/ERC20";
+import { ERC20SymbolBytes } from "../../generated/Router-0/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/Router-0/ERC20NameBytes";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
   const contract = ERC20.bind(tokenAddress);

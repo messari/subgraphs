@@ -18,9 +18,13 @@ import {
   ZERO_ADDRESS,
   BIGINT_ZERO,
   BridgeType,
+  ID_BY_NETWORK,
+  INT_ZERO,
+  INT_ONE,
+  INT_TWO,
 } from "../../../../../src/common/constants";
 import { bigIntToBigDecimal } from "../../../../../src/common/utils/numbers";
-import { BridgeAPIResponse, RouterAPIResponse } from "./api";
+import { BRIDGE_API_RESPONSE, ROUTER_API_RESPONSE } from "./api";
 
 export class MultichainFantomConfigurations implements Configurations {
   getNetwork(): string {
@@ -33,19 +37,24 @@ export class MultichainFantomConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xfA9dA51631268A30Ec3DDd1CcBf46c65FAD99251";
+    return "0xfa9da51631268a30ec3ddd1ccbf46c65fad99251";
   }
   getChainID(): BigInt {
-    return BigInt.fromI32(250);
+    const chainID = ID_BY_NETWORK.get(this.getNetwork());
+    if (!chainID) {
+      log.error("[getChainID] ID_BY_NETWORK not set for network", []);
+      return BIGINT_ZERO;
+    }
+    return chainID;
   }
   getCrosschainID(tokenID: string): BigInt {
     let crosschainID = BIGINT_ZERO;
 
     const key = tokenID.toLowerCase();
-    const obj = json.fromString(BridgeAPIResponse).toObject().get(key);
+    const obj = json.fromString(BRIDGE_API_RESPONSE).toObject().get(key);
 
     if (obj) {
-      crosschainID = BigInt.fromString(obj.toArray()[0].toString());
+      crosschainID = BigInt.fromString(obj.toArray()[INT_ZERO].toString());
     } else {
       log.warning("[getCrosschainID] No crosschainID for key: {}", [key]);
     }
@@ -59,7 +68,7 @@ export class MultichainFantomConfigurations implements Configurations {
       .concat(":")
       .concat(crosschainID);
 
-    if (!json.fromString(RouterAPIResponse).toObject().get(key)) {
+    if (!json.fromString(ROUTER_API_RESPONSE).toObject().get(key)) {
       log.warning("[isWhitelistToken] Not whitelisted key: {}", [key]);
 
       return false;
@@ -79,12 +88,12 @@ export class MultichainFantomConfigurations implements Configurations {
 
     if (bridgeType == BridgeType.BRIDGE) {
       key = tokenID.toLowerCase();
-      obj = json.fromString(BridgeAPIResponse).toObject().get(key);
-      idx = 1;
+      obj = json.fromString(BRIDGE_API_RESPONSE).toObject().get(key);
+      idx = INT_ONE;
     } else {
       key = tokenID.toLowerCase().concat(":").concat(crosschainID);
-      obj = json.fromString(RouterAPIResponse).toObject().get(key);
-      idx = 0;
+      obj = json.fromString(ROUTER_API_RESPONSE).toObject().get(key);
+      idx = INT_ZERO;
     }
 
     if (obj) {
@@ -112,24 +121,24 @@ export class MultichainFantomConfigurations implements Configurations {
 
     if (bridgeType == BridgeType.BRIDGE) {
       key = token.id.toHexString().toLowerCase();
-      obj = json.fromString(BridgeAPIResponse).toObject().get(key);
-      idx = 2;
+      obj = json.fromString(BRIDGE_API_RESPONSE).toObject().get(key);
+      idx = INT_TWO;
     } else {
       key = token.id
         .toHexString()
         .toLowerCase()
         .concat(":")
         .concat(crosschainID);
-      obj = json.fromString(RouterAPIResponse).toObject().get(key);
-      idx = 1;
+      obj = json.fromString(ROUTER_API_RESPONSE).toObject().get(key);
+      idx = INT_ONE;
     }
 
     if (obj) {
       const feeValues = obj.toArray()[idx as i32].toString().split(",");
 
-      const swapFeeRate = BigDecimal.fromString(feeValues[0]);
-      const minFee = BigDecimal.fromString(feeValues[1]);
-      const maxFee = BigDecimal.fromString(feeValues[2]);
+      const swapFeeRate = BigDecimal.fromString(feeValues[INT_ZERO]);
+      const minFee = BigDecimal.fromString(feeValues[INT_ONE]);
+      const maxFee = BigDecimal.fromString(feeValues[INT_TWO]);
 
       let fee = bigIntToBigDecimal(amount, token.decimals).times(
         swapFeeRate.div(BIGDECIMAL_HUNDRED)

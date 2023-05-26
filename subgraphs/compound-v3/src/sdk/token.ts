@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ERC20 } from "../../generated/Configurator/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Configurator/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Configurator/ERC20NameBytes";
@@ -189,8 +190,8 @@ export class StaticTokenDefinition {
   }
 
   // Get all tokens with a static defintion
-  static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    const staticDefinitions = new Array<StaticTokenDefinition>(6);
+  static getStaticDefinitions(): StaticTokenDefinition[] {
+    const staticDefinitions: StaticTokenDefinition[] = [];
 
     // Add DGD
     const tokenDGD = new StaticTokenDefinition(
