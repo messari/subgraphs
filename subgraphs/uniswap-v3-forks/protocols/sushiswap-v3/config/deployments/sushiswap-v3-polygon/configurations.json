@@ -1,0 +1,11 @@
+{
+  "network": "matic",
+  "factoryAddress": "0x917933899c6a5f8e37f31e19f92cdbff7e8ff0e2",
+  "factoryAddressStartBlock": 41024971,
+  "nonFungiblePositionManagerAddress": "0xb7402ee99f0a008e461098ac3a27f4957df89a40",
+  "nonFungiblePositionManagerAddressStartBlock": 41046124,
+  "deployment": "SUSHISWAP_V3_POLYGON",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

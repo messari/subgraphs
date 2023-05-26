@@ -3743,6 +3743,234 @@
       }
     }
   },
+  "sushiswap-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "sushiswap-v3",
+    "project": "sushiswap",
+    "deployments": {
+      "sushiswap-v3-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-ethereum",
+            "query-id": "sushiswap-v3-ethereum"
+          }
+        }
+      },
+      "sushiswap-v3-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-arbitrum",
+            "query-id": "sushiswap-v3-arbitrum"
+          }
+        }
+      },
+      "sushiswap-v3-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-avalanche",
+            "query-id": "sushiswap-v3-avalanche"
+          }
+        }
+      },
+      "sushiswap-v3-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-bsc",
+            "query-id": "sushiswap-v3-bsc"
+          }
+        }
+      },
+      "sushiswap-v3-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-fantom",
+            "query-id": "sushiswap-v3-fantom"
+          }
+        }
+      },
+      "sushiswap-v3-fuse": {
+        "network": "fuse",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-fuse",
+            "query-id": "sushiswap-v3-fuse"
+          }
+        }
+      },
+      "sushiswap-v3-gnosis": {
+        "network": "gnosis",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-gnosis",
+            "query-id": "sushiswap-v3-gnosis"
+          }
+        }
+      },
+      "sushiswap-v3-moonriver": {
+        "network": "moonriver",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-moonriver",
+            "query-id": "sushiswap-v3-moonriver"
+          }
+        }
+      },
+      "sushiswap-v3-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-optimism",
+            "query-id": "sushiswap-v3-optimism"
+          }
+        }
+      },
+      "sushiswap-v3-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.1.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sushiswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-v3-polygon",
+            "query-id": "sushiswap-v3-polygon"
+          }
+        }
+      }
+    }
+  },
   "osmosis-dex": {
     "schema": "dex-amm",
     "base": "osmosis-dex",

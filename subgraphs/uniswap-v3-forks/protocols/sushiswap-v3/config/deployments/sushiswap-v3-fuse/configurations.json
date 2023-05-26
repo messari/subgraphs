@@ -1,0 +1,11 @@
+{
+  "network": "fuse",
+  "factoryAddress": "0x1b9d177ccdea3c79b6c8f40761fc8dc9d0500eaa",
+  "factoryAddressStartBlock": 22556035,
+  "nonFungiblePositionManagerAddress": "0x10c19390e1ac2fd6d0c3643a2320b0aba38e5baa",
+  "nonFungiblePositionManagerAddressStartBlock": 22565055,
+  "deployment": "SUSHISWAP_V3_FUSE",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
