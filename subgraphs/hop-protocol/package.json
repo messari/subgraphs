@@ -18,7 +18,7 @@
     "dl2": "yarn do && yarn dp && yarn dx && yarn da"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.37.6",
+    "@graphprotocol/graph-cli": "0.49.0",
     "@graphprotocol/graph-ts": "0.29.1",
     "messari-subgraph-cli": "^0.1.52"
   },

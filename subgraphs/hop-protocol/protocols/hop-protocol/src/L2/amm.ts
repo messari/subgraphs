@@ -124,7 +124,7 @@ export function handleTokenSwap(event: TokenSwap): void {
       );
     }
 
-    updateAMMTVE(event.address, tokenOne.id, hPool, pool);
+    updateAMMTVE(event.address, Address.fromBytes(tokenOne.id), hPool, pool);
 
     pool.pool.relation = hPool.getBytesID();
     hPool.pool.relation = hPool.getBytesID();
@@ -200,7 +200,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
     pool.pool.relation = hPool.getBytesID();
     hPool.pool.relation = hPool.getBytesID();
 
-    updateAMMTVE(event.address, token.id, hPool, pool);
+    updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
 
     log.warning(
       `LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
@@ -269,7 +269,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
     acc.liquidityWithdraw(pool, liquidity);
 
-    updateAMMTVE(event.address, token.id, hPool, pool);
+    updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
 
     pool.pool.relation = hPool.getBytesID();
     hPool.pool.relation = hPool.getBytesID();
@@ -350,7 +350,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
     acc.liquidityWithdraw(pool, amount.div(BIGINT_TEN_TO_EIGHTEENTH));
 
-    updateAMMTVE(event.address, token.id, hPool, pool);
+    updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
 
     pool.pool.relation = hPool.getBytesID();
     hPool.pool.relation = hPool.getBytesID();
