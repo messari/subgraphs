@@ -7494,7 +7494,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
