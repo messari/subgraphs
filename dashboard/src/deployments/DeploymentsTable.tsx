@@ -49,7 +49,7 @@ function DeploymentsTable({
     erc20: false,
     erc721: false,
     governance: false,
-    network: false,
+    // network: false,
     ["nft-marketplace"]: false,
     ["derivatives-options"]: false,
     ["derivatives-perpfutures"]: false,

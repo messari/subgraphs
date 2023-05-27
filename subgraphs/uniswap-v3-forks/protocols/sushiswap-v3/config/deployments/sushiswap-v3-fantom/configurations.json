@@ -1,0 +1,11 @@
+{
+  "network": "fantom",
+  "factoryAddress": "0x7770978eed668a3ba661d51a773d3a992fc9ddcb",
+  "factoryAddressStartBlock": 58860670,
+  "nonFungiblePositionManagerAddress": "0x10c19390e1ac2fd6d0c3643a2320b0aba38e5baa",
+  "nonFungiblePositionManagerAddressStartBlock": 58896145,
+  "deployment": "SUSHISWAP_V3_FANTOM",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

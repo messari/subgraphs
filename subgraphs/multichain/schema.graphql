@@ -2,6 +2,7 @@
 # Version: 1.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 enum Network {
+  ADA
   APT
   ARBITRUM_ONE
   ARBITRUM_NOVA
@@ -58,6 +59,7 @@ enum Network {
   RSK
   SHIDEN
   SMARTBCH
+  SOL
   SYSCOIN
   TELOS
   TERRA
