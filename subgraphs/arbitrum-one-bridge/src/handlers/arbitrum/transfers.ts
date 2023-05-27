@@ -105,8 +105,8 @@ export function handleTransferIn(event: DepositFinalized): void {
     log.info("calculate token balance owned by bridge contract reverted", []);
   } else {
     inputTokenBalance = inputTokenBalanceResult.value;
+    pool.setInputTokenBalance(inputTokenBalance);
   }
-  pool.setInputTokenBalance(inputTokenBalance!);
 }
 
 // ###################################################################################################
@@ -215,6 +215,6 @@ export function handleTransferOut(event: WithdrawalInitiated): void {
     log.info("calculate token balance owned by bridge contract reverted", []);
   } else {
     inputTokenBalance = inputTokenBalanceResult.value;
+    pool.setInputTokenBalance(inputTokenBalance);
   }
-  pool.setInputTokenBalance(inputTokenBalance!);
 }
