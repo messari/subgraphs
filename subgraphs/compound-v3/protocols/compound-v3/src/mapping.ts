@@ -1,4 +1,3 @@
-/* eslint-disable rulesdir/no-string-literals */
 import {
   Address,
   ethereum,
