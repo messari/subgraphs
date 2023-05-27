@@ -495,7 +495,7 @@ export function handleSupply(event: Supply): void {
       PositionSide.BORROWER,
       accountActorID
     );
-  } else if (mintAmount.le(amount)) {
+  } else if (mintAmount.ge(amount)) {
     // deposit only
     createBaseTokenTransactions(
       cometContract,

@@ -2046,7 +2046,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.3",
+          "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
         "files": {
