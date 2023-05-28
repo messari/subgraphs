@@ -160,7 +160,7 @@ dataSources:
           handler: handleAddLiquidity
         - event: RemoveLiquidity(address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleRemoveLiquidity
-      file: ./src/mappings/mlp-manager.ts
+      file: ./src/mappings/mlpManager.ts
   {{/glpManagers}}
 
   - kind: ethereum/contract
@@ -341,4 +341,4 @@ templates:
           handler: handleAddLiquidity
         - event: RemoveLiquidity(address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleRemoveLiquidity
-      file: ./src/mappings/mlp-manager.ts
+      file: ./src/mappings/mlpManager.ts
