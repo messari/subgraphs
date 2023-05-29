@@ -37,7 +37,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: Bytes!
 
@@ -65,7 +65,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity(immutable: true) {
+type RewardToken @entity(immutable: true) @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: Bytes!
 
@@ -115,7 +115,7 @@ enum LiquidityPoolFeeType {
   WITHDRAWAL_FEE
 }
 
-type LiquidityPoolFee @entity {
+type LiquidityPoolFee @entity @regularPolling {
   " { Fee type }-{ Pool address } "
   id: Bytes!
 
@@ -222,7 +222,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type DerivOptProtocol implements Protocol @entity {
+type DerivOptProtocol implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -362,7 +362,7 @@ type DerivOptProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity(immutable: true) {
+type UsageMetricsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -409,7 +409,7 @@ type UsageMetricsDailySnapshot @entity(immutable: true) {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity(immutable: true) {
+type UsageMetricsHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -505,7 +505,7 @@ type _TempUsageMetricsHourlySnapshot @entity {
   hourlySwapCount: Int!
 }
 
-type FinancialsDailySnapshot @entity(immutable: true) {
+type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -658,7 +658,7 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 ##### Pool-Level Metadata #####
 ###############################
 
-type LiquidityPool @entity {
+type LiquidityPool @entity @regularPolling {
   " Smart contract address of the pool "
   id: Bytes!
 
@@ -855,7 +855,7 @@ type LiquidityPool @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type LiquidityPoolDailySnapshot @entity(immutable: true) {
+type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -1078,7 +1078,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type LiquidityPoolHourlySnapshot @entity(immutable: true) {
+type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -1270,7 +1270,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity(immutable: true) {
+type Deposit implements Event @entity(immutable: true) @transaction {
   " deposit-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1317,7 +1317,7 @@ type Deposit implements Event @entity(immutable: true) {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity(immutable: true) {
+type Withdraw implements Event @entity(immutable: true) @transaction {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1366,7 +1366,7 @@ type Withdraw implements Event @entity(immutable: true) {
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity @regularPolling {
   " Address of the account "
   id: Bytes!
 
@@ -1442,7 +1442,7 @@ enum OptionType {
 # A position describes a contract that a user has taken (either a call/put)
 # Note: A position snapshot is not necessary because the position is opened and closed with no other interaction
 # All of the data we would get from a snapshot is already available in the position.
-type Position @entity {
+type Position @entity @regularPolling {
   " { Account address }-{ Option id }-{ Counter } "
   id: Bytes!
 
@@ -1509,7 +1509,7 @@ type Position @entity {
 }
 
 # Entity containing metadata of a given option (unique underlying + collateral + expiration)
-type Option @entity {
+type Option @entity @regularPolling {
   " Address or other unique identifier of option "
   id: Bytes!
 
