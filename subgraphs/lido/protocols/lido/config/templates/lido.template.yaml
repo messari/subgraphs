@@ -1,11 +1,13 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
 features:
   - grafting
 graft:
-  base: Qme9Vb2FTRRKaoR25bDbtL6JzTcmuQfTgbfmoQXigUynNd
-  block: 17172465
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: Lido
