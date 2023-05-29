@@ -51,23 +51,32 @@ export function handleTransfer(event: Transfer): void {
   getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
   getOrCreateToken(Address.fromString(PROTOCOL_ID), event.block.number);
 
-  // get node operators
-  let nodeOperators: Address[] = [];
-  const nodeOperatorsRegistry = NodeOperatorsRegistry.bind(
-    Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID)
-  );
-  const getRewardsDistributionCallResult =
-    nodeOperatorsRegistry.try_getRewardsDistribution(BIGINT_ZERO);
-  if (getRewardsDistributionCallResult.reverted) {
-    log.info("NodeOperatorsRegistry call reverted", []);
-  } else {
-    nodeOperators = getRewardsDistributionCallResult.value.getRecipients();
-  }
-
   const fromZeros = sender == Address.fromString(ZERO_ADDRESS);
   const isMintToTreasury =
     fromZeros && recipient == Address.fromString(PROTOCOL_TREASURY_ID);
-  const isMintToNodeOperators = fromZeros && nodeOperators.includes(recipient);
+  let isMintToNodeOperators = false;
+
+  if (event.block.number < LIDO_V2_UPGRADE_BLOCK) {
+    // get node operators
+    let nodeOperators: Address[] = [];
+    const nodeOperatorsRegistry = NodeOperatorsRegistry.bind(
+      Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID)
+    );
+    const getRewardsDistributionCallResult =
+      nodeOperatorsRegistry.try_getRewardsDistribution(BIGINT_ZERO);
+    if (getRewardsDistributionCallResult.reverted) {
+      log.info("NodeOperatorsRegistry call reverted", []);
+    } else {
+      nodeOperators = getRewardsDistributionCallResult.value.getRecipients();
+    }
+
+    isMintToNodeOperators =
+      fromZeros && (nodeOperators.includes(recipient) as boolean);
+  } else {
+    isMintToNodeOperators =
+      fromZeros &&
+      recipient == Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID);
+  }
 
   // update metrics
   if (isMintToTreasury || isMintToNodeOperators) {
