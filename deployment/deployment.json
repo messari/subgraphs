@@ -3549,8 +3549,8 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.4.0",
+          "schema": "4.0.0",
+          "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3575,8 +3575,8 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.4.0",
+          "schema": "4.0.0",
+          "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3597,8 +3597,8 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.3.0",
+          "schema": "4.0.0",
+          "subgraph": "1.3.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3623,8 +3623,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.4.0",
+          "schema": "4.0.0",
+          "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3649,8 +3649,8 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.4.1",
+          "schema": "4.0.0",
+          "subgraph": "1.4.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3671,8 +3671,8 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.4.0",
+          "schema": "4.0.0",
+          "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3701,8 +3701,8 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.2.0",
+          "schema": "4.0.0",
+          "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3723,8 +3723,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.2.0",
+          "schema": "4.0.0",
+          "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3753,8 +3753,8 @@
         "network": "ethereum",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3775,8 +3775,8 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3797,8 +3797,8 @@
         "network": "avalanche",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3819,8 +3819,8 @@
         "network": "bsc",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3841,8 +3841,8 @@
         "network": "fantom",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3863,8 +3863,8 @@
         "network": "fuse",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3885,8 +3885,8 @@
         "network": "gnosis",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3907,8 +3907,8 @@
         "network": "moonriver",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3929,8 +3929,8 @@
         "network": "optimism",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3951,8 +3951,8 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.1.2",
+          "schema": "4.0.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
