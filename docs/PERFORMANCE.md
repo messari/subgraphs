@@ -277,5 +277,3 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 - The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed.
 - The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%).
 - These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investigation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and achieve the desired performance improvements.
-
-** Note: ** Edge and Node has
