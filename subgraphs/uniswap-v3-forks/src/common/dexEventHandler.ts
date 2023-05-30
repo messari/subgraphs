@@ -285,7 +285,7 @@ export class DexEventHandler {
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
-    const withdraw = new Deposit(
+    const withdraw = new Withdraw(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
 
@@ -328,7 +328,7 @@ export class DexEventHandler {
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
-    const deposit = new Withdraw(
+    const deposit = new Deposit(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
 
