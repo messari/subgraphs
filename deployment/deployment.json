@@ -3549,7 +3549,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
@@ -3575,7 +3575,7 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
@@ -3597,7 +3597,7 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.3.1",
           "methodology": "1.0.0"
         },
@@ -3623,7 +3623,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
@@ -3649,7 +3649,7 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.4.2",
           "methodology": "1.0.0"
         },
@@ -3671,7 +3671,7 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
@@ -3701,7 +3701,7 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
@@ -3723,7 +3723,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
@@ -3753,7 +3753,7 @@
         "network": "ethereum",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3775,7 +3775,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3797,7 +3797,7 @@
         "network": "avalanche",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3819,7 +3819,7 @@
         "network": "bsc",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3841,7 +3841,7 @@
         "network": "fantom",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3863,7 +3863,7 @@
         "network": "fuse",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3885,7 +3885,7 @@
         "network": "gnosis",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3907,7 +3907,7 @@
         "network": "moonriver",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3929,7 +3929,7 @@
         "network": "optimism",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
@@ -3951,7 +3951,7 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "3.0.5",
+          "schema": "4.0.0",
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },

@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.5
+# Version: 4.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
