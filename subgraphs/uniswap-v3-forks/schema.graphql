@@ -66,6 +66,9 @@ type Token @entity @regularPolling {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
+  " last pool that gave this token a price "
+  _lastPricePool: Bytes
+
   " amount of tokens in the protocol "
   _totalSupply: BigInt!
 
