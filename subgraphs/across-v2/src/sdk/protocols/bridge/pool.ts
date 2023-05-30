@@ -552,7 +552,7 @@ export class Pool {
       return;
     }
     const token = this.tokens.getOrCreateToken(
-      Address.fromBytes(this.pool.outputToken)
+      Address.fromBytes(this.pool.outputToken!)
     );
     const price = this.protocol.pricer.getTokenPrice(token);
 

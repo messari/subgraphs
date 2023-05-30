@@ -71,27 +71,24 @@ export function handleStake(event: Stake): void {
       );
     } else {
       baseEmissionRate = contractCall.value.getBaseEmissionRate();
+      const amount = baseEmissionRate!.times(SECONDS_PER_DAY_BI);
+      pool.setRewardEmissions(RewardTokenType.DEPOSIT, rewardToken, amount);
+
+      log.error(
+        "pool: {}, rewardToken: {}, rewardToken.decimals: {}, rewardToken.lastPriceUSD: {}, baseEmissionRate: {}, SECONDS_PER_DAY_BI: {}, amount: {}, poolRewardsAmount: {}, poolRewardsUSD: {}",
+        [
+          pool.pool.id.toHexString(),
+          rewardToken.id.toHexString(),
+          rewardToken.decimals.toString(),
+          rewardToken.lastPriceUSD!.toString(),
+          baseEmissionRate!.toString(),
+          SECONDS_PER_DAY_BI.toString(),
+          amount.toString(),
+          pool.pool.rewardTokenEmissionsAmount!.toString(),
+          pool.pool.rewardTokenEmissionsUSD!.toString(),
+        ]
+      );
     }
-
-    const amount = baseEmissionRate!
-      .times(SECONDS_PER_DAY_BI)
-      .div(BigInt.fromI32(rewardToken.decimals));
-    pool.setRewardEmissions(RewardTokenType.DEPOSIT, rewardToken, amount);
-
-    log.error(
-      "pool: {}, rewardToken: {}, rewardToken.decimals: {}, rewardToken.lastPriceUSD: {}, baseEmissionRate: {}, SECONDS_PER_DAY_BI: {}, amount: {}, poolRewardsAmount: {}, poolRewardsUSD: {}",
-      [
-        pool.pool.id.toHexString(),
-        rewardToken.id.toHexString(),
-        rewardToken.decimals.toString(),
-        rewardToken.lastPriceUSD!.toString(),
-        baseEmissionRate!.toString(),
-        SECONDS_PER_DAY_BI.toString(),
-        amount.toString(),
-        pool.pool.rewardTokenEmissionsAmount!.toString(),
-        pool.pool.rewardTokenEmissionsUSD!.toString(),
-      ]
-    );
   }
 }
 
