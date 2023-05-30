@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.5
+# Version: 3.0.4
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -47,7 +47,7 @@ enum TokenType {
   # Will add more
 }
 
-type Token @entity @regularPolling {
+type Token @entity {
   " Smart contract address of the token "
   id: Bytes!
 
@@ -75,6 +75,8 @@ type Token @entity @regularPolling {
   _largePriceChangeBuffer: Int!
 
   _largeTVLImpactBuffer: Int!
+
+  _lastPricedPool: LiquidityPool
 }
 
 enum RewardTokenType {
@@ -85,7 +87,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity(immutable: true) @regularPolling {
+type RewardToken @entity(immutable: true) {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: Bytes!
 
@@ -129,7 +131,7 @@ enum LiquidityPoolFeeType {
   WITHDRAWAL_FEE
 }
 
-type LiquidityPoolFee @entity @regularPolling {
+type LiquidityPoolFee @entity {
   " { Fee type }-{ Pool address } "
   id: Bytes!
 
@@ -206,7 +208,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type DexAmmProtocol implements Protocol @entity @regularPolling {
+type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -316,7 +318,7 @@ type DexAmmProtocol implements Protocol @entity @regularPolling {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity @dailySnapshot {
+type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -354,7 +356,7 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   blockNumber: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
+type UsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -389,7 +391,7 @@ type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   blockNumber: BigInt!
 }
 
-type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
+type FinancialsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -452,7 +454,7 @@ type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
 ##### Pool-Level Metadata #####
 ###############################
 
-type LiquidityPool @entity @regularPolling {
+type LiquidityPool @entity {
   " Smart contract address of the pool "
   id: Bytes!
 
@@ -531,10 +533,10 @@ type LiquidityPool @entity @regularPolling {
   cumulativeTotalRevenueUSD: BigDecimal!
 
   " All trade volume occurred for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeByTokenAmount: [BigInt!]!
+  cumulativeVolumeTokenAmounts: [BigInt!]!
 
   " All trade volume occurred for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+  cumulativeVolumesUSD: [BigDecimal!]!
 
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
@@ -616,7 +618,7 @@ type LiquidityPool @entity @regularPolling {
 ##### Pool-Level Timeseries #####
 #################################
 
-type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
+type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -683,19 +685,19 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   cumulativeVolumeUSD: BigDecimal!
 
   " All trade volume occurred in a given day, in USD "
-  dailyVolumeUSD: BigDecimal!
+  dailyTotalVolumeUSD: BigDecimal!
 
   " All trade volume , in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeByTokenAmount: [BigInt!]!
+  cumulativeVolumeTokenAmounts: [BigInt!]!
 
   " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyVolumeByTokenAmount: [BigInt!]!
+  dailyVolumeTokenAmounts: [BigInt!]!
 
   " All trade volume, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+  cumulativeVolumesUSD: [BigDecimal!]!
 
   " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyVolumeByTokenUSD: [BigDecimal!]!
+  dailyVolumesUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -751,7 +753,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   blockNumber: BigInt!
 }
 
-type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
+type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -817,20 +819,20 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
-  " All trade volume occurred in a given hour, in USD "
-  hourlyVolumeUSD: BigDecimal!
+  " All trade volume occurred in a given day, in USD "
+  hourlyTotalVolumeUSD: BigDecimal!
 
-  " All trade volume, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeByTokenAmount: [BigInt!]!
+  " All trade volume , in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeTokenAmounts: [BigInt!]!
 
-  " All trade volume occurred in a given hour for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyVolumeByTokenAmount: [BigInt!]!
+  " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeTokenAmounts: [BigInt!]!
 
   " All trade volume, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+  cumulativeVolumesUSD: [BigDecimal!]!
 
-  " All trade volume occurred in a given hour for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyVolumeByTokenUSD: [BigDecimal!]!
+  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumesUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -890,7 +892,7 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
 ##### Pool Tick-Level Metadata #####
 ####################################
 
-type Tick @entity @regularPolling {
+type Tick @entity {
   " { pool address }-{ tick index } "
   id: Bytes!
 
@@ -938,7 +940,7 @@ type Tick @entity @regularPolling {
 ##### Pool Tick-Level Time Series #####
 #######################################
 
-type TickDailySnapshot @entity(immutable: true) @dailySnapshot {
+type TickDailySnapshot @entity(immutable: true) {
   " { pool address }-{ tick index }-{ day ID } "
   id: Bytes!
 
@@ -970,7 +972,7 @@ type TickDailySnapshot @entity(immutable: true) @dailySnapshot {
   blockNumber: BigInt!
 }
 
-type TickHourlySnapshot @entity(immutable: true) @hourlySnapshot {
+type TickHourlySnapshot @entity(immutable: true) {
   " { pool address }-{ tick index }-{ hour ID } "
   id: Bytes!
 
@@ -1006,7 +1008,7 @@ type TickHourlySnapshot @entity(immutable: true) @hourlySnapshot {
 ##### Account-Level Data #####
 ##############################
 
-type Account @entity @regularPolling {
+type Account @entity {
   " { Account address } "
   id: Bytes!
 
@@ -1041,7 +1043,7 @@ type Account @entity @regularPolling {
   swaps: [Swap!]! @derivedFrom(field: "account")
 }
 
-type Position @entity @regularPolling {
+type Position @entity {
   " { Account address }-{ Market address }-{ Count } "
   id: Bytes!
 
@@ -1124,7 +1126,7 @@ type Position @entity @regularPolling {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
-type PositionSnapshot @entity(immutable: true) @regularPolling {
+type PositionSnapshot @entity(immutable: true) {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1192,7 +1194,7 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Deposit @entity(immutable: true) @transaction {
+type Deposit @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1254,7 +1256,7 @@ type Deposit @entity(immutable: true) @transaction {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity(immutable: true) @transaction {
+type Withdraw @entity(immutable: true) {
   " { Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1316,7 +1318,7 @@ type Withdraw @entity(immutable: true) @transaction {
   amountUSD: BigDecimal!
 }
 
-type Swap @entity(immutable: true) @transaction {
+type Swap @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1385,6 +1387,7 @@ type ActiveAccount @entity(immutable: true) {
 }
 
 #Added Entities
+
 type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "
   id: Bytes!
