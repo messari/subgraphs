@@ -3,7 +3,7 @@
 # See the README.md for more details
 
 # Keeps track of the current block in a network
-type Network @entity {
+type Network @entity @regularPolling {
   " Network name "
   id: ID!
 
