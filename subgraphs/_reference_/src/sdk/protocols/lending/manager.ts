@@ -142,6 +142,7 @@ export class DataManager {
       _market.cumulativeUniqueFlashloaners = INT_ZERO;
 
       _market.createdTimestamp = event.block.timestamp;
+      _market.lastUpdatedTimestamp = event.block.timestamp;
       _market.createdBlockNumber = event.block.number;
 
       _market.positionCount = INT_ZERO;
@@ -225,6 +226,11 @@ export class DataManager {
 
   getMarket(): Market {
     return this.market;
+  }
+
+  updateLastMarketTimestamp(): void {
+    this.market.lastUpdatedTimestamp = this.event.block.timestamp;
+    this.market.save();
   }
 
   getProtocol(): LendingProtocol {
@@ -920,6 +926,18 @@ export class DataManager {
     this.protocol.totalDepositBalanceUSD = totalValueLockedUSD;
     this.protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
     this.protocol.save();
+  }
+
+  updateSupplyIndex(supplyIndex: BigInt): void {
+    this.market.supplyIndex = supplyIndex;
+    this.market.lastUpdatedTimestamp = this.event.block.timestamp;
+    this.market.save();
+  }
+
+  updateBorrowIndex(borrowIndex: BigInt): void {
+    this.market.borrowIndex = borrowIndex;
+    this.market.lastUpdatedTimestamp = this.event.block.timestamp;
+    this.market.save();
   }
 
   //
