@@ -105,9 +105,10 @@ export function handleFilledRelay(event: FilledRelay): void {
   // Revenue
   // Note: We take the amount from crossChain (origin) and multiplying by inputToken price (destination).
   // This isn't ideal but we do this because we don't have access to price for the crossToken.
-  const lpFee = bigIntToBigDecimal(event.params.realizedLpFeePct);
+  const lpFeePct = bigIntToBigDecimal(event.params.realizedLpFeePct);
+  const relayerFeePct = bigIntToBigDecimal(event.params.relayerFeePct);
   const supplySideRevenueAmount = bigIntToBigDecimal(event.params.amount).times(
-    lpFee
+    lpFeePct.plus(relayerFeePct)
   );
   const supplySideRevenue = getUsdPrice(
     inputTokenAddress,
