@@ -73,30 +73,10 @@ export function handleStake(event: Stake): void {
       baseEmissionRate = contractCall.value.getBaseEmissionRate();
       const amount = baseEmissionRate!.times(SECONDS_PER_DAY_BI);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, rewardToken, amount);
-
-      log.error(
-        "pool: {}, rewardToken: {}, rewardToken.decimals: {}, rewardToken.lastPriceUSD: {}, baseEmissionRate: {}, SECONDS_PER_DAY_BI: {}, amount: {}, poolRewardsAmount: {}, poolRewardsUSD: {}",
-        [
-          pool.pool.id.toHexString(),
-          rewardToken.id.toHexString(),
-          rewardToken.decimals.toString(),
-          rewardToken.lastPriceUSD!.toString(),
-          baseEmissionRate!.toString(),
-          SECONDS_PER_DAY_BI.toString(),
-          amount.toString(),
-          pool.pool.rewardTokenEmissionsAmount!.toString(),
-          pool.pool.rewardTokenEmissionsUSD!.toString(),
-        ]
-      );
     }
   }
 }
 
-// unstake
-// -- use unstaked token tp get l1token (?)
-// -- use l1token to get pool
-// -- pool.addStakedOutputToken(amount); || pool.setStakedOutputToken(cumulativeBalance);
-// -- rewards here
 export function handleUnstake(event: Unstake): void {
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -115,7 +95,3 @@ export function handleUnstake(event: Unstake): void {
     pool.addStakedOutputTokenAmount(unstakedAmount);
   }
 }
-
-// outputTokenPriceUSD
-// --> added "refreshOutputTokenSupply()" to addOutputTokenSupply() to take care of this
-// --> price is not available for these LP tokens
