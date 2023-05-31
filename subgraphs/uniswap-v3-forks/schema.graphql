@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.4
+# Version: 4.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -66,6 +66,9 @@ type Token @entity @regularPolling {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
+  " last pool that gave this token a price "
+  _lastPricePool: Bytes
+
   " amount of tokens in the protocol "
   _totalSupply: BigInt!
 
@@ -75,8 +78,6 @@ type Token @entity @regularPolling {
   _largePriceChangeBuffer: Int!
 
   _largeTVLImpactBuffer: Int!
-
-  _lastPricedPool: LiquidityPool
 }
 
 enum RewardTokenType {
@@ -533,10 +534,10 @@ type LiquidityPool @entity @regularPolling {
   cumulativeTotalRevenueUSD: BigDecimal!
 
   " All trade volume occurred for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeTokenAmounts: [BigInt!]!
+  cumulativeVolumeByTokenAmount: [BigInt!]!
 
   " All trade volume occurred for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumesUSD: [BigDecimal!]!
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
 
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
@@ -685,19 +686,19 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   cumulativeVolumeUSD: BigDecimal!
 
   " All trade volume occurred in a given day, in USD "
-  dailyTotalVolumeUSD: BigDecimal!
+  dailyVolumeUSD: BigDecimal!
 
   " All trade volume , in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeTokenAmounts: [BigInt!]!
+  cumulativeVolumeByTokenAmount: [BigInt!]!
 
   " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyVolumeTokenAmounts: [BigInt!]!
+  dailyVolumeByTokenAmount: [BigInt!]!
 
   " All trade volume, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumesUSD: [BigDecimal!]!
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
 
   " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyVolumesUSD: [BigDecimal!]!
+  dailyVolumeByTokenUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -819,20 +820,20 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
-  " All trade volume occurred in a given day, in USD "
-  hourlyTotalVolumeUSD: BigDecimal!
+  " All trade volume occurred in a given hour, in USD "
+  hourlyVolumeUSD: BigDecimal!
 
-  " All trade volume , in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumeTokenAmounts: [BigInt!]!
+  " All trade volume, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
 
-  " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyVolumeTokenAmounts: [BigInt!]!
+  " All trade volume occurred in a given hour for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeByTokenAmount: [BigInt!]!
 
   " All trade volume, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  cumulativeVolumesUSD: [BigDecimal!]!
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
 
-  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyVolumesUSD: [BigDecimal!]!
+  " All trade volume occurred in a given hour for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeByTokenUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -1387,7 +1388,6 @@ type ActiveAccount @entity(immutable: true) {
 }
 
 #Added Entities
-
 type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "
   id: Bytes!

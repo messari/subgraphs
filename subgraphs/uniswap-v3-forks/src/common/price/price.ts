@@ -169,6 +169,8 @@ export function findUSDPricePerToken(
             continue;
           }
 
+          token._lastPricePool = pool.id;
+
           // Set new price and largest pool for pricing.
           largestWhitelistTokenValue = whitelistTokenValueLocked;
           priceSoFar = newPriceSoFar;
