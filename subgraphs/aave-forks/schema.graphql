@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: ID!
 
@@ -69,7 +69,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -129,7 +129,7 @@ enum PositionSide {
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
-type InterestRate @entity {
+type InterestRate @entity @regularPolling {
   " { Interest rate side }-{ Interest rate type }-{ Market ID } "
   id: ID!
 
@@ -215,7 +215,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type LendingProtocol implements Protocol @entity {
+type LendingProtocol implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
@@ -339,7 +339,7 @@ type LendingProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -404,7 +404,7 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: ID!
 
@@ -442,7 +442,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -521,7 +521,7 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Metadata #####
 ###############################
 
-type Market @entity {
+type Market @entity @regularPolling {
   " Smart contract address of the market "
   id: ID!
 
@@ -689,7 +689,7 @@ type Market @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type MarketDailySnapshot @entity {
+type MarketDailySnapshot @entity @dailySnapshot {
   " { Smart contract address of the market }-{ # of days since Unix epoch time } "
   id: ID!
 
@@ -785,7 +785,7 @@ type MarketDailySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type MarketHourlySnapshot @entity {
+type MarketHourlySnapshot @entity @hourlySnapshot {
   " { Smart contract address of the market }-{ # of hours since Unix epoch time } "
   id: ID!
 
@@ -885,7 +885,7 @@ type MarketHourlySnapshot @entity {
 ##### Account-Level Data #####
 ##############################
 
-type Account @entity {
+type Account @entity @regularPolling {
   " { Account address } "
   id: ID!
 
@@ -943,7 +943,7 @@ type Account @entity {
   _enabledCollaterals: [Market!]!
 }
 
-type Position @entity {
+type Position @entity @regularPolling {
   " { Account address }-{ Market address }-{ Position Side }-{ Counter } "
   id: ID!
 
@@ -1020,7 +1020,7 @@ type Position @entity {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
-type PositionSnapshot @entity {
+type PositionSnapshot @entity @regularPolling {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1058,7 +1058,7 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Deposit @entity(immutable: true) {
+type Deposit @entity(immutable: true) @transaction {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1096,7 +1096,7 @@ type Deposit @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity(immutable: true) {
+type Withdraw @entity(immutable: true) @transaction {
   " { Transaction hash }-{ Log index }"
   id: ID!
 
@@ -1139,7 +1139,7 @@ type Withdraw @entity(immutable: true) {
 }
 
 # For CDPs, use this for mint events
-type Borrow @entity(immutable: true) {
+type Borrow @entity(immutable: true) @transaction {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1178,7 +1178,7 @@ type Borrow @entity(immutable: true) {
 }
 
 # For CDPs, use this for burn events
-type Repay @entity(immutable: true) {
+type Repay @entity(immutable: true) @transaction {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1216,7 +1216,7 @@ type Repay @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Liquidate @entity(immutable: true) {
+type Liquidate @entity(immutable: true) @transaction {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
