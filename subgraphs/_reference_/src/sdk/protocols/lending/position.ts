@@ -29,8 +29,8 @@ import { PositionSide } from "./constants";
  * This file contains the PositionManager class, which is used to
  * make changes to a given position.
  *
- * Schema Version:  3.0.1
- * SDK Version:     1.0.2
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.3
  * Author(s):
  *  - @dmelotik
  */
@@ -310,10 +310,16 @@ export class PositionManager {
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
 
-    snapshot.principal = this.position!.principal;
-    if (this.position!.side == PositionSide.BORROWER) {
+    if (this.position!.principal) snapshot.principal = this.position!.principal;
+    if (
+      this.market.borrowIndex &&
+      this.position!.side == PositionSide.BORROWER
+    ) {
       snapshot.index = this.market.borrowIndex;
-    } else {
+    } else if (
+      this.market.supplyIndex &&
+      this.position!.side == PositionSide.COLLATERAL
+    ) {
       snapshot.index = this.market.supplyIndex;
     }
 

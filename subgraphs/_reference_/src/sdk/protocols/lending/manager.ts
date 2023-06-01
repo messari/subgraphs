@@ -51,8 +51,8 @@ import { PositionManager } from "./position";
  * You can think of this as an abstraction so the developer doesn't
  * need to think about all of the detailed storage changes that occur.
  *
- * Schema Version:  3.0.1
- * SDK Version:     1.0.2
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.3
  * Author(s):
  *  - @dmelotik
  */
@@ -228,9 +228,13 @@ export class DataManager {
     return this.market;
   }
 
+  saveMarket(): void {
+    this.market.save();
+  }
+
   updateLastMarketTimestamp(): void {
     this.market.lastUpdatedTimestamp = this.event.block.timestamp;
-    this.market.save();
+    this.saveMarket();
   }
 
   getProtocol(): LendingProtocol {
@@ -298,7 +302,7 @@ export class DataManager {
       marketRates.push(interestRateID);
     }
     this.market.rates = marketRates;
-    this.market.save();
+    this.saveMarket();
 
     return rate;
   }
@@ -346,7 +350,7 @@ export class DataManager {
 
       if (isMarket) {
         this.market.revenueDetail = details.id;
-        this.market.save();
+        this.saveMarket();
       } else {
         this.protocol.revenueDetail = details.id;
         this.protocol.save();
@@ -852,7 +856,7 @@ export class DataManager {
     this.market.rewardTokens = rewardTokens;
     this.market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
     this.market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-    this.market.save();
+    this.saveMarket();
   }
 
   // used to update tvl, borrow balance, reserves, etc. in market and protocol
@@ -902,7 +906,7 @@ export class DataManager {
       .times(inputTokenPriceUSD);
     this.market.totalDepositBalanceUSD = this.market.totalValueLockedUSD;
     this.market.totalBorrowBalanceUSD = totalBorrowed.times(inputTokenPriceUSD);
-    this.market.save();
+    this.saveMarket();
 
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
     let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
@@ -931,13 +935,13 @@ export class DataManager {
   updateSupplyIndex(supplyIndex: BigInt): void {
     this.market.supplyIndex = supplyIndex;
     this.market.lastUpdatedTimestamp = this.event.block.timestamp;
-    this.market.save();
+    this.saveMarket();
   }
 
   updateBorrowIndex(borrowIndex: BigInt): void {
     this.market.borrowIndex = borrowIndex;
     this.market.lastUpdatedTimestamp = this.event.block.timestamp;
-    this.market.save();
+    this.saveMarket();
   }
 
   //
@@ -1005,7 +1009,7 @@ export class DataManager {
       this.market.cumulativeProtocolSideRevenueUSD.plus(protocolRevenueDelta);
     this.market.cumulativeSupplySideRevenueUSD =
       this.market.cumulativeSupplySideRevenueUSD.plus(supplyRevenueDelta);
-    this.market.save();
+    this.saveMarket();
 
     // update protocol
     this.protocol.cumulativeTotalRevenueUSD =
@@ -1110,7 +1114,7 @@ export class DataManager {
       );
 
     this.protocol.save();
-    this.market.save();
+    this.saveMarket();
 
     // update the snapshots in their respective class
     this.snapshots.updateUsageData(transactionType, account);
@@ -1172,7 +1176,7 @@ export class DataManager {
     this.market.transactionCount += INT_ONE;
 
     this.protocol.save();
-    this.market.save();
+    this.saveMarket();
 
     // update the snapshots in their respective class
     this.snapshots.updateTransactionData(transactionType, amount, amountUSD);
