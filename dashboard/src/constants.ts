@@ -26,12 +26,13 @@ export namespace Versions {
   export const Schema300 = "3.0.0";
   export const Schema301 = "3.0.1";
   export const Schema302 = "3.0.2";
+  export const Schema400 = "4.0.0";
 }
 
 export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
   const schema = schemaMapping[schemaType];
   if (schema === "exchanges") {
-    if (["3.0.4"].includes(versionStr)) {
+    if (["4.0.0"].includes(versionStr)) {
       return true;
     }
   } else if (schema === "lending") {
