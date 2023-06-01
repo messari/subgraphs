@@ -6,7 +6,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import { Token } from "../generated/schema";
-import { _ERC20 } from "../generated/SpokePool/_ERC20";
+import { _ERC20 } from "../generated/SpokePool1/_ERC20";
 import { getUsdPrice, getUsdPricePerToken } from "./prices";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { TokenPricer } from "./sdk/protocols/config";

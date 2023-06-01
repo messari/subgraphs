@@ -23,7 +23,7 @@ import {
 import {
   FilledRelay,
   FundsDeposited,
-} from "../../generated/SpokePool/SpokePool";
+} from "../../generated/SpokePool1/SpokePool";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 
 export function handleFilledRelay(event: FilledRelay): void {
