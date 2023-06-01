@@ -6,7 +6,7 @@ import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { LiquidityPoolFeeType } from "../common/constants";
 import { TokenInitialize, TokenPrice } from "../modules/token";
 import { Account } from "../sdk/protocols/perpfutures/account";
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 export function initializeSDK(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(

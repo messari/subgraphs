@@ -29,6 +29,16 @@ export function getUsdPricePerToken(
         .address,
       block
     );
+  log.warning("[getUsdPricePerToken]", []);
+  // 8. Uniswap Router
+  const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr);
+  if (!uniswapPrice.reverted) {
+    log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      uniswapPrice.usdPrice.toString(),
+    ]);
+    return uniswapPrice;
+  }
 
   // 1. YearnLens Oracle
   const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
@@ -104,16 +114,6 @@ export function getUsdPricePerToken(
       curvePrice.usdPrice.toString(),
     ]);
     return curvePrice;
-  }
-
-  // 8. Uniswap Router
-  const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr);
-  if (!uniswapPrice.reverted) {
-    log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.toString(),
-    ]);
-    return uniswapPrice;
   }
 
   log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [

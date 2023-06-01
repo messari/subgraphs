@@ -5,6 +5,7 @@ import {
   dataSource,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+import * as BSC from "../config/bsc";
 import * as XDAI from "../config/gnosis";
 import * as AURORA from "../config/aurora";
 import * as FANTOM from "../config/fantom";
@@ -94,6 +95,8 @@ export function getConfig(): Configurations {
     return new XDAI.config();
   } else if (network == AURORA.NETWORK_STRING) {
     return new AURORA.config();
+  } else if (network == BSC.NETWORK_STRING) {
+    return new BSC.config();
   } else if (network == FANTOM.NETWORK_STRING) {
     return new FANTOM.config();
   } else if (network == POLYGON.NETWORK_STRING) {

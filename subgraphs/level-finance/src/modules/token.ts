@@ -8,7 +8,13 @@ import * as constants from "../common/constants";
 import { TokenPricer } from "../sdk/protocols/config";
 import { ERC20 } from "../../generated/Pool/ERC20";
 import { getUsdPricePerToken } from "../prices";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 
 export class TokenInitialize implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
@@ -44,6 +50,12 @@ export class TokenPrice implements TokenPricer {
     token._setByEvent = false;
     token.save();
 
+    log.warning("[getTokenPrice] tokenAddress {} name {} price {}", [
+      tokenAddress.toHexString(),
+      token.name,
+      tokenPrice.toString(),
+    ]);
+
     return tokenPrice;
   }
 
@@ -73,6 +85,12 @@ export class TokenPrice implements TokenPricer {
     token.lastPriceBlockNumber = block.number;
     token._setByEvent = false;
     token.save();
+
+    log.warning("[getAmountValueUSD] tokenAddress {} name {} price {}", [
+      tokenAddress.toHexString(),
+      token.name,
+      tokenPrice.toString(),
+    ]);
 
     return tokenPrice.times(utils.bigIntToBigDecimal(amount, token.decimals));
   }
