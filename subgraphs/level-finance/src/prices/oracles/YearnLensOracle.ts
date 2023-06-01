@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/templates/MlpManagerTemplate/YearnLensContract";
+import { YearnLensContract } from "../../../generated/Pool/YearnLensContract";
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,

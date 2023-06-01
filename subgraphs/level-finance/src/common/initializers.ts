@@ -33,7 +33,9 @@ export function getOrCreatePool(sdk: SDK): Pool {
     Bytes.fromHexString(constants.VAULT_ADDRESS.toHexString())
   );
   if (!pool.isInitialized) {
-    const outputToken = sdk.Tokens.getOrCreateToken(constants.MLP_ADDRESS);
+    const outputToken = sdk.Tokens.getOrCreateToken(
+      constants.OUTPUT_TOKEN_ADDRESS
+    );
     pool.initialize(
       constants.POOL_NAME,
       constants.POOL_SYMBOL,

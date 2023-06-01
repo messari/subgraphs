@@ -174,6 +174,9 @@ export const POOL_SYMBOL = "Vault";
 export const VAULT_ADDRESS = Address.fromString(
   "0xd152c7f25db7f4b95b7658323c5f33d176818ee4"
 );
+export const OUTPUT_TOKEN_ADDRESS = Address.fromString(
+  "0xb5c42f84ab3f786bca9761240546aa9cec1f8821"
+);
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PRICE_PRECISION_DECIMALS = 12;
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);

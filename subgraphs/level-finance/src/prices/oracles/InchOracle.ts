@@ -3,7 +3,7 @@ import { getUsdPricePerToken } from "..";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { InchOracleContract } from "../../../generated/templates/MlpManagerTemplate/InchOracleContract";
+import { InchOracleContract } from "../../../generated/Pool/InchOracleContract";
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,

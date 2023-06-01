@@ -15,7 +15,10 @@ import {
 import { swap } from "../modules/swap";
 import { collectFees } from "../modules/fee";
 import * as constants from "../common/constants";
-import { updatePosition } from "../modules/position";
+import {
+  updatePosition,
+  updatePositionRealisedPnlUSD,
+} from "../modules/position";
 import { transaction } from "../modules/transaction";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
@@ -57,13 +60,11 @@ export function handlePositionDecreased(event: DecreasePosition): void {
   const key = event.params.key;
   const side = event.params.side;
   const sizeChange = event.params.sizeChanged;
-  const pnl = event.params.pnl;
-  //how to use pnl[]
-  // _storePnl(
-  //   ev.block.timestamp,
-  //   ev.params.pnl.abs.times(ev.params.pnl.sig.equals(ZERO) ? NEGATIVE_ONE : ONE),
-  //   ev.params.feeValue
-  // );
+  const pnl = event.params.pnl.abs.times(
+    event.params.pnl.sig.equals(constants.BIGINT_ZERO)
+      ? constants.BIGINT_NEGONE
+      : constants.BIGINT_ONE
+  );
   updatePosition(
     event,
     key,
@@ -76,7 +77,7 @@ export function handlePositionDecreased(event: DecreasePosition): void {
     feeValue,
     side == constants.Side.LONG,
     TransactionType.COLLATERAL_OUT,
-    constants.BIGINT_ZERO
+    pnl
   );
 }
 
@@ -90,7 +91,11 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
   const key = event.params.key;
   const side = event.params.side;
   const sizeChange = event.params.size;
-  const realisedPnl = event.params.pnl;
+  const realisedPnl = event.params.pnl.abs.times(
+    event.params.pnl.sig.equals(constants.BIGINT_ZERO)
+      ? constants.BIGINT_NEGONE
+      : constants.BIGINT_ONE
+  );
   updatePosition(
     event,
     key,
@@ -142,9 +147,9 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
     constants.BIGINT_ZERO,
     lpAmount,
     TransactionType.DEPOSIT,
-    amount,
     sdk,
-    pool
+    pool,
+    amount
   );
   collectFees(fee, tokenAddress, sdk, pool);
 }
@@ -166,9 +171,9 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
     constants.BIGINT_ZERO,
     lpAmount,
     TransactionType.WITHDRAW,
-    amount,
     sdk,
-    pool
+    pool,
+    amount
   );
   collectFees(fee, tokenAddress, sdk, pool);
 }

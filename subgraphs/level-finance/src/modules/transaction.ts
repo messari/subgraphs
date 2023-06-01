@@ -12,9 +12,9 @@ export function transaction(
   outputTokenSupply: BigInt,
   mintAmount: BigInt,
   transactionType: TransactionType,
-  amount: BigInt = constants.BIGINT_ZERO,
   sdk: SDK,
-  pool: Pool
+  pool: Pool,
+  amount: BigInt = constants.BIGINT_ZERO
 ): void {
   //fix outputToken supply amount and pricing
   const account = getOrCreateAccount(accountAddress, pool, sdk);
