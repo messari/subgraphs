@@ -663,7 +663,7 @@ type Withdraw implements Event @entity @transaction {
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity @regularPolling {
   " Address of the account "
   id: ID!
 }

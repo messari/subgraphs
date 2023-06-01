@@ -119,7 +119,7 @@ enum BridgePermissionType {
   PRIVATE # a centralized party controls the bridge and decides what tokens are added
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: Bytes!
 
@@ -144,7 +144,7 @@ type Token @entity {
 # CrosschainToken might or might not be canonical. It refers to the counterpart of the token on the other chain.
 # If the token is wrapped on the current chain, CrosschainToken will be canonical on the opposite chain.
 # It might also be the case that both the current chain token and its counterpart are canonical, in the case of liquidity bridges.
-type CrosschainToken @entity(immutable: true) {
+type CrosschainToken @entity(immutable: true) @regularPolling {
   # We prepend the chainID because it is possible for a token to have the same address on multiple chains.
   # ChainID is the id of the destination chain (not the one the subgraph is running on), and tokenID is the
   # address of the token on the current chain.
@@ -175,7 +175,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity(immutable: true) {
+type RewardToken @entity(immutable: true) @regularPolling {
   " Bytes.fromI32(0|1).concat(rewardTokenAddress), where 0 is for deposit and 1 is for borrow "
   id: Bytes!
 
@@ -254,7 +254,7 @@ interface Protocol {
   pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
-type BridgeProtocol implements Protocol @entity {
+type BridgeProtocol implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -391,7 +391,7 @@ type BridgeProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity(immutable: true) {
+type UsageMetricsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
   id: Bytes!
 
@@ -499,7 +499,7 @@ type UsageMetricsDailySnapshot @entity(immutable: true) {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity(immutable: true) {
+type UsageMetricsHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " { Bytes.fromI32(num) } # of hours since Unix epoch time "
   id: Bytes!
 
@@ -592,7 +592,7 @@ type UsageMetricsHourlySnapshot @entity(immutable: true) {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity(immutable: true) {
+type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
   id: Bytes!
 
@@ -659,7 +659,7 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 ##### Pool-Level Data #####
 ###########################
 
-type Pool @entity {
+type Pool @entity @regularPolling {
   " Smart contract address of the pool "
   id: Bytes!
 
@@ -766,7 +766,7 @@ type Pool @entity {
   _lastHourlySnapshotTimestamp: BigInt
 }
 
-type PoolRoute @entity {
+type PoolRoute @entity @regularPolling {
   " Bytes.fromUTF(({Pool ID}-{crossToken}-{lowerChainID}-{greaterChainID}) "
   id: Bytes!
 
@@ -804,7 +804,7 @@ type PoolRoute @entity {
   createdBlockNumber: BigInt!
 }
 
-type PoolDailySnapshot @entity(immutable: true) {
+type PoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   " poolAddress.concatI32(daysSinceUnix) "
   id: Bytes!
 
@@ -886,7 +886,7 @@ type PoolDailySnapshot @entity(immutable: true) {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type PoolHourlySnapshot @entity(immutable: true) {
+type PoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " poolAddress.concatI32(hoursSinceUnix) "
   id: Bytes!
 
@@ -968,7 +968,7 @@ type PoolHourlySnapshot @entity(immutable: true) {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type PoolRouteSnapshot @entity(immutable: true) {
+type PoolRouteSnapshot @entity(immutable: true) @hourlySnapshot {
   " poolRouteID.concat(poolSnapshotID) "
   id: Bytes!
 
@@ -1044,7 +1044,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type LiquidityDeposit implements Event @entity(immutable: true) {
+type LiquidityDeposit implements Event @entity(immutable: true) @transaction {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -1088,7 +1088,7 @@ type LiquidityDeposit implements Event @entity(immutable: true) {
   timestamp: BigInt!
 }
 
-type LiquidityWithdraw implements Event @entity(immutable: true) {
+type LiquidityWithdraw implements Event @entity(immutable: true) @transaction {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -1139,7 +1139,7 @@ enum TransferType {
   RELEASE
 }
 
-type BridgeTransfer implements Event @entity(immutable: true) {
+type BridgeTransfer implements Event @entity(immutable: true) @transaction {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -1211,7 +1211,7 @@ type BridgeTransfer implements Event @entity(immutable: true) {
 }
 
 # Some bridges support sending
-type BridgeMessage implements Event @entity(immutable: true) {
+type BridgeMessage implements Event @entity(immutable: true) @transaction {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -1263,7 +1263,7 @@ type BridgeMessage implements Event @entity(immutable: true) {
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity @regularPolling {
   " Address of the account "
   id: Bytes!
 

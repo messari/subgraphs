@@ -13,6 +13,18 @@ import {
   Position as PositionSchema,
 } from "../../../../generated/schema";
 
+/**
+ * This file contains the Position class, which is used to
+ * make all of the storage changes that occur in the position and
+ * its corresponding snapshots.
+ *
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
+ * Author(s):
+ *  - @harsh9200
+ *  - @dhruv-chauhan
+ */
+
 class LoadPositionResponse {
   position: Position;
   isExistingOpenPosition: boolean;

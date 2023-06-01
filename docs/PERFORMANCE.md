@@ -211,7 +211,9 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 - The results after a a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph.
 - An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
 
-### Bytes and Immutables Test 1.0
+### Bytes and Immutables Test (Deprecated)
+
+**NOTE:** The results from this test have been addressed by Edge and Node. The results are no longer indicative of the performance of the subgraph using Bytes verse ID for the entity IDs. The results are still included for reference. The issue on the graph-node repo has been tracked [here](https://github.com/graphprotocol/graph-node/issues/3534). It has closed with the performance issues being resolved.
 
 - The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relevant affects indexing performance
 - The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount
