@@ -22,9 +22,6 @@ export class TokenInitialize implements TokenInitializer {
   }
 }
 
-//if token price is zero
-// if token is GMX or GLP
-
 export class TokenPrice implements TokenPricer {
   getTokenPrice(token: Token, block: ethereum.Block): BigDecimal {
     const tokenAddress = Address.fromBytes(token.id);
@@ -90,7 +87,7 @@ export class TokenPrice implements TokenPricer {
       return tokenPrice.times(utils.bigIntToBigDecimal(amount, token.decimals));
     }
 
-    // for escrowed token, use the price of it non escrowed version
+    // for escrowed token, use the price of its non escrowed version
     if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
       tokenPrice = getUsdPricePerToken(constants.MMY_ADDRESS, block).usdPrice;
     } else {

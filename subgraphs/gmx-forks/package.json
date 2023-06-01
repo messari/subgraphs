@@ -1,5 +1,5 @@
 {
-  "name": "mummy-finance",
+  "name": "gmx-forks",
   "license": "UNLICENSED",
   "scripts": {
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json src/common/constants.mustache > src/common/constants.ts"
