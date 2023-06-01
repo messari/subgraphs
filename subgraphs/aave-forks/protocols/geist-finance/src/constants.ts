@@ -5,12 +5,12 @@ import { Network } from "../../../src/constants";
 /////////////////////
 
 export const REWARD_TOKEN_ADDRESS =
-  "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d"; // GEIST token
+  "0xd8321aa83fb0a4ecd6348d4577431310a6e0814d"; // GEIST token
 export const GEIST_FTM_LP_ADDRESS =
-  "0x668AE94D0870230AC007a01B471D02b2c94DDcB9";
+  "0x668ae94d0870230ac007a01b471d02b2c94ddcb9";
 export const GFTM_ADDRESS = "0x39b3bd37208cbade74d0fcbdbb12d606295b430a";
 export const CRV_ADDRESS = "0x1e4f97b9f9f913c46f1632781732927b9019c68b"; // also gCRV market id
-export const CRV_FTM_LP_ADDRESS = "0xB471Ac6eF617e952b84C6a9fF5de65A9da96C93B";
+export const CRV_FTM_LP_ADDRESS = "0xb471ac6ef617e952b84c6a9ff5de65a9da96c93b";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -19,7 +19,7 @@ export const CRV_FTM_LP_ADDRESS = "0xB471Ac6eF617e952b84C6a9fF5de65A9da96C93B";
 export namespace Protocol {
   export const NAME = "Geist Finance";
   export const SLUG = "geist-finance";
-  export const PROTOCOL_ADDRESS = "0x6c793c628Fe2b480c5e6FB7957dDa4b9291F9c9b";
+  export const PROTOCOL_ADDRESS = "0x6c793c628fe2b480c5e6fb7957dda4b9291f9c9b";
   export const NETWORK = Network.FANTOM;
 }
 
