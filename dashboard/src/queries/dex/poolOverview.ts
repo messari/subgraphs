@@ -12,6 +12,8 @@ export const schema = (version: string): string => {
       return schema200();
     case Versions.Schema300:
       return schema300();
+    case Versions.Schema400:
+      return schema300();
     default:
       return schema130();
   }
