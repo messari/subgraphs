@@ -92,7 +92,13 @@ export function Deposit(
       constants.BIGINT_ZERO
     );
 
-    depositAmount = totalSupply.minus(vault.outputTokenSupply!);
+    const sharesMinted = totalSupply.minus(vault.outputTokenSupply!);
+
+    depositAmount = vault.outputTokenSupply!.isZero()
+      ? sharesMinted
+      : sharesMinted
+          .times(vault.inputTokenBalance)
+          .div(vault.outputTokenSupply!);
   }
 
   // calculate shares minted as per the deposit function in vault contract address
