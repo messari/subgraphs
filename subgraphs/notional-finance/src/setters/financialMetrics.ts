@@ -28,7 +28,7 @@ import { getOrCreateToken } from "../getters/token";
 import { getOrCreateInterestRate } from "../getters/interestRate";
 import { MarketDailySnapshot } from "../../generated/schema";
 
-export function updateFinancials(
+export function updateRevenues(
   event: ethereum.Event,
   marketId: string,
   prevMarketDailySnapshot: MarketDailySnapshot

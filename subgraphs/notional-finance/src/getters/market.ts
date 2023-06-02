@@ -15,7 +15,7 @@ import {
 import { getTokenFromCurrency } from "../common/util";
 import { getOrCreateLendingProtocol } from "./protocol";
 import { getOrCreateInterestRate } from "./interestRate";
-import { updateFinancials } from "../setters/financialMetrics";
+import { updateRevenues } from "../setters/financialMetrics";
 
 export function getOrCreateMarket(
   event: ethereum.Event,
@@ -138,7 +138,7 @@ export function getOrCreateMarketDailySnapshot(
         market.cumulativeTotalRevenueUSD;
       marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     } else {
-      updateFinancials(event, market.id, prevMarketMetrics);
+      updateRevenues(event, market.id, prevMarketMetrics);
     }
 
     marketMetrics.save();
