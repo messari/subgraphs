@@ -1,0 +1,80 @@
+{
+  "network": "arbitrum-one",
+  "ssov": [
+    {
+      "name": "RDPXMonthlyCalls",
+      "address": "0xd74c61ca8917Be73377D74A007E6f002c25Efb4e",
+      "startBlock": 22835202
+    },
+    {
+      "name": "DPXMonthlyCalls",
+      "address": "0x05E7ACeD3b7727f9129E6d302B488cd8a1e0C817",
+      "startBlock": 22835189
+    },
+    {
+      "name": "stETHMonthlyCalls",
+      "address": "0x475a5a712b741b9ab992e6af0b9e5adee3d1851b",
+      "startBlock": 56935590
+    },
+    {
+      "name": "RDPXWeeklyCalls",
+      "address": "0xCdaACF37726Bf1017821b5169e22EB34734B28A8",
+      "startBlock": 22833452
+    },
+    {
+      "name": "BasicWeeklyCalls",
+      "address": "0x10FD85ec522C245a63239b9FC64434F58520bd1f",
+      "startBlock": 22833438
+    },
+    {
+      "name": "stETHWeeklyCalls",
+      "address": "0xFca61E79F38a7a82c62f469f55A9df54CB8dF678",
+      "startBlock": 51682881
+    },
+    {
+      "name": "BTCWeeklyPuts",
+      "address": "0xa7507c48d78345475b85bc27B9CE9B84b354CaF7",
+      "startBlock": 22834300
+    },
+    {
+      "name": "ETHWeeklyPuts",
+      "address": "0x32449DF9c617C59f576dfC461D03f261F617aD5a",
+      "startBlock": 22834243
+    },
+    {
+      "name": "CRVWeeklyPuts",
+      "address": "0x7C5aC7E4E352B733CF65721d9Fe28A17Da890159",
+      "startBlock": 22834344
+    },
+    {
+      "name": "ETHMonthlyCalls",
+      "address": "0xC59836FEC63Cfb2E48b0aa00515056436D74Dc03",
+      "startBlock": 27543139
+    },
+    {
+      "name": "GMXWeeklyPuts",
+      "address": "0xf071F0c56543A2671a2Dfc5FF51d5d858Be91514",
+      "startBlock": 22834326
+    },
+    {
+      "name": "GOHMWeeklyPuts",
+      "address": "0x4269AF9076586230bF5fa3655144a5fe9CB877Fd",
+      "startBlock": 22834312
+    },
+    {
+      "name": "DPXWeeklyPuts",
+      "address": "0xf71b2B6fE3c1d94863e751d6B455f750E714163C",
+      "startBlock": 22834260
+    },
+    {
+      "name": "RDPXWeeklyPuts",
+      "address": "0xb4ec6B4eC9e42A42B0b8cdD3D6df8867546Cf11d",
+      "startBlock": 22834278
+    },
+    {
+      "name": "GOHMWeeklyCalls",
+      "address": "0x546cd36F761f1D984eEE1Dbe67cC4F86E75cAF0C",
+      "startBlock": 22833459
+    }
+  ]
+}

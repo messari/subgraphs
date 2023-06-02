@@ -14,10 +14,7 @@ import { handleReward } from "../common/handlers";
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment
 export function handlePoolAdded(event: PoolAddedEvent): void {
   log.debug("poolToken added: {}", [event.params.poolToken.toHexString()]);
-  createPoolRewardToken(
-    event.params.poolToken.toHexString(),
-    event.block.number
-  );
+  createPoolRewardToken(event, event.params.poolToken.toHexString());
 }
 
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment

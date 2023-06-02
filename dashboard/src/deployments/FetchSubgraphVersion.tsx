@@ -6,41 +6,43 @@ import { getPendingSubgraphId, SubgraphStatusQuery } from "../queries/subgraphSt
 import FetchPendingSubgraphVersion from "./FetchPendingSubgraphVersion";
 
 interface FetchSubgraphVersionProps {
-    subgraphEndpoint: string;
-    slug: string;
-    setDeployments: any;
+  subgraphEndpoint: string;
+  slug: string;
+  setDeployments: any;
 }
 
 function FetchSubgraphVersion({ subgraphEndpoint, slug, setDeployments }: FetchSubgraphVersionProps) {
-    const client = useMemo(() => NewClient(subgraphEndpoint), []);
+  const client = useMemo(() => NewClient(subgraphEndpoint), []);
 
-    // Generate query from subgraphEndpoints
-    const [fetchProtocolMeta, {
-        data: protocolMetaData,
-        error: protocolMetaError
-    }] = useLazyQuery(gql`${ProtocolQuery}`, {
-        client: client,
-    });
+  // Generate query from subgraphEndpoints
+  const [fetchProtocolMeta, { data: protocolMetaData, error: protocolMetaError }] = useLazyQuery(
+    gql`
+      ${ProtocolQuery}
+    `,
+    {
+      client: client,
+    },
+  );
 
-    useEffect(() => {
-        fetchProtocolMeta();
-    }, [])
+  useEffect(() => {
+    fetchProtocolMeta();
+  }, []);
 
-    useEffect(() => {
-        if (protocolMetaData?.protocols) {
-            if (protocolMetaData?.protocols?.length > 0) {
-                setDeployments((prevState: any) => ({ ...prevState, [slug]: protocolMetaData.protocols[0].subgraphVersion }));
-            }
-        }
-    }, [protocolMetaData])
+  useEffect(() => {
+    if (protocolMetaData?.protocols) {
+      if (protocolMetaData?.protocols?.length > 0) {
+        setDeployments((prevState: any) => ({ ...prevState, [slug]: protocolMetaData.protocols[0].subgraphVersion }));
+      }
+    }
+  }, [protocolMetaData]);
 
-    useEffect(() => {
-        if (!!protocolMetaError) {
-            setDeployments((prevState: any) => ({ ...prevState, [slug]: protocolMetaError?.message || null }));
-        }
-    }, [protocolMetaError])
+  useEffect(() => {
+    if (!!protocolMetaError) {
+      setDeployments((prevState: any) => ({ ...prevState, [slug]: protocolMetaError?.message || null }));
+    }
+  }, [protocolMetaError]);
 
-    return null;
+  return null;
 }
 
 export default FetchSubgraphVersion;

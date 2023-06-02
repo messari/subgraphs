@@ -33,11 +33,10 @@ function ProtocolTab({
   protocolTimeseriesData,
   protocolTimeseriesLoading,
   protocolTimeseriesError,
-  overlayProtocolTimeseriesData
+  overlayProtocolTimeseriesData,
 }: ProtocolTabProps) {
   const [issuesToDisplay, setIssuesToDisplay] = useState<{
-    [key: string]:
-    { message: string; type: string; level: string; fieldName: string }
+    [key: string]: { message: string; type: string; level: string; fieldName: string };
   }>({});
 
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
@@ -59,7 +58,7 @@ function ProtocolTab({
 
       let entitySpecificElements: any = {};
       if (specificChartsOnEntity[entityName]) {
-        entitySpecificElements = (specificChartsOnEntity[entityName]);
+        entitySpecificElements = specificChartsOnEntity[entityName];
       }
 
       const prevEntityName = Object.keys(protocolTimeseriesData)[index - 1];
@@ -75,7 +74,8 @@ function ProtocolTab({
               </CopyLinkToClipboard>
             </Box>
             <CircularProgress sx={{ margin: 6 }} size={50} />
-          </Grid>)
+          </Grid>
+        );
       }
 
       if (!currentEntityData && !protocolTimeseriesError[entityName] && protocolTimeseriesError[prevEntityName]) {
@@ -89,12 +89,9 @@ function ProtocolTab({
               </CopyLinkToClipboard>
             </Box>
             <h3>{entityName} timeseries query could not trigger</h3>
-          </Grid>);
+          </Grid>
+        );
       }
-
-      // create state returnedEntity[entityName]
-      // Rather than returning the mapped component, set the component to render to state (if unequal to current state for that entity)
-      // Render the compoennt from state
 
       return (
         <ProtocolTabEntity
@@ -115,13 +112,14 @@ function ProtocolTab({
             const issuesToAdd: any = {};
             issArr.forEach((issObj: any) => {
               issuesToAdd[issObj.fieldName + issObj.type] = issObj;
-            })
+            });
             if (Object.keys(issuesToAdd).length > 0) {
               setIssuesToDisplay((prevState) => {
-                return ({ ...prevState, ...issuesToAdd })
-              })
+                return { ...prevState, ...issuesToAdd };
+              });
             }
-          }} />
+          }}
+        />
       );
     });
   }
@@ -144,7 +142,8 @@ function ProtocolTab({
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
 
-  const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] = Object.values(issuesToDisplay);
+  const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] =
+    Object.values(issuesToDisplay);
 
   return (
     <>
@@ -158,13 +157,14 @@ function ProtocolTab({
           const issuesToAdd: any = {};
           issArr.forEach((issObj: any) => {
             issuesToAdd[issObj.fieldName + issObj.type] = issObj;
-          })
+          });
           if (Object.keys(issuesToAdd).length > 0) {
             setIssuesToDisplay((prevState) => {
-              return ({ ...prevState, ...issuesToAdd })
-            })
+              return { ...prevState, ...issuesToAdd };
+            });
           }
-        }} />
+        }}
+      />
       {protocolDataRender}
       {specificCharts}
     </>

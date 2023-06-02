@@ -133,7 +133,7 @@ export const BIGINT_SIX = BigInt.fromI32(6);
 export const BIGINT_TWELVE = BigInt.fromI32(12);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_NEG_HUNDRED = BigInt.fromI32(-100);
@@ -174,22 +174,31 @@ export const SECONDS_PER_HOUR = 60 * 60; // 360
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_YEAR = 60 * 60 * 24 * 365;
 export const SECONDS_PER_YEAR_BIGINT = BigInt.fromI32(60 * 60 * 24 * 365);
-export const SECONDS_PER_YEAR_BIGDECIMAL = new BigDecimal(BigInt.fromI32(60 * 60 * 24 * 365));
+export const SECONDS_PER_YEAR_BIGDECIMAL = new BigDecimal(
+  BigInt.fromI32(60 * 60 * 24 * 365)
+);
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
-export const VOW_ADDRESS = "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
-export const DAI_ADDRESS = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
+export const VAT_ADDRESS =
+  "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
+export const VOW_ADDRESS =
+  "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
+export const DAI_ADDRESS =
+  "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 export const MIGRATION_ADDRESS = "0xc73e0383f3aff3215e6f04b0331d58cecf0ab849";
 export const CAT_V1_ADDRESS = "0x78f2c2af65126834c51822f56be0d7469d7a523e";
 
 // unconventional token requiring special handling
-export const ILK_SAI = "0x5341490000000000000000000000000000000000000000000000000000000000";
+export const ILK_SAI =
+  "0x5341490000000000000000000000000000000000000000000000000000000000";
 // the first market, used to detect cat/dog contract
-export const ILK_ETH_A = "0x4554482d41000000000000000000000000000000000000000000000000000000";
+export const ILK_ETH_A =
+  "0x4554482d41000000000000000000000000000000000000000000000000000000";

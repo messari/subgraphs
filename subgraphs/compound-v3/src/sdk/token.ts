@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ERC20 } from "../../generated/Configurator/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Configurator/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Configurator/ERC20NameBytes";
@@ -10,7 +11,8 @@ import { BIGDECIMAL_ZERO } from "./constants";
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version: 3.0.0
+ * Schema Version:  3.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @dmelotik
  */
@@ -188,8 +190,8 @@ export class StaticTokenDefinition {
   }
 
   // Get all tokens with a static defintion
-  static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    const staticDefinitions = new Array<StaticTokenDefinition>(6);
+  static getStaticDefinitions(): StaticTokenDefinition[] {
+    const staticDefinitions: StaticTokenDefinition[] = [];
 
     // Add DGD
     const tokenDGD = new StaticTokenDefinition(

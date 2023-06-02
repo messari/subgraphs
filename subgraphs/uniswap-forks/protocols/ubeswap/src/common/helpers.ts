@@ -76,7 +76,7 @@ export function getOrCreateMasterChefStakingPool(
     const pool = LiquidityPool.load(masterChefPool.poolAddress!);
     if (pool) {
       pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+        getOrCreateRewardToken(event, NetworkConfigs.getRewardToken()).id,
       ];
       pool.save();
     }
@@ -141,7 +141,7 @@ export function updateRewardEmissions(event: ethereum.Event): void {
 
   // Divide the rewards for this period by 7 because each period lasts one week.
   const poolRewardDailyAverage = poolRewardForPeriod.div(ONE_WEEK_IN_DAYS);
-  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(event, NetworkConfigs.getRewardToken());
 
   // Update the emissions amount in quantity and USD value.
   pool.rewardTokenEmissionsAmount = [poolRewardDailyAverage];

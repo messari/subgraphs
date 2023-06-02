@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
 
 export function tokenAmountToUSDAmount(token: Token, amount: BigInt): BigDecimal {
@@ -39,11 +39,11 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
 }
 
 export function calculateMedian(prices: BigDecimal[]): BigDecimal {
-  let sorted = prices.sort((a, b) => {
+  const sorted = prices.sort((a, b) => {
     return a.equals(b) ? 0 : a.gt(b) ? 1 : -1;
   });
 
-  let mid = Math.ceil(sorted.length / 2) as i32;
+  const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
     return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
   }

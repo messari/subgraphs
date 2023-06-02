@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/templates/Swap/YearnLensContract";
 
 export function getYearnLensContract(network: string): YearnLensContract {
@@ -19,7 +19,7 @@ export function getTokenPriceFromYearnLens(
   if (!yearnLensContract) {
     return new CustomPriceType();
   }
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
       constants.BIGINT_ZERO

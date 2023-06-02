@@ -61,9 +61,9 @@ export function handleReward(
     return;
   }
 
-  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(event, NetworkConfigs.getRewardToken());
   pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    getOrCreateRewardToken(event, NetworkConfigs.getRewardToken()).id,
   ];
 
   // Update staked amounts

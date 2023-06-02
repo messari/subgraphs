@@ -48,10 +48,8 @@ function PoolTab({
   setPoolId,
 }: PoolTabProps) {
   const [issuesToDisplay, setIssuesToDisplay] = useState<{
-    [key: string]:
-    { message: string; type: string; level: string; fieldName: string }
+    [key: string]: { message: string; type: string; level: string; fieldName: string };
   }>({});
-
 
   console.log("DATA", data);
   // Get the key name of the pool specific to the protocol type (singular and plural)
@@ -99,15 +97,24 @@ function PoolTab({
   const schemaVersion = data?.protocols[0]?.version;
 
   if (schemaType?.toUpperCase() === "BRIDGE") {
-    const headerComponent = (<Grid key={"Bridge Specific Charts"}>
-      <Box sx={{ marginTop: "24px" }}>
-        <CopyLinkToClipboard link={window.location.href} scrollId={"Bridge Specific Charts"}>
-          <Typography variant="h4">{"Bridge Specific Charts"}</Typography>
-        </CopyLinkToClipboard>
-      </Box>
-    </Grid>);
+    const headerComponent = (
+      <Grid key={"Bridge Specific Charts"}>
+        <Box sx={{ marginTop: "24px" }}>
+          <CopyLinkToClipboard link={window.location.href} scrollId={"Bridge Specific Charts"}>
+            <Typography variant="h4">{"Bridge Specific Charts"}</Typography>
+          </CopyLinkToClipboard>
+        </Box>
+      </Grid>
+    );
     if (data[poolKeySingular]?.routes?.length > 0) {
-      specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+      specificCharts.push(
+        headerComponent,
+        <BridgeOutboundVolumeLogic
+          poolId={poolId}
+          routes={data[poolKeySingular]?.routes}
+          subgraphToQueryURL={subgraphToQueryURL}
+        />,
+      );
     }
   } else if (schemaType?.toUpperCase() === "EXCHANGE") {
     if (poolTimeseriesData) {
@@ -116,26 +123,26 @@ function PoolTab({
           specificChartsOnEntity[entityName] = {};
         }
         const currentEntityData = poolTimeseriesData[entityName];
-        const tokenWeightData: any = []
+        const tokenWeightData: any = [];
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          let dateVal: number = Number(timeseriesInstance["timestamp"]);
           dateValueKeys.forEach((key: string) => {
             let factor = 86400;
-            if (key.includes('hour')) {
+            if (key.includes("hour")) {
               factor = factor / 24;
             }
             if (!!(Number(timeseriesInstance[key]) * factor)) {
-              dateVal = (Number(timeseriesInstance[key]) * factor);
+              dateVal = Number(timeseriesInstance[key]) * factor;
             }
-          })
+          });
           if (timeseriesInstance.inputTokenWeights) {
             timeseriesInstance.inputTokenWeights.forEach((weight: any, idx: number) => {
               if (idx > tokenWeightData.length - 1) {
                 tokenWeightData.push([]);
               }
-              tokenWeightData[idx].push({ value: Number(weight), date: dateVal })
-            })
+              tokenWeightData[idx].push({ value: Number(weight), date: dateVal });
+            });
           }
           // For exchange protocols, calculate the baseYield
           let value = 0;
@@ -148,14 +155,14 @@ function PoolTab({
               value = 0;
             }
           }
-          if (!specificChartsOnEntity[entityName]['baseYield']) {
-            specificChartsOnEntity[entityName]['baseYield'] = [];
+          if (!specificChartsOnEntity[entityName]["baseYield"]) {
+            specificChartsOnEntity[entityName]["baseYield"] = [];
           } else {
-            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: dateVal });
+            specificChartsOnEntity[entityName]["baseYield"].push({ value, date: dateVal });
           }
         }
-        specificChartsOnEntity[entityName]['inputTokenWeights'] = tokenWeightData;
-      })
+        specificChartsOnEntity[entityName]["inputTokenWeights"] = tokenWeightData;
+      });
     }
   } else if (schemaType?.toUpperCase() === "YIELD") {
     if (poolTimeseriesData) {
@@ -166,30 +173,36 @@ function PoolTab({
         const currentEntityData = poolTimeseriesData[entityName];
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          let dateVal: number = Number(timeseriesInstance["timestamp"]);
           dateValueKeys.forEach((key: string) => {
             let factor = 86400;
-            if (key.includes('hour')) {
+            if (key.includes("hour")) {
               factor = factor / 24;
             }
             if (!!(Number(timeseriesInstance[key]) * factor)) {
-              dateVal = (Number(timeseriesInstance[key]) * factor);
+              dateVal = Number(timeseriesInstance[key]) * factor;
             }
-          })
+          });
           let value = 0;
           // For Yield Agg protocols, calculate the baseYield
           if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.dailySupplySideRevenueUSD) {
-            value = Number(timeseriesInstance.dailySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 365 * 100;
+            value =
+              Number(timeseriesInstance.dailySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) *
+              365 *
+              100;
           } else if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.hourlySupplySideRevenueUSD) {
-            value = Number(timeseriesInstance.hourlySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 365 * 100;
+            value =
+              Number(timeseriesInstance.hourlySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) *
+              365 *
+              100;
           }
-          if (!specificChartsOnEntity[entityName]['baseYield']) {
-            specificChartsOnEntity[entityName]['baseYield'] = [];
+          if (!specificChartsOnEntity[entityName]["baseYield"]) {
+            specificChartsOnEntity[entityName]["baseYield"] = [];
           } else {
-            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: dateVal });
+            specificChartsOnEntity[entityName]["baseYield"].push({ value, date: dateVal });
           }
         }
-      })
+      });
     }
   } else if (schemaType?.toUpperCase() === "LENDING") {
     if (poolTimeseriesData) {
@@ -205,38 +218,43 @@ function PoolTab({
           const rateKey = `${rate?.type || ""}-${rate?.side || ""}`;
           ratesChart[rateKey] = [];
           ratesSums[rateKey] = 0;
-        })
+        });
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          let dateVal: number = Number(timeseriesInstance["timestamp"]);
           dateValueKeys.forEach((key: string) => {
             let factor = 86400;
-            if (key.includes('hour')) {
+            if (key.includes("hour")) {
               factor = factor / 24;
             }
             if (!!(Number(timeseriesInstance[key]) * factor)) {
-              dateVal = (Number(timeseriesInstance[key]) * factor);
+              dateVal = Number(timeseriesInstance[key]) * factor;
             }
-          })
+          });
           const initTableValue: any = { value: [], date: dateVal };
           timeseriesInstance["rates"].forEach((rateElement: any, idx: number) => {
             const rateKey = `${rateElement.type || ""}-${rateElement.side || ""}`;
             initTableValue.value.push(`[${idx}]: ${Number(rateElement.rate).toFixed(3)}%`);
             ratesSums[rateKey] += Number(rateElement.rate);
-            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: dateVal })
+            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: dateVal });
           });
-          tableVals.push({ value: initTableValue.value.join(', '), date: initTableValue.date });
+          tableVals.push({ value: initTableValue.value.join(", "), date: initTableValue.date });
         }
-        const issues = Object.keys(ratesSums)?.filter(rateLabel => ratesSums[rateLabel] === 0);
-        specificChartsOnEntity[entityName]['rates'] = { dataChart: ratesChart, tableData: tableVals, issues: issues.map(iss => entityName + '-' + iss) };
-      })
+        const issues = Object.keys(ratesSums)?.filter((rateLabel) => ratesSums[rateLabel] === 0);
+        specificChartsOnEntity[entityName]["rates"] = {
+          dataChart: ratesChart,
+          tableData: tableVals,
+          issues: issues.map((iss) => entityName + "-" + iss),
+        };
+      });
     }
   }
 
   let poolDataSection = null;
   let poolTable = null;
   if (poolId) {
-    const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] = Object.values(issuesToDisplay);
+    const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] =
+      Object.values(issuesToDisplay);
     issuesDisplayElement = (
       <IssuesDisplay issuesArrayProps={issuesArrayProps} allLoaded={allLoaded} oneLoaded={oneLoaded} />
     );
@@ -252,27 +270,36 @@ function PoolTab({
             const issuesToAdd: any = {};
             issArr.forEach((issObj: any) => {
               issuesToAdd[issObj.fieldName + issObj.type] = issObj;
-            })
+            });
             if (Object.keys(issuesToAdd).length > 0) {
               setIssuesToDisplay((prevState) => {
-                return ({ ...prevState, ...issuesToAdd });
+                return { ...prevState, ...issuesToAdd };
               });
             }
-          }} />
+          }}
+        />
       );
     }
-    let activeMessage = null
+    let activeMessage = null;
     if (data.protocols[0].type === "LENDING") {
-      activeMessage = <Typography sx={{ color: "lime", my: 3 }} variant="h5">This Market is active.</Typography>;
+      activeMessage = (
+        <Typography sx={{ color: "lime", my: 3 }} variant="h5">
+          This Market is active.
+        </Typography>
+      );
       if (!entityData?.isActive) {
-        activeMessage = <Typography sx={{ color: "red", my: 3 }} variant="h5">This Market is <b>NOT</b> active.</Typography>;
+        activeMessage = (
+          <Typography sx={{ color: "red", my: 3 }} variant="h5">
+            This Market is <b>NOT</b> active.
+          </Typography>
+        );
       }
     }
     if (poolTimeseriesData) {
       const poolEntityElements = Object.keys(poolTimeseriesData).map((entityName: string) => {
         let entitySpecificElements: any = {};
         if (specificChartsOnEntity[entityName]) {
-          entitySpecificElements = (specificChartsOnEntity[entityName]);
+          entitySpecificElements = specificChartsOnEntity[entityName];
         }
         return (
           <PoolTabEntity
@@ -291,13 +318,14 @@ function PoolTab({
               const issuesToAdd: any = {};
               issArr.forEach((issObj: any) => {
                 issuesToAdd[issObj.fieldName + issObj.type] = issObj;
-              })
+              });
               if (Object.keys(issuesToAdd).length > 0) {
                 setIssuesToDisplay((prevState) => {
-                  return ({ ...prevState, ...issuesToAdd });
+                  return { ...prevState, ...issuesToAdd };
                 });
               }
-            }} />
+            }}
+          />
         );
       });
       poolDataSection = (

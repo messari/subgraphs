@@ -27,21 +27,21 @@ import {
   BIGDECIMAL_ZERO,
   BridgePoolType,
   BridgeType,
+  CONTEXT_KEY_CHAINID,
+  CONTEXT_KEY_CROSSCHAINID,
+  CONTEXT_KEY_POOLID,
   CrosschainTokenType,
   EventType,
   ZERO_ADDRESS,
 } from "../common/constants";
 import { NetworkConfigs } from "../../configurations/configure";
 
-import { LogAnySwapIn, LogAnySwapOut } from "../../generated/RouterV6/Router";
+import { LogAnySwapIn, LogAnySwapOut } from "../../generated/Router-0/Router";
 import {
-  DepositCall,
-  WithdrawCall,
   LogSwapout,
   LogSwapin,
-  DepositVaultCall,
-  WithdrawVaultCall,
-} from "../../generated/RouterV6/anyTOKEN";
+  Transfer,
+} from "../../generated/Router-0/anyToken";
 
 export function handlerSwapOutV2(event: LogSwapout): void {
   const protocol = getOrCreateProtocol();
@@ -669,182 +669,82 @@ export function handleSwapIn(event: LogAnySwapIn): void {
   protocol.save();
 }
 
-export function handleDeposit(call: DepositCall): void {
-  const context = dataSource.context();
-  const poolID = context.getString("poolID");
-  const chainID = BigInt.fromString(context.getString("chainID"));
-  const crosschainID = BigInt.fromString(context.getString("crosschainID"));
+export function handleTransfer(event: Transfer): void {
+  if (
+    event.params.from == Address.fromString(ZERO_ADDRESS) ||
+    event.params.to == Address.fromString(ZERO_ADDRESS)
+  ) {
+    const context = dataSource.context();
+    const poolID = context.getString(CONTEXT_KEY_POOLID);
+    const chainID = BigInt.fromString(context.getString(CONTEXT_KEY_CHAINID));
+    const crosschainID = BigInt.fromString(
+      context.getString(CONTEXT_KEY_CROSSCHAINID)
+    );
 
-  const protocol = getOrCreateProtocol();
-  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
-    protocol,
-    call.block
-  );
-  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(
-    protocol,
-    call.block
-  );
+    const protocol = getOrCreateProtocol();
+    const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
+      protocol,
+      event.block
+    );
+    const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(
+      protocol,
+      event.block
+    );
 
-  const tokenAddress = Address.fromString(poolID);
-  const token = getOrCreateToken(protocol, tokenAddress, chainID, call.block);
+    const tokenAddress = Address.fromString(poolID);
+    const token = getOrCreateToken(
+      protocol,
+      tokenAddress,
+      chainID,
+      event.block
+    );
 
-  updateUsageMetrics(
-    protocol,
-    usageMetricsDaily,
-    usageMetricsHourly,
-    EventType.DEPOSIT,
-    crosschainID,
-    call.block,
-    call.inputs.to
-  );
+    if (event.params.from == Address.fromString(ZERO_ADDRESS)) {
+      updateUsageMetrics(
+        protocol,
+        usageMetricsDaily,
+        usageMetricsHourly,
+        EventType.DEPOSIT,
+        crosschainID,
+        event.block,
+        event.params.to
+      );
 
-  createLiquidityDepositEvent(
-    protocol,
-    token,
-    Bytes.fromHexString(poolID),
-    chainID,
-    call.inputs.to,
-    tokenAddress,
-    call.inputs.amount,
-    call
-  );
+      createLiquidityDepositEvent(
+        protocol,
+        token,
+        Bytes.fromHexString(poolID),
+        chainID,
+        event.params.to,
+        tokenAddress,
+        event.params.value,
+        event
+      );
+    } else if (event.params.to == Address.fromString(ZERO_ADDRESS)) {
+      updateUsageMetrics(
+        protocol,
+        usageMetricsDaily,
+        usageMetricsHourly,
+        EventType.WITHDRAW,
+        crosschainID,
+        event.block,
+        event.params.from
+      );
 
-  usageMetricsHourly.save();
-  usageMetricsDaily.save();
-  protocol.save();
-}
+      createLiquidityWithdrawEvent(
+        protocol,
+        token,
+        Bytes.fromHexString(poolID),
+        chainID,
+        event.params.from,
+        tokenAddress,
+        event.params.value,
+        event
+      );
+    }
 
-export function handleDepositVault(call: DepositVaultCall): void {
-  const context = dataSource.context();
-  const poolID = context.getString("poolID");
-  const chainID = BigInt.fromString(context.getString("chainID"));
-  const crosschainID = BigInt.fromString(context.getString("crosschainID"));
-
-  const protocol = getOrCreateProtocol();
-  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
-    protocol,
-    call.block
-  );
-  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(
-    protocol,
-    call.block
-  );
-
-  const tokenAddress = Address.fromString(poolID);
-  const token = getOrCreateToken(protocol, tokenAddress, chainID, call.block);
-
-  updateUsageMetrics(
-    protocol,
-    usageMetricsDaily,
-    usageMetricsHourly,
-    EventType.DEPOSIT,
-    crosschainID,
-    call.block,
-    call.inputs.to
-  );
-
-  createLiquidityDepositEvent(
-    protocol,
-    token,
-    Bytes.fromHexString(poolID),
-    chainID,
-    call.inputs.to,
-    tokenAddress,
-    call.inputs.amount,
-    call
-  );
-
-  usageMetricsHourly.save();
-  usageMetricsDaily.save();
-  protocol.save();
-}
-
-export function handleWithdraw(call: WithdrawCall): void {
-  const context = dataSource.context();
-  const poolID = context.getString("poolID");
-  const chainID = BigInt.fromString(context.getString("chainID"));
-  const crosschainID = BigInt.fromString(context.getString("crosschainID"));
-
-  const protocol = getOrCreateProtocol();
-  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
-    protocol,
-    call.block
-  );
-  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(
-    protocol,
-    call.block
-  );
-
-  const tokenAddress = Address.fromString(poolID);
-  const token = getOrCreateToken(protocol, tokenAddress, chainID, call.block);
-
-  updateUsageMetrics(
-    protocol,
-    usageMetricsDaily,
-    usageMetricsHourly,
-    EventType.WITHDRAW,
-    crosschainID,
-    call.block,
-    call.inputs.to
-  );
-
-  createLiquidityWithdrawEvent(
-    protocol,
-    token,
-    Bytes.fromHexString(poolID),
-    chainID,
-    tokenAddress,
-    call.inputs.to,
-    call.inputs.amount,
-    call
-  );
-
-  usageMetricsHourly.save();
-  usageMetricsDaily.save();
-  protocol.save();
-}
-
-export function handleWithdrawVault(call: WithdrawVaultCall): void {
-  const context = dataSource.context();
-  const poolID = context.getString("poolID");
-  const chainID = BigInt.fromString(context.getString("chainID"));
-  const crosschainID = BigInt.fromString(context.getString("crosschainID"));
-
-  const protocol = getOrCreateProtocol();
-  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
-    protocol,
-    call.block
-  );
-  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(
-    protocol,
-    call.block
-  );
-
-  const tokenAddress = Address.fromString(poolID);
-  const token = getOrCreateToken(protocol, tokenAddress, chainID, call.block);
-
-  updateUsageMetrics(
-    protocol,
-    usageMetricsDaily,
-    usageMetricsHourly,
-    EventType.WITHDRAW,
-    crosschainID,
-    call.block,
-    call.inputs.to
-  );
-
-  createLiquidityWithdrawEvent(
-    protocol,
-    token,
-    Bytes.fromHexString(poolID),
-    chainID,
-    tokenAddress,
-    call.inputs.to,
-    call.inputs.amount,
-    call
-  );
-
-  usageMetricsHourly.save();
-  usageMetricsDaily.save();
-  protocol.save();
+    usageMetricsHourly.save();
+    usageMetricsDaily.save();
+    protocol.save();
+  }
 }

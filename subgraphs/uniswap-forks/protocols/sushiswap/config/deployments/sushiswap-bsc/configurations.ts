@@ -41,12 +41,12 @@ export class SushiswapBscConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+        toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
       )
     );
   }
@@ -81,7 +81,7 @@ export class SushiswapBscConfigurations implements Configurations {
     return toLowerCase("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"); // wBNB
   }
   getRewardToken(): string {
-    return toLowerCase("0x947950BcC74888a40Ffa2593C5798F11Fc9124C4");
+    return toLowerCase("0x947950bcc74888a40ffa2593c5798f11fc9124c4");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
@@ -96,9 +96,9 @@ export class SushiswapBscConfigurations implements Configurations {
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", // USDC
-      "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3", // DAI
-      "0x55d398326f99059fF775485246999027B3197955", // USDT
+      "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
+      "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3", // DAI
+      "0x55d398326f99059ff775485246999027b3197955", // USDT
     ]);
   }
   getStableOraclePools(): string[] {

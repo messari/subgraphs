@@ -39,9 +39,9 @@ export function updateMasterChef(
     return;
   }
 
-  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(event, NetworkConfigs.getRewardToken());
   pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    getOrCreateRewardToken(event, NetworkConfigs.getRewardToken()).id,
   ];
 
   // Calculate Reward Emission per second to a specific pool

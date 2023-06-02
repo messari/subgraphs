@@ -1,11 +1,13 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts/index";
+import { BigDecimal, ethereum, log } from "@graphprotocol/graph-ts/index";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
+  getOrCreateProtocol,
   getOrCreateToken,
   getOrCreateTokenWhitelist,
 } from "../common/getters";
 import {
+  LiquidityPool,
   Token,
   _HelperStore,
   _LiquidityPoolAmount,
@@ -15,17 +17,23 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_TWO,
   BIGINT_ZERO,
+  PRICE_CHANGE_BUFFER_LIMIT,
+  BIGDECIMAL_TEN_BILLION,
+  BIGDECIMAL_FIVE_PERCENT,
 } from "../common/constants";
-import { safeDiv } from "../common/utils/utils";
+import {
+  absBigDecimal,
+  convertTokenToDecimal,
+  safeDiv,
+} from "../common/utils/utils";
 import { NetworkConfigs } from "../../configurations/configure";
 
 // Update the token price of the native token for the specific protocol/network (see network specific configs)
 // Update the token by referencing the native token against pools with the reference token and a stable coin
 // Estimate the price against the pool with the highest liquidity
-export function updateNativeTokenPriceInUSD(): Token {
+export function getNativeTokenPriceInUSD(nativeToken: Token): BigDecimal {
   let nativeAmount = BIGDECIMAL_ZERO;
   let stableAmount = BIGDECIMAL_ZERO;
-  const nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < NetworkConfigs.getStableOraclePools().length; i++) {
     const pool = _LiquidityPoolAmount.load(
@@ -45,7 +53,8 @@ export function updateNativeTokenPriceInUSD(): Token {
     }
   }
   nativeToken.lastPriceUSD = safeDiv(stableAmount, nativeAmount);
-  return nativeToken;
+  nativeToken.save();
+  return nativeToken.lastPriceUSD!;
 }
 
 /**
@@ -53,12 +62,11 @@ export function updateNativeTokenPriceInUSD(): Token {
  * You can find the possible whitelisted tokens used for comparision in the network configuration typescript file.
  **/
 export function findUSDPricePerToken(
-  token: Token,
-  nativeToken: Token,
-  blockNumber: BigInt
+  event: ethereum.Event,
+  token: Token
 ): BigDecimal {
   if (token.id == NetworkConfigs.getReferenceToken()) {
-    return nativeToken.lastPriceUSD!;
+    return getNativeTokenPriceInUSD(token);
   }
   const tokenWhitelist = getOrCreateTokenWhitelist(token.id);
   const whiteList = tokenWhitelist.whitelistPools;
@@ -77,54 +85,122 @@ export function findUSDPricePerToken(
     for (let i = 0; i < whiteList.length; ++i) {
       const poolAddress = whiteList[i];
       const poolAmounts = getLiquidityPoolAmounts(poolAddress);
-      const pool = getLiquidityPool(poolAddress, blockNumber);
+      const pool = getLiquidityPool(poolAddress, event.block.number);
 
       if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
-        if (
-          pool.inputTokens[0] == token.id &&
-          pool.totalValueLockedUSD.gt(
-            NetworkConfigs.getMinimumLiquidityThresholdTrackPrice()
-          )
-        ) {
-          // whitelist token is token1
-          const whitelistToken = getOrCreateToken(pool.inputTokens[1]);
-          // get the derived NativeToken in pool
-          const whitelistTokenLocked = poolAmounts.inputTokenBalances[1].times(
-            whitelistToken.lastPriceUSD!
-          );
-          if (whitelistTokenLocked.gt(largestLiquidityWhitelistTokens)) {
-            largestLiquidityWhitelistTokens = whitelistTokenLocked;
-            // token1 per our token * nativeToken per token1
-            priceSoFar = safeDiv(
-              poolAmounts.inputTokenBalances[1],
-              poolAmounts.inputTokenBalances[0]
-            ).times(whitelistToken.lastPriceUSD! as BigDecimal);
-          }
+        const priceTokenIndex: i32 = get_token_index(pool, token);
+        if (priceTokenIndex == -1) {
+          continue;
         }
+        const whitelistTokenIndex = 0 == priceTokenIndex ? 1 : 0;
+
+        const whitelistToken = getOrCreateToken(
+          event,
+          pool.inputTokens[whitelistTokenIndex],
+          false
+        );
+        const whitelistTokenLocked = poolAmounts.inputTokenBalances[
+          whitelistTokenIndex
+        ].times(whitelistToken.lastPriceUSD!);
         if (
-          pool.inputTokens[1] == token.id &&
-          pool.totalValueLockedUSD.gt(
+          whitelistTokenLocked.gt(largestLiquidityWhitelistTokens) &&
+          whitelistTokenLocked.gt(
             NetworkConfigs.getMinimumLiquidityThresholdTrackPrice()
           )
         ) {
-          const whitelistToken = getOrCreateToken(pool.inputTokens[0]);
-          // get the derived nativeToken in pool
-          const whitelistTokenLocked = poolAmounts.inputTokenBalances[0].times(
-            whitelistToken.lastPriceUSD!
-          );
-          if (whitelistTokenLocked.gt(largestLiquidityWhitelistTokens)) {
-            largestLiquidityWhitelistTokens = whitelistTokenLocked;
-            // token0 per our token * NativeToken per token0
-            priceSoFar = safeDiv(
-              poolAmounts.inputTokenBalances[0],
-              poolAmounts.inputTokenBalances[1]
-            ).times(whitelistToken.lastPriceUSD! as BigDecimal);
+          largestLiquidityWhitelistTokens = whitelistTokenLocked;
+          // token1 per our token * nativeToken per token1
+
+          const newPrice = safeDiv(
+            poolAmounts.inputTokenBalances[whitelistTokenIndex],
+            poolAmounts.inputTokenBalances[priceTokenIndex]
+          ).times(whitelistToken.lastPriceUSD! as BigDecimal);
+
+          if (isValidTVL(pool, token, whitelistToken.lastPriceUSD!)) {
+            priceSoFar = newPrice;
           }
         }
       }
     }
   }
-  return priceSoFar; // nothing was found return 0
+
+  // Buffer token pricings that would cause large spikes on the protocol level
+  const protocol = getOrCreateProtocol();
+  const tokenTVLDelta = absBigDecimal(
+    priceSoFar
+      .times(convertTokenToDecimal(token._totalSupply, token.decimals))
+      .minus(token._totalValueLockedUSD)
+  );
+  const protocolTVLPercentageDelta = absBigDecimal(
+    safeDiv(tokenTVLDelta, protocol.totalValueLockedUSD)
+  );
+  if (protocolTVLPercentageDelta.gt(BIGDECIMAL_FIVE_PERCENT)) {
+    log.warning("Price too high for token: {} from pool: {}", [
+      token.id,
+      priceSoFar.toString(),
+    ]);
+    if (token._largeTVLImpactBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
+      token._largeTVLImpactBuffer += 1;
+      token.save();
+      return token.lastPriceUSD!;
+    }
+  }
+
+  if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
+    token.save();
+    return priceSoFar;
+  }
+
+  // If priceSoFar 10x greater or less than token.lastPriceUSD, use token.lastPriceUSD
+  // Increment buffer so that it allows large price jumps if seen repeatedly
+  if (
+    priceSoFar.gt(token.lastPriceUSD!.times(BIGDECIMAL_TWO)) ||
+    priceSoFar.lt(token.lastPriceUSD!.div(BIGDECIMAL_TWO))
+  ) {
+    if (token._largePriceChangeBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
+      token._largePriceChangeBuffer += 1;
+      token.save();
+      return token.lastPriceUSD!;
+    }
+  }
+
+  token._largePriceChangeBuffer = 0;
+  token._largeTVLImpactBuffer = 0;
+
+  token.save();
+  return priceSoFar;
+}
+
+// Tried to return null from here and it did not
+function get_token_index(pool: LiquidityPool, token: Token): i32 {
+  if (pool.inputTokens[0] == token.id) {
+    return 0;
+  }
+  if (pool.inputTokens[1] == token.id) {
+    return 1;
+  }
+  return -1;
+}
+
+function isValidTVL(
+  pool: LiquidityPool,
+  token: Token,
+  price: BigDecimal
+): bool {
+  const newTokenTotalValueLocked = convertTokenToDecimal(
+    token._totalSupply,
+    token.decimals
+  ).times(price);
+
+  // If price is too high, skip this pool
+  if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
+    log.warning("Price too high for token: {} from pool: {}", [
+      token.id,
+      pool.id,
+    ]);
+    return false;
+  }
+  return true;
 }
 
 /**

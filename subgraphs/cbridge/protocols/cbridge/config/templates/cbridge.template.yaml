@@ -1,0 +1,415 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  # this section is for price oracle
+  - kind: ethereum
+    name: UniswapV2Factory
+    network: {{ network }}
+    source:
+      abi: UniswapV2Factory
+      startBlock: {{ Bridge.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: PoolBasedBridge
+    network: {{ network }}
+    source:
+      address: "{{ Bridge.address }}"
+      startBlock: {{ Bridge.startBlock }}
+      abi: PoolBasedBridge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PoolBasedBridge
+          file: ./abis/PoolBasedBridge.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Send(bytes32,address,address,address,uint256,uint64,uint64,uint32)
+          handler: handleSend
+        - event: LiquidityAdded(uint64,address,address,uint256)
+          handler: handleLiquidityAdded
+        - event: Relay(bytes32,address,address,address,uint256,uint64,bytes32)
+          handler: handleRelay
+        {{^supportCallHandlers}}
+        - event: WithdrawDone(bytes32,uint64,address,address,uint256,bytes32)
+          handler: handleWithdrawEvent
+        {{/supportCallHandlers}}
+      # Use withdraw callhandler if possible to get info of source chain
+      {{#supportCallHandlers}}
+      callHandlers:
+        - function: withdraw(bytes,bytes[],address[],uint256[])
+          handler: handleWithdrawCall
+      {{/supportCallHandlers}}
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: OriginalTokenVault
+    network: {{ network }}
+    source:
+      address: "{{ OriginalTokenVault.address }}"
+      startBlock: {{ OriginalTokenVault.startBlock }}
+      abi: OriginalTokenVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: OriginalTokenVault
+          file: ./abis/OriginalTokenVault.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposited(bytes32,address,address,uint256,uint64,address)
+          handler: handleOTVDeposited
+        - event: Withdrawn(bytes32,address,address,uint256,uint64,bytes32,address)
+          handler: handleOTVWithdrawn
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: OriginalTokenVaultV2
+    network: {{ network }}
+    source:
+      address: "{{ OriginalTokenVaultV2.address }}"
+      startBlock: {{ OriginalTokenVaultV2.startBlock }}
+      abi: OriginalTokenVaultV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: OriginalTokenVaultV2
+          file: ./abis/OriginalTokenVaultV2.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposited(bytes32,address,address,uint256,uint64,address,uint64)
+          handler: handleOTVv2Deposited
+        - event: Withdrawn(bytes32,address,address,uint256,uint64,bytes32,address)
+          handler: handleOTVv2Withdrawn
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: PeggedTokenBridge
+    network: {{ network }}
+    source:
+      address: "{{ PeggedTokenBridge.address }}"
+      startBlock: {{ PeggedTokenBridge.startBlock }}
+      abi: PeggedTokenBridge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PeggedTokenBridge
+          file: ./abis/PeggedTokenBridge.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Mint(bytes32,address,address,uint256,uint64,bytes32,address)
+          handler: handlePTBMint
+        - event: Burn(bytes32,address,address,uint256,address)
+          handler: handlePTBBurn
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: PeggedTokenBridgeV2
+    network: {{ network }}
+    source:
+      address: "{{ PeggedTokenBridgeV2.address }}"
+      startBlock: {{ PeggedTokenBridgeV2.startBlock }}
+      abi: PeggedTokenBridgeV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PeggedTokenBridgeV2
+          file: ./abis/PeggedTokenBridgeV2.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Mint(bytes32,address,address,uint256,uint64,bytes32,address)
+          handler: handlePTBv2Mint
+        - event: Burn(bytes32,address,address,uint256,uint64,address,uint64)
+          handler: handlePTBv2Burn
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: FarmingRewards
+    network: {{ network }}
+    source:
+      address: "{{ FarmingRewards.address }}"
+      startBlock: {{ FarmingRewards.startBlock }}
+      abi: FarmingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: FarmingRewards
+          file: ./abis/FarmingRewards.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: FarmingRewardClaimed(indexed address,indexed address,uint256)
+          handler: handleFarmingRewardClaimed
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: MessageBus
+    network: {{ network }}
+    source:
+      address: "{{ MessageBus.address }}"
+      startBlock: {{ MessageBus.startBlock }}
+      abi: MessageBus
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MessageBus
+          file: ./abis/MessageBus.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: FeeWithdrawn(address,uint256)
+          handler: handleMessageBusFeeWithdrawn
+        # messageOut
+        - event: Message(indexed address,address,uint256,bytes,uint256)
+          handler: handleMessage
+        - event: Message2(indexed address,bytes,uint256,bytes,uint256)
+          handler: handleMessage2
+        - event: MessageWithTransfer(indexed address,address,uint256,address,bytes32,bytes,uint256)
+          handler: handleMessageWithTransfer
+        {{^supportCallHandlers}}
+        # messageIn
+        - event: Executed(uint8,bytes32,uint8,indexed address,uint64,bytes32)
+          handler: handlerMessageExecuted
+        {{/supportCallHandlers}}
+      {{#supportCallHandlers}}
+      # Use executeMessage callHandlers if possible for sender
+      callHandlers:
+        - function: executeMessage(bytes,(address,address,uint64,bytes32),bytes[],address[],uint256[])
+          handler: handleExecuteMessage
+        - function: executeMessage(bytes,(bytes,address,uint64,bytes32),bytes[],address[],uint256[])
+          handler: handleExecuteMessage2
+      {{/supportCallHandlers}}      
+      file: ./src/mappings.ts

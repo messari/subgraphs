@@ -1,0 +1,7 @@
+{
+  "network": "optimism",
+  "governorContractAddress": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+  "governorContractStartBlock": 71801427,
+  "tokenContractAddress": "0x4200000000000000000000000000000000000042",
+  "tokenContractStartBlock": 6490467
+}

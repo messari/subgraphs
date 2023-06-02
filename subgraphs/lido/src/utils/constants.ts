@@ -95,9 +95,9 @@ export namespace InterestRateSide {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export const UNISWAP_V2_FACTORY = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
 
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
@@ -159,9 +159,11 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
+/* eslint-disable-next-line rulesdir/no-checksum-addresses */
 export const PROTOCOL_ID = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84";
 export const PROTOCOL_TREASURY_ID =
-  "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c";
+  "0x3e40d73eb977dc6a537af587d48316fee66e9c8c";
 export const PROTOCOL_NODE_OPERATORS_REGISTRY_ID =
-  "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5";
-export const PROTOCOL_ORACLE_ID = "0x442af784A788A5bd6F42A01Ebe9F287a871243fb";
+  "0x55032650b14df07b85bf18a3a3ec8e0af2e028d5";
+export const PROTOCOL_ORACLE_ID = "0x442af784a788a5bd6f42a01ebe9f287a871243fb";
+export const LIDO_V2_UPGRADE_BLOCK = BigInt.fromString("17266004");

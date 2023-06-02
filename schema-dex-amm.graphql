@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.3.1
+# Version: 1.3.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: ID!
 
@@ -53,6 +53,16 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " amount of tokens in the protocol "
+  _totalSupply: BigInt!
+
+  " Total value locked in the protocol "
+  _totalValueLockedUSD: BigDecimal!
+
+  _largePriceChangeBuffer: Int!
+
+  _largeTVLImpactBuffer: Int!
 }
 
 enum RewardTokenType {
@@ -63,7 +73,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -107,7 +117,7 @@ enum LiquidityPoolFeeType {
   WITHDRAWAL_FEE
 }
 
-type LiquidityPoolFee @entity {
+type LiquidityPoolFee @entity @regularPolling {
   " { Fee type }-{ Pool address } "
   id: ID!
 
@@ -184,7 +194,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type DexAmmProtocol implements Protocol @entity {
+type DexAmmProtocol implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
@@ -258,7 +268,7 @@ type DexAmmProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -293,7 +303,7 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: ID!
 
@@ -325,7 +335,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -373,7 +383,7 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Metadata #####
 ###############################
 
-type LiquidityPool @entity {
+type LiquidityPool @entity @regularPolling {
   " Smart contract address of the pool "
   id: ID!
 
@@ -469,7 +479,7 @@ type LiquidityPool @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type LiquidityPoolDailySnapshot @entity {
+type LiquidityPoolDailySnapshot @entity @dailySnapshot {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
 
@@ -542,7 +552,7 @@ type LiquidityPoolDailySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type LiquidityPoolHourlySnapshot @entity {
+type LiquidityPoolHourlySnapshot @entity @hourlySnapshot {
   " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: ID!
 
@@ -653,7 +663,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity {
+type Deposit @entity(immutable: true) @transaction {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -690,6 +700,9 @@ type Deposit implements Event @entity {
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
 
@@ -697,7 +710,7 @@ type Deposit implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw @entity(immutable: true) @transaction {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
@@ -734,6 +747,9 @@ type Withdraw implements Event @entity {
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
 
@@ -741,7 +757,7 @@ type Withdraw implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity {
+type Swap @entity(immutable: true) @transaction {
   " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -784,19 +800,22 @@ type Swap implements Event @entity {
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity(immutable: true) @regularPolling {
   " Address of the account "
   id: ID!
 }
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity {
+type ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }

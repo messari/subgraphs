@@ -36,30 +36,30 @@ export class HoneyswapGnosisConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7";
+    return "0xa818b4f111ccac7aa31d0bcc0806d64f2e0737d7";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7")
+      Address.fromString("0xa818b4f111ccac7aa31d0bcc0806d64f2e0737d7")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTradeFee(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("3.0");
+    return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;
@@ -79,16 +79,23 @@ export class HoneyswapGnosisConfigurations implements Configurations {
   getWhitelistTokens(): string[] {
     return [
       "0x9c58bacc331c9aa871afd802db6379a98e80cedb", // GNO
-      "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", // WETH
+      "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1", // WETH
       "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // WXDAI
       "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
       "0x38fb649ad3d6ba1113be5f57b927053e97fc5bf7", // xCOMB
       "0x71850b7e9ee3f13ab46d67167341e4bdc905eef9", // HNY
+      "0x21a42669643f45bc0e086b8fc2ed70c23d67509d", // FOX
+      "0x4f4f9b8d5b4d0dc10506e5551b0513b61fd59e75", // GIV
+      "0x4291f029b9e7acb02d49428458cf6fceac545f81", // WATER
+      "0xdd96b45877d0e8361a4ddb732da741e97f3191ff", // BUSD
+      "0xe2e73a1c69ecf83f464efce6a5be353a37ca09b2", // LINK
+      "0x3a97704a1b25f08aa230ae53b352e2e72ef52843", // AGVE
     ];
   }
   getStableCoins(): string[] {
     return [
       "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // WXDAI
+      "0xdd96b45877d0e8361a4ddb732da741e97f3191ff", // BUSD
       "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
     ];
   }

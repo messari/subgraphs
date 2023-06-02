@@ -1,0 +1,660 @@
+{
+  "deployment": "MULTICHAIN_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "bridgeConfig": [
+    {
+      "name": "BridgeV2-0",
+      "address": "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+      "abi": "anyToken",
+      "startBlock": 12083039
+    },
+    {
+      "name": "BridgeV2-1",
+      "address": "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+      "abi": "anyToken",
+      "startBlock": 12969295
+    },
+    {
+      "name": "BridgeV2-2",
+      "address": "0x6e264d4f2f7810cb82b9b73d6310e73c88be0bff",
+      "abi": "anyToken",
+      "startBlock": 22816736
+    },
+    {
+      "name": "BridgeV2-3",
+      "address": "0x7d86f1eaff29f076576b2ff09ce3bcc7533fd2c5",
+      "abi": "anyToken",
+      "startBlock": 21465143
+    },
+    {
+      "name": "BridgeV2-4",
+      "address": "0xc4bfaa8e2310bee9f80b27b253fc5f05221ab202",
+      "abi": "anyToken",
+      "startBlock": 12366104
+    },
+    {
+      "name": "BridgeV2-5",
+      "address": "0xe5130d3dbfac6ae7d73a24d719762df74d8e4c27",
+      "abi": "anyToken",
+      "startBlock": 23627384
+    },
+    {
+      "name": "BridgeV2-6",
+      "address": "0x6474239b1a83ceb3789cd8ddb2218e6f5c6840dd",
+      "abi": "anyToken",
+      "startBlock": 23627624
+    },
+    {
+      "name": "BridgeV2-7",
+      "address": "0xe613a914bbb433855378183c3ab13003285da40a",
+      "abi": "anyToken",
+      "startBlock": 21201181
+    },
+    {
+      "name": "BridgeV2-8",
+      "address": "0x00c7bfc4fc822629ee60b62b9b41fa8df4d4715a",
+      "abi": "anyToken",
+      "startBlock": 20661391
+    },
+    {
+      "name": "BridgeV2-9",
+      "address": "0x6fefd97f328342a8a840546a55fdcfee7542f9a8",
+      "abi": "anyToken",
+      "startBlock": 19637829
+    },
+    {
+      "name": "BridgeV2-10",
+      "address": "0xada7ef7fc572ea7a2e04e04f55b75144f1959605",
+      "abi": "anyToken",
+      "startBlock": 23430036
+    },
+    {
+      "name": "BridgeV2-11",
+      "address": "0x5fcb9de282af6122ce3518cde28b7089c9f97b26",
+      "abi": "anyToken",
+      "startBlock": 15852305
+    },
+    {
+      "name": "BridgeV2-12",
+      "address": "0xcaf5191fc480f43e4df80106c7695eca56e48b18",
+      "abi": "anyToken",
+      "startBlock": 17351375
+    },
+    {
+      "name": "BridgeV2-13",
+      "address": "0x3b42fd538597fd049648c9f017208bf712195b73",
+      "abi": "anyToken",
+      "startBlock": 20924201
+    },
+    {
+      "name": "BridgeV2-14",
+      "address": "0x1c2e7118591ec1b6122e4fe3d645706a9747b10e",
+      "abi": "anyToken",
+      "startBlock": 23627429
+    },
+    {
+      "name": "BridgeV2-15",
+      "address": "0x05f2972cd67705e7f2dcbffd0daa3f939b61020b",
+      "abi": "anyToken",
+      "startBlock": 22816518
+    },
+    {
+      "name": "BridgeV2-16",
+      "address": "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+      "abi": "anyToken",
+      "startBlock": 14156798
+    },
+    {
+      "name": "BridgeV2-17",
+      "address": "0xb585caea456f475244a84f32671b7648afd82f91",
+      "abi": "anyToken",
+      "startBlock": 21465208
+    },
+    {
+      "name": "BridgeV2-18",
+      "address": "0xa753efa27efd65a456295078ed606306c52c2ebf",
+      "abi": "anyToken",
+      "startBlock": 23897718
+    },
+    {
+      "name": "BridgeV2-19",
+      "address": "0x978338a9d2d0aa2ff388d3dc98b9bf25bff5efb4",
+      "abi": "anyToken",
+      "startBlock": 23091038
+    },
+    {
+      "name": "BridgeV2-20",
+      "address": "0x58c1bbb508e96cfec1787acf6afe1c7008a5b064",
+      "abi": "anyToken",
+      "startBlock": 17860479
+    },
+    {
+      "name": "BridgeV2-21",
+      "address": "0x4e1581f01046efdd7a1a2cdb0f82cdd7f71f2e59",
+      "abi": "anyToken",
+      "startBlock": 22079498
+    },
+    {
+      "name": "BridgeV2-22",
+      "address": "0x1d939c340bc3c8f1eb2b1ec965e1612d32d79c75",
+      "abi": "anyToken",
+      "startBlock": 20658654
+    },
+    {
+      "name": "BridgeV2-23",
+      "address": "0xd097f30fd3b0e489be8b5772ddcab6fcbe7ac89a",
+      "abi": "anyToken",
+      "startBlock": 20658579
+    },
+    {
+      "name": "BridgeV2-24",
+      "address": "0xd97f9674e2597e7a252de4875985f4385b9608fb",
+      "abi": "anyToken",
+      "startBlock": 19130364
+    },
+    {
+      "name": "BridgeV2-25",
+      "address": "0xc4bb7277a74678f053259cb1f96140347efbfd46",
+      "abi": "anyToken",
+      "startBlock": 20165306
+    },
+    {
+      "name": "BridgeV2-26",
+      "address": "0xe84cea9df2d6a6010c0bd74b803f6372534e75e9",
+      "abi": "anyToken",
+      "startBlock": 21201084
+    },
+    {
+      "name": "BridgeV2-27",
+      "address": "0x38389eb214c4ac1cdda7a7582ab01e8a9bb548ba",
+      "abi": "anyToken",
+      "startBlock": 15314377
+    },
+    {
+      "name": "BridgeV2-28",
+      "address": "0xd1790c5435b9fb7c9444c749cefe53d40d751eac",
+      "abi": "anyToken",
+      "startBlock": 20888647
+    },
+    {
+      "name": "BridgeV2-29",
+      "address": "0x5e430f88d1be82eb3ef92b6ff06125168fd5dcf2",
+      "abi": "anyToken",
+      "startBlock": 21654185
+    },
+    {
+      "name": "BridgeV2-30",
+      "address": "0x9eba16f6b7e8848e440922861123f0bee957002a",
+      "abi": "anyToken",
+      "startBlock": 23627553
+    },
+    {
+      "name": "BridgeV2-31",
+      "address": "0xbf77e7b4ccc92bbaff26dd08a6a00609d05ff459",
+      "abi": "anyToken",
+      "startBlock": 20924216
+    },
+    {
+      "name": "BridgeV2-32",
+      "address": "0xb25e20de2f2ebb4cffd4d16a55c7b395e8a94762",
+      "abi": "anyToken",
+      "startBlock": 21737414
+    },
+    {
+      "name": "BridgeV2-33",
+      "address": "0x8dfdc61c7c7551d0deec950a2822eb59cddb8f59",
+      "abi": "anyToken",
+      "startBlock": 20405987
+    },
+    {
+      "name": "BridgeV2-34",
+      "address": "0x2ad402655243203fcfa7dcb62f8a08cc2ba88ae0",
+      "abi": "anyToken",
+      "startBlock": 21200922
+    },
+    {
+      "name": "BridgeV2-35",
+      "address": "0x985f3300cb203efae88d9f9a2a707c7a330f2967",
+      "abi": "anyToken",
+      "startBlock": 20658520
+    },
+    {
+      "name": "BridgeV2-36",
+      "address": "0x64ee4f41a15d6c431ab6607d4e95462169d50f6c",
+      "abi": "anyToken",
+      "startBlock": 22001622
+    },
+    {
+      "name": "BridgeV2-37",
+      "address": "0x3e01b7e242d5af8064cb9a8f9468ac0f8683617c",
+      "abi": "anyToken",
+      "startBlock": 22816681
+    },
+    {
+      "name": "BridgeV2-38",
+      "address": "0x9049198f6b21acf1e050cfcf36a6879a07b0bbe4",
+      "abi": "anyToken",
+      "startBlock": 20924297
+    },
+    {
+      "name": "BridgeV2-39",
+      "address": "0xd3b71117e6c1558c1553305b44988cd944e97300",
+      "abi": "anyToken",
+      "startBlock": 16287780
+    },
+    {
+      "name": "BridgeV2-40",
+      "address": "0xbb29d2a58d880af8aa5859e30470134deaf84f2b",
+      "abi": "anyToken",
+      "startBlock": 20166621
+    },
+    {
+      "name": "BridgeV2-41",
+      "address": "0xfa0ca21da6a94623d953034f140372613f102346",
+      "abi": "anyToken",
+      "startBlock": 19376269
+    },
+    {
+      "name": "BridgeV2-42",
+      "address": "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+      "abi": "anyToken",
+      "startBlock": 14671590
+    },
+    {
+      "name": "BridgeV2-43",
+      "address": "0x47536f17f4ff30e64a96a7555826b8f9e66ec468",
+      "abi": "anyToken",
+      "startBlock": 15853796
+    },
+    {
+      "name": "BridgeV2-44",
+      "address": "0x92df60c51c710a1b1c20e42d85e221f3a1bfc7f2",
+      "abi": "anyToken",
+      "startBlock": 23899009
+    },
+    {
+      "name": "BridgeV2-45",
+      "address": "0xd7b78f43ab667ff671f7025ffd2216b72332acbb",
+      "abi": "anyToken",
+      "startBlock": 20925352
+    },
+    {
+      "name": "BridgeV2-46",
+      "address": "0x306377cfa2ac72e757151591e9ecf0135d7c9613",
+      "abi": "anyToken",
+      "startBlock": 16119340
+    },
+    {
+      "name": "BridgeV2-47",
+      "address": "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+      "abi": "anyToken",
+      "startBlock": 15020224
+    },
+    {
+      "name": "BridgeV2-48",
+      "address": "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+      "abi": "anyToken",
+      "startBlock": 15435835
+    },
+    {
+      "name": "BridgeV2-49",
+      "address": "0xbc2597d3f1f9565100582cde02e3712d03b8b0f6",
+      "abi": "anyToken",
+      "startBlock": 16663163
+    },
+    {
+      "name": "BridgeV2-50",
+      "address": "0xecb6d48e04d1df057e398b98ac8b3833eb3839ec",
+      "abi": "anyToken",
+      "startBlock": 16662782
+    },
+    {
+      "name": "BridgeV2-51",
+      "address": "0x53098a3656de0c1ee8dcf004e6a0e886b2968a2f",
+      "abi": "anyToken",
+      "startBlock": 15314149
+    },
+    {
+      "name": "BridgeV2-52",
+      "address": "0x2cf7d99c1bff7caa25b737c909637948e6e7781e",
+      "abi": "anyToken",
+      "startBlock": 18109366
+    },
+    {
+      "name": "BridgeV2-53",
+      "address": "0x130966628846bfd36ff31a822705796e8cb8c18d",
+      "abi": "anyToken",
+      "startBlock": 15314250
+    },
+    {
+      "name": "BridgeV2-54",
+      "address": "0xe6b9d092223f39013656702a40dbe6b7decc5746",
+      "abi": "anyToken",
+      "startBlock": 19638250
+    },
+    {
+      "name": "BridgeV2-55",
+      "address": "0xbcf339df10d78f2b44aa760ead0f715a7a7d7269",
+      "abi": "anyToken",
+      "startBlock": 19130974
+    },
+    {
+      "name": "BridgeV2-56",
+      "address": "0x6afcff9189e8ed3fcc1cffa184feb1276f6a82a5",
+      "abi": "anyToken",
+      "startBlock": 15969245
+    },
+    {
+      "name": "BridgeV2-57",
+      "address": "0xcea59dce6a6d73a24e6d6944cfabc330814c098a",
+      "abi": "anyToken",
+      "startBlock": 23899079
+    },
+    {
+      "name": "BridgeV2-58",
+      "address": "0x1dd9e9e142f3f84d90af1a9f2cb617c7e08420a4",
+      "abi": "anyToken",
+      "startBlock": 16393930
+    },
+    {
+      "name": "BridgeV2-59",
+      "address": "0x3176ff6e935544dd1bd249265c080c95adb00512",
+      "abi": "anyToken",
+      "startBlock": 20660105
+    },
+    {
+      "name": "BridgeV2-60",
+      "address": "0x39fc9e94caeacb435842fadedecb783589f50f5f",
+      "abi": "anyToken",
+      "startBlock": 18109277
+    },
+    {
+      "name": "BridgeV2-61",
+      "address": "0x013253863b0e1cc8b6e473fc64d756d2f17a3637",
+      "abi": "anyToken",
+      "startBlock": 21739428
+    },
+    {
+      "name": "BridgeV2-62",
+      "address": "0x48844ddba89799dc40ec31728dac629802d407f3",
+      "abi": "anyToken",
+      "startBlock": 22268000
+    },
+    {
+      "name": "BridgeV2-63",
+      "address": "0xb01371072fdcb9b4433b855e16a682b461f94ab3",
+      "abi": "anyToken",
+      "startBlock": 17859931
+    },
+    {
+      "name": "BridgeV2-64",
+      "address": "0xe7f04e0fbde4b16feb4a67747133f251e4dbccd7",
+      "abi": "anyToken",
+      "startBlock": 23899127
+    },
+    {
+      "name": "BridgeV2-65",
+      "address": "0xf3ce95ec61114a4b1bfc615c16e6726015913ccc",
+      "abi": "anyToken",
+      "startBlock": 19376134
+    },
+    {
+      "name": "BridgeV2-66",
+      "address": "0xae8627db72d7fc6241f2e2b87eb2bbc7cafb1661",
+      "abi": "anyToken",
+      "startBlock": 16662890
+    },
+    {
+      "name": "BridgeV2-67",
+      "address": "0xf331b2c406fef2539e9b1150345575feb9f0323c",
+      "abi": "anyToken",
+      "startBlock": 22268124
+    },
+    {
+      "name": "BridgeV2-68",
+      "address": "0x70a20ccb2a35f47ed90c4460ca9f8e660107344b",
+      "abi": "anyToken",
+      "startBlock": 16119890
+    },
+    {
+      "name": "BridgeV2-69",
+      "address": "0xe95fd76cf16008c12ff3b3a937cb16cd9cc20284",
+      "abi": "anyToken",
+      "startBlock": 17351257
+    },
+    {
+      "name": "BridgeV2-70",
+      "address": "0x685b63cfe0179b3efb70a01dcb1d648549aa192d",
+      "abi": "anyToken",
+      "startBlock": 17099743
+    },
+    {
+      "name": "BridgeV2-71",
+      "address": "0xe0ce60af0850bf54072635e66e79df17082a1109",
+      "abi": "anyToken",
+      "startBlock": 15853670
+    },
+    {
+      "name": "BridgeV2-72",
+      "address": "0x5f7f94a1dd7b15594d17543beb8b30b111dd464c",
+      "abi": "anyToken",
+      "startBlock": 20166464
+    },
+    {
+      "name": "BridgeV2-73",
+      "address": "0x8ae1f939b6f12fc017dfc6510010dae9dad28d68",
+      "abi": "anyToken",
+      "startBlock": 16394099
+    },
+    {
+      "name": "BridgeV2-74",
+      "address": "0x6362496bef53458b20548a35a2101214ee2be3e0",
+      "abi": "anyToken",
+      "startBlock": 19376184
+    },
+    {
+      "name": "BridgeV2-75",
+      "address": "0x350fa8f62e50f8ac20a840c3dc570ebc5bdffc4c",
+      "abi": "anyToken",
+      "startBlock": 17350895
+    },
+    {
+      "name": "BridgeV2-76",
+      "address": "0x6d2a71f4edf10ab1e821b9b373363e1e24e5df6b",
+      "abi": "anyToken",
+      "startBlock": 16119808
+    },
+    {
+      "name": "BridgeV2-77",
+      "address": "0xf98f70c265093a3b3adbef84ddc29eace900685b",
+      "abi": "anyToken",
+      "startBlock": 16119197
+    },
+    {
+      "name": "BridgeV2-78",
+      "address": "0xe56979f6ada241c1bed92e68535dcead9de2a5ef",
+      "abi": "anyToken",
+      "startBlock": 16119659
+    },
+    {
+      "name": "BridgeV2-79",
+      "address": "0xa56c978be266b1a9ab7b8982050d500505eeae61",
+      "abi": "anyToken",
+      "startBlock": 16394276
+    },
+    {
+      "name": "BridgeV2-80",
+      "address": "0x09211dc67f9fe98fb7bbb91be0ef05f4a12fa2b2",
+      "abi": "anyToken",
+      "startBlock": 17099557
+    },
+    {
+      "name": "BridgeV2-81",
+      "address": "0x3053ad3b31600074e9a90440770f78d5e8fc5a54",
+      "abi": "anyToken",
+      "startBlock": 15576993
+    },
+    {
+      "name": "BridgeV2-82",
+      "address": "0xf887906e130349a624ffa3cf1fa5b56f48b11c08",
+      "abi": "anyToken",
+      "startBlock": 22268055
+    },
+    {
+      "name": "BridgeV2-83",
+      "address": "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+      "abi": "anyToken",
+      "startBlock": 20166532
+    },
+    {
+      "name": "BridgeV2-84",
+      "address": "0x855d4248672a1fce482165e8dbe1207b94b1968a",
+      "abi": "anyToken",
+      "startBlock": 15853892
+    },
+    {
+      "name": "BridgeV2-85",
+      "address": "0x3c1bb39bb696b443a1d80bb2b3a3d950ba9dee87",
+      "abi": "anyToken",
+      "startBlock": 15853540
+    },
+    {
+      "name": "BridgeV2-86",
+      "address": "0xcaf870dad882b00f4b20d714bbf7fceada5e4195",
+      "abi": "anyToken",
+      "startBlock": 16119734
+    },
+    {
+      "name": "BridgeV2-87",
+      "address": "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+      "abi": "anyToken",
+      "startBlock": 15021160
+    },
+    {
+      "name": "BridgeV2-88",
+      "address": "0x89d45ccdae300e9a2a725eec8ec76dda571d6e2b",
+      "abi": "anyToken",
+      "startBlock": 16393510
+    },
+    {
+      "name": "BridgeV2-89",
+      "address": "0x993163cad35162fb579d7b64e6695cb076ef5064",
+      "abi": "anyToken",
+      "startBlock": 16393653
+    },
+    {
+      "name": "BridgeV2-90",
+      "address": "0x95555e4e4cb2c094914af53598eff14b9340881f",
+      "abi": "anyToken",
+      "startBlock": 17860835
+    },
+    {
+      "name": "BridgeV2-91",
+      "address": "0x0615dbba33fe61a31c7ed131bda6655ed76748b1",
+      "abi": "anyToken",
+      "startBlock": 21201805
+    },
+    {
+      "name": "BridgeV2-92",
+      "address": "0x373e768f79c820aa441540d254dca6d045c6d25b",
+      "abi": "anyToken",
+      "startBlock": 20606338
+    },
+    {
+      "name": "BridgeV2-93",
+      "address": "0xfd14d755a3a3358aec08d0979ecf369b4a387039",
+      "abi": "anyToken",
+      "startBlock": 24173940
+    },
+    {
+      "name": "BridgeV2-94",
+      "address": "0xc629d02732ee932db1fa83e1fcf93ae34abfc96b",
+      "abi": "anyToken",
+      "startBlock": 24724254
+    },
+    {
+      "name": "BridgeV2-95",
+      "address": "0xcc081220542a60a8ea7963c4f53d522b503272c1",
+      "abi": "anyToken",
+      "startBlock": 24724316
+    },
+    {
+      "name": "BridgeV2-96",
+      "address": "0x01a8eb7751fc53c1a780f4eb8ed4d8ae7ccffe15",
+      "abi": "anyToken",
+      "startBlock": 25250507
+    },
+    {
+      "name": "BridgeV2-97",
+      "address": "0x2c2c1cd892cfe2368a0070b7ae28740e954b0920",
+      "abi": "anyToken",
+      "startBlock": 25519205
+    },
+    {
+      "name": "BridgeV2-98",
+      "address": "0x804a8ecc6e3af0ab085b3e8a63ae34420403cb01",
+      "abi": "anyToken",
+      "startBlock": 25519116
+    },
+    {
+      "name": "BridgeV2-99",
+      "address": "0x6cd6cb131764c704ba9167c29930fbdc38901ab7",
+      "abi": "anyToken",
+      "startBlock": 25758973
+    }
+  ],
+  "routerConfig": [
+    {
+      "name": "Router-0",
+      "address": "0x6ff0609046a38d76bd40c5863b4d1a2dce687f73",
+      "abi": "Router",
+      "startBlock": 17355461
+    },
+    {
+      "name": "Router-1",
+      "address": "0x2ef4a574b72e1f555185afa8a09c6d1a8ac4025c",
+      "abi": "Router",
+      "startBlock": 23980693
+    },
+    {
+      "name": "Router-2",
+      "address": "0x4f3aff3a747fcade12598081e80c6605a8be192f",
+      "abi": "Router",
+      "startBlock": 15190030
+    },
+    {
+      "name": "Router-3",
+      "address": "0x84cebca6bd17fe11f7864f7003a1a30f2852b1dc",
+      "abi": "Router",
+      "startBlock": 30007475
+    },
+    {
+      "name": "Router-4",
+      "address": "0xafaace7138ab3c2bcb2db4264f8312e1bbb80653",
+      "abi": "Router",
+      "startBlock": 20697550
+    },
+    {
+      "name": "Router-5",
+      "address": "0x72C290f3f13664B024ee611983Aa2d5621Ebe917",
+      "abi": "Router",
+      "startBlock": 36001687
+    },
+    {
+      "name": "Router-6",
+      "address": "0x2eF4A574b72E1f555185AfA8A09c6d1A8AC4025C",
+      "abi": "Router",
+      "startBlock": 23980693
+    },
+    {
+      "name": "Router-7",
+      "address": "0xd50380e953603b37a74dc67c92fc5e19e0b65469",
+      "abi": "Router",
+      "startBlock": 35337626
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

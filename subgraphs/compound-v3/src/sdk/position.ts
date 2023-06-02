@@ -18,6 +18,7 @@ import {
   exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
+  PositionSide,
   SECONDS_PER_DAY,
   TransactionType,
 } from "./constants";
@@ -28,7 +29,8 @@ import { TokenManager } from "./token";
  * This file contains the PositionManager class, which is used to
  * make changes to a given position.
  *
- * Schema Version: 3.0.0
+ * Schema Version:  3.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @dmelotik
  */
@@ -97,7 +99,8 @@ export class PositionManager {
     protocol: LendingProtocol,
     newBalance: BigInt,
     transactionType: string,
-    priceUSD: BigDecimal
+    priceUSD: BigDecimal,
+    _principal: BigInt | null = null
   ): void {
     let positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -116,6 +119,7 @@ export class PositionManager {
       // update existing position
       position = position!;
       position.balance = newBalance;
+      position._principalValue = _principal;
       if (transactionType == TransactionType.DEPOSIT) {
         position.depositCount += INT_ONE;
       } else if (transactionType == TransactionType.BORROW) {
@@ -130,7 +134,7 @@ export class PositionManager {
       //
       // take position snapshot
       //
-      this.snapshotPosition(event, priceUSD);
+      this.snapshotPosition(event, priceUSD, _principal);
       return;
     }
     position = new Position(positionID);
@@ -145,6 +149,7 @@ export class PositionManager {
       position.type = this.interestType;
     }
     position.balance = newBalance;
+    position._principalValue = _principal;
     position.depositCount = INT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.borrowCount = INT_ZERO;
@@ -197,7 +202,7 @@ export class PositionManager {
     //
     // take position snapshot
     //
-    this.snapshotPosition(event, priceUSD);
+    this.snapshotPosition(event, priceUSD, _principal);
     this.dailyActivePosition(positionCounter, event, protocol);
   }
 
@@ -206,7 +211,8 @@ export class PositionManager {
     protocol: LendingProtocol,
     newBalance: BigInt,
     transactionType: string,
-    priceUSD: BigDecimal
+    priceUSD: BigDecimal,
+    _principal: BigInt | null = null
   ): void {
     const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -225,6 +231,7 @@ export class PositionManager {
     }
 
     position.balance = newBalance;
+    position._principalValue = _principal;
 
     if (transactionType == TransactionType.WITHDRAW) {
       position.withdrawCount += INT_ONE;
@@ -278,11 +285,15 @@ export class PositionManager {
     //
     // update position snapshot
     //
-    this.snapshotPosition(event, priceUSD);
+    this.snapshotPosition(event, priceUSD, _principal);
     this.dailyActivePosition(positionCounter, event, protocol);
   }
 
-  private snapshotPosition(event: ethereum.Event, priceUSD: BigDecimal): void {
+  private snapshotPosition(
+    event: ethereum.Event,
+    priceUSD: BigDecimal,
+    _principal: BigInt | null = null
+  ): void {
     const snapshot = new PositionSnapshot(
       this.position!.id.concat("-")
         .concat(event.transaction.hash.toHexString())
@@ -302,6 +313,11 @@ export class PositionManager {
       .times(priceUSD);
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
+    snapshot._principalValue = _principal;
+    if (_principal && this.position!.side == PositionSide.BORROWER)
+      snapshot._baseIndex = this.market._baseBorrowIndex;
+    if (_principal && this.position!.side == PositionSide.COLLATERAL)
+      snapshot._baseIndex = this.market._baseSupplyIndex;
     snapshot.save();
   }
 

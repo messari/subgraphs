@@ -1,0 +1,17 @@
+{
+  "deployment": "PORTAL_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "core": {
+    "address": "0x7A4B5a56256163F07b2C80A7cA55aBE66c4ec4d7",
+    "startBlock": 20629146
+  },
+  "tokenBridge": {
+    "address": "0x5a58505a96D1dbf8dF91cB21B54419FC36e93fdE",
+    "startBlock": 20630679
+  },
+  "supportsCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

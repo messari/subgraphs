@@ -18,6 +18,95 @@ As you begin adding code to the repository you will notice there is a lot of cod
 
 At this point you will just need to follow the "Reviewing" process until your PR is merged.
 
+## Pull Requests
+
+In general you want to keep PRs small when possible. This way it is easier to review and if a breaking change is merged it is easier to go back and not mess up a lot of history.
+
+### What should be included in a PR?
+
+To keep PRs small follow these guidelines, and use them to make educated choices about other scenarios you might run into:
+
+- If you are formatting code outside of the scope of your PR it should be in a separate PR
+- Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
+- Use a single PR for each feature (ie, a new subgraph has its own PR)
+- Update the subgraph version according to our versioning outlined in the discussion [here](https://github.com/messari/subgraphs/issues/1379)
+- Link the issue you are tackling to the PR under `Development` on the right-side column.
+- Example PR that can be emulated [#1845](https://github.com/messari/subgraphs/pull/1845)
+
+### Merging
+
+For now after a PR is reviewed Vincent (@this-username-is-taken) does the final merge into `master`.
+
+### PR Comments
+
+It is nice to outline the changes / fixes you made in your PR. This way the reviewer knows what to look for and what to expect.
+
+If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (h/t @0xbe1).
+
+An example of good PR heading comments:
+
+![Good comments](./images/contributing/good-comments.png)
+
+> Sometimes a PR is so small or the name is self explanatory and a descriptive comment is not necessary. See [#715](https://github.com/messari/subgraphs/pull/715). Use your judgement and ask questions if you want to learn and grow as a team!
+
+## Naming and Versioning Conventions
+
+### How to name your PR
+
+It is nice to have a consistent naming convention for pull requests. Oftentimes there are dozens of PRs out on `messari/subgraphs` so being able to know exactly what a PR is is important.
+
+PR names also drive the commit name once a PR is merged into `master`. In this way it is easier to tell what was changed in each commit.
+
+The impact level identifiers are based on semver versioning. So you can use #`name` to help prefix and categorize your PR. Our subgraph versioning has resemblance from [semver](https://semver.org/#summary) versioning, with our own twist as discussed [here](https://github.com/messari/subgraphs/issues/1379).
+
+### #patch
+
+Changes that affect the developer. This may include linting, formatting, small refactors, docs, etc. This does not require a redeploy.
+
+### #minor
+
+This is a change that does not seriously affect data on downstream consumers. It may be a refactor, performance improvement, or new feature. There is developer discretion when it comes to what is considered a minor vs major change. This may require a redeploy, but it is not urgent/dire.
+
+### #major
+
+This is a code change that seriously affects data for subgraph consumers. These changes will make noticeable differences in the data and should be redeployed and backfilled ASAP.
+
+### Additional identifiers
+
+In addition to the version impact level you can identify a change with words to be more descriptive. In some cases a change doesn't really fit into the semver system. For example, adding this to the docs.
+
+Some other naming identifiers:
+
+- `fix` - bug fix
+- `feat` - new feature
+- `chore` - chores (like updating README.md)
+- `docs` - adding to the docs
+- `style` - fix folder/file names or syntax formatting
+- `refactor` - update logic, but the program performs the same way
+- `perf` - add performance
+- `test` - add a test
+
+> If you find yourself wanting to name a PR with multiple of these identifiers you should probably make a PR for each one.
+
+### How to name a PR
+
+"`identifier`(#`semver-change`); `subgraph-name`; `description`"
+
+> Ideally you want the `description` to be short and sweet.
+
+Examples:
+
+- "fix(#major); compound forks; upgrade to 2.0.1 schema"
+- "feat(#minor); dashboard; add tvl to front page"
+- "chore(); README; update comp version"
+- "fix(#patch); abracadabra; fixing issue #420"
+- "docs(); contributing; add Contributing.md"
+- "refactor(#minor); aave-v2-forks; update reward logic"
+- "style(); uniswap; format code"
+- "perf(#minor); spookyswap; find value without contract call"
+
+> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifier to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
+
 ## Reviewing
 
 ### Reviewee
@@ -61,93 +150,6 @@ git pull --rebase origin master
 This will initiate a rebase. Sometimes you will have to resolve conflicts. And then `git add .` and `git rebase --continue` or `git rebase --skip`.
 
 Following this method, after rebasing you can do the command `git push --force` to update your remote repo.
-
-## Pull Requests
-
-In general you want to keep PRs small when possible. This way it is easier to review and if a breaking change is merged it is easier to go back and not mess up a lot of history.
-
-### What should be included in a PR?
-
-To keep PRs small follow these guidelines, and use them to make educated choices about other scenarios you might run into:
-
-- If you are formatting code outside of the scope of your PR it should be in a separate PR
-- Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
-- Use a single PR for each feature (ie, a new subgraph has its own PR)
-- Update the subgraph version according to our versioning outlined in the discussion [here](https://github.com/messari/subgraphs/issues/1379)
-
-### Merging
-
-For now after a PR is reviewed Vincent (@this-username-is-taken) does the final merge into `master`.
-
-### PR Comments
-
-It is nice to outline the changes / fixes you made in your PR. This way the reviewer knows what to look for and what to expect.
-
-If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (h/t @0xbe1).
-
-An example of good PR heading comments:
-
-![Good comments](./images/contributing/good-comments.png)
-
-> Sometimes a PR is so small or the name is self explanatory and a descriptive comment is not necessary. See [#715](https://github.com/messari/subgraphs/pull/715). Use your judgement and ask questions if you want to learn and grow as a team!
-
-## Naming and Versioning Conventions
-
-### How to name your PR
-
-It is nice to have a consistent naming convention for pull requests. Oftentimes there are dozens of PRs out on `messari/subgraphs` so being able to know exactly what a PR is is important.
-
-PR names also drive the commit name once a PR is merged into `master`. In this way it is easier to tell what was changed in each commit.
-
-The impact level identifiers are based on semver versioning. So you can use #`name` to help prefix and categorize your PR. Our subgraph versioning has resemblance from [semver](https://semver.org/#summary) versioning, with our own twist as discussed [here](https://github.com/messari/subgraphs/issues/1379).
-
-### #patch
-
-Changes that affect the developer. This may include linting, formatting, small refactors, docs, etc. This does not require a redeploy.
-
-### #minor
-
-This is a change that does not seriously affect data on Protocol Metrics. It may be a refactor, performance improvement, or new feature. There is developer discretion when it comes to what is considered a minor vs major change. This may require a redeploy, but it is not urgent/dire.
-
-### #major
-
-This is a code change that seriously affects data on Protocol Metrics. These changes will make noticeable differences in the data and should be redeployed and backfilled ASAP.
-
-### Additional identifiers
-
-In addition to the version impact level you can identify a change with words to be more descriptive. In some cases a change doesn't really fit into the semver system. For example, adding this to the docs.
-
-Some other naming identifiers:
-
-- `fix` - bug fix
-- `feat` - new feature
-- `chore` - chores (like updating README.md)
-- `docs` - adding to the docs
-- `style` - fix folder/file names or syntax formatting
-- `refactor` - update logic, but the program performs the same way
-- `perf` - add performance
-- `test` - add a test
-
-> If you find yourself wanting to name a PR with multiple of these identifiers you should probably make a PR for each one.
-
-### How to name a PR
-
-"`identifier`(#`semver-change`); `subgraph-name`; `description`"
-
-> Ideally you want the `description` to be short and sweet.
-
-Examples:
-
-- "fix(#major); compound forks; upgrade to 2.0.1 schema"
-- "feat(#minor); dashboard; add tvl to front page"
-- "chore(); README; update comp version"
-- "fix(#patch); abracadabra; fixing issue #420"
-- "docs(); contributing; add Contributing.md"
-- "refactor(#minor); aave-v2-forks; update reward logic"
-- "style(); uniswap; format code"
-- "perf(#minor); spookyswap; find value without contract call"
-
-> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifier to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
 
 ## Syncing with upstream/master
 

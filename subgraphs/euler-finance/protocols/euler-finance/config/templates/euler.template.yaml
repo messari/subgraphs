@@ -14,9 +14,9 @@ dataSources:
     name: euler
     network: mainnet
     source:
-      address: "{{ factoryContract }}"
+      address: "{{ factory.address }}"
       abi: Euler
-      startBlock: {{ startBlock }} # this is when the first market was deployed
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -73,9 +73,9 @@ dataSources:
     name: EulStakes
     network: mainnet
     source:
-      address: "0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3"
+      address: "{{ EulStakes.address }}"
       abi: EulStakes
-      startBlock: 14975091
+      startBlock: {{ EulStakes.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

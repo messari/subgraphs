@@ -1,0 +1,43 @@
+{
+  "network": "mainnet",
+  "ethereum": {
+    "standardBridge": [
+      {
+        "name": "L1StandardBridge",
+        "address": "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
+        "startBlock": 12686786
+      },
+      {
+        "name": "BitBTCBridge",
+        "address": "0xaBA2c5F108F7E820C049D5Af70B16ac266c8f128",
+        "startBlock": 13658540
+      },
+      {
+        "name": "DAIBridge",
+        "address": "0x10E6593CDda8c58a1d0f14C5164B376352a55f2F",
+        "startBlock": 12781431
+      },
+      {
+        "name": "dForceUSDBridge",
+        "address": "0xC5b1EC605738eF73a4EFc562274c1c0b6609cF59",
+        "startBlock": 13756229
+      },
+      {
+        "name": "wstETHBridge",
+        "address": "0x76943C0D61395d8F2edF9060e1533529cAe05dE6",
+        "startBlock": 15281202
+      }
+    ],
+    "messenger": {
+      "address": "0x25ace71c97b33cc4729cf772ae268934f7ab5fa1",
+      "startBlock": 12686757
+    },
+    "snxBridge": {
+      "address": "0x39Ea01a0298C315d149a490E34B59Dbf2EC7e48F",
+      "startBlock": 14750082
+    }
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
