@@ -13,7 +13,7 @@ export function collectFees(
 ): void {
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
   const totalFee = utils
-    .bigIntToBigDecimal(fee, constants.VALUE_DECIMALS)
+    .bigIntToBigDecimal(fee, token.decimals)
     .times(token.lastPriceUSD!);
   pool.addRevenueUSD(
     totalFee.times(constants.PROTOCOL_SIDE_REVENUE_PERCENT),

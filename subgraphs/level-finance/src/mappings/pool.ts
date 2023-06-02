@@ -48,6 +48,7 @@ export function handlePositionIncreased(event: IncreasePosition): void {
     TransactionType.COLLATERAL_IN,
     constants.BIGINT_ZERO
   );
+  //fee in usd
 }
 
 export function handlePositionDecreased(event: DecreasePosition): void {
@@ -79,6 +80,7 @@ export function handlePositionDecreased(event: DecreasePosition): void {
     TransactionType.COLLATERAL_OUT,
     pnl
   );
+  //fee in usd
 }
 
 export function handlePositionLiquidated(event: LiquidatePosition): void {
@@ -110,6 +112,7 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
     TransactionType.LIQUIDATE,
     realisedPnl
   );
+  //fee in usd
 }
 
 export function handleUpdatePosition(event: UpdatePosition): void {
@@ -151,6 +154,8 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
     pool,
     amount
   );
+  //fee in token in 18 decimals
+
   collectFees(fee, tokenAddress, sdk, pool);
 }
 
@@ -175,6 +180,7 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
     pool,
     amount
   );
+  //fee in token in 18 decimals
   collectFees(fee, tokenAddress, sdk, pool);
 }
 
@@ -197,6 +203,7 @@ export function handleSwap(event: Swap): void {
     sdk,
     pool
   );
+  //fee is in 18 decimals in amount in price
   collectFees(fee, tokenInAddress, sdk, pool);
 }
 
