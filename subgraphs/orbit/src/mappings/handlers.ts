@@ -277,8 +277,12 @@ function _handleTransferIn(
     token
   );
   pool.addDestinationToken(crossToken);
+  log.debug("Made it {}: hti 1 abc with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(receiver))
-  account.transferIn(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(sender), amount);
+  log.debug("Made it {}: hti 2 with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
+  if (sender.byteLength == 20) {
+    account.transferIn(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(sender), amount);
+  }
 }
 
 function _handleTransferOut(

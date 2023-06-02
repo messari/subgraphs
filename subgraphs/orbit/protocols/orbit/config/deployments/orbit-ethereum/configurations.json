@@ -22,7 +22,7 @@
       "burnHandler": "handleBurn"
     }
   ],
-  "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": 0
+  "graftEnabled": true,
+  "subgraphId": "QmXNWBcdJFgET766xkuUwzmtHKFVc7MKjX4iH19upcCfcS",
+  "graftStartBlock": 16606067
 }
