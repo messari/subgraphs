@@ -22,7 +22,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor + Fuse Fee + Admin Fee)`
+`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
 Note: This currently excludes Liquidations
 
@@ -32,7 +32,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor - Fuse Fee - Admin Fee)`
+`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
 
 Note: This currently excludes Liquidations
 
