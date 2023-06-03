@@ -41,15 +41,14 @@ export function updateRevenues(event: ethereum.Event, marketId: string): void {
   const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
 
   // daysSincePrevSnapshot
-  const prevDailyId = market._dailySnapshots[1];
+  const prevDailyId = BigInt.fromString(market._prevDailySnapshotId).toI64();
   const prevMarketDailySnapshot = getOrCreateMarketDailySnapshot(
     event,
-    BigInt.fromString(prevDailyId).toI64(),
+    prevDailyId,
     marketId
   );
-  const prevSnapshot = BigInt.fromString(market._dailySnapshots[0]);
   const daysSincePrevSnapshot = new BigDecimal(
-    BigInt.fromI64(dailyId - prevSnapshot.toI64())
+    BigInt.fromI64(dailyId - prevDailyId)
   );
 
   // normalized lending rate
