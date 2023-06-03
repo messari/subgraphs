@@ -96,6 +96,8 @@ dataSources:
           handler: handleIncreasePoolAmount
         - event: DecreasePoolAmount(address,uint256)
           handler: handleDecreasePoolAmount
+        - event: UpdateFundingRate(address,uint256)
+          handler: handleUpdateFundingRate
       file: ./src/mappings/vault.ts
   
   {{#glpManagers}}

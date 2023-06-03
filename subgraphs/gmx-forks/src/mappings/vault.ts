@@ -12,15 +12,18 @@ import {
   LiquidatePosition as LiquidatePositionEvent,
   DecreasePoolAmount as DecreasePoolAmountEvent,
   IncreasePoolAmount as IncreasePoolAmountEvent,
+  UpdateFundingRate,
 } from "../../generated/Vault/Vault";
 import { swap } from "../modules/swap";
 import * as utils from "../common/utils";
 import { collectFees } from "../modules/fees";
+import { Bytes } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { updatePoolAmount } from "../modules/amount";
 import { increasePoolVolume } from "../modules/volume";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
+import { LiquidityPool as PoolSchema } from "../../generated/schema";
 
 export function handleClosePosition(event: ClosePositionEvent): void {
   const sdk = initializeSDK(event);
@@ -120,4 +123,27 @@ export function handleSwap(event: SwapEvent): void {
     event.params.tokenOut,
     event.params.amountOutAfterFees
   );
+}
+
+export function handleUpdateFundingRate(event: UpdateFundingRate): void {
+  const tokenAddress = event.params.token;
+  const fundingrate = event.params.fundingRate;
+  const pool = PoolSchema.load(
+    Bytes.fromHexString(constants.VAULT_ADDRESS.toHexString())
+  );
+  if (!pool) return;
+
+  const inputTokens = pool.inputTokens;
+  const fundingTokenIndex = inputTokens.indexOf(
+    Bytes.fromHexString(tokenAddress.toHexString())
+  );
+  const fundingrates = pool.fundingrate;
+  if (fundingTokenIndex >= 0) {
+    fundingrates[fundingTokenIndex] = utils.bigIntToBigDecimal(
+      fundingrate,
+      constants.FUNDING_PRECISION_DECIMALS
+    );
+  }
+  pool.fundingrate = fundingrates;
+  pool.save();
 }

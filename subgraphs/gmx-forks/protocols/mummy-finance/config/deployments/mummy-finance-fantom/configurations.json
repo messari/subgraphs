@@ -1,7 +1,7 @@
 {
   "network": "fantom",
   "protocolName": "Mummy Finance",
-  "protocolSlug": "MMY",
+  "protocolSlug": "mummy-finance",
   "protocolId": "0x304951d7172bcada54ccac1e4674862b3d5b3d5b",
   "poolName": "MMYVault",
   "poolSymbol": "Vault",

@@ -172,12 +172,6 @@ export function updatePosition(
 
     getOrCreateAccount(event.transaction.from, pool, sdk);
   }
-  const indexTokenFundingRate = utils.getFundingRate(indexTokenAddress);
-  const collateralTokenFundingRate = utils.getFundingRate(
-    collateralTokenAddress
-  );
-  utils.updateFundingRate(pool, indexToken, indexTokenFundingRate);
-  utils.updateFundingRate(pool, collateralToken, collateralTokenFundingRate);
 }
 
 export function updateUserPosition(

@@ -4,7 +4,6 @@ import {
   initializeSDK,
 } from "../common/initializers";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import * as utils from "../common/utils";
 export function swap(
   event: ethereum.Event,
   accountAddress: Address,
@@ -27,12 +26,4 @@ export function swap(
     Address.fromBytes(pool.getBytesID()),
     true
   );
-
-  const tokenInFundingRate = utils.getFundingRate(tokenInAddress);
-  const tokenOutFundingRate = utils.getFundingRate(tokenOutAddress);
-  const tokenIn = sdk.Tokens.getOrCreateToken(tokenInAddress);
-  const tokenOut = sdk.Tokens.getOrCreateToken(tokenOutAddress);
-
-  utils.updateFundingRate(pool, tokenIn, tokenInFundingRate);
-  utils.updateFundingRate(pool, tokenOut, tokenOutFundingRate);
 }

@@ -1,7 +1,7 @@
 {
   "network": "arbitrum-one",
   "protocolName": "GMX",
-  "protocolSlug": "GMX",
+  "protocolSlug": "gmx",
   "protocolId": "0x321f653eed006ad1c29d174e17d96351bde22649",
   "poolName": "GMXVault",
   "poolSymbol": "Vault",

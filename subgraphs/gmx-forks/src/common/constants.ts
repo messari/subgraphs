@@ -4,8 +4,8 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Mummy Finance";
-export const PROTOCOL_SLUG = "MMY";
+export const PROTOCOL_NAME = "GMX";
+export const PROTOCOL_SLUG = "GMX";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -168,34 +168,35 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0x304951d7172bcada54ccac1e4674862b3d5b3d5b";
-export const POOL_NAME = "MMYVault";
+export const PROTOCOL_ID = "0x321f653eed006ad1c29d174e17d96351bde22649";
+export const POOL_NAME = "GMXVault";
 export const POOL_SYMBOL = "Vault";
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PRICE_PRECISION_DECIMALS = 30;
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(0);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
-export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.1");
+export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.15");
 export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
 export const FUNDING_PRECISION = BigDecimal.fromString("1000000");
 export const FUNDING_PRECISION_DECIMALS = 6;
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0xa6d7d0e650aa40ffa42d845a354c12c2bc0ab15f"
+  "0x489ee077994b6658eafa855c308275ead8097c4a"
 );
 
 export const MLP_ADDRESS = Address.fromString(
-  "0x0ce61aaf89500e4f007884fbbf62642618def5dd"
+  "0x4277f8f2c384827b5273592ff7cebd9f2c1ac258"
 );
 
 export const MLP_MANAGER_ADDRESSES = [
-  Address.fromString("0x304951d7172bcada54ccac1e4674862b3d5b3d5b"), // GlpManager_V1
+  Address.fromString("0x321f653eed006ad1c29d174e17d96351bde22649"), // GlpManager_V1
+  Address.fromString("0x3963ffc9dff443c2a94f21b129d429891e32ec18"), // GlpManager_V2
 ];
 
 export const MMY_ADDRESS = Address.fromString(
-  "0x01e77288b38b416f972428d562454fb329350bac"
+  "0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a"
 );
 
 export const ESCROWED_MMY_ADDRESS = Address.fromString(
-  "0xe41c6c006de9147fc4c84b20cdfbfc679667343f"
+  "0xf42ae1d54fd613c9bb14810b0588faaa09a426ca"
 );

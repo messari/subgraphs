@@ -24,7 +24,4 @@ export function updatePoolAmount(
       inputTokenBalances[inputTokenIndex].minus(amount);
   }
   pool.setInputTokenBalances(inputTokenBalances, true);
-
-  const tokenFundingRate = utils.getFundingRate(tokenAddress);
-  utils.updateFundingRate(pool, token, tokenFundingRate);
 }
