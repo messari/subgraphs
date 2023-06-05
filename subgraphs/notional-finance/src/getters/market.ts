@@ -80,7 +80,7 @@ export function getOrCreateMarket(
     market.borrowingPositionCount = INT_ZERO;
 
     // helper for rev calc
-    market._dailySnapshots = [];
+    market._prevDailyId = "";
 
     market.save();
   }

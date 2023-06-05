@@ -27,7 +27,6 @@ import {
 import { getOrCreateLendingProtocol } from "../getters/protocol";
 import { getOrCreateToken } from "../getters/token";
 import { getOrCreateInterestRate } from "../getters/interestRate";
-import { addToArrayAtIndex } from "../common/arrays";
 
 export function updateRevenues(event: ethereum.Event, marketId: string): void {
   const market = getOrCreateMarket(event, marketId);
@@ -42,7 +41,12 @@ export function updateRevenues(event: ethereum.Event, marketId: string): void {
   const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
 
   // daysSincePrevSnapshot
-  const prevDailyId = BigInt.fromString(market._dailySnapshots[1]).toI64();
+  let prevDailyId: i64;
+  if (market._prevDailyId == "") {
+    prevDailyId = dailyId;
+  } else {
+    prevDailyId = BigInt.fromString(market._prevDailyId).toI64();
+  }
   const prevMarketDailySnapshot = getOrCreateMarketDailySnapshot(
     event,
     prevDailyId,
@@ -78,6 +82,7 @@ export function updateRevenues(event: ethereum.Event, marketId: string): void {
     market.cumulativeProtocolSideRevenueUSD.plus(
       protocolSideRevenueUSDSincePrevSnapshot
     );
+  market._prevDailyId = dailyId.toString();
   market.save();
 
   // protocol cumulatives
@@ -259,14 +264,6 @@ export function updateMarket(
     market.id
   );
 
-  // if (!market._dailySnapshots.includes(dailyId.toString())) {
-  market._dailySnapshots = addToArrayAtIndex(
-    market._dailySnapshots,
-    dailyId.toString(),
-    0
-  );
-  // }
-
   // amount in USD
   const amount = cTokenAmount;
   const token = getOrCreateToken(
@@ -409,7 +406,5 @@ export function updateMarket(
   marketHourlySnapshot.save();
   marketDailySnapshot.save();
 
-  // TODO: update revenues here instead of getOrCreateMarketDailySnapshot
-  // updateRevenues(event, market.id, prevMarketMetrics);
   updateRevenues(event, market.id);
 }

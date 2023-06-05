@@ -664,8 +664,8 @@ type Market @entity @regularPolling {
 
   ##### Helper #####
 
-  " Helper to track MarketDailySnapshot ids for revenue calculation "
-  _dailySnapshots: [String!]!
+  " Helper to track of previous daily id for revenue calculation "
+  _prevDailyId: String!
 }
 
 #################################
