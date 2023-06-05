@@ -285,7 +285,7 @@ export class DexEventHandler {
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
-    const withdraw = new Deposit(
+    const withdraw = new Withdraw(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
 
@@ -328,7 +328,7 @@ export class DexEventHandler {
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
-    const deposit = new Withdraw(
+    const deposit = new Deposit(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
 
@@ -563,12 +563,12 @@ export class DexEventHandler {
     this.pool.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD.plus(
       this.trackedVolumeUSD
     );
-    this.pool.cumulativeVolumesUSD = sumBigDecimalListByIndex([
-      this.pool.cumulativeVolumesUSD,
+    this.pool.cumulativeVolumeByTokenUSD = sumBigDecimalListByIndex([
+      this.pool.cumulativeVolumeByTokenUSD,
       this.trackedInputTokenBalanceDeltasUSD,
     ]);
-    this.pool.cumulativeVolumeTokenAmounts = sumBigIntListByIndex([
-      this.pool.cumulativeVolumeTokenAmounts,
+    this.pool.cumulativeVolumeByTokenAmount = sumBigIntListByIndex([
+      this.pool.cumulativeVolumeByTokenAmount,
       absBigIntList(this.inputTokenBalanceDeltas),
     ]);
 
@@ -701,10 +701,10 @@ export class DexEventHandler {
     );
 
     let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    let prevCumulativeVolumesUSD = new Array<BigDecimal>(
+    let prevCumulativeVolumeByTokenUSD = new Array<BigDecimal>(
       this.pool.inputTokens.length
     ).fill(BIGDECIMAL_ZERO);
-    let prevCumulativeVolumeTokenAmounts = new Array<BigInt>(
+    let prevCumulativeVolumeByTokenAmount = new Array<BigInt>(
       this.pool.inputTokens.length
     ).fill(BIGINT_ZERO);
     let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -716,9 +716,10 @@ export class DexEventHandler {
 
     if (prevPoolMetrics != null) {
       prevCumulativeVolumeUSD = prevPoolMetrics.cumulativeVolumeUSD;
-      prevCumulativeVolumesUSD = prevPoolMetrics.cumulativeVolumesUSD;
-      prevCumulativeVolumeTokenAmounts =
-        prevPoolMetrics.cumulativeVolumeTokenAmounts;
+      prevCumulativeVolumeByTokenUSD =
+        prevPoolMetrics.cumulativeVolumeByTokenUSD;
+      prevCumulativeVolumeByTokenAmount =
+        prevPoolMetrics.cumulativeVolumeByTokenAmount;
       prevCumulativeSupplySideRevenueUSD =
         prevPoolMetrics.cumulativeSupplySideRevenueUSD;
       prevCumulativeProtocolSideRevenueUSD =
@@ -756,19 +757,20 @@ export class DexEventHandler {
       this.pool.uncollectedSupplySideValuesUSD;
 
     poolMetrics.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
-    poolMetrics.dailyTotalVolumeUSD = this.pool.cumulativeVolumeUSD.minus(
+    poolMetrics.dailyVolumeUSD = this.pool.cumulativeVolumeUSD.minus(
       prevCumulativeVolumeUSD
     );
-    poolMetrics.cumulativeVolumesUSD = this.pool.cumulativeVolumesUSD;
-    poolMetrics.dailyVolumesUSD = subtractBigDecimalLists(
-      this.pool.cumulativeVolumesUSD,
-      prevCumulativeVolumesUSD
+    poolMetrics.cumulativeVolumeByTokenUSD =
+      this.pool.cumulativeVolumeByTokenUSD;
+    poolMetrics.dailyVolumeByTokenUSD = subtractBigDecimalLists(
+      this.pool.cumulativeVolumeByTokenUSD,
+      prevCumulativeVolumeByTokenUSD
     );
-    poolMetrics.cumulativeVolumeTokenAmounts =
-      this.pool.cumulativeVolumeTokenAmounts;
-    poolMetrics.dailyVolumeTokenAmounts = subtractBigIntLists(
-      this.pool.cumulativeVolumeTokenAmounts,
-      prevCumulativeVolumeTokenAmounts
+    poolMetrics.cumulativeVolumeByTokenAmount =
+      this.pool.cumulativeVolumeByTokenAmount;
+    poolMetrics.dailyVolumeByTokenAmount = subtractBigIntLists(
+      this.pool.cumulativeVolumeByTokenAmount,
+      prevCumulativeVolumeByTokenAmount
     );
 
     poolMetrics.inputTokenBalances = this.pool.inputTokenBalances;
@@ -820,10 +822,10 @@ export class DexEventHandler {
     );
 
     let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    let prevCumulativeVolumesUSD = new Array<BigDecimal>(
+    let prevCumulativeVolumeByTokenUSD = new Array<BigDecimal>(
       this.pool.inputTokens.length
     ).fill(BIGDECIMAL_ZERO);
-    let prevCumulativeVolumeTokenAmounts = new Array<BigInt>(
+    let prevCumulativeVolumeByTokenAmount = new Array<BigInt>(
       this.pool.inputTokens.length
     ).fill(BIGINT_ZERO);
     let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -835,9 +837,10 @@ export class DexEventHandler {
 
     if (prevPoolMetrics != null) {
       prevCumulativeVolumeUSD = prevPoolMetrics.cumulativeVolumeUSD;
-      prevCumulativeVolumesUSD = prevPoolMetrics.cumulativeVolumesUSD;
-      prevCumulativeVolumeTokenAmounts =
-        prevPoolMetrics.cumulativeVolumeTokenAmounts;
+      prevCumulativeVolumeByTokenUSD =
+        prevPoolMetrics.cumulativeVolumeByTokenUSD;
+      prevCumulativeVolumeByTokenAmount =
+        prevPoolMetrics.cumulativeVolumeByTokenAmount;
       prevCumulativeSupplySideRevenueUSD =
         prevPoolMetrics.cumulativeSupplySideRevenueUSD;
       prevCumulativeProtocolSideRevenueUSD =
@@ -875,19 +878,20 @@ export class DexEventHandler {
       this.pool.uncollectedSupplySideValuesUSD;
 
     poolMetrics.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
-    poolMetrics.hourlyTotalVolumeUSD = this.pool.cumulativeVolumeUSD.minus(
+    poolMetrics.hourlyVolumeUSD = this.pool.cumulativeVolumeUSD.minus(
       prevCumulativeVolumeUSD
     );
-    poolMetrics.cumulativeVolumesUSD = this.pool.cumulativeVolumesUSD;
-    poolMetrics.hourlyVolumesUSD = subtractBigDecimalLists(
-      this.pool.cumulativeVolumesUSD,
-      prevCumulativeVolumesUSD
+    poolMetrics.cumulativeVolumeByTokenUSD =
+      this.pool.cumulativeVolumeByTokenUSD;
+    poolMetrics.hourlyVolumeByTokenUSD = subtractBigDecimalLists(
+      this.pool.cumulativeVolumeByTokenUSD,
+      prevCumulativeVolumeByTokenUSD
     );
-    poolMetrics.cumulativeVolumeTokenAmounts =
-      this.pool.cumulativeVolumeTokenAmounts;
-    poolMetrics.hourlyVolumeTokenAmounts = subtractBigIntLists(
-      this.pool.cumulativeVolumeTokenAmounts,
-      prevCumulativeVolumeTokenAmounts
+    poolMetrics.cumulativeVolumeByTokenAmount =
+      this.pool.cumulativeVolumeByTokenAmount;
+    poolMetrics.hourlyVolumeByTokenAmount = subtractBigIntLists(
+      this.pool.cumulativeVolumeByTokenAmount,
+      prevCumulativeVolumeByTokenAmount
     );
 
     poolMetrics.inputTokenBalances = this.pool.inputTokenBalances;

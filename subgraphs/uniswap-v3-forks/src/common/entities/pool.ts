@@ -80,8 +80,8 @@ export function createLiquidityPool(
   pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeVolumeTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.cumulativeVolumesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  pool.cumulativeVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.cumulativeVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

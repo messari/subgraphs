@@ -1,6 +1,13 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: Lido
@@ -75,6 +82,8 @@ dataSources:
           handler: handleSubmit
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+        - event: ETHDistributed(indexed uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleETHDistributed
       file: ./src/mappings/Lido.ts
   - kind: ethereum
     name: LidoOracle
