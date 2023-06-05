@@ -97,7 +97,7 @@ export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal
 ): BigDecimal {
-  let tokenPrice = getUsdPricePerToken(tokenAddr);
+  const tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
