@@ -70,37 +70,35 @@ export function getTokenSupply(tokenAddr: Address): BigInt {
 export function getConfig(): Configurations {
   const network = dataSource.network();
 
-  // if (network == XDAI.NETWORK_STRING) {
-  //   return new XDAI.config();
-  // } else if (network == AURORA.NETWORK_STRING) {
-  //   return new AURORA.config();
-  // } else if (network == BSC.NETWORK_STRING) {
-  //   return new BSC.config();
-  // } else if (network == FANTOM.NETWORK_STRING) {
-  //   return new FANTOM.config();
-  // } else if (network == POLYGON.NETWORK_STRING) {
-  //   return new POLYGON.config();
-  // } else
-  if (network == MAINNET.NETWORK_STRING) {
+  if (network == XDAI.NETWORK_STRING) {
+    return new XDAI.config();
+  } else if (network == AURORA.NETWORK_STRING) {
+    return new AURORA.config();
+  } else if (network == BSC.NETWORK_STRING) {
+    return new BSC.config();
+  } else if (network == FANTOM.NETWORK_STRING) {
+    return new FANTOM.config();
+  } else if (network == POLYGON.NETWORK_STRING) {
+    return new POLYGON.config();
+  } else if (network == MAINNET.NETWORK_STRING) {
     return new MAINNET.config();
+  } else if (network == HARMONY.NETWORK_STRING) {
+    return new HARMONY.config();
+  } else if (network == MOONBEAM.NETWORK_STRING) {
+    return new MOONBEAM.config();
+  } else if (network == OPTIMISM.NETWORK_STRING) {
+    return new OPTIMISM.config();
+  } else if (network == AVALANCHE.NETWORK_STRING) {
+    return new AVALANCHE.config();
+  } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
+    return new ARBITRUM_ONE.config();
+  } else if (network == CRONOS.NETWORK_STRING) {
+    return new CRONOS.config();
+  } else if (network == CELO.NETWORK_STRING) {
+    return new CELO.config();
+  } else if (network == FUSE.NETWORK_STRING) {
+    return new FUSE.config();
   }
-  // else if (network == HARMONY.NETWORK_STRING) {
-  //   return new HARMONY.config();
-  // } else if (network == MOONBEAM.NETWORK_STRING) {
-  //   return new MOONBEAM.config();
-  // } else if (network == OPTIMISM.NETWORK_STRING) {
-  //   return new OPTIMISM.config();
-  // } else if (network == AVALANCHE.NETWORK_STRING) {
-  //   return new AVALANCHE.config();
-  // } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
-  //   return new ARBITRUM_ONE.config();
-  // } else if (network == CRONOS.NETWORK_STRING) {
-  //   return new CRONOS.config();
-  // } else if (network == CELO.NETWORK_STRING) {
-  //   return new CELO.config();
-  // } else if (network == FUSE.NETWORK_STRING) {
-  //   return new FUSE.config();
-  // }
 
   return new TEMPLATE.config();
 }
