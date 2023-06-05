@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import {
   BigDecimal,
   BigInt,
@@ -41,7 +42,7 @@ export function updateRevenues(event: ethereum.Event, marketId: string): void {
   const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
 
   // daysSincePrevSnapshot
-  const prevDailyId = BigInt.fromString(market._prevDailySnapshotId).toI64();
+  const prevDailyId = BigInt.fromString(market._dailySnapshots[1]).toI64();
   const prevMarketDailySnapshot = getOrCreateMarketDailySnapshot(
     event,
     prevDailyId,
