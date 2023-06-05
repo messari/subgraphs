@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers, @typescript-eslint/no-unused-vars */
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { INT_ONE, OracleType } from "../common/constants";
 import { Configurations, OracleConfig, OracleContract } from "../common/types";

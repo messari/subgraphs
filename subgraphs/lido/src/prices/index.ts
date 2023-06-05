@@ -34,7 +34,7 @@ export function getUsdPricePerToken(
   const oracleCount = oracleConfig.oracleCount();
   const oracleOrder = oracleConfig.oracleOrder();
 
-  let prices: CustomPriceType[] = [];
+  const prices: CustomPriceType[] = [];
   for (let i = 0; i < oracleOrder.length; i++) {
     if (prices.length >= oracleCount) {
       break;

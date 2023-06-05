@@ -119,7 +119,7 @@ function sortByPrices(prices: CustomPriceType[]): CustomPriceType[] {
 }
 
 function pairwiseDiffOfPrices(prices: CustomPriceType[]): BigDecimal[] {
-  let diff: BigDecimal[] = [];
+  const diff: BigDecimal[] = [];
   for (let i = 1; i < prices.length; i++) {
     const x = prices[i].usdPrice;
     const y = prices[i - 1].usdPrice;
@@ -143,14 +143,14 @@ export function kClosestPrices(
   // k minimum difference values and their original indexes
   const pairwiseDiffCopy = pairwiseDiff.map<BigDecimal>((x: BigDecimal) => x);
   const pairwiseDiffSortedSlice = pairwiseDiffCopy.sort().slice(0, k);
-  let minDiffAtIdx: i32[] = [];
+  const minDiffAtIdx: i32[] = [];
   for (let i = 0; i < pairwiseDiffSortedSlice.length; i++) {
     const idx = pairwiseDiff.indexOf(pairwiseDiffSortedSlice[i]);
     minDiffAtIdx.push(idx as i32);
   }
 
   // k closest USD price values
-  let kClosestPrices: CustomPriceType[] = [];
+  const kClosestPrices: CustomPriceType[] = [];
   for (let i = 0; i < minDiffAtIdx.length; i++) {
     if (!kClosestPrices.includes(pricesSorted[minDiffAtIdx[i]])) {
       kClosestPrices.push(pricesSorted[minDiffAtIdx[i]]);
