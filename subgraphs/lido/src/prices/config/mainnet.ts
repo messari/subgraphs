@@ -1,4 +1,7 @@
-import { Address, TypedMap } from "@graphprotocol/graph-ts";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import * as constants from "../common/constants";
+import { Address, ethereum, TypedMap, BigInt } from "@graphprotocol/graph-ts";
+import { Configurations, OracleConfig } from "../common/types";
 
 export const NETWORK_STRING = "mainnet";
 
@@ -103,3 +106,60 @@ WHITELIST_TOKENS.set(
   "LINK",
   Address.fromString("0x514910771AF9Ca656af840dff83E8264EcF986CA")
 );
+
+class DefaultOracleConfig implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.SUSHI_ROUTER,
+    ];
+  }
+}
+
+class stETHOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.SUSHI_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+export class config implements Configurations {
+  getOracleConfig(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null
+  ): OracleConfig {
+    if (tokenAddr || block) {
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
+        ].includes(tokenAddr) &&
+        block &&
+        block.number.gt(BigInt.fromString("14019699")) &&
+        block.number.lt(BigInt.fromString("14941265"))
+      ) {
+        return new stETHOverride();
+      }
+    }
+
+    return new DefaultOracleConfig();
+  }
+}

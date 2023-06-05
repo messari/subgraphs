@@ -1,5 +1,5 @@
 import * as constants from "./constants";
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 
 export class Wrapped<T> {
   inner: T;
@@ -45,4 +45,16 @@ export class CustomPriceType {
   get decimalsBaseTen(): BigDecimal {
     return constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal();
   }
+}
+
+export interface OracleConfig {
+  oracleCount(): number;
+  oracleOrder(): string[];
+}
+
+export interface Configurations {
+  getOracleConfig(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null
+  ): OracleConfig;
 }

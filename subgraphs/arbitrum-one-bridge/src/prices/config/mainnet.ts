@@ -1,5 +1,6 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Configurations, OracleContract } from "../common/types";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { INT_ONE, OracleType } from "../common/constants";
+import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "mainnet";
 
@@ -111,6 +112,38 @@ export const USDC_ADDRESS = Address.fromString(
   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 );
 
+class DefaultOracleConfig implements OracleConfig {
+  oracleCount(): number {
+    return INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      OracleType.YEARN_LENS_ORACLE,
+      OracleType.CHAINLINK_FEED,
+      OracleType.CURVE_CALCULATIONS,
+      OracleType.SUSHI_CALCULATIONS,
+      OracleType.CURVE_ROUTER,
+      OracleType.UNISWAP_FORKS_ROUTER,
+    ];
+  }
+}
+
+class spellOverride implements OracleConfig {
+  oracleCount(): number {
+    return INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      OracleType.CHAINLINK_FEED,
+      OracleType.CURVE_CALCULATIONS,
+      OracleType.SUSHI_CALCULATIONS,
+      OracleType.CURVE_ROUTER,
+      OracleType.UNISWAP_FORKS_ROUTER,
+      OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
 export class config implements Configurations {
   network(): string {
     return NETWORK_STRING;
@@ -170,5 +203,23 @@ export class config implements Configurations {
 
   usdcTokenDecimals(): BigInt {
     return USDC_TOKEN_DECIMALS;
+  }
+
+  getOracleConfig(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null
+  ): OracleConfig {
+    if (tokenAddr || block) {
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x090185f2135308bad17527004364ebcc2d37e5f6"), // SPELL
+        ].includes(tokenAddr)
+      ) {
+        return new spellOverride();
+      }
+    }
+
+    return new DefaultOracleConfig();
   }
 }

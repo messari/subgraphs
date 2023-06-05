@@ -1,6 +1,9 @@
 {
   "deployment": "ARBITRUM_ONE_MAINNET",
   "network": "mainnet",
+  "graftEnabled": true,
+  "subgraphId": "QmbCbUm24E6CYAeUEDxmRJSiGtFCh56e7cuuveYueSm8Pa",
+  "graftStartBlock": 13742800,
   "file": "./src/handlers/ethereum/transfers.ts",
   "L1Bridge": [
     {

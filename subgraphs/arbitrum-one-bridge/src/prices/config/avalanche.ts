@@ -1,5 +1,7 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Configurations, OracleContract } from "../common/types";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import * as constants from "../common/constants";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "avalanche";
 
@@ -51,6 +53,26 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const HARDCODED_STABLES: Address[] = [];
+
+///////////////////////////////////////////////////////////////////////////
+////////////////////////// ORACLE CONFIGURATIONS //////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+class DefaultOracleConfig implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+    ];
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
@@ -127,5 +149,12 @@ export class config implements Configurations {
 
   usdcTokenDecimals(): BigInt {
     return USDC_TOKEN_DECIMALS;
+  }
+
+  getOracleConfig(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null
+  ): OracleConfig {
+    return new DefaultOracleConfig();
   }
 }

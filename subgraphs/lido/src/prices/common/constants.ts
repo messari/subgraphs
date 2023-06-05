@@ -10,6 +10,21 @@ import { SushiSwapPair__getReservesResult } from "../../../generated/Lido/SushiS
 /////////////////////////////////// COMMON ////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+export namespace OracleType {
+  export const CURVE_ROUTER = "CurveRouter";
+  export const CHAINLINK_FEED = "ChainlinkFeed";
+  export const YEARN_LENS_ORACLE = "YearnLensOracle";
+  export const CURVE_CALCULATIONS = "CurveCalculations";
+  export const UNISWAP_FORKS_ROUTER = "UniswapForksRouter";
+  export const SUSHI_CALCULATIONS = "SushiswapCalculations";
+  export const SUSHI_ROUTER = "SushiswapRouter";
+}
+
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+export const INT_TWO = 2 as i32;
+export const INT_NEGATIVE_ONE = -1 as i32;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
