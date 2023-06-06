@@ -576,7 +576,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -598,7 +598,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2989,7 +2989,7 @@
     "protocol": "morpho",
     "project": "morpho",
     "deployments": {
-      "morpho-aave-ethereum": {
+      "morpho-aave-v2-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -3006,8 +3006,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "morpho-aave-ethereum",
-            "query-id": "morpho-aave-ethereum"
+            "slug": "morpho-aave-v2-ethereum",
+            "query-id": "morpho-aave-v2-ethereum"
           }
         }
       },

@@ -1,6 +1,6 @@
 import { Schema, Versions } from "../../constants";
 
-export const versionsList = ["1.3.0", "2.0.0", "3.0.3", "3.0.4"];
+export const versionsList = ["1.3.0", "2.0.0", "3.0.3", "3.0.4", "4.0.0"];
 
 export const schema = (version: string): Schema => {
   // The version group uses the first two digits  of the schema version and defaults to that schema.
@@ -20,6 +20,8 @@ export const schema = (version: string): Schema => {
         return schema303();
       }
       return schema304();
+    case Versions.Schema400:
+      return schema400();
     default:
       return schema130();
   }
@@ -1749,6 +1751,428 @@ export const schema304 = (): Schema => {
       cumulativeProtocolSideRevenueUSD
       cumulativeTotalRevenueUSD
       cumulativeVolumeTokenAmounts
+      cumulativeDepositCount
+      cumulativeWithdrawCount    
+      cumulativeSwapCount
+      cumulativeVolumeUSD
+      inputTokenBalances
+      inputTokenBalancesUSD
+      inputTokenWeights
+      stakedOutputTokenAmount
+      rewardTokenEmissionsAmount
+      rewardTokenEmissionsUSD
+      positionCount
+      openPositionCount
+      closedPositionCount
+      ${positionsQuery}
+    }
+  }`;
+
+  return {
+    entities,
+    entitiesData,
+    query,
+    protocolTableQuery,
+    poolData,
+    events,
+    protocolFields,
+    poolsQuery,
+    financialsQuery,
+    hourlyUsageQuery,
+    dailyUsageQuery,
+    poolTimeseriesQuery,
+    positionsQuery,
+  };
+};
+
+export const schema400 = (): Schema => {
+  const entities = [
+    "financialsDailySnapshots",
+    "usageMetricsDailySnapshots",
+    "liquidityPoolDailySnapshots",
+    "usageMetricsHourlySnapshots",
+    "liquidityPoolHourlySnapshots",
+  ];
+
+  const entitiesData = {
+    financialsDailySnapshots: {
+      id: "ID!",
+      day: "Int!",
+      totalValueLockedUSD: "BigDecimal!",
+      totalLiquidityUSD: "BigDecimal!",
+      activeLiquidityUSD: "BigDecimal!",
+      uncollectedProtocolSideValueUSD: "BigDecimal!",
+      uncollectedSupplySideValueUSD: "BigDecimal!",
+      protocolControlledValueUSD: "BigDecimal",
+      dailyVolumeUSD: "BigDecimal!",
+      cumulativeVolumeUSD: "BigDecimal!",
+      dailySupplySideRevenueUSD: "BigDecimal!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      dailyProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      dailyTotalRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      timestamp: "BigInt!",
+    },
+    usageMetricsDailySnapshots: {
+      id: "ID!",
+      day: "Int!",
+      cumulativeUniqueUsers: "Int!",
+      dailyActiveUsers: "Int!",
+      dailyTransactionCount: "Int!",
+      dailyDepositCount: "Int!",
+      dailyWithdrawCount: "Int!",
+      dailySwapCount: "Int"!,
+      totalPoolCount: "Int!",
+      timestamp: "BigInt!",
+    },
+    liquidityPoolDailySnapshots: {
+      id: "ID!",
+      day: "Int!",
+      tick: "BigInt",
+      totalValueLockedUSD: "BigDecimal!",
+      totalLiquidity: "BigInt!",
+      totalLiquidityUSD: "BigDecimal!",
+      activeLiquidity: "BigInt!",
+      activeLiquidityUSD: "BigDecimal!",
+      uncollectedProtocolSideTokenAmounts: "[BigInt!]!",
+      uncollectedProtocolSideValuesUSD: "[BigDecimal!]!",
+      uncollectedSupplySideTokenAmounts: "[BigInt!]!",
+      uncollectedSupplySideValuesUSD: "[BigDecimal!]!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      dailySupplySideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      dailyProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      dailyTotalRevenueUSD: "BigDecimal!",
+      cumulativeVolumeUSD: "BigDecimal!",
+      dailyVolumeUSD: "BigDecimal!",
+      cumulativeVolumeByTokenAmount: "[BigInt!]!",
+      dailyVolumeByTokenAmount: "[BigInt!]!",
+      cumulativeVolumeByTokenUSD: "[BigDecimal!]!",
+      dailyVolumeByTokenUSD: "[BigDecimal!]!",
+      inputTokenBalances: "[BigInt!]!",
+      inputTokenBalancesUSD: "[BigDecimal!]!",
+      inputTokenWeights: "[BigDecimal!]!",
+      stakedOutputTokenAmount: "BigInt",
+      rewardTokenEmissionsAmount: "[BigInt!]",
+      rewardTokenEmissionsUSD: "[BigDecimal!]",
+      positionCount: "Int!",
+      openPositionCount: "Int!",
+      closedPositionCount: "Int!",
+      cumulativeDepositCount: "Int!",
+      dailyDepositCount: "Int!",
+      cumulativeWithdrawCount: "Int!",
+      dailyWithdrawCount: "Int!",
+      cumulativeSwapCount: "Int!",
+      dailySwapCount: "Int!",
+      timestamp: "BigInt!",
+    },
+    usageMetricsHourlySnapshots: {
+      id: "ID!",
+      hour: "Int!",
+      cumulativeUniqueUsers: "Int!",
+      hourlyActiveUsers: "Int!",
+      hourlyTransactionCount: "Int!",
+      hourlyDepositCount: "Int!",
+      hourlyWithdrawCount: "Int!",
+      hourlySwapCount: "Int!",
+      timestamp: "BigInt!",
+    },
+    liquidityPoolHourlySnapshots: {
+      id: "ID!",
+      hour: "Int!",
+      tick: "BigInt",
+      totalValueLockedUSD: "BigDecimal!",
+      totalLiquidity: "BigInt!",
+      totalLiquidityUSD: "BigDecimal!",
+      activeLiquidity: "BigInt!",
+      activeLiquidityUSD: "BigDecimal!",
+      uncollectedProtocolSideTokenAmounts: "[BigInt!]!",
+      uncollectedProtocolSideValuesUSD: "[BigDecimal!]!",
+      uncollectedSupplySideTokenAmounts: "[BigInt!]!",
+      uncollectedSupplySideValuesUSD: "[BigDecimal!]!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      hourlySupplySideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      hourlyProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      hourlyTotalRevenueUSD: "BigDecimal!",
+      cumulativeVolumeUSD: "BigDecimal!",
+      hourlyVolumeUSD: "BigDecimal!",
+      cumulativeVolumeByTokenAmount: "[BigInt!]!",
+      hourlyVolumeByTokenAmount: "[BigInt!]!",
+      cumulativeVolumeByTokenUSD: "[BigDecimal!]!",
+      hourlyVolumeByTokenUSD: "[BigDecimal!]!",
+      inputTokenBalances: "[BigInt!]!",
+      inputTokenBalancesUSD: "[BigDecimal!]!",
+      inputTokenWeights: "[BigDecimal!]!",
+      stakedOutputTokenAmount: "BigInt",
+      rewardTokenEmissionsAmount: "[BigInt!]",
+      rewardTokenEmissionsUSD: "[BigDecimal!]",
+      positionCount: "Int!",
+      openPositionCount: "Int!",
+      closedPositionCount: "Int!",
+      cumulativeDepositCount: "Int!",
+      hourlyDepositCount: "Int!",
+      cumulativeWithdrawCount: "Int!",
+      hourlyWithdrawCount: "Int!",
+      cumulativeSwapCount: "Int!",
+      hourlySwapCount: "Int!",
+      timestamp: "BigInt!",
+    },
+  };
+
+  const finanQuery =
+    "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.financialsDailySnapshots).join(",") +
+    "}";
+  const usageDailyQuery =
+    "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsDailySnapshots).join(",") +
+    "}";
+  const usageHourlyQuery =
+    "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsHourlySnapshots).join(",") +
+    "}";
+
+  const liquidityPoolDailyQuery =
+    "liquidityPoolDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {" +
+    Object.keys(entitiesData.liquidityPoolDailySnapshots).join(",") +
+    "}";
+  const liquidityPoolHourlyQuery =
+    "liquidityPoolHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {" +
+    Object.keys(entitiesData.liquidityPoolHourlySnapshots).join(",") +
+    "}";
+
+  const eventsFields = ["timestamp", "blockNumber"];
+
+  // Query liquidityPool(pool) entity and events entities
+  let events: string[] = ["deposits", "withdraws", "swaps"];
+  let eventsQuery: any[] = events.map((event) => {
+    let options = "";
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}" + options + ") { ";
+    let fields = eventsFields.join(",");
+    if (event === "swaps") {
+      fields +=
+        ", hash, amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}, reserveAmounts";
+    } else {
+      fields += ", hash, position{id} amountUSD, inputTokens{id, decimals}, inputTokenAmounts, reserveAmounts";
+    }
+
+    return baseStr + fields + " }";
+  });
+
+  const financialsQuery = `
+      query Data {
+        ${finanQuery}
+      }`;
+  const hourlyUsageQuery = `
+      query Data {
+        ${usageHourlyQuery}
+      }`;
+  const dailyUsageQuery = `
+      query Data {
+        ${usageDailyQuery}
+      }`;
+
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalLiquidityUSD: "BigDecimal!",
+    activeLiquidityUSD: "BigDecimal!",
+    uncollectedProtocolSideValueUSD: "BigDecimal!",
+    uncollectedSupplySideValueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    cumulativeVolumeUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!",
+    cumulativeUniqueLPs: "Int!",
+    cumulativeUniqueTraders: "Int!",
+    totalPoolCount: "Int!",
+    openPositionCount: "Int!",
+    cumulativePositionCount: "Int!",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      dexAmmProtocol(id: $protocolId) {
+        ${protocolQueryFields}
+      }
+    }`;
+
+  const positionsQuery = `
+    positions(first: 1000) {
+      id
+      account {
+        id
+      }
+      hashOpened
+      hashClosed
+      timestampOpened
+      timestampClosed
+      blockNumberOpened
+      blockNumberClosed
+      depositCount
+      withdrawCount
+      withdraws {
+        hash
+      }
+      deposits {
+        hash
+      }
+    }
+`;
+
+  const poolsQuery = `
+      query Data {
+        liquidityPools(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolData: { [x: string]: string } = {
+    id: "Bytes!",
+    protocol: "DexAmmProtocol!",
+    name: "String",
+    symbol: "String",
+    liquidityToken: "Token",
+    liquidityTokenType: "TokenType",
+    inputTokens: "[Token!]!",
+    rewardTokens: "[RewardToken!]",
+    fees: "[LiquidityPoolFee!]!",
+    isSingleSided: "Boolean!",
+    createdTimestamp: "BigInt!",
+    createdBlockNumber: "BigInt!",
+    tick: "BigInt",
+    totalValueLockedUSD: "BigDecimal!",
+    totalLiquidity: "BigInt!",
+    totalLiquidityUSD: "BigDecimal!",
+    activeLiquidity: "BigInt!",
+    activeLiquidityUSD: "BigDecimal!",
+    uncollectedProtocolSideTokenAmounts: "[BigInt!]!",
+    uncollectedProtocolSideValuesUSD: "[BigDecimal!]!",
+    uncollectedSupplySideTokenAmounts: "[BigInt!]!",
+    uncollectedSupplySideValuesUSD: "[BigDecimal!]!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeVolumeByTokenAmount: "[BigInt!]!",
+    cumulativeVolumeByTokenUSD: "[BigDecimal!]!",
+    cumulativeVolumeUSD: "BigDecimal!",
+    cumulativeDepositCount: "Int!",
+    cumulativeWithdrawCount: "Int!",
+    cumulativeSwapCount: "Int!",
+    inputTokenBalances: "[BigInt!]!",
+    inputTokenBalancesUSD: "[BigDecimal!]!",
+    inputTokenWeights: "[BigDecimal!]!",
+    stakedOutputTokenAmount: "BigInt",
+    rewardTokenEmissionsAmount: "[BigInt!]",
+    rewardTokenEmissionsUSD: "[BigDecimal!]",
+    positionCount: "Int!",
+    openPositionCount: "Int!",
+    closedPositionCount: "Int!",
+    lastSnapshotDayID: "Int!",
+    lastSnapshotHourID: "Int!",
+    lastUpdateTimestamp: "BigInt!",
+    lastUpdateBlockNumber: "BigInt!",
+  };
+
+  const poolTimeseriesQuery = `
+      query Data($poolId: String) {
+        ${liquidityPoolDailyQuery}
+        ${liquidityPoolHourlyQuery}
+      }
+      `;
+
+  let query = `
+  query Data($poolId: String, $protocolId: String){
+    _meta {
+      block {
+        number
+      }
+      deployment
+    }
+    protocols {
+      id
+      methodologyVersion
+      network
+      name
+      type
+      slug
+      schemaVersion
+      subgraphVersion
+    }
+    dexAmmProtocols {
+      ${protocolQueryFields}
+    }
+    ${eventsQuery}
+    liquidityPool(id: $poolId){
+      id
+      name
+      symbol
+      fees{
+        feePercentage
+        feeType
+      }
+      inputTokens{
+        id
+        decimals
+        name
+        symbol
+      }
+      liquidityToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      liquidityTokenType
+      rewardTokens {
+        id
+        type
+        token {
+          id
+          decimals
+          name
+          symbol
+        }
+      }
+      lastSnapshotDayID
+      lastSnapshotHourID
+      lastUpdateTimestamp
+      lastUpdateBlockNumber
+      isSingleSided
+      createdTimestamp
+      createdBlockNumber
+      tick
+      totalValueLockedUSD
+      totalLiquidity
+      totalLiquidityUSD
+      activeLiquidity
+      activeLiquidityUSD
+      uncollectedProtocolSideTokenAmounts
+      uncollectedProtocolSideValuesUSD
+      uncollectedSupplySideTokenAmounts
+      uncollectedSupplySideValuesUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeVolumeByTokenAmount
       cumulativeDepositCount
       cumulativeWithdrawCount    
       cumulativeSwapCount
