@@ -5,15 +5,10 @@ import {
   LiquidityRemoved,
 } from "../../generated/HubPool/HubPool";
 import { SDK } from "../sdk/protocols/bridge";
-import { BridgeConfig } from "../sdk/protocols/bridge/config";
-import {
-  BridgePermissionType,
-  BridgePoolType,
-} from "../sdk/protocols/bridge/enums";
-import { Versions } from "../versions";
+import { BridgePoolType } from "../sdk/protocols/bridge/enums";
 import {
   ACROSS_HUB_POOL_CONTRACT,
-  ACROSS_PROTOCOL_NAME,
+  MAINNET_BRIDGE_CONFIG,
   Pricer,
   TokenInit,
   getTokenBalance,
@@ -21,17 +16,9 @@ import {
 import { _OutputTokenToPool } from "../../generated/schema";
 import { _ERC20 } from "../../generated/SpokePool1/_ERC20";
 
-const conf = new BridgeConfig(
-  ACROSS_HUB_POOL_CONTRACT,
-  ACROSS_PROTOCOL_NAME,
-  ACROSS_PROTOCOL_NAME,
-  BridgePermissionType.WHITELIST,
-  Versions
-);
-
 export function handleLiquidityAdded(event: LiquidityAdded): void {
   const sdk = SDK.initializeFromEvent(
-    conf,
+    MAINNET_BRIDGE_CONFIG,
     new Pricer(event.block),
     new TokenInit(),
     event
@@ -57,9 +44,7 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
 
   // pool
-  const poolId = event.address
-    .concat(event.params.l1Token)
-    .concat(Bytes.fromUTF8("liquidity"));
+  const poolId = event.params.l1Token.concat(Bytes.fromUTF8("liquidity"));
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
@@ -108,7 +93,7 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
 
 export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   const sdk = SDK.initializeFromEvent(
-    conf,
+    MAINNET_BRIDGE_CONFIG,
     new Pricer(event.block),
     new TokenInit(),
     event
@@ -134,9 +119,7 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
 
   // pool
-  const poolId = event.address
-    .concat(event.params.l1Token)
-    .concat(Bytes.fromUTF8("liquidity"));
+  const poolId = event.params.l1Token.concat(Bytes.fromUTF8("liquidity"));
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {

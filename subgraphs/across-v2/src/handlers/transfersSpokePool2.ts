@@ -1,21 +1,17 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import { Network } from "../sdk/util/constants";
 import {
-  ACROSS_HUB_POOL_CONTRACT,
-  ACROSS_PROTOCOL_NAME,
+  DEPLOYER_BRIDGE_CONFIG,
+  MAINNET_BRIDGE_CONFIG,
   Pricer,
   TokenInit,
   getTokenBalance,
 } from "../util";
 import { getUsdPrice } from "../prices";
 import { findDestinationToken, findOriginToken } from "../availableRoutesApi";
-import { Versions } from "../versions";
 
 import { SDK } from "../sdk/protocols/bridge";
-import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import {
-  BridgePermissionType,
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
@@ -24,7 +20,9 @@ import {
   FilledRelay,
   FundsDeposited,
 } from "../../generated/SpokePool2/SpokePool";
+import { Network } from "../sdk/util/constants";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
+import { BridgeConfig } from "../sdk/protocols/bridge/config";
 
 export function handleFilledRelay(event: FilledRelay): void {
   // Chain
@@ -32,21 +30,12 @@ export function handleFilledRelay(event: FilledRelay): void {
   const destinationChainId = event.params.destinationChainId;
 
   // mainnet vs L2s
-  let bridgeId: string;
+  let conf: BridgeConfig;
   if (destinationChainId == networkToChainID(Network.MAINNET)) {
-    bridgeId = ACROSS_HUB_POOL_CONTRACT;
+    conf = MAINNET_BRIDGE_CONFIG;
   } else {
-    bridgeId = event.address.toHexString();
+    conf = DEPLOYER_BRIDGE_CONFIG;
   }
-
-  // Config
-  const conf = new BridgeConfig(
-    bridgeId,
-    ACROSS_PROTOCOL_NAME,
-    ACROSS_PROTOCOL_NAME,
-    BridgePermissionType.WHITELIST,
-    Versions
-  );
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -75,7 +64,7 @@ export function handleFilledRelay(event: FilledRelay): void {
   );
 
   // Pool
-  const poolId = event.address.concat(inputToken.id);
+  const poolId = inputToken.id;
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
@@ -123,21 +112,12 @@ export function handleFundsDeposited(event: FundsDeposited): void {
   const destinationChainId = event.params.destinationChainId;
 
   // mainnet vs L2s
-  let bridgeId: string;
-  if (originChainId == networkToChainID(Network.MAINNET)) {
-    bridgeId = ACROSS_HUB_POOL_CONTRACT;
+  let conf: BridgeConfig;
+  if (destinationChainId == networkToChainID(Network.MAINNET)) {
+    conf = MAINNET_BRIDGE_CONFIG;
   } else {
-    bridgeId = event.address.toHexString();
+    conf = DEPLOYER_BRIDGE_CONFIG;
   }
-
-  // Config
-  const conf = new BridgeConfig(
-    bridgeId,
-    ACROSS_PROTOCOL_NAME,
-    ACROSS_PROTOCOL_NAME,
-    BridgePermissionType.WHITELIST,
-    Versions
-  );
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -166,7 +146,7 @@ export function handleFundsDeposited(event: FundsDeposited): void {
   );
 
   // Pool
-  const poolId = event.address.concat(inputToken.id);
+  const poolId = inputToken.id;
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {

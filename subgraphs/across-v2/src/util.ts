@@ -13,6 +13,9 @@ import { TokenPricer } from "./sdk/protocols/config";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "./sdk/util/constants";
 import { BIGINT_ZERO } from "./prices/common/constants";
+import { BridgePermissionType } from "./sdk/protocols/bridge/enums";
+import { BridgeConfig } from "./sdk/protocols/bridge/config";
+import { Versions } from "./versions";
 
 export class Pricer implements TokenPricer {
   block: ethereum.Block;
@@ -112,3 +115,25 @@ export const ACROSS_HUB_POOL_CONTRACT =
 export const ACROSS_REWARD_TOKEN = "0x44108f0223a3c3028f5fe7aec7f9bb2e66bef82f";
 export const ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT =
   "0x9040e41ef5e8b281535a96d9a48acb8cfabd9a48";
+export const ACROSS_PROTOCOL_DEPLOYER_CONTRACT =
+  "0x9a8f92a830a5cb89a3816e3d267cb7791c16b04d";
+
+// Use ACROSS_PROTOCOL_DEPLOYER_CONTRACT to unify
+// all activity from different SpokePools on a chain
+export const DEPLOYER_BRIDGE_CONFIG = new BridgeConfig(
+  ACROSS_PROTOCOL_DEPLOYER_CONTRACT,
+  ACROSS_PROTOCOL_NAME,
+  ACROSS_PROTOCOL_NAME,
+  BridgePermissionType.WHITELIST,
+  Versions
+);
+
+// Use ACROSS_HUB_POOL_CONTRACT to manage all
+// liquidity and staking related activity
+export const MAINNET_BRIDGE_CONFIG = new BridgeConfig(
+  ACROSS_HUB_POOL_CONTRACT,
+  ACROSS_PROTOCOL_NAME,
+  ACROSS_PROTOCOL_NAME,
+  BridgePermissionType.WHITELIST,
+  Versions
+);

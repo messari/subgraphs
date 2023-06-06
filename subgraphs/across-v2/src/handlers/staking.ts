@@ -6,15 +6,11 @@ import {
 import { SDK } from "../sdk/protocols/bridge";
 import {
   ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT,
-  ACROSS_HUB_POOL_CONTRACT,
-  ACROSS_PROTOCOL_NAME,
   ACROSS_REWARD_TOKEN,
+  MAINNET_BRIDGE_CONFIG,
   Pricer,
   TokenInit,
 } from "../util";
-import { BridgePermissionType } from "../sdk/protocols/bridge/enums";
-import { Versions } from "../versions";
-import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { _OutputTokenToPool } from "../../generated/schema";
 import {
   BIGINT_MINUS_ONE,
@@ -23,21 +19,9 @@ import {
 } from "../sdk/util/constants";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
-// use hub pool contract as bridge conf name so that
-// stakedOutputTokenAmount, rewardTokenEmissionsAmount, rewardTokenEmissionsUSD
-// are tracked as part of the liquidity pools
-const conf = new BridgeConfig(
-  ACROSS_HUB_POOL_CONTRACT,
-  ACROSS_PROTOCOL_NAME,
-  ACROSS_PROTOCOL_NAME,
-  BridgePermissionType.WHITELIST,
-  Versions
-);
-
-// stake
 export function handleStake(event: Stake): void {
   const sdk = SDK.initializeFromEvent(
-    conf,
+    MAINNET_BRIDGE_CONFIG,
     new Pricer(event.block),
     new TokenInit(),
     event
@@ -79,7 +63,7 @@ export function handleStake(event: Stake): void {
 
 export function handleUnstake(event: Unstake): void {
   const sdk = SDK.initializeFromEvent(
-    conf,
+    MAINNET_BRIDGE_CONFIG,
     new Pricer(event.block),
     new TokenInit(),
     event
