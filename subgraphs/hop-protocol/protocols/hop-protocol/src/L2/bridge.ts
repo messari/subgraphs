@@ -58,7 +58,7 @@ class TokenInit implements TokenInitializer {
   }
 }
 const conf = new BridgeConfig(
-  "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
+  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
   "HOP-"
     .concat(dataSource.network().toUpperCase().replace("-", "_"))
     .concat("-BRIDGE"),
@@ -169,7 +169,7 @@ export function handleTransferFromL1Completed(
     );
 
     //MESSAGES
-    let receipt = event.receipt;
+    const receipt = event.receipt;
 
     if (receipt) {
       for (let index = 0; index < receipt.logs.length; index++) {
@@ -314,7 +314,7 @@ export function handleTransferSent(event: TransferSent): void {
     );
 
     //MESSAGES
-    let receipt = event.receipt;
+    const receipt = event.receipt;
 
     if (receipt) {
       for (let index = 0; index < receipt.logs.length; index++) {

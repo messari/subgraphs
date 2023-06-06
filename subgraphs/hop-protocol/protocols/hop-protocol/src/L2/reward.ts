@@ -43,7 +43,7 @@ class Pricer implements TokenPricer {
 }
 
 const conf = new BridgeConfig(
-  "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
+  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
   "HOP-"
     .concat(dataSource.network().toUpperCase().replace("-", "_"))
     .concat("-BRIDGE"),
@@ -66,7 +66,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
   if (
     NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
   ) {
-    let amount = event.params.reward;
+    const amount = event.params.reward;
     const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
       event.address.toHexString()
     );
@@ -102,7 +102,7 @@ export function handleStaked(event: Staked): void {
   if (
     NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
   ) {
-    let amount = event.params.amount;
+    const amount = event.params.amount;
 
     const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
       event.address.toHexString()
@@ -147,7 +147,7 @@ export function handleWithdrawn(event: Withdrawn): void {
   if (
     NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
   ) {
-    let amount = event.params.amount;
+    const amount = event.params.amount;
 
     const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
       event.address.toHexString()

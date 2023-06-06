@@ -20,7 +20,6 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import { Transfer } from "../../../../generated/Token/Token";
-import { _ERC20 } from "../../../../generated/Token/_ERC20";
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
@@ -40,8 +39,6 @@ class Pricer implements TokenPricer {
 
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
-    const token = _ERC20.bind(address);
-
     const tokenConfig = NetworkConfigs.getTokenDetails(address.toHexString());
     const symbol = tokenConfig[0];
     const name = tokenConfig[1];
@@ -51,7 +48,7 @@ class TokenInit implements TokenInitializer {
 }
 
 const conf = new BridgeConfig(
-  "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
+  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
   "HOP-"
     .concat(dataSource.network().toUpperCase().replace("-", "_"))
     .concat("-BRIDGE"),
@@ -115,7 +112,7 @@ export function handleTransfer(event: Transfer): void {
       pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
     }
 
-    let acc = sdk.Accounts.loadAccount(event.params.to);
+    const acc = sdk.Accounts.loadAccount(event.params.to);
     const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
       reverseChainIDs.get(
         dataSource.network().toUpperCase().replace("-", "_")
