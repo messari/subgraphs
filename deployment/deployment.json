@@ -481,7 +481,7 @@
           },
           "decentralized-network": {
             "slug": "aave-v3-ethereum",
-            "query-id": "HB1Z2EAw4rtPRYVb2Nz8QGFLHCpym6ByBX6vbCViuE9F"
+            "query-id": "JCNWRypm7FYwV8fx5HhzZPSFaMxgkPuw4TnR3Gpi81zk"
           }
         }
       }
@@ -645,7 +645,7 @@
           },
           "decentralized-network": {
             "slug": "convex-finance-ethereum",
-            "query-id": "CVVEQi1VRgQYwX5r6tPjD1Leiao2nETLYC6pHTWVNPtk"
+            "query-id": "7rFZ2x6aLQ7EZsNx8F5yenk4xcqwqR3Dynf9rdixCSME"
           }
         }
       }
@@ -2207,7 +2207,7 @@
           },
           "decentralized-network": {
             "slug": "curve-finance-ethereum",
-            "query-id": "GAGwGKc4ArNKKq9eFTcwgd1UGymvqhTier9Npqo1YvZB"
+            "query-id": "3fy93eAT56UJsRCEht8iFhfi6wjHWXtZ9dnnbQmvFopF"
           }
         }
       },
@@ -2629,7 +2629,7 @@
           },
           "decentralized-network": {
             "slug": "liquity-ethereum",
-            "query-id": "GQ8aYQ1kdQPGDSQzeF6cPo9MzdzqkPxqmuCaMCJoNLrF"
+            "query-id": "2D2dFCLjUt3MfFgTKW8cBxiRQ3Adss7KUtYh2rTcFVY"
           }
         }
       }
@@ -6583,7 +6583,7 @@
           },
           "decentralized-network": {
             "slug": "opensea-seaport-ethereum",
-            "query-id": "9ZvDz8qtx3PrnaUw1duQ7EhgGphgQcgSHqhLzQXBa16u"
+            "query-id": "2GmLsgYGWoFoouZzKjp8biYDkfmeLTkEY3VDQyZqSJHA"
           }
         }
       }
