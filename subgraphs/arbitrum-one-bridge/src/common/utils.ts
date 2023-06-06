@@ -5,10 +5,18 @@ import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _ERC20 } from "../../generated/ERC20Gateway/_ERC20";
-import { BridgePermissionType } from "../sdk/protocols/bridge/enums";
+import {
+  BridgePermissionType,
+  BridgePoolType,
+} from "../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { Versions } from "../versions";
-import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "../sdk/util/constants";
+import {
+  ETH_ADDRESS,
+  ETH_NAME,
+  ETH_SYMBOL,
+  Network,
+} from "../sdk/util/constants";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 export class Pricer implements TokenPricer {
@@ -128,3 +136,35 @@ export const arbSideConf = new BridgeConfig(
 );
 
 export const ethAddress = Address.fromString(ETH_ADDRESS);
+
+// ARB Token Addresses
+export const ARB_L1_ADDRESS = Address.fromString(
+  "0xb50721bcf8d664c30412cfbc6cf7a15145234ad1"
+);
+export const ARB_L2_ADDRESS = Address.fromString(
+  "0x912ce59144191c1204e64559fe8253a0e49e6548"
+);
+
+export function isArbToken(inputTokenAddress: Address): bool {
+  if (
+    inputTokenAddress == ARB_L2_ADDRESS ||
+    inputTokenAddress == ARB_L1_ADDRESS
+  ) {
+    return true;
+  }
+  return false;
+}
+
+export function bridgePoolType(
+  isArbToken: bool,
+  network: Network
+): BridgePoolType {
+  // separate conditionals for readability
+  if (network === Network.ARBITRUM_ONE && isArbToken) {
+    return BridgePoolType.LOCK_RELEASE;
+  } else if (network === Network.MAINNET && !isArbToken) {
+    return BridgePoolType.LOCK_RELEASE;
+  }
+
+  return BridgePoolType.BURN_MINT;
+}
