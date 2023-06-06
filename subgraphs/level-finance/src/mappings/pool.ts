@@ -33,6 +33,8 @@ export function handlePositionIncreased(event: IncreasePosition): void {
   const key = event.params.key;
   const side = event.params.side;
   const sizeChange = event.params.sizeChanged;
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
 
   updatePosition(
     event,
@@ -46,8 +48,12 @@ export function handlePositionIncreased(event: IncreasePosition): void {
     feeValue,
     side == constants.Side.LONG,
     TransactionType.COLLATERAL_IN,
-    constants.BIGINT_ZERO
+    constants.BIGINT_ZERO,
+    sdk,
+    pool
   );
+
+  collectFees(feeValue, indexTokenAddress, sdk, pool, true);
   //fee in usd
 }
 
@@ -66,6 +72,8 @@ export function handlePositionDecreased(event: DecreasePosition): void {
       ? constants.BIGINT_NEGONE
       : constants.BIGINT_ONE
   );
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
   updatePosition(
     event,
     key,
@@ -78,8 +86,11 @@ export function handlePositionDecreased(event: DecreasePosition): void {
     feeValue,
     side == constants.Side.LONG,
     TransactionType.COLLATERAL_OUT,
-    pnl
+    pnl,
+    sdk,
+    pool
   );
+  collectFees(feeValue, indexTokenAddress, sdk, pool, true);
   //fee in usd
 }
 
@@ -98,6 +109,8 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
       ? constants.BIGINT_NEGONE
       : constants.BIGINT_ONE
   );
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
   updatePosition(
     event,
     key,
@@ -110,8 +123,11 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
     feeValue,
     side == constants.Side.LONG,
     TransactionType.LIQUIDATE,
-    realisedPnl
+    realisedPnl,
+    sdk,
+    pool
   );
+  collectFees(feeValue, indexTokenAddress, sdk, pool, true);
   //fee in usd
 }
 
@@ -126,6 +142,8 @@ export function handleUpdatePosition(event: UpdatePosition): void {
 }
 
 export function handleClosePosition(event: ClosePosition): void {
+  //increase poolVolume
+
   event.params.collateralValue;
   event.params.entryInterestRate;
   event.params.entryPrice;

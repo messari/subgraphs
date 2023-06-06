@@ -1,9 +1,4 @@
 import {
-  getOrCreateAccount,
-  getOrCreatePool,
-  initializeSDK,
-} from "../common/initializers";
-import {
   Address,
   Bytes,
   ethereum,
@@ -14,11 +9,12 @@ import * as utils from "../common/utils";
 import { increasePoolVolume } from "./volume";
 import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
-import { Pool as PoolContract } from "../../generated/Pool/Pool";
 import { updatePoolOpenInterestUSD } from "./interest";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { getOrCreateAccount } from "../common/initializers";
 import { Token, _PositionMap } from "../../generated/schema";
 import { Account } from "../sdk/protocols/perpfutures/account";
+import { Pool as PoolContract } from "../../generated/Pool/Pool";
 import { Position } from "../sdk/protocols/perpfutures/position";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { bigDecimalToBigInt, exponentToBigDecimal } from "../sdk/util/numbers";
@@ -35,11 +31,10 @@ export function updatePosition(
   fee: BigInt,
   isLong: boolean,
   transactionType: TransactionType,
-  liqudateProfit: BigInt
+  liqudateProfit: BigInt,
+  sdk: SDK,
+  pool: Pool
 ): void {
-  const sdk = initializeSDK(event);
-
-  const pool = getOrCreatePool(sdk);
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
   sdk.Tokens.updateTokenPrice(

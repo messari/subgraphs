@@ -9,12 +9,17 @@ export function collectFees(
   fee: BigInt,
   tokenAddress: Address,
   sdk: SDK,
-  pool: Pool
+  pool: Pool,
+  isUSD: bool = false
 ): void {
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-  const totalFee = utils
-    .bigIntToBigDecimal(fee, token.decimals)
-    .times(token.lastPriceUSD!);
+  let totalFee = constants.BIGDECIMAL_ZERO;
+  if (isUSD) totalFee = utils.bigIntToBigDecimal(fee, constants.VALUE_DECIMALS);
+  else {
+    totalFee = utils
+      .bigIntToBigDecimal(fee, token.decimals)
+      .times(token.lastPriceUSD!);
+  }
   pool.addRevenueUSD(
     totalFee.times(constants.PROTOCOL_SIDE_REVENUE_PERCENT),
     totalFee.times(
