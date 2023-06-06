@@ -90,6 +90,8 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x625e7708f30ca75bfd92586e17077590c60eb4cd"), // Aave Arbitrum USDC
   Address.fromString("0x6ab707aca953edaefbc4fd23ba73294241490620"), // Aave Arbitrum USDT
   Address.fromString("0x82e64f49ed5ec1bc6e43dad4fc8af9bb3a2312ee"), // Aave Arbitrum DAI
+  Address.fromString("0xda10009cbd5d07dd0cecc66161fc93d7c9000da1"), // Dai Stablecoin"
+  Address.fromString("0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"), // USD arb1
 ];
 
 ///////////////////////////////////////////////////////////////////////////
