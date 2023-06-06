@@ -31,7 +31,7 @@ export function handleFilledRelay(event: FilledRelay): void {
 
   // mainnet vs L2s
   let conf: BridgeConfig;
-  if (destinationChainId == networkToChainID(Network.MAINNET)) {
+  if (originChainId == networkToChainID(Network.MAINNET)) {
     conf = MAINNET_BRIDGE_CONFIG;
   } else {
     conf = DEPLOYER_BRIDGE_CONFIG;
@@ -113,7 +113,7 @@ export function handleFundsDeposited(event: FundsDeposited): void {
 
   // mainnet vs L2s
   let conf: BridgeConfig;
-  if (destinationChainId == networkToChainID(Network.MAINNET)) {
+  if (originChainId == networkToChainID(Network.MAINNET)) {
     conf = MAINNET_BRIDGE_CONFIG;
   } else {
     conf = DEPLOYER_BRIDGE_CONFIG;
