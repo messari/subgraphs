@@ -117,6 +117,7 @@ class DefaultOracleConfig implements OracleConfig {
   }
 }
 
+// https://github.com/messari/subgraphs/issues/2090
 class spellOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
@@ -133,6 +134,7 @@ class spellOverride implements OracleConfig {
   }
 }
 
+// https://github.com/messari/subgraphs/issues/726
 class stETHOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
@@ -149,6 +151,7 @@ class stETHOverride implements OracleConfig {
   }
 }
 
+// https://github.com/messari/subgraphs/issues/2097
 class baxaOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
