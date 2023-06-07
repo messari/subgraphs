@@ -1,5 +1,7 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Configurations, OracleContract } from "../common/types";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import * as constants from "../common/constants";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "mainnet";
 
@@ -96,6 +98,42 @@ export const HARDCODED_STABLES: Address[] = [
 ];
 
 ///////////////////////////////////////////////////////////////////////////
+////////////////////////// ORACLE CONFIGURATIONS //////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+class DefaultOracleConfig implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+    ];
+  }
+}
+
+class baxaOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.SUSHI_CALCULATIONS,
+    ];
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
@@ -170,5 +208,23 @@ export class config implements Configurations {
 
   usdcTokenDecimals(): BigInt {
     return USDC_TOKEN_DECIMALS;
+  }
+
+  getOracleConfig(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null
+  ): OracleConfig {
+    if (tokenAddr || block) {
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x91b08f4a7c1251dfccf5440f8894f8daa10c8de5"), // BAXA
+        ].includes(tokenAddr)
+      ) {
+        return new baxaOverride();
+      }
+    }
+
+    return new DefaultOracleConfig();
   }
 }
