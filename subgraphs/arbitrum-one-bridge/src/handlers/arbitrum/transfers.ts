@@ -15,7 +15,7 @@ import {
   TokenInit,
 } from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
-import { _ERC20 } from "../../../generated/ArbGateway/_ERC20";
+import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
 // ###################################################################################################
 // ################################# Transfer Ins ####################################################

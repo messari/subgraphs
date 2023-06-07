@@ -15,7 +15,7 @@ import {
   Pricer,
   TokenInit,
 } from "../../common/utils";
-import { _ERC20 } from "../../../generated/ArbGateway/_ERC20";
+import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
 // ###################################################################################################
 // ################################# Transfer Ins ####################################################
