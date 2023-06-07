@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers, @typescript-eslint/no-unused-vars */
 import * as constants from "../common/constants";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "moonbeam";

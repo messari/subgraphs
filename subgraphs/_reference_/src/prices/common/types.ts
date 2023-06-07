@@ -35,22 +35,27 @@ export class CustomPriceType {
   private _usdPrice: Wrapped<BigDecimal>;
   private _decimals: Wrapped<i32>;
   private _oracleType: string;
+  private _counterLiquidity: Wrapped<BigDecimal>;
 
   constructor() {
     this._usdPrice = new Wrapped(constants.BIGDECIMAL_ZERO);
     this._decimals = new Wrapped(constants.BIGINT_ZERO.toI32() as u8);
     this._oracleType = "";
+    this._counterLiquidity = new Wrapped(constants.BIGDECIMAL_ZERO);
   }
 
   static initialize(
     _usdPrice: BigDecimal,
     _decimals: i32 = 0,
-    _oracleType: string = ""
+    _oracleType: string = "",
+    _counterLiquidity: BigDecimal | null = null
   ): CustomPriceType {
     const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);
     result._oracleType = _oracleType;
+    if (_counterLiquidity)
+      result._counterLiquidity = new Wrapped(_counterLiquidity);
 
     return result;
   }
@@ -71,6 +76,14 @@ export class CustomPriceType {
 
   get oracleType(): string {
     return this._oracleType;
+  }
+
+  get counterLiquidity(): BigDecimal {
+    return this._counterLiquidity.inner;
+  }
+
+  setCounterLiquidity(counterLiquidity: BigDecimal): void {
+    this._counterLiquidity = new Wrapped(counterLiquidity);
   }
 }
 
