@@ -31,7 +31,7 @@ export function handleFilledRelay(event: FilledRelay): void {
 
   // mainnet vs L2s
   let conf: BridgeConfig;
-  if (originChainId == networkToChainID(Network.MAINNET)) {
+  if (destinationChainId == networkToChainID(Network.MAINNET)) {
     conf = MAINNET_BRIDGE_CONFIG;
   } else {
     conf = DEPLOYER_BRIDGE_CONFIG;
