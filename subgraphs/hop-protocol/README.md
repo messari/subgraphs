@@ -1,28 +1,60 @@
-# Template Subgraph
+# Hop Protocol
 
-## Calculation Methodology v1.0.0
+Hop is a scalable rollup-to-rollup general token bridge. It allows users to send tokens from one rollup or sidechain to another almost immediately without having to wait for the networks challenge period.
 
-### TODO
+## Usage metrics
 
-Explain how the main metrics are calculated for this subgraph.
+`Unique Transfer Senders` & `Unique Transfer Receivers`
 
-See [Compound](../compound-forks/protocols/compound-v2/README.md) or [Uniswap](../uniswap-forks/protocols/uniswap-v2/README.md) for inspiration.
+Number of users that have either sent or received tokens or ETH through the bridge.
+
+`Unique Message Senders`
+
+Number of users that have sent messages through the bridge. Note that a messages sent during bridge transfers are excluded.
+
+`Active Users` & `Total Unique Users`
+
+Number of users that have interacted with the protocol in any way - transferring tokens/ETH or sending messages.
+
+## Volume
+
+### `Volume Out USD`
+
+Sum of assets transferred out from selected network.
+
+### `Volume In USD`
+
+Sum of assets transferred in to selected network.
+
+### `Total Volume USD`
+
+`Volume Out USD` + `Volume In USD`
+
+### `Net Volume USD`
+
+`Volume In USD` - `Volume Out USD`
+
+## Total Value Locked USD
+
+Total value of assets currently locked in the Amm.
+
+## Revenue
+
+Hop charge a fee for swaps on L2. The fee is 4 basis points or 0.04% of the swap amount.
 
 ## Notes
 
-Any issues, discrepancies, unique logic to report.
+- Received messages are not being tracked, because there is not enough data included in the event.
+
+## Smart Contract Interactions
+
+![Hop Protocol](../../docs/images/protocols/hop-protocol.jpg "Hop Protocol")
 
 ## Links
 
 Links to the relevant sources to learn about this protocol.
 
-- Protocol: https://uniswap.org/
-- Analytics: https://v2.info.uniswap.org/
-- Docs: https://docs.uniswap.org/protocol/V2/introduction
-- Smart contracts: https://github.com/Uniswap/v2-core
-- Deployed addresses: https://docs.uniswap.org/protocol/V2/reference/smart-contracts/factory
-- Official subgraph: https://github.com/Uniswap/v2-subgraph
-
-## Contract Relationship Map (Optional)
-
-A map of relationships between contracts and interactions
+- Protocol: https://app.hop.exchange/
+- Docs: https://docs.hop.exchange/v/developer-docs/
+- Smart contracts: https://github.com/hop-protocol/contracts
+- Smart contract addresses: https://docs.hop.exchange/v/developer-docs/smart-contracts/contract-addresses
