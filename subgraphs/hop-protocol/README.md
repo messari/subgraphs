@@ -40,7 +40,7 @@ Total value of assets currently locked in the Amm.
 
 ## Revenue
 
-Hop charge a fee for swaps on L2. The fee is 4 basis points or 0.04% of the swap amount.
+Hop Protocol takes a fee for swaps on L2 which goes to the liquidity providers. The fee is 4 basis points or 0.04% of the swap amount.
 
 ## Notes
 
