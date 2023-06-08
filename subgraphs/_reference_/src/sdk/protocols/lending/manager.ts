@@ -142,7 +142,6 @@ export class DataManager {
       _market.cumulativeUniqueFlashloaners = INT_ZERO;
 
       _market.createdTimestamp = event.block.timestamp;
-      _market.lastUpdatedTimestamp = event.block.timestamp;
       _market.createdBlockNumber = event.block.number;
 
       _market.positionCount = INT_ZERO;
@@ -232,8 +231,9 @@ export class DataManager {
     this.market.save();
   }
 
-  updateLastMarketTimestamp(): void {
-    this.market.lastUpdatedTimestamp = this.event.block.timestamp;
+  // only update when updating the supply/borrow index
+  updateIndexLastMarketTimestamp(): void {
+    this.market.indexLastUpdatedTimestamp = this.event.block.timestamp;
     this.saveMarket();
   }
 
@@ -934,13 +934,13 @@ export class DataManager {
 
   updateSupplyIndex(supplyIndex: BigInt): void {
     this.market.supplyIndex = supplyIndex;
-    this.market.lastUpdatedTimestamp = this.event.block.timestamp;
+    this.market.indexLastUpdatedTimestamp = this.event.block.timestamp;
     this.saveMarket();
   }
 
   updateBorrowIndex(borrowIndex: BigInt): void {
     this.market.borrowIndex = borrowIndex;
-    this.market.lastUpdatedTimestamp = this.event.block.timestamp;
+    this.market.indexLastUpdatedTimestamp = this.event.block.timestamp;
     this.saveMarket();
   }
 

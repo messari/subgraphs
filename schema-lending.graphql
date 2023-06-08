@@ -806,9 +806,6 @@ type Market @entity @regularPolling {
   " Creation timestamp "
   createdTimestamp: BigInt!
 
-  " Last updated timestamp "
-  lastUpdatedTimestamp: BigInt!
-
   " Creation block number "
   createdBlockNumber: BigInt!
 
@@ -872,6 +869,9 @@ type Market @entity @regularPolling {
 
   " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
   stableBorrowedTokenBalance: BigInt
+
+  " Last updated timestamp of supply/borrow index. "
+  indexLastUpdatedTimestamp: BigInt
 
   " Index used by the protocol to calculate interest generated on the supply token (ie, liquidityIndex in Aave)"
   supplyIndex: BigInt
