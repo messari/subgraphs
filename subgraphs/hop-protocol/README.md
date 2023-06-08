@@ -48,7 +48,7 @@ Hop Protocol takes a fee for swaps on L2 which goes to the liquidity providers. 
 
 ## Smart Contract Interactions
 
-![Hop Protocol](../../docs/images/protocols/hop-protocol.jpg "Hop Protocol")
+![Hop Protocol](../../docs/images/protocols/hop-protocol/hop-protocol.jpg "Hop Protocol")
 
 ## Links
 
