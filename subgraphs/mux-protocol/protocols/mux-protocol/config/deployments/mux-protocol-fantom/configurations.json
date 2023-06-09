@@ -1,0 +1,9 @@
+{
+  "network": "fantom",
+  "pool": {
+    "address": "0x2e81F443A11a943196c88afcB5A0D807721A88E6",
+    "startBlock": "37650215"
+  },
+  "isArbitrum": false,
+  "deployment": "MUX_FANTOM"
+}
