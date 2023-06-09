@@ -46,6 +46,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: FixedLeverageRatioStrategy
           file: ./abis/FixedLeverageRatioStrategy.json
+        - name: CallableLoan
+          file: ./abis/CallableLoan.json
       eventHandlers:
         - event: PoolCreated(indexed address,indexed address)
           handler: handlePoolCreated
