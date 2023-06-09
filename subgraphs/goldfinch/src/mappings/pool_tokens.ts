@@ -89,13 +89,10 @@ export function handleTokenRedeemed(event: TokenRedeemed): void {
   token.save();
 }
 
-function isUserFullyWithdrawnFromPool(
-  user: User,
-  tranchedPool: TranchedPool
-): boolean {
+function isUserFullyWithdrawnFromPool(user: User, loanId: string): boolean {
   for (let i = 0; i < user.poolTokens.length; i++) {
     const token = assert(PoolToken.load(user.poolTokens[i]));
-    if (token.loan == tranchedPool.id && !token.principalAmount.isZero()) {
+    if (token.loan == loanId && !token.principalAmount.isZero()) {
       return false;
     }
   }
@@ -117,14 +114,20 @@ export function handleTokenPrincipalWithdrawn(
   );
   token.save();
   if (token.principalAmount.isZero()) {
-    const tranchedPool = assert(
-      TranchedPool.load(event.params.pool.toHexString())
-    );
+    const tranchedPool = TranchedPool.load(event.params.pool.toHexString());
+    const callableLoan = CallableLoan.load(event.params.pool.toHexString());
     const user = assert(User.load(event.params.owner.toHexString()));
-    if (isUserFullyWithdrawnFromPool(user, tranchedPool)) {
+    if (tranchedPool && isUserFullyWithdrawnFromPool(user, tranchedPool.id)) {
       tranchedPool.backers = removeFromList(tranchedPool.backers, user.id);
       tranchedPool.numBackers = tranchedPool.backers.length;
       tranchedPool.save();
+    } else if (
+      callableLoan &&
+      isUserFullyWithdrawnFromPool(user, callableLoan.id)
+    ) {
+      callableLoan.backers = removeFromList(callableLoan.backers, user.id);
+      callableLoan.numBackers = callableLoan.backers.length;
+      callableLoan.save();
     }
   }
 }

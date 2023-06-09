@@ -587,6 +587,12 @@ templates:
           file: ./abis/CallableLoan.json
         - name: Schedule
           file: ./abis/Schedule.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: CreditLine
+          file: ./abis/CreditLine.json
+        - name: PoolTokens
+          file: ./abis/PoolTokens.json
       eventHandlers:
         - event: CallRequestSubmitted(indexed uint256,indexed uint256,indexed uint256,uint256)
           handler: handleCallRequestSubmitted

@@ -1751,7 +1751,6 @@ type CallableLoan implements Loan @entity {
   balance: BigInt!
   termEndTime: BigInt!
   termStartTime: BigInt!
-  termInSeconds: Int!
   interestRate: BigDecimal!
   interestRateBigInt: BigInt! # For use in calculations that have to be done with integers (to mimic on-chain math)
   lateFeeRate: BigDecimal!
@@ -1760,10 +1759,6 @@ type CallableLoan implements Loan @entity {
 
   creditLineAddress: Bytes!
 
-  """
-  Please note that numRepayments never updates, even if the underlying repaymentSchedule is changed. It always reflects the initial number of expected repayments.
-  """
-  numRepayments: Int!
   principalAmountRepaid: BigInt!
   interestAmountRepaid: BigInt!
 }
