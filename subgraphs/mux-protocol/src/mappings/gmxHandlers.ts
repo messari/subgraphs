@@ -248,6 +248,10 @@ export function handleClosePosition(event: ClosePosition): void {
   );
   updatePositionRealisedPnlUSD(event.params.key, realisedPnlUSD);
 
+  // For GMX, every closePosition action will emit both ClosePosition() and DecreasePosition() event.
+  // Most of pool volume computation has already been covered in DecreasePosition() event handler.
+  // As there is not pnl in DecreasePosition() event parameters, here in ClosePosition() event handler
+  // we just needs to cover the extra volumes when a users has a loss and has to use some of collateral to cover the loss.
   if (event.params.realisedPnl < BIGINT_ZERO) {
     increasePoolVolume(
       event,
