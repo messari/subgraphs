@@ -1,0 +1,780 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "proxyId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "proxy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "gmxPositionKey",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "collateralTokenId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isLong",
+        "type": "bool"
+      }
+    ],
+    "name": "CreateProxy",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "prevAssetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "newAssetId",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "prevLimit",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newLimit",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetBorrowConfig",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "gmxReferralCode",
+        "type": "bytes32"
+      }
+    ],
+    "name": "SetGmxReferralCode",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "keeper",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "enable",
+        "type": "bool"
+      }
+    ],
+    "name": "SetKeeper",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "maintainer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "enable",
+        "type": "bool"
+      }
+    ],
+    "name": "SetMaintainer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetProjectAssetConfig",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetProjectConfig",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "uint256", "name": "toBorrow", "type": "uint256" },
+      { "internalType": "uint256", "name": "fee", "type": "uint256" }
+    ],
+    "name": "borrowAsset",
+    "outputs": [
+      { "internalType": "uint256", "name": "amountOut", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "bool", "name": "isLong", "type": "bool" },
+      { "internalType": "bytes32[]", "name": "keys", "type": "bytes32[]" }
+    ],
+    "name": "cancelOrders",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "account", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "bool", "name": "isLong", "type": "bool" },
+      { "internalType": "bytes32[]", "name": "keys", "type": "bytes32[]" }
+    ],
+    "name": "cancelTimeoutOrders",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "collateralToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "assetToken",
+            "type": "address"
+          },
+          { "internalType": "bool", "name": "isLong", "type": "bool" },
+          {
+            "internalType": "uint256",
+            "name": "collateralUsd",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "sizeUsd", "type": "uint256" },
+          { "internalType": "uint96", "name": "priceUsd", "type": "uint96" },
+          { "internalType": "uint8", "name": "flags", "type": "uint8" },
+          {
+            "internalType": "bytes32",
+            "name": "referralCode",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ProxyFactory.ClosePositionArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "closePosition",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "collateralToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "assetToken",
+            "type": "address"
+          },
+          { "internalType": "bool", "name": "isLong", "type": "bool" },
+          {
+            "internalType": "uint256",
+            "name": "collateralUsd",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "sizeUsd", "type": "uint256" },
+          { "internalType": "uint96", "name": "priceUsd", "type": "uint96" },
+          { "internalType": "uint96", "name": "tpPriceUsd", "type": "uint96" },
+          { "internalType": "uint96", "name": "slPriceUsd", "type": "uint96" },
+          { "internalType": "uint8", "name": "flags", "type": "uint8" },
+          {
+            "internalType": "bytes32",
+            "name": "referralCode",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ProxyFactory.ClosePositionArgsV2",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "closePositionV2",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "bool", "name": "isLong", "type": "bool" }
+    ],
+    "name": "createProxy",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" }
+    ],
+    "name": "getAssetId",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" }
+    ],
+    "name": "getBorrowStates",
+    "outputs": [
+      { "internalType": "uint256", "name": "totalBorrow", "type": "uint256" },
+      { "internalType": "uint256", "name": "borrowLimit", "type": "uint256" },
+      { "internalType": "uint256", "name": "badDebt", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" }
+    ],
+    "name": "getConfigVersions",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "projectConfigVersion",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "assetConfigVersion",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" }
+    ],
+    "name": "getProjectAssetConfig",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" }
+    ],
+    "name": "getProjectConfig",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "getProxiesOf",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "accountKey", "type": "bytes32" }
+    ],
+    "name": "getProxy",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "account", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "bool", "name": "isLong", "type": "bool" }
+    ],
+    "name": "getProxyAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "implementation",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "weth_", "type": "address" },
+      { "internalType": "address", "name": "liquidityPool", "type": "address" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "keeper", "type": "address" }
+    ],
+    "name": "isKeeper",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "account", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "bool", "name": "isLong", "type": "bool" },
+      { "internalType": "uint256", "name": "liquidatePrice", "type": "uint256" }
+    ],
+    "name": "liquidatePosition",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "collateralToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "assetToken",
+            "type": "address"
+          },
+          { "internalType": "bool", "name": "isLong", "type": "bool" },
+          { "internalType": "address", "name": "tokenIn", "type": "address" },
+          { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+          { "internalType": "uint256", "name": "minOut", "type": "uint256" },
+          { "internalType": "uint256", "name": "borrow", "type": "uint256" },
+          { "internalType": "uint256", "name": "sizeUsd", "type": "uint256" },
+          { "internalType": "uint96", "name": "priceUsd", "type": "uint96" },
+          { "internalType": "uint8", "name": "flags", "type": "uint8" },
+          {
+            "internalType": "bytes32",
+            "name": "referralCode",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ProxyFactory.OpenPositionArgs",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "openPosition",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "collateralToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "assetToken",
+            "type": "address"
+          },
+          { "internalType": "bool", "name": "isLong", "type": "bool" },
+          { "internalType": "address", "name": "tokenIn", "type": "address" },
+          { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+          { "internalType": "uint256", "name": "minOut", "type": "uint256" },
+          { "internalType": "uint256", "name": "borrow", "type": "uint256" },
+          { "internalType": "uint256", "name": "sizeUsd", "type": "uint256" },
+          { "internalType": "uint96", "name": "priceUsd", "type": "uint96" },
+          { "internalType": "uint96", "name": "tpPriceUsd", "type": "uint96" },
+          { "internalType": "uint96", "name": "slPriceUsd", "type": "uint96" },
+          { "internalType": "uint8", "name": "flags", "type": "uint8" },
+          {
+            "internalType": "bytes32",
+            "name": "referralCode",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ProxyFactory.OpenPositionArgsV2",
+        "name": "args",
+        "type": "tuple"
+      }
+    ],
+    "name": "openPositionV2",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "uint256", "name": "toRepay", "type": "uint256" },
+      { "internalType": "uint256", "name": "fee", "type": "uint256" },
+      { "internalType": "uint256", "name": "badDebt", "type": "uint256" }
+    ],
+    "name": "repayAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "uint8", "name": "newAssetId", "type": "uint8" },
+      { "internalType": "uint256", "name": "newLimit", "type": "uint256" }
+    ],
+    "name": "setBorrowConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "keeper", "type": "address" },
+      { "internalType": "bool", "name": "enable", "type": "bool" }
+    ],
+    "name": "setKeeper",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "maintainer", "type": "address" },
+      { "internalType": "bool", "name": "enable", "type": "bool" }
+    ],
+    "name": "setMaintainer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "uint256[]", "name": "values", "type": "uint256[]" }
+    ],
+    "name": "setProjectAssetConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "uint256[]", "name": "values", "type": "uint256[]" }
+    ],
+    "name": "setProjectConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "referralManager",
+        "type": "address"
+      }
+    ],
+    "name": "setReferralManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "newImplementation_",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "weth",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "projectId", "type": "uint256" },
+      { "internalType": "address", "name": "account", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "assetToken", "type": "address" },
+      { "internalType": "bool", "name": "isLong", "type": "bool" }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
