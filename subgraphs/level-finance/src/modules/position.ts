@@ -25,6 +25,7 @@ export function updatePosition(
   accountAddress: Address,
   collateralTokenAddress: Address,
   collateralDelta: BigInt,
+  isCollateralUSD: bool,
   indexTokenAddress: Address,
   sizeDelta: BigInt,
   indexTokenPrice: BigInt,
@@ -50,20 +51,28 @@ export function updatePosition(
     constants.VALUE_DECIMALS
   );
   const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
-  const collateralUSDDelta = utils.bigIntToBigDecimal(
-    collateralDelta,
-    constants.PRICE_PRECISION_DECIMALS
-  );
+  let collateralUSDDelta = constants.BIGDECIMAL_ZERO;
+
   let collateralTokenAmountDelta = constants.BIGINT_ZERO;
   if (
     collateralToken.lastPriceUSD &&
     collateralToken.lastPriceUSD! > constants.BIGDECIMAL_ZERO
   ) {
-    collateralTokenAmountDelta = bigDecimalToBigInt(
-      collateralUSDDelta
-        .times(exponentToBigDecimal(collateralToken.decimals))
-        .div(collateralToken.lastPriceUSD!)
-    );
+    if (isCollateralUSD) {
+      collateralUSDDelta = utils.bigIntToBigDecimal(
+        collateralDelta,
+        constants.VALUE_DECIMALS
+      );
+      collateralTokenAmountDelta = bigDecimalToBigInt(
+        collateralUSDDelta
+          .times(exponentToBigDecimal(collateralToken.decimals))
+          .div(collateralToken.lastPriceUSD!)
+      );
+    } else {
+      collateralTokenAmountDelta = collateralDelta.div(
+        constants.PRICE_FEED_PRECISION
+      );
+    }
   }
 
   const inputTokenAmounts = new Array<BigInt>(

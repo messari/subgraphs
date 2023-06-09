@@ -866,6 +866,8 @@ type LiquidityPool @entity {
 
   " Timestamp of the last time this entity was updated "
   _lastUpdateTimestamp: BigInt
+
+  _tranches: [_Tranche!]
 }
 
 #################################
@@ -1994,4 +1996,18 @@ type _CircularBuffer @entity {
 
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
+}
+
+# Helper entity for calculating reward emissions
+type _Tranche @entity {
+  " Tranche contract Address "
+  id: Bytes!
+
+  token: Token!
+
+  tokenPrice: BigDecimal!
+
+  totalSupply: BigInt!
+
+  tvl: BigDecimal!
 }

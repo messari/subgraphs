@@ -7,6 +7,7 @@ import { LiquidityPoolFeeType } from "../common/constants";
 import { TokenInitialize, TokenPrice } from "../modules/token";
 import { Account } from "../sdk/protocols/perpfutures/account";
 import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { _Tranche } from "../../generated/schema";
 
 export function initializeSDK(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(
@@ -59,4 +60,17 @@ export function getOrCreateAccount(
     pool.addUser();
   }
   return account;
+}
+
+export function getOrCreateTranche(address: Address): _Tranche {
+  let tranche = _Tranche.load(Bytes.fromHexString(address.toHexString()));
+  if (!tranche) {
+    tranche = new _Tranche(Bytes.fromHexString(address.toHexString()));
+    tranche.token = Bytes.fromHexString(address.toHexString());
+    tranche.tokenPrice = constants.BIGDECIMAL_ZERO;
+    tranche.totalSupply = constants.BIGINT_ZERO;
+    tranche.tvl = constants.BIGDECIMAL_ZERO;
+    tranche.save();
+  }
+  return tranche;
 }

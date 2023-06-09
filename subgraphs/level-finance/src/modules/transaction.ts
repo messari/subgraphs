@@ -1,4 +1,4 @@
-import { getOrCreateAccount } from "../common/initializers";
+import { getOrCreateAccount, getOrCreateTranche } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
@@ -9,6 +9,7 @@ import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 export function transaction(
   accountAddress: Address,
   tokenAddress: Address,
+  trancheAddress: Address,
   outputTokenSupply: BigInt,
   mintAmount: BigInt,
   transactionType: TransactionType,
@@ -19,6 +20,8 @@ export function transaction(
   //fix outputToken supply amount and pricing
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
+  const outputToken = sdk.Tokens.getOrCreateToken(trancheAddress);
+  const tranche = getOrCreateTranche(trancheAddress);
 
   if (transactionType === TransactionType.DEPOSIT) {
     utils.checkAndUpdateInputTokens(pool, token, amount);

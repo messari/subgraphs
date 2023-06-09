@@ -4,10 +4,14 @@ import {
   Bytes,
   ethereum,
   BigDecimal,
+  Address,
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { Token as TokenSchema } from "../../generated/schema";
+import { LpToken as LpTokenContract } from "../../generated/Pool/LpToken";
+import { SDK } from "../sdk/protocols/perpfutures";
+import { getOrCreatePool, initializeSDK } from "./initializers";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -134,4 +138,18 @@ export function checkAndUpdateInputTokens(
 ): void {
   if (pool.tokenExists(token)) return;
   pool.addInputToken(token, newTokenBalance);
+}
+
+export function getLpTokenSupply(trancheAddress: Address): BigInt {
+  const lpTokenContract = LpTokenContract.bind(trancheAddress);
+  const totalSupply = readValue(
+    lpTokenContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+  return totalSupply;
+}
+
+export function getOutputTokenSupply(sdk: SDK, pool: Pool): BigInt {
+  const tranchesAddresses = pool.pool._tranches;
+  for (let i = 0; i < tranchesAddresses!.length; i++) {}
 }

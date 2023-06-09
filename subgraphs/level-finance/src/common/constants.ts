@@ -187,7 +187,7 @@ export const SUPPLY_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
 
 export const VALUE_DECIMALS = 30 as i8;
 export const INTEREST_RATE_DECIMALS = 10 as i8;
-export const PRICE_FEED_DECIMALS = 8 as i8;
+export const PRICE_FEED_DECIMALS = 12 as i8;
 export const FEE_PRECISION = BigInt.fromI32(10).pow(10);
 export const VALUE_PRECISION = BigInt.fromI32(10).pow(VALUE_DECIMALS);
 export const PRICE_FEED_PRECISION = BigInt.fromI32(10).pow(PRICE_FEED_DECIMALS);

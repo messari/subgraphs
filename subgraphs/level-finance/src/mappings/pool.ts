@@ -15,10 +15,7 @@ import {
 import { swap } from "../modules/swap";
 import { collectFees } from "../modules/fee";
 import * as constants from "../common/constants";
-import {
-  updatePosition,
-  updatePositionRealisedPnlUSD,
-} from "../modules/position";
+import { updatePosition } from "../modules/position";
 import { transaction } from "../modules/transaction";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
@@ -42,6 +39,7 @@ export function handlePositionIncreased(event: IncreasePosition): void {
     accountAddress,
     collateralTokenAddress,
     collateralValue,
+    false,
     indexTokenAddress,
     sizeChange,
     indexPrice,
@@ -80,6 +78,7 @@ export function handlePositionDecreased(event: DecreasePosition): void {
     accountAddress,
     collateralTokenAddress,
     collateralValue,
+    true,
     indexTokenAddress,
     sizeChange,
     indexPrice,
@@ -117,6 +116,7 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
     accountAddress,
     collateralTokenAddress,
     collateralValue,
+    true,
     indexTokenAddress,
     sizeChange,
     indexPrice,
@@ -158,6 +158,7 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const lpAmount = event.params.lpAmount;
   const senderAddress = event.params.sender;
   const tokenAddress = event.params.token;
+  const tranche = event.params.tranche;
 
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
@@ -165,6 +166,7 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   transaction(
     senderAddress,
     tokenAddress,
+    tranche,
     constants.BIGINT_ZERO,
     lpAmount,
     TransactionType.DEPOSIT,
@@ -191,6 +193,7 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   transaction(
     senderAddress,
     tokenAddress,
+    tranche,
     constants.BIGINT_ZERO,
     lpAmount,
     TransactionType.WITHDRAW,
