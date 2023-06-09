@@ -160,7 +160,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   let chartRenderCondition: Boolean =
     Object.keys(defiLlamaData).length > 0 &&
     financialsData?.financialsDailySnapshots &&
-    defiLlamaData?.name?.toLowerCase() === defiLlamaSlug?.split(" (")[0]?.toLowerCase();
+    defiLlamaData?.name?.split(" ")[0].toLowerCase() === defiLlamaSlug?.split("-")[0].split(" (")[0]?.toLowerCase();
 
   let stakedDataset = "";
   let borrowedDataset = "";

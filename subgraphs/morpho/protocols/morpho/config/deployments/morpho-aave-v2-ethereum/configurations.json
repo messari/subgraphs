@@ -1,0 +1,8 @@
+{
+  "network": "mainnet",
+  "isAaveV2": true,
+  "factory": {
+    "startBlock": 15383036,
+    "address": "0x777777c9898d384f785ee44acfe945efdff5f3e0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "network": "bsc",
+  "pool": {
+    "address": "0x855E99F768FaD76DD0d3EB7c446C0b759C96D520",
+    "startBlock": "17537646"
+  },
+  "isArbitrum": false,
+  "deployment": "MUX_BSC"
+}

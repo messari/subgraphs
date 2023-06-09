@@ -36,6 +36,7 @@ export const DeploymentsDropDown = ({
         if (protocolValue.subgraphNetworks[networkName]) {
           selectionsSet.push({
             label: protocolName.split("-").join(" ") + " (" + networkName + ")",
+            value: protocolValue.slug + " (" + networkName + ")",
             url: protocolValue.subgraphNetworks[networkName],
           });
         }
@@ -62,7 +63,7 @@ export const DeploymentsDropDown = ({
       if (textInput === "Select a protocol") {
         setTextInput(selection.label);
       }
-      setDefiLlamaSlug(selection.label);
+      setDefiLlamaSlug(selection.value);
       setDeploymentURL(selection.url);
     } else if (!(issuesProps.filter((x: any) => x.type === "QRY").length > 0) && selectionsSet.length > 0) {
       setIssues([
@@ -92,7 +93,7 @@ export const DeploymentsDropDown = ({
             p.set("defillamanetwork", targEle.innerText?.split(" (")[1].split(")")[0]);
             navigate("?" + p.toString().split("%2F").join("/"));
             setTextInput(targEle.innerText);
-            setDefiLlamaSlug(targEle.innerText);
+            setDefiLlamaSlug(subgraphObj.value)
             setDeploymentURL(subgraphObj.url);
           }
 

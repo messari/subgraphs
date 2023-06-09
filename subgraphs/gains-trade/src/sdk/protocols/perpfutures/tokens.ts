@@ -5,6 +5,18 @@ import * as constants from "../../util/constants";
 
 import { Token, RewardToken } from "../../../../generated/schema";
 
+/**
+ * This file contains the TokenClass, which acts as
+ * a wrapper for the Token entity making it easier to
+ * use in mappings and get info about the token.
+ *
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
+ * Author(s):
+ *  - @harsh9200
+ *  - @dhruv-chauhan
+ */
+
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;
 }

@@ -1,0 +1,54 @@
+{
+  "deployment": "MULTICHAIN_CELO",
+  "network": "celo",
+  "file": "./src/mappings/handlers.ts",
+  "bridgeConfig": [
+    {
+      "name": "BridgeV2-0",
+      "address": "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+      "abi": "anyToken",
+      "startBlock": 9668734
+    },
+    {
+      "name": "BridgeV2-1",
+      "address": "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+      "abi": "anyToken",
+      "startBlock": 9426941
+    },
+    {
+      "name": "BridgeV2-2",
+      "address": "0x173fd7434b8b50df08e3298f173487ebdb35fd14",
+      "abi": "anyToken",
+      "startBlock": 13333156
+    }
+  ],
+  "routerConfig": [
+    {
+      "name": "Router-0",
+      "address": "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",
+      "abi": "Router",
+      "startBlock": 9584386
+    },
+    {
+      "name": "Router-1",
+      "address": "0x33C80d5492b04BFB94F2757FCA88a2d7f49211e6",
+      "abi": "Router",
+      "startBlock": 17255049
+    },
+    {
+      "name": "Router-2",
+      "address": "0xf27ee99622c3c9b264583dacb2cce056e194494f",
+      "abi": "Router",
+      "startBlock": 10155435
+    },
+    {
+      "name": "Router-3",
+      "address": "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5",
+      "abi": "Router",
+      "startBlock": 13321485
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

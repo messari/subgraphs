@@ -1,0 +1,11 @@
+{
+  "network": "optimism",
+  "factoryAddress": "0x9c6522117e2ed1fe5bdb72bb0ed5e3f2bde7dbe0",
+  "factoryAddressStartBlock": 85432013,
+  "nonFungiblePositionManagerAddress": "0x1af415a1eba07a4986a52b6f2e7de7003d82231e",
+  "nonFungiblePositionManagerAddressStartBlock": 85528596,
+  "deployment": "SUSHISWAP_V3_OPTIMISM",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

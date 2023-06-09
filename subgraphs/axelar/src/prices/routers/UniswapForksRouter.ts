@@ -92,7 +92,7 @@ export function getPriceFromRouter(
     }
   }
 
-  const feeBips = BigInt.fromI32(30);
+  const feeBips = constants.BIGINT_THIRTY;
 
   const amountOutBigDecimal = amountOut
     .times(constants.BIGINT_TEN_THOUSAND)
