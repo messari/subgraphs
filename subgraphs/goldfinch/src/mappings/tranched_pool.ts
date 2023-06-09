@@ -1,7 +1,6 @@
 import { TranchedPool } from "../../generated/schema";
 import { GoldfinchConfig as GoldfinchConfigContract } from "../../generated/templates/TranchedPool/GoldfinchConfig";
 import { CreditLine as CreditLineContract } from "../../generated/templates/TranchedPool/CreditLine";
-import { CallableLoan as CallableLoanContract } from "../../generated/templates/CallableLoan/CallableLoan";
 
 import {
   TranchedPool as TranchedPoolContract,
@@ -44,7 +43,7 @@ import {
   getOrCreateProtocol,
 } from "../common/getters";
 import { CreditLine } from "../../generated/templates/TranchedPool/CreditLine";
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   createTransaction,
   snapshotFinancials,
@@ -53,7 +52,6 @@ import {
   updateRevenues,
   updateUsageMetrics,
 } from "../common/helpers";
-import { updateInterestRates } from "../entities/market";
 import {
   _handleDepositMessari,
   _handleDrawdownMessari,

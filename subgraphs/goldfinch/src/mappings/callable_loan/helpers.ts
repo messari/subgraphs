@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import {
   Address,
   BigInt,
@@ -115,24 +116,4 @@ export function updatePoolTokensRedeemable(callableLoan: CallableLoan): void {
     }
     poolToken.save();
   }
-}
-
-export function updateTotalPrincipalCollected(amount: BigInt): void {
-  const protocol = getOrInitProtocol();
-  protocol.totalPrincipalCollected =
-    protocol.totalPrincipalCollected.plus(amount);
-  protocol.save();
-}
-
-export function updateTotalInterestCollected(amount: BigInt): void {
-  const protocol = getOrInitProtocol();
-  protocol.totalInterestCollected =
-    protocol.totalInterestCollected.plus(amount);
-  protocol.save();
-}
-
-export function updateTotalReserveCollected(amount: BigInt): void {
-  const protocol = getOrInitProtocol();
-  protocol.totalReserveCollected = protocol.totalReserveCollected.plus(amount);
-  protocol.save();
 }

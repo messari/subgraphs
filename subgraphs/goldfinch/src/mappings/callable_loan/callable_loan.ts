@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { PoolToken, CallableLoan } from "../../../generated/schema";
 import {
   CallableLoan as CallableLoanContract,
@@ -12,32 +12,7 @@ import {
 } from "../../../generated/templates/CallableLoan/CallableLoan";
 import { createTransactionFromEvent } from "../../entities/helpers";
 import { getOrInitUser } from "../../entities/user";
-import { TranchedPool } from "../../../generated/schema";
-import { GoldfinchConfig as GoldfinchConfigContract } from "../../../generated/templates/TranchedPool/GoldfinchConfig";
-import { PoolTokens as PoolTokensContract } from "../../../generated/templates/TranchedPool/PoolTokens";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  CONFIG_KEYS_ADDRESSES,
-  PositionSide,
-  TransactionType,
-  USDC_DECIMALS,
-} from "../../common/constants";
-import {
-  getOrCreateAccount,
-  getOrCreateMarket,
-  getOrCreateProtocol,
-} from "../../common/getters";
-import { CreditLine } from "../../../generated/templates/TranchedPool/CreditLine";
-import {
-  createTransaction,
-  snapshotFinancials,
-  snapshotMarket,
-  updatePosition,
-  updateRevenues,
-  updateUsageMetrics,
-} from "../../common/helpers";
-import { updateInterestRates } from "../../entities/market";
+import { getOrCreateMarket } from "../../common/getters";
 import {
   _handleDepositMessari,
   _handleDrawdownMessari,

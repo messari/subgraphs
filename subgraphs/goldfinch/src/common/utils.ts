@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ethereum, BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts";
 import { GoldfinchConfig } from "../../generated/GoldfinchConfig/GoldfinchConfig";
 import { CONFIG_KEYS_ADDRESSES, V2_2_MIGRATION_TIME } from "./constants";

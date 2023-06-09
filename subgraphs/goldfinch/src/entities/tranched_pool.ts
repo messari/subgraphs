@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   TranchedPool,
