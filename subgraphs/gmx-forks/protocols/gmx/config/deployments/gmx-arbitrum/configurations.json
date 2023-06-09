@@ -2,7 +2,7 @@
   "network": "arbitrum-one",
   "protocolName": "GMX",
   "protocolSlug": "gmx",
-  "protocolId": "0x321f653eed006ad1c29d174e17d96351bde22649",
+  "protocolId": "0x489ee077994b6658eafa855c308275ead8097c4a",
   "poolName": "GMXVault",
   "poolSymbol": "Vault",
   "protocolSideRevenuePercent": "0.15",

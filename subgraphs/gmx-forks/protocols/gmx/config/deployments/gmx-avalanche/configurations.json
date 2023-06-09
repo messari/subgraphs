@@ -2,7 +2,7 @@
   "network": "avalanche",
   "protocolName": "GMX",
   "protocolSlug": "gmx",
-  "protocolId": "0xd152c7f25db7f4b95b7658323c5f33d176818ee4",
+  "protocolId": "0x9ab2de34a33fb459b538c43f251eb825645e8595",
   "poolName": "GMXVault",
   "poolSymbol": "Vault",
   "protocolSideRevenuePercent": "0.15",
