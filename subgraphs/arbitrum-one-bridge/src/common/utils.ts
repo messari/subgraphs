@@ -54,6 +54,7 @@ export class TokenInit implements TokenInitializer {
     if (address == Address.fromString(ETH_ADDRESS)) {
       name = ETH_NAME;
       symbol = ETH_SYMBOL;
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       decimals = 18;
     } else {
       name = this.fetchTokenName(address);
