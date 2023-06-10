@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 // A function which given 3 arrays of arbitrary types of the same length,
 // where the first one holds the reference order, the second one holds the same elements
@@ -49,17 +49,47 @@ export function updateArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
   return retval;
 }
 
-export function subtractTwoBigIntArrays(a: BigInt[], b: BigInt[]): BigInt[] {
-  if (a.length != b.length) return [];
-
-  return a.map<BigInt>((valueA, indexA) => valueA.minus(b[indexA]));
+export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
+  if (x.length == 0) {
+    return [item];
+  }
+  if (index == -1 || index > x.length) {
+    index = x.length;
+  }
+  const retval = new Array<T>();
+  let i = 0;
+  while (i < index) {
+    retval.push(x[i]);
+    i += 1;
+  }
+  retval.push(item);
+  while (i < x.length) {
+    retval.push(x[i]);
+    i += 1;
+  }
+  return retval;
 }
 
-export function subtractTwoBigDecimalArrays(
-  a: BigDecimal[],
-  b: BigDecimal[]
-): BigDecimal[] {
-  if (a.length != b.length) return [];
+export function addArrays<T>(a: T[], b: T[]): T[] {
+  const retval = new Array<T>();
+  if (a.length == b.length) {
+    let i = 0;
+    while (i < a.length) {
+      retval.push(a[i].plus(b[i]));
+      i += 1;
+    }
+  }
+  return retval;
+}
 
-  return a.map<BigDecimal>((valueA, indexA) => valueA.minus(b[indexA]));
+export function subtractArrays<T>(a: T[], b: T[]): T[] {
+  const retval = new Array<T>();
+  if (a.length == b.length) {
+    let i = 0;
+    while (i < a.length) {
+      retval.push(a[i].minus(b[i]));
+      i += 1;
+    }
+  }
+  return retval;
 }

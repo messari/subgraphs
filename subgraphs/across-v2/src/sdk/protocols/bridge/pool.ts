@@ -376,6 +376,7 @@ export class Pool {
     this.pool.inputTokenBalance = newBalance;
     if (updateMetrics) {
       this.refreshTotalValueLocked();
+      this.refreshNetValueExportedUSD();
     }
   }
 
@@ -488,7 +489,7 @@ export class Pool {
    */
   addMintSupply(amount: BigInt): void {
     this.pool.mintSupply = this.pool.mintSupply!.plus(amount);
-    this.save();
+    this.refreshNetValueExportedUSD();
   }
 
   /**
@@ -641,7 +642,6 @@ export class Pool {
         amount = amount.times(BIGINT_MINUS_ONE);
       }
       this.addMintSupply(amount);
-      this.refreshNetValueExportedUSD();
     } else if (
       this.pool.type == BridgePoolType.LIQUIDITY ||
       this.pool.type == BridgePoolType.LOCK_RELEASE
@@ -651,7 +651,6 @@ export class Pool {
         amount = amount.times(BIGINT_MINUS_ONE);
       }
       this.addInputTokenBalance(amount);
-      this.refreshNetValueExportedUSD();
     }
   }
 
