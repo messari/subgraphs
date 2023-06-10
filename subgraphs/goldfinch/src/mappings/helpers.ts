@@ -241,6 +241,9 @@ export function _handleDrawdownMessari(
     .balance()
     .divDecimal(USDC_DECIMALS);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
+  if (!market._borrower) {
+    market._borrower = borrower;
+  }
   market.save();
 
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
@@ -281,7 +284,6 @@ export function _handleDrawdownMessari(
     amountUSD,
     event
   );
-  return marketID;
 }
 
 export function _handleRepayMessari(
