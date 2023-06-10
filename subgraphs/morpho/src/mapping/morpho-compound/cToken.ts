@@ -1,16 +1,17 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-import {
-  AccrueInterest,
-  AccrueInterest1,
-  CToken,
-} from "../../../generated/templates/CToken/CToken";
 import {
   BLOCKS_PER_YEAR,
-  MORPHO_COMPOUND_ADDRESS,
   ReserveUpdateParams,
+  MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { getMarket } from "../../utils/initializers";
+import {
+  CToken,
+  AccrueInterest,
+  AccrueInterest1,
+} from "../../../generated/templates/CToken/CToken";
 import { _handleReserveUpdate } from "../common";
+import { ethereum } from "@graphprotocol/graph-ts";
+import { getMarket } from "../../utils/initializers";
+import { CompoundMath } from "../../utils/maths/CompoundMath";
 import { fetchMorphoPositionsCompound, getCompoundProtocol } from "./fetchers";
 
 export function handleAccrueInterestV1(event: AccrueInterest1): void {
@@ -47,6 +48,7 @@ function handleAccrueInterest(event: ethereum.Event): void {
       borrowPoolRate
     ),
     morphoPositions,
-    market
+    market,
+    new CompoundMath()
   );
 }

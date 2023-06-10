@@ -1,68 +1,71 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
-  P2PSupplyDeltaUpdated,
   Repaid,
   Supplied,
-  SupplierPositionUpdated,
   Withdrawn,
-  DefaultMaxGasForMatchingSet,
-  IsBorrowPausedSet,
+  Borrowed,
+  Liquidated,
+  P2PStatusSet,
+  PauseStatusSet,
   IsDeprecatedSet,
-  IsLiquidateBorrowPausedSet,
-  IsLiquidateCollateralPausedSet,
   IsRepayPausedSet,
   IsSupplyPausedSet,
-  IsWithdrawPausedSet,
   MaxSortedUsersSet,
-  OwnershipTransferred,
-  P2PIndexCursorSet,
-  P2PStatusSet,
-  PartialPauseStatusSet,
-  PauseStatusSet,
   ReserveFactorSet,
+  IsBorrowPausedSet,
+  P2PIndexCursorSet,
   ReserveFeeClaimed,
-  Liquidated,
   P2PAmountsUpdated,
-  P2PBorrowDeltaUpdated,
-  Borrowed,
-  BorrowerPositionUpdated,
   P2PIndexesUpdated,
+  IsWithdrawPausedSet,
+  OwnershipTransferred,
+  PartialPauseStatusSet,
+  P2PSupplyDeltaUpdated,
+  P2PBorrowDeltaUpdated,
+  SupplierPositionUpdated,
+  BorrowerPositionUpdated,
+  IsLiquidateBorrowPausedSet,
+  DefaultMaxGasForMatchingSet,
+  IsLiquidateCollateralPausedSet,
 } from "../../../generated/Morpho/MorphoCompound";
 import {
   BASE_UNITS,
-  BLOCKS_PER_DAY,
-  CCOMP_ADDRESS,
-  COMPTROLLER_ADDRESS,
   COMP_ADDRESS,
-  DEFAULT_DECIMALS,
-  MORPHO_COMPOUND_ADDRESS,
+  CCOMP_ADDRESS,
+  BLOCKS_PER_DAY,
   RewardTokenType,
+  DEFAULT_DECIMALS,
+  COMPTROLLER_ADDRESS,
   exponentToBigDecimal,
+  MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { getMarket, getOrCreateRewardToken } from "../../utils/initializers";
 import {
+  _handleRepaid,
   _handleBorrowed,
-  _handleBorrowerPositionUpdated,
+  _handleSupplied,
+  _handleWithdrawn,
   _handleLiquidated,
   _handleP2PIndexesUpdated,
-  _handleRepaid,
-  _handleSupplied,
+  _handleBorrowerPositionUpdated,
   _handleSupplierPositionUpdated,
-  _handleWithdrawn,
 } from "../common";
-import { fetchMorphoPositionsCompound, getCompoundProtocol } from "./fetchers";
-import { LendingProtocol, Market } from "../../../generated/schema";
+import { updateFinancials } from "../../helpers";
 import { CToken } from "../../../generated/Morpho/CToken";
+import { LendingProtocol, Market } from "../../../generated/schema";
 import { Comptroller } from "../../../generated/Morpho/Comptroller";
 import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { getMarket, getOrCreateRewardToken } from "../../utils/initializers";
+import { fetchMorphoPositionsCompound, getCompoundProtocol } from "./fetchers";
+
 export { handleMarketCreated } from "./handleMarketCreated";
 
 export function handleP2PIndexesUpdated(event: P2PIndexesUpdated): void {
+  const protocol = getCompoundProtocol(event.address);
   const market = getMarket(event.params._poolToken);
 
   _handleP2PIndexesUpdated(
     event,
-    getCompoundProtocol(event.address),
+    protocol,
     fetchMorphoPositionsCompound(market),
     market,
     event.params._poolSupplyIndex,
@@ -70,14 +73,17 @@ export function handleP2PIndexesUpdated(event: P2PIndexesUpdated): void {
     event.params._poolBorrowIndex,
     event.params._p2pBorrowIndex
   );
+
+  updateFinancials(protocol, event.block);
 }
 
 export function handleBorrowed(event: Borrowed): void {
+  const protocol = getCompoundProtocol(event.address);
   const market = getMarket(event.params._poolToken);
 
   _handleBorrowed(
     event,
-    getCompoundProtocol(event.address),
+    protocol,
     fetchMorphoPositionsCompound(market),
     market,
     event.params._borrower,
@@ -85,25 +91,33 @@ export function handleBorrowed(event: Borrowed): void {
     event.params._balanceOnPool,
     event.params._balanceInP2P
   );
+
+  updateFinancials(protocol, event.block);
 }
 
 export function handleBorrowerPositionUpdated(
   event: BorrowerPositionUpdated
 ): void {
+  const protocol = getCompoundProtocol(event.address);
+
   _handleBorrowerPositionUpdated(
     event,
-    getCompoundProtocol(event.address),
+    protocol,
     event.params._poolToken,
     event.params._user,
     event.params._balanceOnPool,
     event.params._balanceInP2P
   );
+
+  updateFinancials(protocol, event.block);
 }
 
 export function handleLiquidated(event: Liquidated): void {
+  const protocol = getCompoundProtocol(event.address);
+
   _handleLiquidated(
     event,
-    getCompoundProtocol(event.address),
+    protocol,
     event.params._poolTokenCollateralAddress,
     event.params._poolTokenBorrowedAddress,
     event.params._liquidator,
@@ -111,6 +125,8 @@ export function handleLiquidated(event: Liquidated): void {
     event.params._amountSeized,
     event.params._amountRepaid
   );
+
+  updateFinancials(protocol, event.block);
 }
 
 export function handleP2PAmountsUpdated(event: P2PAmountsUpdated): void {

@@ -1,29 +1,31 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { AToken } from "../../../generated/Morpho/AToken";
-import { ChainlinkPriceFeed } from "../../../generated/Morpho/ChainlinkPriceFeed";
-import { DebtToken } from "../../../generated/Morpho/DebtToken";
-import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingPoolAddressesProvider";
-import { MorphoAaveV2 } from "../../../generated/Morpho/MorphoAaveV2";
-import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
 import {
-  LendingProtocol,
+  readValue,
+  INT_EIGHT,
+  exponentToBigInt,
+  DEFAULT_DECIMALS,
+  exponentToBigDecimal,
+  MORPHO_AAVE_V2_ADDRESS,
+  ETH_USD_PRICE_FEED_ADDRESS,
+} from "../../constants";
+import {
   Market,
+  LendingProtocol,
   UnderlyingTokenMapping,
 } from "../../../generated/schema";
 import {
-  ETH_USD_PRICE_FEED_ADDRESS,
-  exponentToBigDecimal,
-  exponentToBigInt,
-  MORPHO_AAVE_V2_ADDRESS,
-  readValue,
-} from "../../constants";
-import { MorphoPositions } from "../common";
-import {
-  getOrInitLendingProtocol,
   getOrInitToken,
+  getOrInitLendingProtocol,
 } from "../../utils/initializers";
-import { LendingPool as LendingPoolTemplate } from "../../../generated/templates";
+import { MorphoPositions } from "../common";
+import { AToken } from "../../../generated/Morpho/AToken";
+import { DebtToken } from "../../../generated/Morpho/DebtToken";
 import { LendingPool } from "../../../generated/Morpho/LendingPool";
+import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
+import { MorphoAaveV2 } from "../../../generated/Morpho/MorphoAaveV2";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { ChainlinkPriceFeed } from "../../../generated/Morpho/ChainlinkPriceFeed";
+import { LendingPool as LendingPoolTemplate } from "../../../generated/templates";
+import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingPoolAddressesProvider";
 import { LendingPoolConfigurator as LendingPoolConfiguratorTemplate } from "../../../generated/templates";
 
 export function getAaveProtocol(protocolAddress: Address): LendingProtocol {
@@ -159,7 +161,7 @@ export function fetchAssetPrice(market: Market): BigDecimal {
   const priceEthInUsd = ethPriceFeed
     .latestAnswer()
     .toBigDecimal()
-    .div(exponentToBigDecimal(8)); // price is in 8 decimals (10^8)
+    .div(exponentToBigDecimal(INT_EIGHT)); // price is in 8 decimals (10^8)
 
   if (priceEthInUsd.equals(BigDecimal.zero())) {
     return BigDecimal.zero();
@@ -167,6 +169,6 @@ export function fetchAssetPrice(market: Market): BigDecimal {
     return oracleResult
       .toBigDecimal()
       .times(priceEthInUsd)
-      .div(exponentToBigDecimal(18));
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
   }
 }

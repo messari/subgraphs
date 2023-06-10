@@ -1,44 +1,44 @@
 import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
   log,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
-  _ActiveAccount,
-  Account,
-  Borrow,
-  Deposit,
-  LendingProtocol,
-  Liquidate,
-  Market,
   Repay,
+  Borrow,
+  Market,
+  Account,
+  Deposit,
   Withdraw,
+  Liquidate,
+  _ActiveAccount,
+  LendingProtocol,
 } from "../../generated/schema";
 import {
-  BIGDECIMAL_HUNDRED,
   EventType,
-  exponentToBigDecimal,
+  PositionSide,
   exponentToBigInt,
   InterestRateSide,
   InterestRateType,
-  PositionSide,
+  BIGDECIMAL_HUNDRED,
   ReserveUpdateParams,
+  exponentToBigDecimal,
 } from "../constants";
 import {
+  getEventId,
   addPosition,
   createAccount,
-  createInterestRate,
-  getEventId,
   snapshotUsage,
-  subtractPosition,
-  updateFinancials,
-  updateMarketSnapshots,
   updateP2PRates,
-  updateProtocolPosition,
   updateSnapshots,
+  subtractPosition,
+  createInterestRate,
+  updateProtocolPosition,
+  updateRevenueSnapshots,
 } from "../helpers";
+import { IMaths } from "../utils/maths/maths.interface";
 import { getMarket, getOrInitToken } from "../utils/initializers";
 
 export class MorphoPositions {
@@ -119,7 +119,6 @@ export function _handleSupplied(
     .div(exponentToBigInt(market._indexesOffset));
 
   position.balance = totalSupplyOnPool.plus(totalSupplyInP2P);
-
   position.save();
 
   deposit.position = position.id;
@@ -136,6 +135,8 @@ export function _handleSupplied(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(market.inputTokenPriceUSD);
+  deposit.gasPrice = event.transaction.gasPrice;
+  deposit.gasLimit = event.transaction.gasLimit;
   deposit.save();
 
   // update metrics
@@ -167,8 +168,7 @@ export function _handleSupplied(
     deposit.amountUSD,
     deposit.amount,
     EventType.DEPOSIT,
-    event.block.timestamp,
-    event.block.number
+    event.block
   );
   updateProtocolPosition(protocol, market, morphoPositions);
 }
@@ -209,6 +209,7 @@ export function _handleWithdrawn(
     .times(market._p2pSupplyIndex!)
     .div(exponentToBigInt(market._indexesOffset));
   const balance = totalSupplyOnPool.plus(totalSupplyInP2P);
+
   const position = subtractPosition(
     protocol,
     market,
@@ -244,7 +245,6 @@ export function _handleWithdrawn(
   position._balanceOnPool = balanceOnPool;
   position._balanceInP2P = balanceInP2P;
   position._virtualP2P = virtualP2P;
-
   position.save();
 
   withdraw.position = position.id;
@@ -261,6 +261,8 @@ export function _handleWithdrawn(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(market.inputTokenPriceUSD);
+  withdraw.gasPrice = event.transaction.gasPrice;
+  withdraw.gasLimit = event.transaction.gasLimit;
   withdraw.save();
 
   protocol.withdrawCount += 1;
@@ -285,8 +287,7 @@ export function _handleWithdrawn(
     withdraw.amountUSD,
     withdraw.amount,
     EventType.WITHDRAW,
-    event.block.timestamp,
-    event.block.number
+    event.block
   );
   updateProtocolPosition(protocol, market, morphoPositions);
 }
@@ -419,8 +420,7 @@ export function _handleLiquidated(
     liquidate.amountUSD,
     liquidate.amount,
     EventType.LIQUIDATOR,
-    event.block.timestamp,
-    event.block.number
+    event.block
   );
 }
 
@@ -506,6 +506,8 @@ export function _handleBorrowed(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(market.inputTokenPriceUSD);
+  borrow.gasPrice = event.transaction.gasPrice;
+  borrow.gasLimit = event.transaction.gasLimit;
   borrow.save();
 
   // update metrics
@@ -537,8 +539,7 @@ export function _handleBorrowed(
     borrow.amountUSD,
     borrow.amount,
     EventType.BORROW,
-    event.block.timestamp,
-    event.block.number
+    event.block
   );
   updateProtocolPosition(protocol, market, morphoPositions);
 }
@@ -558,12 +559,16 @@ export function _handleP2PIndexesUpdated(
   // The token price is updated in reserveUpdated event
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
+  let totalSupplyOnPool = market._scaledSupplyOnPool!;
+  if (market._scaledPoolCollateral)
+    totalSupplyOnPool = totalSupplyOnPool.plus(market._scaledPoolCollateral!);
+
   const supplyDeltaIndexes = poolSupplyIndex
     .minus(market._lastPoolSupplyIndex!)
     .toBigDecimal()
     .div(exponentToBigDecimal(market._indexesOffset));
   const poolSupplyInterest = supplyDeltaIndexes
-    .times(market._scaledSupplyOnPool!.toBigDecimal())
+    .times(totalSupplyOnPool.toBigDecimal())
     .div(exponentToBigDecimal(inputToken.decimals));
 
   const virtualSupplyInterest = supplyDeltaIndexes
@@ -669,42 +674,18 @@ export function _handleP2PIndexesUpdated(
         .times(market.inputTokenPriceUSD)
     );
 
-  market.cumulativeTotalRevenueUSD =
-    market.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
-  market.cumulativeProtocolSideRevenueUSD =
-    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueDeltaUSD);
-  market.cumulativeSupplySideRevenueUSD =
-    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
-
-  protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
-  protocol.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueDeltaUSD);
-  protocol.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
-
   market.save();
   protocol.save();
 
   updateProtocolPosition(protocol, market, morphoPositions);
 
-  // update financial snapshot
-  updateFinancials(
-    event,
-    protocol,
-    totalRevenueDeltaUSD,
-    protocolSideRevenueDeltaUSD,
-    supplySideRevenueDeltaUSD
-  );
-
   // update revenue in market snapshots
-  updateMarketSnapshots(
-    event.block.number,
-    event.block.timestamp,
+  updateRevenueSnapshots(
     market,
-    totalRevenueDeltaUSD,
+    protocol,
     supplySideRevenueDeltaUSD,
-    protocolSideRevenueDeltaUSD
+    protocolSideRevenueDeltaUSD,
+    event.block
   );
 }
 
@@ -793,6 +774,8 @@ export function _handleRepaid(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(market.inputTokenPriceUSD);
+  repay.gasPrice = event.transaction.gasPrice;
+  repay.gasLimit = event.transaction.gasLimit;
   repay.save();
 
   protocol.repayCount += 1;
@@ -818,8 +801,7 @@ export function _handleRepaid(
     repay.amountUSD,
     repay.amount,
     EventType.REPAY,
-    event.block.timestamp,
-    event.block.number
+    event.block
   );
   updateProtocolPosition(protocol, market, morphoPositions);
 }
@@ -827,10 +809,9 @@ export function _handleRepaid(
 export function _handleReserveUpdate(
   params: ReserveUpdateParams,
   morphoPositions: MorphoPositions,
-  market: Market
+  market: Market,
+  __MATHS__: IMaths
 ): void {
-  updateProtocolPosition(params.protocol, market, morphoPositions);
-
   // Update the total supply and borrow frequently by using pool updates
   const totalDepositBalanceUSD = market
     ._totalSupplyOnPool!.plus(market._totalSupplyInP2P!)
@@ -886,7 +867,8 @@ export function _handleReserveUpdate(
     poolBorrowRate.id,
   ];
 
-  updateP2PRates(market);
+  updateP2PRates(market, __MATHS__);
+  updateProtocolPosition(params.protocol, market, morphoPositions);
 
   market.save();
   return;

@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity @regularPolling {
+type Token @entity {
   " Smart contract address of the token "
   id: Bytes!
 
@@ -72,7 +72,7 @@ enum RewardTokenType {
   STAKE
 }
 
-type RewardToken @entity(immutable: true) @regularPolling {
+type RewardToken @entity(immutable: true) {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -176,7 +176,7 @@ enum PositionSide {
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
-type InterestRate @entity @regularPolling {
+type InterestRate @entity {
   " { Interest rate side }-{ Interest rate type }-{ Market ID }-{ Optional: Tranche }-{ Optional: # days/hours since epoch time } "
   id: ID!
 
@@ -219,7 +219,7 @@ enum FeeType {
   OTHER
 }
 
-type Fee @entity @regularPolling {
+type Fee @entity {
   " { Fee type } "
   id: ID!
 
@@ -235,7 +235,7 @@ type Fee @entity @regularPolling {
 
 # This entity offers a more nuanced view of revenue types
 # Use this to provide the sources of revenue and amounts of each
-type RevenueDetail @entity @regularPolling {
+type RevenueDetail @entity {
   " { Market/Protocol ID }{ Optional: Snapshot ID } "
   id: Bytes!
 
@@ -259,7 +259,7 @@ enum OracleSource {
 # Most lending protocols get token prices through onchain oracles.
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
-type Oracle @entity @regularPolling {
+type Oracle @entity {
   " { Market Address }{ Token Address } "
   id: Bytes!
 
@@ -374,7 +374,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type LendingProtocol implements Protocol @entity @regularPolling {
+type LendingProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -543,6 +543,7 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   ##### Morpho Specific #####
 
+  ## Morpho Compound and morpho aave v2 specific fields
   _defaultMaxGasForMatchingSupply: BigInt
   _defaultMaxGasForMatchingBorrow: BigInt
   _defaultMaxGasForMatchingWithdraw: BigInt
@@ -551,6 +552,11 @@ type LendingProtocol implements Protocol @entity @regularPolling {
   _maxSortedUsers: BigInt
   _owner: Bytes
   _oracle: Bytes
+
+  ## Morpho Aave v3 specific fields
+  _defaultMaxIterationsWithdraw: BigInt
+  _defaultMaxIterationsRepay: BigInt
+
 }
 
 # helper entity to iterate through all markets
@@ -566,7 +572,7 @@ type _MarketList @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity @dailySnapshot {
+type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -649,7 +655,7 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
+type UsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -690,7 +696,7 @@ type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity @dailySnapshot {
+type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -786,7 +792,7 @@ A market is defined by the input token.
 At a minimum that means being able to deposit/withdraw that token.
 e.g. there may be related markets as they only act as collateral for other markets.
 """
-type Market @entity @regularPolling {
+type Market @entity {
   " Smart contract address of the market "
   id: Bytes!
 
@@ -1062,6 +1068,24 @@ type Market @entity @regularPolling {
   " The p2p borrow index, updated at the last update on Morpho"
   _p2pBorrowIndex: BigInt
 
+  " The supply rate in P2P, updated at the last pool update "
+  _p2pSupplyRate: BigInt
+
+  " The borrow rate in P2P, updated at the last pool update "
+  _p2pBorrowRate: BigInt
+
+  " The p2p supply index, updated at the last pool update, by recomputing the P2P rates. Used in monitoring "
+  _p2pSupplyIndexFromRates: BigInt
+
+  " The p2p borrow index, updated at the last pool update, by recomputing the P2P rates. Used in monitoring "
+  _p2pBorrowIndexFromRates: BigInt
+
+  " The cursor where the p2p rate is calculated from, without conversion "
+  _p2pIndexCursor_BI: BigInt
+
+  " The percent of revenue from P2P market that is converted to reserves at the current time. "
+  _reserveFactor_BI: BigInt
+
   " Whether the p2p matching is disabled or not on this market"
   _isP2PDisabled: Boolean
 
@@ -1079,6 +1103,9 @@ type Market @entity @regularPolling {
 
   " The total amount borrowed peer-to-peer"
   _totalBorrowInP2P: BigDecimal
+
+  " The total amount of collateral on the underlying pool"
+  _totalCollateralOnPool: BigDecimal
 
   " The p2pSupplyAmount in scaled units"
   _p2pSupplyAmount: BigInt
@@ -1104,6 +1131,9 @@ type Market @entity @regularPolling {
   " The aggregation of the scaled p2p borrow balances if the p2p balances was on pool"
   _virtualScaledBorrow: BigInt
 
+  " The scaled balance on pool used as collateral"
+  _scaledPoolCollateral: BigInt
+
   " The poolSupplyAmount in scaled units"
   _poolSupplyAmount: BigInt
 
@@ -1118,6 +1148,12 @@ type Market @entity @regularPolling {
 
   " Whether the withdraw is paused or not"
   _isWithdrawPaused: Boolean
+
+  " Whether the withdraw collateral is paused or not"
+  _isWithdrawCollateralPaused: Boolean
+
+  " Whether the supply collateral is paused or not"
+  _isSupplyCollateralPaused: Boolean
 
   " Whether the repay is paused or not"
   _isRepayPaused: Boolean
@@ -1166,13 +1202,16 @@ type Market @entity @regularPolling {
 
   " The number of decimals of the rates and the indexes, WAD or RAY."
   _indexesOffset: Int
+
+  " The idle supply on the Morpho contract"
+  _idleSupply: BigInt
 }
 
 #################################
 ##### Pool-Level Timeseries #####
 #################################
 
-type MarketDailySnapshot @entity @dailySnapshot {
+type MarketDailySnapshot @entity {
   " { Smart contract address of the market }{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -1401,7 +1440,7 @@ type MarketDailySnapshot @entity @dailySnapshot {
   dailyActiveBorrowingPositionCount: Int!
 }
 
-type MarketHourlySnapshot @entity @hourlySnapshot {
+type MarketHourlySnapshot @entity {
   " { Smart contract address of the market }{ # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -1528,7 +1567,7 @@ type MarketHourlySnapshot @entity @hourlySnapshot {
 ##### Account-Level Data #####
 ##############################
 
-type Account @entity @regularPolling {
+type Account @entity {
   " { Account address } "
   id: Bytes!
 
@@ -1603,7 +1642,7 @@ type Account @entity @regularPolling {
 }
 
 # A position is defined as who has control over the collateral or debt
-type Position @entity @regularPolling {
+type Position @entity {
   " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
   id: ID!
 
@@ -1709,7 +1748,7 @@ type Position @entity @regularPolling {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions.
-type PositionSnapshot @entity(immutable: true) @hourlySnapshot {
+type PositionSnapshot @entity(immutable: true) {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1826,7 +1865,7 @@ interface Event {
   amountUSD: BigDecimal!
 }
 
-type Deposit implements Event @entity(immutable: true) @transaction {
+type Deposit implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1876,7 +1915,7 @@ type Deposit implements Event @entity(immutable: true) @transaction {
   amountUSD: BigDecimal!
 }
 
-type Withdraw implements Event @entity(immutable: true) @transaction {
+type Withdraw implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1931,7 +1970,7 @@ type Withdraw implements Event @entity(immutable: true) @transaction {
 }
 
 # For CDPs, use this for mint events
-type Borrow implements Event @entity(immutable: true) @transaction {
+type Borrow implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1982,7 +2021,7 @@ type Borrow implements Event @entity(immutable: true) @transaction {
 }
 
 # For CDPs, use this for burn events
-type Repay implements Event @entity(immutable: true) @transaction {
+type Repay implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2032,7 +2071,7 @@ type Repay implements Event @entity(immutable: true) @transaction {
   amountUSD: BigDecimal!
 }
 
-type Liquidate implements Event @entity(immutable: true) @transaction {
+type Liquidate implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2089,7 +2128,7 @@ type Liquidate implements Event @entity(immutable: true) @transaction {
 # e.g. transferring aTokens (collateral) directly, not a deposit.
 # Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
-type Transfer implements Event @entity(immutable: true) @transaction {
+type Transfer implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2139,7 +2178,8 @@ type Transfer implements Event @entity(immutable: true) @transaction {
   amountUSD: BigDecimal!
 }
 
-type Flashloan implements Event @entity(immutable: true) @transaction {
+"There is no flash loans on Morpho V1 like protocols"
+type Flashloan implements Event @entity(immutable: true) {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2198,4 +2238,6 @@ type UnderlyingTokenMapping @entity {
   id: Bytes!
   aToken: Bytes!
   debtToken: Bytes!
+  aTokenV3: Bytes
+  variableDebtTokenV3: Bytes
 }
