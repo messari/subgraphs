@@ -60,4 +60,7 @@ export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10"), // Curve.fi Factory USD Metapool: Defrost H2O
   Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
   Address.fromString("0xaa9dfbf31d2f807ca4d9f7be281d75ca7bdce64d"), // Curve.fi Factory Plain Pool: Curve DD2Pool
+  Address.fromString("0x83f798e925bcd4017eb265844fddabb448f1707d"), // iearn USDT
+  Address.fromString("0xe6354ed5bc4b393a5aad09f21c46e101e692d447"), // iearn USDT
+  Address.fromString("0x1be5d71f2da660bfdee8012ddc58d024448a0a59"), // iearn USDT
 ];

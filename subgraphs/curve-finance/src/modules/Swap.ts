@@ -9,6 +9,7 @@ import {
   Address,
   ethereum,
   BigDecimal,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import {
   updateTokenVolume,
@@ -117,7 +118,11 @@ export function Swap(
     tokenIn = underlyingCoins[soldId.toI32()].toHexString();
     tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
 
-    if (pool._isMetapool && boughtId.equals(constants.BIGINT_ZERO))
+    if (
+      pool._isMetapool &&
+      boughtId.equals(constants.BIGINT_ZERO) &&
+      utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)
+    )
       tokenIn = pool._inputTokensOrdered.at(-1);
   }
 

@@ -71,16 +71,23 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x64343594ab9b56e99087bfa6f2335db24c2d1f17"), // vesta stable
   Address.fromString("0xf0b5ceefc89684889e5f7e0a7775bd100fcd3709"), // digital dollar
   Address.fromString("0xdbcd16e622c95acb2650b38ec799f76bfc557a0b"), // Curve.fi ETH/wstETH
+  Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
 ];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0x5979d7b546e38e414f7e9822514be443a4800529"), // Wrapped liquid staked Ether 2.0 token
+  Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
 ];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0x5979d7b546e38e414f7e9822514be443a4800529"), // Wrapped liquid staked Ether 2.0 token
   Address.fromString("0xdbcd16e622c95acb2650b38ec799f76bfc557a0b"), // Curve.fi ETH/wstETH
+  Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
 ];
-export const INCH_ORACLE_BLACKLIST: Address[] = [];
-export const AAVE_ORACLE_BLACKLIST: Address[] = [];
+export const INCH_ORACLE_BLACKLIST: Address[] = [
+  Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
+];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [
+  Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
+];
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// HARDCODED STABLES ////////////////////////////
