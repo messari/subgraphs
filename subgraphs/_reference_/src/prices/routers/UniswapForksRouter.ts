@@ -136,8 +136,8 @@ export function getPriceFromRouter(
   }
   if (tokenPair.equals(constants.NULL.TYPE_ADDRESS)) return priceFromRouter;
 
-  const counterLiquidityUSD = getLpTokenCounterLiquidityUsdc(tokenPair, block);
-  priceFromRouter.setCounterLiquidity(counterLiquidityUSD.usdPrice);
+  const liquidityUSD = getLpTokenLiquidityUsdc(tokenPair, block);
+  priceFromRouter.setLiquidity(liquidityUSD.usdPrice);
 
   return priceFromRouter;
 }
@@ -254,7 +254,7 @@ export function getLpTokenTotalLiquidityUsdc(
   return new CustomPriceType();
 }
 
-function getLpTokenCounterLiquidityUsdc(
+function getLpTokenLiquidityUsdc(
   lpAddress: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {

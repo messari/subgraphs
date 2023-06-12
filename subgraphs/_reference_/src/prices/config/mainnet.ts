@@ -98,24 +98,8 @@ export const HARDCODED_STABLES: Address[] = [
 ];
 
 ///////////////////////////////////////////////////////////////////////////
-////////////////////////// ORACLE CONFIGURATIONS //////////////////////////
+///////////////////////// ORACLE CONFIG OVERRIDES /////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-
-class DefaultOracleConfig implements OracleConfig {
-  oracleCount(): number {
-    return constants.INT_ONE;
-  }
-  oracleOrder(): string[] {
-    return [
-      constants.OracleType.YEARN_LENS_ORACLE,
-      constants.OracleType.CHAINLINK_FEED,
-      constants.OracleType.CURVE_CALCULATIONS,
-      constants.OracleType.SUSHI_CALCULATIONS,
-      constants.OracleType.CURVE_ROUTER,
-      constants.OracleType.UNISWAP_FORKS_ROUTER,
-    ];
-  }
-}
 
 // https://github.com/messari/subgraphs/issues/2090
 class spellOverride implements OracleConfig {
@@ -245,10 +229,10 @@ export class config implements Configurations {
     return USDC_TOKEN_DECIMALS;
   }
 
-  getOracleConfig(
+  getOracleOverride(
     tokenAddr: Address | null,
     block: ethereum.Block | null
-  ): OracleConfig {
+  ): OracleConfig | null {
     if (tokenAddr || block) {
       if (
         tokenAddr &&
@@ -279,6 +263,6 @@ export class config implements Configurations {
       }
     }
 
-    return new DefaultOracleConfig();
+    return null;
   }
 }
