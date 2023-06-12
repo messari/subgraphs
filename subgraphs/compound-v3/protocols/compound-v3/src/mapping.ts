@@ -691,7 +691,8 @@ export function handleTransfer(event: Transfer): void {
   const fromAddress = ethereum
     .decode("address", supplyLog.topics.at(1))!
     .toAddress();
-  if (fromAddress != ZERO_ADDRESS) {
+  if (fromAddress != ZERO_ADDRESS || event.address != supplyLog.address) {
+    // must be a transfer from the same comet
     // not apart of transferBase() since from address is not null
     return;
   }
