@@ -41,7 +41,7 @@ export function getUsdPricePerToken(
     );
   }
 
-  let oracle = new OracleType();
+  const oracle = new OracleType();
   const override = config.getOracleOverride(tokenAddr, block);
   if (override) {
     oracle.setOracleConfig(override);
