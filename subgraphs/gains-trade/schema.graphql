@@ -1895,7 +1895,7 @@ type Position @entity @regularPolling {
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
-type PositionSnapshot @entity(immutable: true) @regularPolling {
+type PositionSnapshot @entity(immutable: true) @hourlySnapshot {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
