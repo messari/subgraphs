@@ -1,27 +1,24 @@
-import { getOrCreateAccount, getOrCreateTranche } from "../common/initializers";
+import { getOrCreateAccount } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
+import { updateTranche } from "./tranche";
 
 export function transaction(
   accountAddress: Address,
   tokenAddress: Address,
   trancheAddress: Address,
-  outputTokenSupply: BigInt,
   mintAmount: BigInt,
   transactionType: TransactionType,
   sdk: SDK,
   pool: Pool,
   amount: BigInt = constants.BIGINT_ZERO
 ): void {
-  //fix outputToken supply amount and pricing
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-  const outputToken = sdk.Tokens.getOrCreateToken(trancheAddress);
-  const tranche = getOrCreateTranche(trancheAddress);
 
   if (transactionType === TransactionType.DEPOSIT) {
     utils.checkAndUpdateInputTokens(pool, token, amount);
@@ -45,13 +42,15 @@ export function transaction(
   amountsArray[idx] = amount;
   pool.setInputTokenBalances(inputTokenBalances, true);
 
-  pool.setOutputTokenSupply(outputTokenSupply);
-  pool.setStakedOutputTokenAmount(outputTokenSupply);
-
   if (transactionType === TransactionType.DEPOSIT) {
     account.deposit(pool, amountsArray, mintAmount, true);
   }
   if (transactionType === TransactionType.WITHDRAW) {
     account.withdraw(pool, amountsArray, mintAmount, true);
   }
+  updateTranche(trancheAddress, transactionType, token, amount);
+  pool.addTranche(Bytes.fromHexString(trancheAddress.toHexString()));
+  const outputTokenSupply = utils.getOutputTokenSupply(pool);
+  pool.setOutputTokenSupply(outputTokenSupply);
+  pool.setStakedOutputTokenAmount(outputTokenSupply);
 }

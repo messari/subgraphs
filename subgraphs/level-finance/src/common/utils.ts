@@ -8,10 +8,14 @@ import {
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { Token as TokenSchema } from "../../generated/schema";
+import { Token as TokenSchema, _Tranche } from "../../generated/schema";
 import { LpToken as LpTokenContract } from "../../generated/Pool/LpToken";
 import { SDK } from "../sdk/protocols/perpfutures";
-import { getOrCreatePool, initializeSDK } from "./initializers";
+import {
+  getOrCreatePool,
+  getOrCreateTranche,
+  initializeSDK,
+} from "./initializers";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -149,7 +153,32 @@ export function getLpTokenSupply(trancheAddress: Address): BigInt {
   return totalSupply;
 }
 
-export function getOutputTokenSupply(sdk: SDK, pool: Pool): BigInt {
+export function getOutputTokenPrice(pool: Pool): BigDecimal {
   const tranchesAddresses = pool.pool._tranches;
-  for (let i = 0; i < tranchesAddresses!.length; i++) {}
+  let pricesSum = constants.BIGDECIMAL_ZERO;
+
+  for (let i = 0; i < tranchesAddresses!.length; i++) {
+    const tranche = getOrCreateTranche(tranchesAddresses![i]);
+    pricesSum = pricesSum.plus(
+      tranche!.tvl.div(
+        bigIntToBigDecimal(tranche!.totalSupply, constants.DEFAULT_DECIMALS)
+      )
+    );
+  }
+  if (tranchesAddresses!.length <= 0) return constants.BIGDECIMAL_ZERO;
+  return pricesSum.div(
+    BigDecimal.fromString(tranchesAddresses!.length.toString())
+  );
+}
+
+export function getOutputTokenSupply(pool: Pool): BigInt {
+  const tranchesAddresses = pool.pool._tranches;
+  let totalSupply = constants.BIGINT_ZERO;
+
+  for (let i = 0; i < tranchesAddresses!.length; i++) {
+    const tranche = getOrCreateTranche(tranchesAddresses![i]);
+    totalSupply = totalSupply.plus(tranche.totalSupply);
+  }
+  if (tranchesAddresses!.length <= 0) return constants.BIGINT_ZERO;
+  return totalSupply;
 }

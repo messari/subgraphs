@@ -181,6 +181,8 @@ export class Pool {
     this.pool._lastSnapshotHourID = constants.BIGINT_ZERO;
     this.pool._lastUpdateTimestamp = event.block.timestamp;
 
+    this.pool._tranches = [];
+
     this.save();
 
     this.protocol.addPool();
@@ -1108,5 +1110,17 @@ export class Pool {
 
     this.save();
     this.addClosedInflowVolumeUSD(amountUSD);
+  }
+
+  addTranche(trancheId: Bytes): void {
+    if (!this.pool._tranches) return;
+    const trancheIndex = this.pool._tranches!.indexOf(trancheId);
+
+    if (trancheIndex == -1) {
+      const newTranches: Bytes[] = [];
+      newTranches.push(trancheId);
+      this.pool._tranches = newTranches;
+      this.save();
+    }
   }
 }

@@ -2003,10 +2003,6 @@ type _Tranche @entity {
   " Tranche contract Address "
   id: Bytes!
 
-  token: Token!
-
-  tokenPrice: BigDecimal!
-
   totalSupply: BigInt!
 
   tvl: BigDecimal!
