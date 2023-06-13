@@ -276,11 +276,19 @@ function PoolTabEntity({
               ) {
                 value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
               }
-              if (fieldName === "inputTokenBalance") {
-                const dec = data[poolKeySingular].inputToken.decimals;
-                value = convertTokenDecimals(currentInstanceField, dec);
-              }
-              if (fieldName === "mintSupply") {
+              if (
+                [
+                  "inputTokenBalance",
+                  "mintSupply",
+                  "dailyNativeDeposit",
+                  "dailyNativeBorrow",
+                  "dailyNativeLiquidate",
+                  "dailyNativeWithdraw",
+                  "dailyNativeRepay",
+                  "dailyNativeTransfer",
+                  "dailyNativeFlashloan",
+                ].includes(fieldName)
+              ) {
                 const dec = data[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentInstanceField, dec);
               }
@@ -553,11 +561,19 @@ function PoolTabEntity({
               ) {
                 value = convertTokenDecimals(currentOverlayInstanceField, data[poolKeySingular]?.outputToken?.decimals);
               }
-              if (fieldName === "inputTokenBalance") {
-                const dec = overlayData[poolKeySingular].inputToken.decimals;
-                value = convertTokenDecimals(currentOverlayInstanceField, dec);
-              }
-              if (fieldName === "mintSupply") {
+              if (
+                [
+                  "inputTokenBalance",
+                  "mintSupply",
+                  "dailyNativeDeposit",
+                  "dailyNativeBorrow",
+                  "dailyNativeLiquidate",
+                  "dailyNativeWithdraw",
+                  "dailyNativeRepay",
+                  "dailyNativeTransfer",
+                  "dailyNativeFlashloan",
+                ].includes(fieldName)
+              ) {
                 const dec = overlayData[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentOverlayInstanceField, dec);
               }
