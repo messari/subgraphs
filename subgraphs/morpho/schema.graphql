@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: Bytes!
 
@@ -72,7 +72,7 @@ enum RewardTokenType {
   STAKE
 }
 
-type RewardToken @entity(immutable: true) {
+type RewardToken @entity(immutable: true) @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -176,7 +176,7 @@ enum PositionSide {
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
-type InterestRate @entity {
+type InterestRate @entity @regularPolling {
   " { Interest rate side }-{ Interest rate type }-{ Market ID }-{ Optional: Tranche }-{ Optional: # days/hours since epoch time } "
   id: ID!
 
@@ -219,7 +219,7 @@ enum FeeType {
   OTHER
 }
 
-type Fee @entity {
+type Fee @entity @regularPolling {
   " { Fee type } "
   id: ID!
 
@@ -235,7 +235,7 @@ type Fee @entity {
 
 # This entity offers a more nuanced view of revenue types
 # Use this to provide the sources of revenue and amounts of each
-type RevenueDetail @entity {
+type RevenueDetail @entity @regularPolling {
   " { Market/Protocol ID }{ Optional: Snapshot ID } "
   id: Bytes!
 
@@ -259,7 +259,7 @@ enum OracleSource {
 # Most lending protocols get token prices through onchain oracles.
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
-type Oracle @entity {
+type Oracle @entity @regularPolling {
   " { Market Address }{ Token Address } "
   id: Bytes!
 
@@ -374,7 +374,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type LendingProtocol implements Protocol @entity {
+type LendingProtocol implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -566,7 +566,7 @@ type _MarketList @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -649,7 +649,7 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -690,7 +690,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -786,7 +786,7 @@ A market is defined by the input token.
 At a minimum that means being able to deposit/withdraw that token.
 e.g. there may be related markets as they only act as collateral for other markets.
 """
-type Market @entity {
+type Market @entity @regularPolling {
   " Smart contract address of the market "
   id: Bytes!
 
@@ -1172,7 +1172,7 @@ type Market @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type MarketDailySnapshot @entity {
+type MarketDailySnapshot @entity @dailySnapshot {
   " { Smart contract address of the market }{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -1401,7 +1401,7 @@ type MarketDailySnapshot @entity {
   dailyActiveBorrowingPositionCount: Int!
 }
 
-type MarketHourlySnapshot @entity {
+type MarketHourlySnapshot @entity @hourlySnapshot {
   " { Smart contract address of the market }{ # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -1528,7 +1528,7 @@ type MarketHourlySnapshot @entity {
 ##### Account-Level Data #####
 ##############################
 
-type Account @entity {
+type Account @entity @regularPolling {
   " { Account address } "
   id: Bytes!
 
@@ -1603,7 +1603,7 @@ type Account @entity {
 }
 
 # A position is defined as who has control over the collateral or debt
-type Position @entity {
+type Position @entity @regularPolling {
   " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
   id: ID!
 
@@ -1709,7 +1709,7 @@ type Position @entity {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions.
-type PositionSnapshot @entity(immutable: true) {
+type PositionSnapshot @entity(immutable: true) @hourlySnapshot {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1826,7 +1826,7 @@ interface Event {
   amountUSD: BigDecimal!
 }
 
-type Deposit implements Event @entity(immutable: true) {
+type Deposit implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1876,7 +1876,7 @@ type Deposit implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Withdraw implements Event @entity(immutable: true) {
+type Withdraw implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1931,7 +1931,7 @@ type Withdraw implements Event @entity(immutable: true) {
 }
 
 # For CDPs, use this for mint events
-type Borrow implements Event @entity(immutable: true) {
+type Borrow implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1982,7 +1982,7 @@ type Borrow implements Event @entity(immutable: true) {
 }
 
 # For CDPs, use this for burn events
-type Repay implements Event @entity(immutable: true) {
+type Repay implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2032,7 +2032,7 @@ type Repay implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Liquidate implements Event @entity(immutable: true) {
+type Liquidate implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2089,7 +2089,7 @@ type Liquidate implements Event @entity(immutable: true) {
 # e.g. transferring aTokens (collateral) directly, not a deposit.
 # Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
-type Transfer implements Event @entity(immutable: true) {
+type Transfer implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2139,7 +2139,7 @@ type Transfer implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Flashloan implements Event @entity(immutable: true) {
+type Flashloan implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
