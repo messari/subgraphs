@@ -90,8 +90,6 @@ export class SushiswapMaticConfigurations implements Configurations {
       "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
       "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
       "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6", // wBTC
-      "0x4e78011ce80ee02d2c3e649fb657e45898257815", // Klima
-      "0x2f800db0fdb5223b3c3f354886d907a671414a7f", // BCT
     ]);
   }
   getStableCoins(): string[] {

@@ -108,7 +108,10 @@ export class QuickswapMaticConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x1518820879bc87d4dfea5664bb1b6c240d20d4f2", // Drop
+      "0x26d41380012d698e0a65c0f268cfa8ed0148f6f3", // Flamingo
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return ["0x5d76fa95c308fce88d347556785dd1dd44416272"];

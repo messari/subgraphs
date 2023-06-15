@@ -255,6 +255,7 @@ function getOrCreateRewarder(
     rewarder.hasFundsAt = BIGINT_ZERO;
     rewarder.tokenPerSec = BIGINT_ZERO;
     rewarder.rateCalculatedAt = BIGINT_ZERO;
+    rewarder._rewardRateCalculationInProgress = false;
 
     const tokenPerSec = RewarderCalculator.attemptToRetrieveRewardRate(c);
     if (tokenPerSec) {
