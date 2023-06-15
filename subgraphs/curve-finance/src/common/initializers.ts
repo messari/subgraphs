@@ -128,7 +128,8 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
 export function getOrCreateToken(
   address: Address,
   block: ethereum.Block,
-  fetchLatestPrice: bool = false
+  fetchLatestPrice: bool = false,
+  skipPricing: bool = false
 ): Token {
   let token = Token.load(address.toHexString());
 
@@ -159,6 +160,7 @@ export function getOrCreateToken(
 
     token.save();
   }
+  if (skipPricing) return token;
 
   if (
     fetchLatestPrice ||

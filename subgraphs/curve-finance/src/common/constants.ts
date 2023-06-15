@@ -95,7 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Curve Finance";
   export const SLUG = "curve-finance";
-  export const NETWORK = Network.ARBITRUM_ONE;
+  export const NETWORK = Network.MAINNET;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.0.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -125,7 +125,7 @@ export const NUMBER_OF_WEEKS_DENOMINATOR = BigInt.fromI32(604800);
 export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(3000);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(1);
 
 export const CURVE_ADDRESS_PROVIDER = Address.fromString(
   "0x0000000022d53366457f9d5e68ec105046fc4383"
@@ -140,20 +140,41 @@ export const PROTOCOL_ID = Address.fromString(
   "0x0000000022D53366457F9d5E68Ec105046FC4383"
 );
 export const POOL_INFO_ADDRESS = Address.fromString(
-  "0x78CF256256C8089d68Cde634Cf7cDEFb39286470"
+  "0xe64608E223433E8a03a1DaaeFD8Cb638C14B552C"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0xabC000d88f23Bb45525E447528DBF656A9D55bf5"
+  "0x2f50d538606fa9edd2b11e2446beb18c9d5846bb"
 );
 export const CRV_TOKEN_ADDRESS = Address.fromString(
-  "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978"
+  "0xd533a949740bb3306d119cc777fa900ba034cd52"
 );
 
 export const POOL_REGISTRIES: Address[] = [
-  Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351"), // MainRegistry
-  Address.fromString("0xb17b674D9c5CB2e441F8e196a2f048A81355d031"), // StableSwapFactory
-  Address.fromString("0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15"), // CryptoSwapRegistry
+  Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), // PoolRegistry
+  Address.fromString("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c"), // PoolRegistryV2
+  Address.fromString("0xB9fC157394Af804a3578134A6585C0dc9cc990d4"), // MetapoolFactory
+  Address.fromString("0x8F942C20D02bEfc377D41445793068908E2250D0"), // CryptoSwapRegistry
+  Address.fromString("0xF18056Bbd320E96A48e3Fbf8bC061322531aac99"), // CryptoPoolFactory
 ]
 
 export const HARDCODED_BASEPOOLS_LP_TOKEN: Address[] = [
+  Address.fromString("0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"), // 3crv
+  Address.fromString("0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"), // renbtc
+  Address.fromString("0xC25a3A3b969415c80451098fa907EC722572917F"), // susd
+  Address.fromString("0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B"), // busd
+  Address.fromString("0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2"), // compound
+  Address.fromString("0xb19059ebb43466C323583928285a49f558E572Fd"), // hbtc
+  Address.fromString("0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8"), // pax
+  Address.fromString("0x49849C98ae39Fff122806C06791Fa73784FB3675"), // ren
+  Address.fromString("0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c"), // seth
+  Address.fromString("0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23"), // usdt
+  Address.fromString("0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8"), // y
+  Address.fromString("0x3a664Ab939FD8482048609f652f9a0B0677337B9"), // dusd
+  Address.fromString("0xD2967f45c4f384DEEa880F807Be904762a3DeA07"), // gusd
+  Address.fromString("0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858"), // husd
+  Address.fromString("0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F"), // linkusd
+  Address.fromString("0x1AEf73d49Dedc4b1778d0706583995958Dc862e6"), // musd
+  Address.fromString("0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35"), // rsv
+  Address.fromString("0x97E2768e8E73511cA874545DC5Ff8067eB19B787"), // usdk
+  Address.fromString("0x4f3E8F405CF5aFC05D68142F3783bDfE13811522"), // usdn
 ]

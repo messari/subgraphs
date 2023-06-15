@@ -43,9 +43,16 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
 
 export function getOrCreateTokenFromString(
   tokenAddress: string,
-  block: ethereum.Block
+  block: ethereum.Block,
+  fetchLatestPrice: bool = false,
+  skipPricing: bool = false
 ): Token {
-  return getOrCreateToken(Address.fromString(tokenAddress), block);
+  return getOrCreateToken(
+    Address.fromString(tokenAddress),
+    block,
+    fetchLatestPrice,
+    skipPricing
+  );
 }
 
 export function readValue<T>(
@@ -540,7 +547,9 @@ export function updateProtocolTotalValueLockedUSD(block: ethereum.Block): void {
     for (let idx = 0; idx < pool.inputTokens.length; idx++) {
       const inputToken = getOrCreateTokenFromString(
         pool.inputTokens[idx],
-        block
+        block,
+        false,
+        true
       );
 
       if (inputToken.isBasePoolLpToken) {
