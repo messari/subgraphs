@@ -3,7 +3,13 @@ import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenPricer } from "../sdk/protocols/config";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { _ERC20 } from "../../generated/ERC20Gateway/_ERC20";
 import { BridgePermissionType } from "../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
@@ -46,6 +52,7 @@ export class TokenInit implements TokenInitializer {
     if (address == Address.fromString(ETH_ADDRESS)) {
       name = ETH_NAME;
       symbol = ETH_SYMBOL;
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       decimals = 18;
     } else {
       name = this.fetchTokenName(address);
@@ -106,6 +113,52 @@ function tokenHasPriceIssue(tokenAddress: string): bool {
   }
 
   return false;
+}
+
+// See https://developer.arbitrum.io/arbos/l1-to-l2-messaging
+export function undoAlias(aliasAddress: Address): string {
+  const ADDRESS_BIT_LENGTH = 160;
+
+  // aliasAddress stuff; input is in little-endian, reverse addressBytes
+  const aliasAddressBytes = Bytes.fromUint8Array(
+    Bytes.fromHexString(aliasAddress.toHexString().slice(2)).reverse()
+  );
+  const aliasAddressBigInt = BigInt.fromUnsignedBytes(aliasAddressBytes);
+
+  // offsetAddress stuff
+  const offsetAddress = Address.fromString(
+    "0x1111000000000000000000000000000000001111"
+  );
+  const offsetBytes = Bytes.fromHexString(offsetAddress.toHexString());
+  const offsetBigInt = BigInt.fromUnsignedBytes(offsetBytes);
+
+  // actualAddress stuff; aliasBigInt should never overflow
+  const actualAddressBigInt = aliasAddressBigInt.minus(offsetBigInt);
+  const actualAddress = asUintN(ADDRESS_BIT_LENGTH as u8, actualAddressBigInt);
+
+  return actualAddress;
+}
+
+function asUintN(bitLength: u8, value: BigInt): string {
+  const maxUintN: BigInt = BigInt.fromI32(1)
+    .leftShift(bitLength)
+    .minus(BigInt.fromI32(1));
+
+  // handle under/overflow behavior
+  if (value < BigInt.fromI32(0)) {
+    value = value.plus(maxUintN).plus(BigInt.fromI32(1));
+  } else if (value > maxUintN) {
+    value = value.minus(maxUintN).minus(BigInt.fromI32(1));
+  }
+
+  return (
+    "0x" +
+    value
+      .toHexString()
+      .slice(2)
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      .padStart(bitLength / 4, "0")
+  );
 }
 
 // Note: Using one of the proxy admin contracts as bridge id
