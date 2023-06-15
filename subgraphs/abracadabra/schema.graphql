@@ -990,7 +990,7 @@ type Position @entity @regularPolling {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
-type PositionSnapshot @entity @regularPolling {
+type PositionSnapshot @entity @hourlySnapshot {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
