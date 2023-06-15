@@ -110,7 +110,11 @@ export class HoneyswapGnosisConfigurations implements Configurations {
     return [];
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x2f26b15dd4d27d9811a08389a0171a3c8750890e", //Honey/hiveWATER Token LP
+      "0x5d32a9baf31a793dba7275f77856a47a0f5d09b3", // Giveth Test GIV Token
+      "0x69f79c9ea174d4659b18c7993c7efbbbb58cf068", // Test HNY Token
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];
