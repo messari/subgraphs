@@ -107,6 +107,12 @@ export function handleCometDeployed(event: CometDeployed): void {
       protocolData
     );
 
+    if (!manager.isNewMarket()) {
+      return;
+    }
+
+    manager.updateBorrowIndex(BASE_INDEX_SCALE);
+    manager.updateSupplyIndex(BASE_INDEX_SCALE);
     const market = manager.getMarket();
     market.canBorrowFrom = true;
 
@@ -123,8 +129,6 @@ export function handleCometDeployed(event: CometDeployed): void {
     market._baseTrackingBorrowSpeed = BIGINT_ZERO;
     market._baseTrackingSupplySpeed = BIGINT_ZERO;
     market.canBorrowFrom = true;
-    market._baseBorrowIndex = BASE_INDEX_SCALE;
-    market._baseSupplyIndex = BASE_INDEX_SCALE;
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
@@ -1127,7 +1131,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
 
   const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
   if (
-    newBaseBorrowIndex.lt(market._baseBorrowIndex!) ||
+    newBaseBorrowIndex.lt(market.borrowIndex!) ||
     newBaseBorrowIndex == BASE_INDEX_SCALE
   ) {
     log.error(
@@ -1137,12 +1141,10 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     return;
   }
   const totalBorrowBase = tryTotalsBasic.value.totalBorrowBase;
-  const baseBorrowIndexDiff = newBaseBorrowIndex.minus(
-    market._baseBorrowIndex!
-  );
-  market._baseBorrowIndex = newBaseBorrowIndex;
-  market._baseSupplyIndex = tryTotalsBasic.value.baseSupplyIndex;
-  market.save();
+  const baseBorrowIndexDiff = newBaseBorrowIndex.minus(market.borrowIndex!);
+
+  dataManager.updateBorrowIndex(newBaseBorrowIndex);
+  dataManager.updateSupplyIndex(tryTotalsBasic.value.baseSupplyIndex);
 
   const totalRevenueDeltaUSD = baseBorrowIndexDiff
     .toBigDecimal()

@@ -2045,7 +2045,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.1",
+          "schema": "3.1.0",
           "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
@@ -2071,7 +2071,7 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "3.0.1",
+          "schema": "3.1.0",
           "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
@@ -2093,7 +2093,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.1",
+          "schema": "3.1.0",
           "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
