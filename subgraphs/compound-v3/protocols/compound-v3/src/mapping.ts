@@ -1126,7 +1126,10 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   market.save();
 
   const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
-  if (newBaseBorrowIndex.lt(market._baseBorrowIndex!)) {
+  if (
+    newBaseBorrowIndex.lt(market._baseBorrowIndex!) ||
+    newBaseBorrowIndex == BASE_INDEX_SCALE
+  ) {
     log.error(
       "[updateRevenue] New base borrow index is less than old on market {}",
       [market.id.toHexString()]
