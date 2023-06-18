@@ -2,6 +2,8 @@
 
 ## Calculation Methodology v1.0.0
 
+There are two types of markets (pools): Tranched Pool and Callable Loan. Both are created by the GoldfinchFactory contract, with `PoolCreated` and `CallableLoanCreated` event, respectively.
+
 ### Total Value Locked (TVL) USD
 
 Sum across all Markets (Pools):
@@ -12,7 +14,7 @@ Note: Investments made to Tranched Pools from the Senior Pool are deducted from 
 
 ### Total Deposit USD
 
-Sum across all Markets (Pools):
+Sum across all Markets:
 
 `Total deposit amount USD - total withdrawal amount USD`
 
@@ -20,7 +22,7 @@ Note: Investments made to Tranched Pools from the Senior Pool are deducted from 
 
 ### Total Borrow USD
 
-Sum across all Tranched Pools:
+Sum across all markets:
 
 `Draw down amount USD`
 
@@ -47,8 +49,6 @@ Note: Goldfinch collects protocol side revenue from 3 sources: 1.) withdraw fee 
 ### Total Unique Users
 
 Count of Unique Addresses which have interacted with the protocol via any transaction
-
-`'frob' LogNote event emitted by Vat addresses which include deposits/withdrawals/borrows/repays + Cat.Bite events or Dog.Bark events emitted during liquidations`
 
 ### Reward Token Emissions
 
