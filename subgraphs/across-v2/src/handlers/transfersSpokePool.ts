@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
   DEPLOYER_BRIDGE_CONFIG,
@@ -19,12 +19,106 @@ import {
 import {
   FilledRelay,
   FundsDeposited,
-} from "../../generated/SpokePool2/SpokePool";
-import { Network } from "../sdk/util/constants";
+} from "../../generated/SpokePool1/SpokePool1";
+import {
+  FilledRelay as FilledRelaySpokePool2,
+  FundsDeposited as FundsDepositedSpokePool2,
+} from "../../generated/SpokePool2/SpokePool2";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
+import { Network } from "../sdk/util/constants";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 
-export function handleFilledRelay(event: FilledRelay): void {
+export function handleFilledRelaySpokePool2(
+  event: FilledRelaySpokePool2
+): void {
+  // build params
+  const amount = new ethereum.EventParam("amount", event.parameters[0].value);
+  const totalFilledAmount = new ethereum.EventParam(
+    "totalFilledAmount",
+    event.parameters[1].value
+  );
+  const fillAmount = new ethereum.EventParam(
+    "fillAmount",
+    event.parameters[2].value
+  );
+  const repaymentChainId = new ethereum.EventParam(
+    "repaymentChainId",
+    event.parameters[3].value
+  );
+  const originChainId = new ethereum.EventParam("", event.parameters[4].value);
+  const destinationChainId = new ethereum.EventParam(
+    "destinationChainId",
+    event.parameters[5].value
+  );
+  const relayerFeePct = new ethereum.EventParam("", event.parameters[6].value);
+  const appliedRelayerFeePct = new ethereum.EventParam(
+    "appliedRelayerFeePct",
+    ethereum.Value.fromI32(0)
+  );
+  const realizedLpFeePct = new ethereum.EventParam(
+    "realizedLpFeePct",
+    event.parameters[7].value
+  );
+  const depositId = new ethereum.EventParam(
+    "depositId",
+    event.parameters[8].value
+  );
+  const destinationToken = new ethereum.EventParam(
+    "destinationToken",
+    event.parameters[9].value
+  );
+  const relayer = new ethereum.EventParam(
+    "relayer",
+    event.parameters[10].value
+  );
+  const depositor = new ethereum.EventParam(
+    "depositor",
+    event.parameters[11].value
+  );
+  const recipient = new ethereum.EventParam(
+    "recipient",
+    event.parameters[12].value
+  );
+  const isSlowRelay = new ethereum.EventParam(
+    "isSlowRelay",
+    ethereum.Value.fromBoolean(false)
+  );
+
+  const params: ethereum.EventParam[] = [
+    amount,
+    totalFilledAmount,
+    fillAmount,
+    repaymentChainId,
+    originChainId,
+    destinationChainId,
+    relayerFeePct,
+    appliedRelayerFeePct,
+    realizedLpFeePct,
+    depositId,
+    destinationToken,
+    relayer,
+    depositor,
+    recipient,
+    isSlowRelay,
+  ];
+
+  // build event
+  const filledRelaySpokePool1 = new FilledRelay(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    params,
+    event.receipt
+  );
+
+  // primary handler
+  handleFilledRelaySpokePool1(filledRelaySpokePool1);
+}
+
+export function handleFilledRelaySpokePool1(event: FilledRelay): void {
   // Chain
   const originChainId = event.params.originChainId;
   const destinationChainId = event.params.destinationChainId;
@@ -106,7 +200,73 @@ export function handleFilledRelay(event: FilledRelay): void {
   pool.addSupplySideRevenueUSD(supplySideRevenue);
 }
 
-export function handleFundsDeposited(event: FundsDeposited): void {
+export function handleFundsDepositedSpokePool2(
+  event: FundsDepositedSpokePool2
+): void {
+  // build params
+  const amount = new ethereum.EventParam("amount", event.parameters[0].value);
+  const originChainId = new ethereum.EventParam(
+    "originChainId",
+    event.parameters[1].value
+  );
+  const destinationChainId = new ethereum.EventParam(
+    "destinationChainId",
+    event.parameters[2].value
+  );
+  const relayerFeePct = new ethereum.EventParam(
+    "relayerFeePct",
+    event.parameters[3].value
+  );
+  const depositId = new ethereum.EventParam(
+    "depositId",
+    event.parameters[4].value
+  );
+  const quoteTimestamp = new ethereum.EventParam(
+    "quoteTimestamp",
+    event.parameters[5].value
+  );
+  const originToken = new ethereum.EventParam(
+    "originToken",
+    event.parameters[6].value
+  );
+  const recipient = new ethereum.EventParam(
+    "recipient",
+    event.parameters[7].value
+  );
+  const depositor = new ethereum.EventParam(
+    "depositor",
+    event.parameters[8].value
+  );
+
+  const params: ethereum.EventParam[] = [
+    amount,
+    originChainId,
+    destinationChainId,
+    relayerFeePct,
+    depositId,
+    quoteTimestamp,
+    originToken,
+    recipient,
+    depositor,
+  ];
+
+  // build event
+  const fundsDepositedSpokePool1 = new FundsDeposited(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    params,
+    event.receipt
+  );
+
+  // primary handler
+  handleFundsDepositedSpokePool1(fundsDepositedSpokePool1);
+}
+
+export function handleFundsDepositedSpokePool1(event: FundsDeposited): void {
   // Chain
   const originChainId = event.params.originChainId;
   const destinationChainId = event.params.destinationChainId;
@@ -139,7 +299,7 @@ export function handleFundsDeposited(event: FundsDeposited): void {
     )
   );
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-    originChainId,
+    destinationChainId,
     crossTokenAddress!,
     CrosschainTokenType.CANONICAL,
     inputTokenAddress!

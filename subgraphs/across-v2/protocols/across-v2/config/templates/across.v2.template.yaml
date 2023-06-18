@@ -116,11 +116,11 @@ dataSources:
   {{/AcceleratingDistributor}}
   {{#SpokePool}}
   - kind: ethereum
-    name: {{name}}
+    name: {{ name }}
     network: {{ network }}
     source:
       address: "{{ address }}"
-      abi: SpokePool
+      abi: {{ name }}
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
@@ -139,8 +139,10 @@ dataSources:
         - PoolRoute
         - PoolRouteSnapshot   
       abis:
-        - name: SpokePool
-          file: ./abis/{{name}}.json
+        - name: SpokePool1
+          file: ./abis/SpokePool1.json
+        - name: SpokePool2
+          file: ./abis/SpokePool2.json
         - name: AcceleratingDistributor
           file: ./abis/AcceleratingDistributor.json
         ################################################ 
@@ -174,9 +176,9 @@ dataSources:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: {{filledRelayEvent}}
-          handler: handleFilledRelay
-        - event: {{fundsDepositedEvent}}
-          handler: handleFundsDeposited
-      file: ./src/handlers/transfers{{name}}.ts
+        - event: {{ filledRelayEvent }}
+          handler: handleFilledRelay{{ name }}
+        - event: {{ fundsDepositedEvent }}
+          handler: handleFundsDeposited{{ name }}
+      file: ./src/handlers/transfersSpokePool.ts
   {{/SpokePool}}
