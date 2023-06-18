@@ -23,7 +23,7 @@ import {
 import {
   FilledRelay as FilledRelaySpokePool2,
   FundsDeposited as FundsDepositedSpokePool2,
-} from "../../generated/SpokePool2/SpokePool2";
+} from "../../generated/SpokePool1/SpokePool2";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 import { Network } from "../sdk/util/constants";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
