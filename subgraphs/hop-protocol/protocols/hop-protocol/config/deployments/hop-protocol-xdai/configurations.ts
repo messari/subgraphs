@@ -12,7 +12,7 @@ import {
   XdaiRewardToken,
   ZERO_ADDRESS,
   RewardTokens,
-} from "../../../../../src/common/constants";
+} from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
 export class HopProtocolxDaiConfigurations implements Configurations {

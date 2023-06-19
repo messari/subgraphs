@@ -29,7 +29,7 @@ import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
 import { BIGINT_TEN_TO_EIGHTEENTH } from "../../../../src/common/constants";
-import { updateAMMTVE } from "../../../../src/common/tokens";
+import { updateAMMTVE } from "../../../../src/sdk/util/tokens";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -44,7 +44,7 @@ class Pricer implements TokenPricer {
 }
 
 const conf = new BridgeConfig(
-  "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
+  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
   "HOP-"
     .concat(dataSource.network().toUpperCase().replace("-", "_"))
     .concat("-BRIDGE"),
@@ -135,7 +135,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-    let amount = event.params.tokenAmounts;
+    const amount = event.params.tokenAmounts;
     if (amount.length == 0) {
       return;
     }
@@ -215,7 +215,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 }
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-    let amount = event.params.tokenAmounts;
+    const amount = event.params.tokenAmounts;
     if (amount.length == 0) {
       return;
     }

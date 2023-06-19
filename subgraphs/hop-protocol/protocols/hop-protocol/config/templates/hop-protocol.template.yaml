@@ -11,63 +11,6 @@ graft:
 {{/graftEnabled}}
 {{#isMainnet}}
 dataSources:
-{{#tokens}}
-  - kind: ethereum/contract
-    name: {{dataSourceName}}
-    network: {{network}}
-    source:
-      address: '{{address}}'
-      abi: Token
-      startBlock: {{startBlock}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Transfer
-      abis:
-        - name: Token
-          file: ./abis/Token.json
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePool
-          file: ./abis/Prices/Curve/Pool.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Aave Contracts
-        - name: AaveOracleContract
-          file: ./abis/Prices/AaveOracle.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./protocols/hop-protocol/src/mainnet/token.ts
-{{/tokens}}
 {{#bridges}}
   - kind: ethereum/contract
     name: {{dataSourceName}}
@@ -126,8 +69,6 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: BonderAdded(indexed address)
-          handler: handleBonderAdded
         - event: TransferSentToL2(indexed uint256,indexed address,uint256,uint256,uint256,indexed address,uint256)
           handler: handleTransferSentToL2
           receipt: true
@@ -137,63 +78,6 @@ dataSources:
 
 {{^isMainnet}}
 dataSources:
-{{#tokens}}
-  - kind: ethereum/contract
-    name: {{dataSourceName}}
-    network: {{network}}
-    source:
-      address: '{{address}}'
-      abi: Token
-      startBlock: {{startBlock}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Transfer
-      abis:
-        - name: Token
-          file: ./abis/Token.json
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePool
-          file: ./abis/Prices/Curve/Pool.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Aave Contracts
-        - name: AaveOracleContract
-          file: ./abis/Prices/AaveOracle.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./protocols/hop-protocol/src/L2/token.ts
-{{/tokens}}
 {{#amms}}
   - kind: ethereum/contract
     name: {{dataSourceName}}

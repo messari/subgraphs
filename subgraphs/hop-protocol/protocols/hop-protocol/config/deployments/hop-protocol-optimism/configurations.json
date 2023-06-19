@@ -6,72 +6,7 @@
   "graftEnabled": false,
   "subgraphId": "QmcNz4aH8coWhEeVqABKTAWc9PteFXjczFcugB83skqkka",
   "graftStartBlock": 31755239,
-  "tokens": [
-    {
-      "dataSourceName": "Token",
-      "token": "USDC",
-      "tokenName": "USD Coin",
-      "tokenDecimals": 6,
-      "address": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
-      "startBlock": 0
-    },
-    {
-      "dataSourceName": "TokenUSDT",
-      "token": "USDT",
-      "tokenName": "Tether USD",
-      "tokenDecimals": 6,
-      "address": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
-      "startBlock": 0
-    },
-    {
-      "dataSourceName": "TokenDAI",
-      "token": "DAI",
-      "tokenName": "DAI Stablecoin",
-      "tokenDecimals": 18,
-      "address": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-      "startBlock": 0
-    },
-    {
-      "dataSourceName": "TokenETH",
-      "token": "ETH",
-      "tokenName": "Ethereum",
-      "tokenDecimals": 18,
-      "address": "0x4200000000000000000000000000000000000006",
-      "startBlock": 0
-    },
-    {
-      "dataSourceName": "TokenWBTC",
-      "token": "WBTC",
-      "tokenName": "Wrapped BTC",
-      "tokenDecimals": 18,
-      "address": "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
-      "startBlock": 0
-    },
-    {
-      "dataSourceName": "TokenSNX",
-      "token": "SNX",
-      "tokenName": "Synthetix Network Token",
-      "tokenDecimals": 18,
-      "address": "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4",
-      "startBlock": 26092038
-    },
-    {
-      "dataSourceName": "TokensUSD",
-      "token": "sUSD",
-      "tokenName": "Synth sUSD",
-      "tokenDecimals": 18,
-      "address": "0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9",
-      "startBlock": 27410328
-    },
-    {
-      "dataSourceName": "TokenHOP",
-      "token": "HOP",
-      "tokenName": "Hop",
-      "tokenDecimals": 18,
-      "address": "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC",
-      "startBlock": 24710333
-    }
-  ],
+
   "amms": [
     {
       "dataSourceName": "HopL2Amm",

@@ -19,12 +19,12 @@ import {
   BigInt,
   Bytes,
   dataSource,
+  ethereum,
   log,
 } from "@graphprotocol/graph-ts";
 import {
   TransferSent,
   TransferFromL1Completed,
-  BonderAdded,
 } from "../../../../generated/HopL2Bridge/L2_Bridge";
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
@@ -33,8 +33,14 @@ import {
   XDAI_L2_SIGNATURE,
   OPTIMISM_L2_SIGNATURE,
   MESSENGER_EVENT_SIGNATURES,
-} from "../../../../src/common/constants";
-import { Network } from "../../../../src/sdk/util/constants";
+} from "../../../../src/sdk/util/constants";
+import {
+  ARBITRUM_L1_SIGNATURE,
+  Network,
+  OPTIMISM_L1_SIGNATURE,
+  TRANSFERTOL2,
+  XDAI_L1_SIGNATURE,
+} from "../../../../src/sdk/util/constants";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -67,18 +73,6 @@ const conf = new BridgeConfig(
   Versions
 );
 
-export function handleBonderAdded(event: BonderAdded): void {
-  if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-    sdk.Accounts.loadAccount(event.params.newBonder);
-  }
-}
-
 export function handleTransferFromL1Completed(
   event: TransferFromL1Completed
 ): void {
@@ -94,7 +88,7 @@ export function handleTransferFromL1Completed(
       event.address.toHexString()
     )[1];
 
-    log.warning("inputToken: {}, bridgeAddress: {}", [
+    log.warning("inputToken: {}, event.address: {}", [
       inputTokenOne,
       event.address.toHexString(),
     ]);
@@ -102,7 +96,7 @@ export function handleTransferFromL1Completed(
       event.address.toHexString()
     );
     log.warning(
-      "inputTokenOne2: {}, bridgeAddress2: {}, poolAddress2: {}, txHash: {}",
+      "inputTokenOne2: {}, event.address2: {}, poolAddress2: {}, txHash: {}",
       [
         inputTokenOne,
         event.address.toHexString(),
@@ -220,24 +214,53 @@ export function handleTransferFromL1Completed(
 }
 
 export function handleTransferSent(event: TransferSent): void {
-  log.warning(
-    "TransferSent - bridgeAddress: {},  hash: {}, outgoingChainId: {}",
-    [
-      event.address.toHexString(),
-      event.transaction.hash.toHexString(),
-      event.params.chainId.toString(),
-    ]
-  );
-  if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
+  const receipt = event.receipt;
+
+  if (!receipt) return;
+  for (let index = 0; index < receipt.logs.length; index++) {
+    const _address = receipt.logs[index].address;
+    if (receipt.logs[index].topics.length == 0) continue;
+
+    const _topic0 = receipt.logs[index].topics[0].toHexString();
+
+    if (_topic0 != TRANSFERTOL2) continue;
+
+    const _chainID = receipt.logs.at(2).topic.at(1);
+    const _recipient = receipt.logs.at(2).topic.at(3);
+
+    const bridgeAddress = _topic0.address;
+    const chainID = ethereum.decode("uint256", _chainID)!.toBigInt();
+    const transferData = receipt.logs.at(2).data;
+
+    const decoded = ethereum
+      .decode("(uint256, uint256, uint256, uint256)", transferData)!
+      .toTuple();
+
+    const amount = decoded[0].toBigInt();
+
+    const recipient = ethereum.decode("address", _recipient)!.toAddress();
+
+    const _messengerdata = receipt.logs.at(1).data;
+    const _messengerTopic0 = receipt.logs.at(1).topic.at(0);
+    const messengerdata = Bytes.fromUint8Array(_messengerdata.subarray(0));
+
+    log.warning(
+      "TransferSent - bridgeAddress: {},  hash: {}, outgoingChainId: {}",
+      [
+        bridgeAddress.toHexString(),
+        event.transaction.hash.toHexString(),
+        chainID.toString(),
+      ]
+    );
     const inputTokenOne = NetworkConfigs.getTokenAddressFromBridgeAddress(
-      event.address.toHexString()
+      bridgeAddress.toHexString()
     )[0];
     const inputTokenTwo = NetworkConfigs.getTokenAddressFromBridgeAddress(
-      event.address.toHexString()
+      bridgeAddress.toHexString()
     )[1];
 
     const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
-      event.address.toHexString()
+      bridgeAddress.toHexString()
     );
 
     const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
@@ -262,7 +285,7 @@ export function handleTransferSent(event: TransferSent): void {
     const tokenTwo = sdk.Tokens.getOrCreateToken(
       Address.fromString(inputTokenTwo)
     );
-    const acc = sdk.Accounts.loadAccount(event.params.recipient);
+    const acc = sdk.Accounts.loadAccount(recipient);
     const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress));
 
     const hPool = sdk.Pools.loadPool<string>(
@@ -290,12 +313,9 @@ export function handleTransferSent(event: TransferSent): void {
     hPool.pool.relation = hPool.getBytesID();
 
     const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-      event.params.chainId,
+      chainID,
       Address.fromString(
-        NetworkConfigs.getCrossTokenAddress(
-          event.params.chainId.toString(),
-          inputTokenOne
-        )
+        NetworkConfigs.getCrossTokenAddress(chainID.toString(), inputTokenOne)
       ),
       CrosschainTokenType.CANONICAL,
       Address.fromString(inputTokenOne)
@@ -308,46 +328,47 @@ export function handleTransferSent(event: TransferSent): void {
     acc.transferOut(
       pool,
       pool.getDestinationTokenRoute(crossToken)!,
-      event.params.recipient,
-      event.params.amount,
+      recipient,
+      amount,
       event.transaction.hash
     );
 
-    //MESSAGES
-    const receipt = event.receipt;
+    ///
 
-    if (receipt) {
-      for (let index = 0; index < receipt.logs.length; index++) {
-        const _address = receipt.logs[index].address;
-        if (receipt.logs[index].topics.length == 0) continue;
+    log.warning(
+      "MessageOUTDT - emittingContractaddress: {}, topic0: {},  logAddress: {}, data: {}",
+      [
+        bridgeAddress.toHexString(),
+        _topic0,
+        _address.toHexString(),
+        messengerdata.toHexString(),
+      ]
+    );
+    if (_messengerTopic0 == ARBITRUM_L1_SIGNATURE) {
+      acc.messageOut(chainID, recipient, messengerdata);
+    } else if (_messengerTopic0 == XDAI_L1_SIGNATURE) {
+      const _xDaiData = receipt.logs.at(1).topic.at(3);
+      const xDaiData = ethereum.decode("bytes32", _xDaiData)!.toBytes();
 
-        const _topic0 = receipt.logs[index].topics[0].toHexString();
-        if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue;
-        const _data = receipt.logs[index].data;
+      acc.messageOut(chainID, event.params.recipient, xDaiData);
+    } else if (_messengerTopic0 == OPTIMISM_L1_SIGNATURE) {
+      const _optimismData = receipt.logs.at(1).topic.at(1);
+      const optimismData = ethereum.decode("bytes32", _optimismData)!.toBytes();
 
-        const data = Bytes.fromUint8Array(_data.subarray(0));
+      acc.messageOut(chainID, recipient, optimismData);
 
-        log.warning(
-          "MessageOUTDT - emittingContractaddress: {}, topic0: {},  logAddress: {}, data: {}",
-          [
-            event.address.toHexString(),
-            _topic0,
-            _address.toHexString(),
-            data.toHexString(),
-          ]
-        );
-        if (_topic0 == XDAI_L2_SIGNATURE || _topic0 == OPTIMISM_L2_SIGNATURE) {
-          acc.messageOut(event.params.chainId, event.params.recipient, data);
-        }
-        log.warning("MessageOUTDT2 - TokenAddress: {},  data: {}", [
-          event.address.toHexString(),
-          data.toHexString(),
-        ]);
-      }
+      log.warning("MessageOUT - BridgeAddress: {}, data: {}", [
+        event.address.toHexString(),
+        messengerdata.toHexString(),
+      ]);
     }
-    log.warning("TransferOUT - TokenAddress: {},  txHash: {},", [
-      event.address.toHexString(),
-      event.transaction.hash.toHexString(),
+
+    log.warning("MessageOUTDT2 - TokenAddress: {},  data: {}", [
+      bridgeAddress.toHexString(),
+      messengerdata.toHexString(),
     ]);
   }
+  log.warning("TransferOUT - txHash: {},", [
+    event.transaction.hash.toHexString(),
+  ]);
 }

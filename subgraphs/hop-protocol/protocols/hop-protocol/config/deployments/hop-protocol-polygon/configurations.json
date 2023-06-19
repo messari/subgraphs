@@ -6,56 +6,6 @@
   "graftEnabled": false,
   "subgraphId": "QmNqpEkiRtDZpA44qUkGWEJWSkdibxndWfX9fBvSXTH1aq",
   "graftStartBlock": 23023811,
-  "tokens": [
-    {
-      "dataSourceName": "Token",
-      "token": "USDC",
-      "tokenName": "USD Coin",
-      "tokenDecimals": 6,
-      "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-      "startBlock": 15810013
-    },
-    {
-      "dataSourceName": "TokenUSDT",
-      "token": "USDT",
-      "tokenName": "Tether USD",
-      "tokenDecimals": 6,
-      "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-      "startBlock": 17058878
-    },
-    {
-      "dataSourceName": "TokenMATIC",
-      "token": "MATIC",
-      "tokenName": "Matic",
-      "tokenDecimals": 18,
-      "address": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-      "startBlock": 17669097
-    },
-    {
-      "dataSourceName": "TokenDAI",
-      "token": "DAI",
-      "tokenName": "DAI Stablecoin",
-      "tokenDecimals": 18,
-      "address": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-      "startBlock": 19112518
-    },
-    {
-      "dataSourceName": "TokenETH",
-      "token": "ETH",
-      "tokenName": "Ethereum",
-      "tokenDecimals": 18,
-      "address": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-      "startBlock": 19706859
-    },
-    {
-      "dataSourceName": "TokenHOP",
-      "token": "HOP",
-      "tokenName": "Hop",
-      "tokenDecimals": 18,
-      "address": "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC",
-      "startBlock": 33447834
-    }
-  ],
   "amms": [
     {
       "dataSourceName": "HopL2Amm",

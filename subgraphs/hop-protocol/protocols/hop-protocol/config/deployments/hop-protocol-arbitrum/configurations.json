@@ -6,44 +6,6 @@
   "graftEnabled": false,
   "subgraphId": "QmTLeuxKJS6e4uEUt45C1UMmAb19M7YYgsQ8yrHQiVQxvj",
   "graftStartBlock": 9494730,
-  "tokens": [
-    {
-      "dataSourceName": "Token",
-      "token": "USDC",
-      "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
-      "startBlock": 440027
-    },
-    {
-      "dataSourceName": "TokenUSDT",
-      "token": "USDT",
-      "address": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-      "startBlock": 441562
-    },
-    {
-      "dataSourceName": "TokenDAI",
-      "token": "DAI",
-      "address": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-      "startBlock": 945326
-    },
-    {
-      "dataSourceName": "TokenETH",
-      "token": "ETH",
-      "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-      "startBlock": 2135598
-    },
-    {
-      "dataSourceName": "TokenWBTC",
-      "token": "WBTC",
-      "address": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-      "startBlock": 2481596
-    },
-    {
-      "dataSourceName": "TokenHOP",
-      "token": "HOP",
-      "address": "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC",
-      "startBlock": 26088165
-    }
-  ],
   "amms": [
     {
       "dataSourceName": "HopL2Amm",
@@ -68,12 +30,6 @@
       "token": "ETH",
       "address": "0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97",
       "startBlock": 2135591
-    },
-    {
-      "dataSourceName": "HopL2AmmWBTC",
-      "token": "WBTC",
-      "address": "0x7191061D5d4C60f598214cC6913502184BAddf18",
-      "startBlock": 2481584
     }
   ],
   "bridges": [
@@ -100,12 +56,6 @@
       "token": "ETH",
       "address": "0x3749C4f034022c39ecafFaBA182555d4508caCCC",
       "startBlock": 2135598
-    },
-    {
-      "dataSourceName": "HopL2BridgeWBTC",
-      "token": "WBTC",
-      "address": "0x3E4a3a4796d16c0Cd582C382691998f7c06420B6",
-      "startBlock": 2481596
     },
     {
       "dataSourceName": "HopL2BridgeHOP",

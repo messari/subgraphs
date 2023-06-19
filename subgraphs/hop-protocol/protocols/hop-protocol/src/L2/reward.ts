@@ -28,7 +28,7 @@ import {
   updateRewardsPaid,
   updateStaked,
   updateWithdrawn,
-} from "../../../../src/common/rewards";
+} from "../../../../src/sdk/util/rewards";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {

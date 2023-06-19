@@ -12,7 +12,7 @@ import {
   OptimismRewardToken,
   RewardTokens,
   OptimismHtoken,
-} from "../../../../../src/common/constants";
+} from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolOptimismConfigurations implements Configurations {
   getNetwork(): string {

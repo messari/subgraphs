@@ -16,24 +16,15 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
-import {
-  TransferSentToL2,
-  BonderAdded,
-} from "../../../../generated/HopL1Bridge/L1_Bridge";
+import { TransferSentToL2 } from "../../../../generated/HopL1Bridge/L1_Bridge";
 
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
-import {
-  ARBITRUM_L1_SIGNATURE,
-  MESSENGER_EVENT_SIGNATURES,
-  OPTIMISM_L1_SIGNATURE,
-  XDAI_L1_SIGNATURE,
-} from "../../../../src/common/constants";
+import { updateBridgeMessage } from "../../../../src/sdk/util/bridge";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -58,7 +49,7 @@ class TokenInit implements TokenInitializer {
 }
 
 const conf = new BridgeConfig(
-  "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
+  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
   "HOP-"
     .concat(dataSource.network().toUpperCase().replace("-", "_"))
     .concat("-BRIDGE"),
@@ -66,20 +57,6 @@ const conf = new BridgeConfig(
   BridgePermissionType.PERMISSIONLESS,
   Versions
 );
-
-export function handleBonderAdded(event: BonderAdded): void {
-  if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
-    log.warning("bridgeAddress: {}", [event.address.toHexString()]);
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-    sdk.Accounts.loadAccount(event.params.newBonder);
-  }
-}
 
 export function handleTransferSentToL2(event: TransferSentToL2): void {
   if (event.params.chainId.toString() == "42170") return;
@@ -178,74 +155,23 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 
     pool.addInputTokenBalance(event.params.amount);
 
-    let receipt = event.receipt;
+    const receipt = event.receipt;
+    if (!receipt) return;
 
-    if (receipt) {
-      log.warning("S7 - chainID: {}, inputToken: {}, txHash: {}", [
-        event.params.chainId.toString(),
-        inputToken,
-        event.transaction.hash.toHexString(),
-      ]);
-      for (let index = 0; index < receipt.logs.length; index++) {
-        const _address = receipt.logs[index].address;
-        if (receipt.logs[index].topics.length == 0) continue;
+    log.warning("S7 - chainID: {}, inputToken: {}, txHash: {}", [
+      event.params.chainId.toString(),
+      inputToken,
+      event.transaction.hash.toHexString(),
+    ]);
 
-        const _topic0 = receipt.logs[index].topics[0].toHexString();
-        const _data = receipt.logs[index].data;
-
-        log.warning("S8 - chainID: {}, topic0: {}, txHash: {}", [
-          event.params.chainId.toString(),
-          _topic0,
-          event.transaction.hash.toHexString(),
-        ]);
-        if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue;
-        log.warning(
-          "S9 - chainID: {}, inputToken: {}, topic0: {}, txHash: {}",
-          [
-            event.params.chainId.toString(),
-            inputToken,
-            _topic0,
-            event.transaction.hash.toHexString(),
-          ]
-        );
-
-        const data = Bytes.fromUint8Array(_data.subarray(0));
-
-        log.warning(
-          "MessageOUTDT - emittingContractaddress: {}, topic0: {}, logAddress: {}, data: {}",
-          [
-            event.address.toHexString(),
-            _topic0,
-            _address.toHexString(),
-            data.toHexString(),
-          ]
-        );
-        if (_topic0 == ARBITRUM_L1_SIGNATURE) {
-          acc.messageOut(event.params.chainId, event.params.recipient, data);
-        } else if (_topic0 == XDAI_L1_SIGNATURE) {
-          const _xDaiData = receipt.logs[index].topics[3];
-
-          acc.messageOut(
-            event.params.chainId,
-            event.params.recipient,
-            _xDaiData
-          );
-        } else if (_topic0 == OPTIMISM_L1_SIGNATURE) {
-          const _optimismData = receipt.logs[index].topics[1];
-
-          acc.messageOut(
-            event.params.chainId,
-            event.params.recipient,
-            _optimismData
-          );
-
-          log.warning("MessageOUT - BridgeAddress: {}, data: {}", [
-            event.address.toHexString(),
-            data.toHexString(),
-          ]);
-        }
-      }
-    }
+    updateBridgeMessage(
+      event,
+      event.params.recipient,
+      event.params.chainID,
+      acc,
+      inputToken,
+      receipt
+    );
 
     log.warning("TransferOUT - BridgeAddress: {},  txHash: {}", [
       event.address.toHexString(),

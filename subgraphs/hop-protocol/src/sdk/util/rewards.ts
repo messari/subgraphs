@@ -5,10 +5,25 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { _CircularBuffer } from "../../../generated/schema";
 import {
+  log,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  Address,
+  ethereum,
+} from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../../configurations/configure";
+import { _CircularBuffer } from "../../../generated/schema";
+import { L2_Reward } from "../../../generated/HopL2Rewards/L2_Reward";
+import {
+  GNO_REWARDS,
+  HOP_REWARDS,
   Network,
+  OP_REWARDS,
+  RewardTokens,
+} from "./constants";
+import {
   BIGDECIMAL_ZERO,
   INT_FOUR,
   INT_NEGATIVE_ONE,
@@ -16,6 +31,15 @@ import {
   INT_TWO,
   INT_ZERO,
 } from "./constants";
+import { PoolManager } from "../../sdk/protocols/bridge/pool";
+import { BridgePoolType } from "../../sdk/protocols/bridge/enums";
+import { TokenManager } from "../../sdk/protocols/bridge/tokens";
+import {
+  BIGINT_MINUS_ONE,
+  BIGINT_TEN_TO_EIGHTEENTH,
+  BIGINT_TWO,
+  RewardTokenType,
+} from "../../sdk/util/constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -252,34 +276,33 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  const network = dataSource.network().toUpperCase().replace("-", "_");
-  if (network == Network.MAINNET) {
+  if (NetworkConfigs.getNetwork() == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
-  } else if (network == Network.ARBITRUM_ONE) {
+  } else if (NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
-  } else if (network == Network.AURORA) {
+  } else if (NetworkConfigs.getNetwork() == Network.AURORA) {
     return BigDecimal.fromString("1.03");
-  } else if (network == Network.BSC) {
+  } else if (NetworkConfigs.getNetwork() == Network.BSC) {
     return BigDecimal.fromString("5");
-  } else if (network == Network.CELO) {
+  } else if (NetworkConfigs.getNetwork() == Network.CELO) {
     return BigDecimal.fromString("5");
-  } else if (network == Network.FANTOM) {
+  } else if (NetworkConfigs.getNetwork() == Network.FANTOM) {
     return BigDecimal.fromString("1");
-  } else if (network == Network.FUSE) {
+  } else if (NetworkConfigs.getNetwork() == Network.FUSE) {
     return BigDecimal.fromString("1");
-  } else if (network == Network.OPTIMISM) {
+  } else if (NetworkConfigs.getNetwork() == Network.OPTIMISM) {
     return BigDecimal.fromString("12.5");
-  } else if (network == Network.MATIC) {
+  } else if (NetworkConfigs.getNetwork() == Network.MATIC) {
     return BigDecimal.fromString("2");
-  } else if (network == Network.XDAI) {
+  } else if (NetworkConfigs.getNetwork() == Network.XDAI) {
     return BigDecimal.fromString("5");
-  } else if (network == Network.MOONBEAM) {
+  } else if (NetworkConfigs.getNetwork() == Network.MOONBEAM) {
     return BigDecimal.fromString("13.39");
-  } else if (network == Network.MOONRIVER) {
+  } else if (NetworkConfigs.getNetwork() == Network.MOONRIVER) {
     return BigDecimal.fromString("13.39");
-  } else if (network == Network.AVALANCHE) {
+  } else if (NetworkConfigs.getNetwork() == Network.AVALANCHE) {
     return BigDecimal.fromString("13.39");
-  } else if (network == Network.CRONOS) {
+  } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
   }
 
@@ -288,5 +311,294 @@ function getStartingBlockRate(): BigDecimal {
   else {
     log.warning("getStartingBlockRate(): Network not found", []);
     return BIGDECIMAL_ZERO;
+  }
+}
+export function updateWithdrawn(
+  pools: PoolManager,
+  hPools: PoolManager,
+  tokens: TokenManager,
+  poolName: string,
+  poolSymbol: string,
+  hPoolName: string,
+  poolAddress: string,
+  rewardToken: string,
+  amount: BigInt
+): void {
+  if (GNO_REWARDS.includes(rewardToken)) {
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+    hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+  }
+  if (OP_REWARDS.includes(rewardToken)) {
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+    hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+  }
+  if (HOP_REWARDS.includes(rewardToken)) {
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+    hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+  }
+}
+
+export function updateStaked(
+  pools: PoolManager,
+  hPools: PoolManager,
+  tokens: TokenManager,
+  poolName: string,
+  poolSymbol: string,
+  hPoolName: string,
+  poolAddress: string,
+  rewardToken: string,
+  amount: BigInt
+): void {
+  if (GNO_REWARDS.includes(rewardToken)) {
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    pool.addStakedOutputTokenAmount(amount);
+    hPool.addStakedOutputTokenAmount(amount);
+  }
+  if (OP_REWARDS.includes(rewardToken)) {
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    pool.addStakedOutputTokenAmount(amount);
+    hPool.addStakedOutputTokenAmount(amount);
+  }
+  if (HOP_REWARDS.includes(rewardToken)) {
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    pool.addStakedOutputTokenAmount(amount);
+    hPool.addStakedOutputTokenAmount(amount);
+  }
+}
+
+export function updateRewardsPaid(
+  pools: PoolManager,
+  hPools: PoolManager,
+  tokens: TokenManager,
+  poolName: string,
+  poolSymbol: string,
+  hPoolName: string,
+  poolAddress: string,
+  event: ethereum.Event,
+  amount: BigInt
+): void {
+  if (GNO_REWARDS.includes(event.address.toHexString())) {
+    log.warning(
+      "GNO RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}",
+      [event.address.toHexString(), poolAddress, amount.toString()]
+    );
+
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    const Reward = L2_Reward.bind(event.address);
+    const rewardRateCall = Reward.try_rewardRate();
+    if (!rewardRateCall.reverted) {
+      log.warning(
+        "GNO RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}",
+        [
+          event.transaction.hash.toHexString(),
+          rewardRateCall.value.toString(),
+          BIGINT_TEN_TO_EIGHTEENTH.toString(),
+        ]
+      );
+      const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
+
+      const dailyEmission = BigInt.fromI32(86400).times(rewardRate);
+      pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+      hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+
+      log.warning(
+        "GNO RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
+        [
+          event.transaction.hash.toHexString(),
+          rewardRate.toString(),
+          dailyEmission.toString(),
+        ]
+      );
+    } else {
+      log.warning("GNO Rewards rate call reverted", []);
+    }
+  }
+  if (OP_REWARDS.includes(event.address.toHexString())) {
+    const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+      event.address.toHexString()
+    );
+    log.warning("OP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
+      event.address.toHexString(),
+      poolAddress,
+      amount.toString(),
+    ]);
+    log.warning("OP RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
+
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+    const Reward = L2_Reward.bind(event.address);
+    const rewardRateCall = Reward.try_rewardRate();
+    if (!rewardRateCall.reverted) {
+      log.warning(
+        "OP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}",
+        [
+          event.transaction.hash.toHexString(),
+          rewardRateCall.value.toString(),
+          BIGINT_TEN_TO_EIGHTEENTH.toString(),
+        ]
+      );
+      const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
+
+      const dailyEmission = BigInt.fromI32(86400).times(rewardRate);
+      pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+      hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+
+      log.warning(
+        "OP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
+        [
+          event.transaction.hash.toHexString(),
+          rewardRate.toString(),
+          dailyEmission.toString(),
+        ]
+      );
+    } else {
+      log.warning("OP Rewards rate call reverted", []);
+    }
+  }
+  if (HOP_REWARDS.includes(event.address.toHexString())) {
+    log.warning(
+      "HOP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}",
+      [event.address.toHexString(), poolAddress, amount.toString()]
+    );
+
+    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+
+    const hPool = hPools.loadPool<string>(
+      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+    );
+    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
+
+    if (!pool.isInitialized) {
+      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    if (!hPool.isInitialized) {
+      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+    }
+
+    const Reward = L2_Reward.bind(event.address);
+    const rewardRateCall = Reward.try_rewardRate();
+    if (!rewardRateCall.reverted) {
+      log.warning(
+        "HOP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}",
+        [
+          event.transaction.hash.toHexString(),
+          rewardRateCall.value.toString(),
+          BIGINT_TEN_TO_EIGHTEENTH.toString(),
+        ]
+      );
+      const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
+
+      const dailyEmission = BigInt.fromI32(86400).times(rewardRate);
+      pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+      hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+
+      log.warning(
+        "HOP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
+        [
+          event.transaction.hash.toHexString(),
+          rewardRate.toString(),
+          dailyEmission.toString(),
+        ]
+      );
+    } else {
+      log.warning("HOP Rewards rate call reverted", []);
+    }
   }
 }

@@ -12,7 +12,7 @@ import {
   ZERO_ADDRESS,
   RewardTokens,
   PolygonHtoken,
-} from "../../../../../src/common/constants";
+} from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolPolygonConfigurations implements Configurations {
   getNetwork(): string {

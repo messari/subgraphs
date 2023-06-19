@@ -1,11 +1,11 @@
 /* eslint-disable prefer-const */
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { Pool } from "../sdk/protocols/bridge/pool";
+import { Pool } from "../protocols/bridge/pool";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_TEN_TO_EIGHTEENTH,
-} from "../sdk/util/constants";
+} from "./constants";
 import { BIGINT_TEN_TO_SIX, SIX_DECIMAL_TOKENS } from "./constants";
 import { L2_Amm } from "../../generated/HopL2Amm/L2_Amm";
 

@@ -28,8 +28,8 @@ import {
   XdaiHtoken,
   XdaiToken,
   priceTokens,
-} from "../common/constants";
-import { UniswapPair } from "../../generated/Token/UniswapPair";
+} from "../sdk/util/constants";
+import { UniswapPair } from "../../generated/HopL1Bridge/UniswapPair";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
