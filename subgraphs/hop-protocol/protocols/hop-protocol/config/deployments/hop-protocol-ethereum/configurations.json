@@ -7,7 +7,7 @@
   "graftStartBlock": 14228420,
   "bridges": [
     {
-      "dataSourceName": "HopL1Bridge",
+      "dataSourceName": "Bridge",
       "token": "USDC",
       "address": "0x3666f603Cc164936C1b87e207F36BEBa4AC5f18a",
       "startBlock": 12650032

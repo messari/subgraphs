@@ -17,7 +17,7 @@ dataSources:
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: L1_Bridge
+      abi: Bridge
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -25,7 +25,7 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: L1_Bridge
+        - name: Bridge
           file: ./abis/L1_Bridge.json
         - name: L1_Optimism_Messenger
           file: ./abis/L1_Optimism_Messenger.json
@@ -146,7 +146,7 @@ dataSources:
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: L2_Bridge
+      abi: Bridge
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -156,7 +156,7 @@ dataSources:
       abis:
         - name: L2_Amm
           file: ./abis/L2_Amm.json
-        - name: L2_Bridge
+        - name: Bridge
           file: ./abis/L2_Bridge.json
         - name: L2_Optimism_Messenger
           file: ./abis/L2_Optimism_Messenger.json

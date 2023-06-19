@@ -29,7 +29,7 @@ import {
   XdaiToken,
   priceTokens,
 } from "../sdk/util/constants";
-import { UniswapPair } from "../../generated/HopL1Bridge/UniswapPair";
+import { UniswapPair } from "../../generated/Bridge/UniswapPair";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
@@ -73,7 +73,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     );
 
     let price: BigDecimal;
-    let reserve = uniSwapPair.try_getReserves();
+    const reserve = uniSwapPair.try_getReserves();
     if (!reserve.reverted) {
       price = reserve.value.value1
         .toBigDecimal()

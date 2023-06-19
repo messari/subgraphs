@@ -19,7 +19,7 @@ import {
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
-import { TransferSentToL2 } from "../../../../generated/HopL1Bridge/L1_Bridge";
+import { TransferSentToL2 } from "../../../../generated/Bridge/Bridge";
 
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
@@ -167,7 +167,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
     updateBridgeMessage(
       event,
       event.params.recipient,
-      event.params.chainID,
+      event.params.chainId,
       acc,
       inputToken,
       receipt

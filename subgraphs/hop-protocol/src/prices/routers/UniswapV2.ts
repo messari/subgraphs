@@ -2,8 +2,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { UniswapPair as UniswapPairContract } from "../../../generated/HopL1Bridge/UniswapPair";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/HopL1Bridge/UniswapRouter";
+import { UniswapPair as UniswapPairContract } from "../../../generated/Bridge/UniswapPair";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/Bridge/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   if (tokenAddress.equals(ethAddress)) return false;

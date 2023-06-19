@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/HopL1Bridge/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/Bridge/CalculationsCurve";
 
 export function getCalculationsCurveContract(
   contractAddress: Address
