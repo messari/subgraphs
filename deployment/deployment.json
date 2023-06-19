@@ -8856,5 +8856,35 @@
         }
       }
     }
+  },
+  "ebtc": {
+    "schema": "lending",
+    "base": "ebtc",
+    "protocol": "ebtc",
+    "project": "ebtc",
+    "deployments": {
+      "ebtc-goerli": {
+        "network": "goerli",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.1",
+          "subgraph": "0.0.1",
+          "methodology": "0.0.1"
+        },
+        "files": {
+          "template": "ebtc.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "decentralized-network": {
+            "slug": "ebtc-goerli",
+            "query-id": "QmdZphstRBDgd6teT5dhQDZ84H6bsqwTy8tEj579JFhqwU"
+          }
+        }
+      }
+    }
   }
 }

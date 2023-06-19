@@ -1,0 +1,2 @@
+# gets generated from constants.mustache
+src/constants.ts

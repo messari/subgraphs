@@ -1,0 +1,42 @@
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ONE, BIGDECIMAL_HUNDRED } from "./sdk/constants";
+
+/////////////////////////////
+///// Protocol Specific /////
+/////////////////////////////
+
+export const PROTOCOL_NAME = "eBTC";
+export const PROTOCOL_SLUG = "ebtc";
+
+export const BTC_ADDRESS = Bytes.fromHexString(
+  "0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05"
+  // TODO: since chainlink does not have a registry on goerli, we get the wbtc
+  // price from uniswap instead. however, for mainnet we have to get the
+  // native btc price from the chainlink registry!
+  //"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+);
+export const ETH_ADDRESS = Bytes.fromHexString(
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+);
+export const EBTC_ADDRESS = Bytes.fromHexString(
+  "{{ eBTCToken.address }}"
+);
+export const STETH_ADDRESS = Bytes.fromHexString(
+  "{{ stethToken.address }}"
+);
+export const CDP_MANAGER = Bytes.fromHexString(
+  "{{ cdpManager.address }}"
+);
+export const ACTIVE_POOL = Bytes.fromHexString(
+  "{{ activePool.address }}"
+);
+
+export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32({{ activePool.startBlock }});
+export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32({{ activePool.createdAt }});
+
+export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
+export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO).times(
+  BIGDECIMAL_HUNDRED
+);
+export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
+export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
