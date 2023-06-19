@@ -59,8 +59,6 @@ const conf = new BridgeConfig(
 );
 
 export function handleTransferSentToL2(event: TransferSentToL2): void {
-  if (event.params.chainId.toString() == "42170") return;
-
   if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
     const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
       event.address.toHexString()
