@@ -137,7 +137,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     } else if (chainId == "137") {
       return this.getPolygonPoolAddressFromBridgeAddress(bridgeAddress); //Polygon
     } else {
-      log.warning("Chain not found", []);
+      log.critical("Chain not found", []);
       return "";
     }
   }
@@ -256,7 +256,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (chainId == "1")
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
     else {
-      log.warning("Chain not found", []);
+      log.critical("Chain not found", []);
       return "";
     }
   }
