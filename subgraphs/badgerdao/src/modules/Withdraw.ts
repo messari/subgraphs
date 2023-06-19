@@ -17,7 +17,7 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Prices";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
@@ -107,8 +107,7 @@ export function Withdraw(
   const withdrawAmountUSD = withdrawAmount
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
@@ -124,8 +123,7 @@ export function Withdraw(
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,

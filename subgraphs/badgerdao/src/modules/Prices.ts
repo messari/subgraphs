@@ -36,8 +36,7 @@ export function getPriceOfOutputTokens(
     .times(amount.toBigDecimal())
     .div(vaultTokenDecimals)
     .div(vaultTokenDecimals)
-    .times(virtualPrice.usdPrice)
-    .div(virtualPrice.decimalsBaseTen);
+    .times(virtualPrice.usdPrice);
 
   return price;
 }

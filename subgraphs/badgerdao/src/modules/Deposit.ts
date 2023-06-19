@@ -118,8 +118,7 @@ export function Deposit(
   const depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
@@ -134,8 +133,7 @@ export function Deposit(
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.pricePerShare = getPricePerShare(vaultAddress);
 
