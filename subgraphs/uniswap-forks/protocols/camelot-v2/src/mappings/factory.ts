@@ -1,3 +1,4 @@
+import { NetworkConfigs } from "../../../../configurations/configure";
 import {
   OwnerFeeShareUpdated,
   PairCreated,
@@ -21,6 +22,19 @@ export function handleOwnerFeeShareUpdated(event: OwnerFeeShareUpdated): void {
 
 export function handlePairCreated(event: PairCreated): void {
   const logger = new Logger(event, "handlePairCreated");
+  if (
+    NetworkConfigs.getUntrackedPairs().includes(event.params.pair.toHexString())
+  ) {
+    logger.warning(
+      "farm found in UntrackedPairs list, not tracking: {}    {}     {}",
+      [
+        event.params.pair.toHexString(),
+        event.params.token0.toHexString(),
+        event.params.token1.toHexString(),
+      ]
+    );
+    return;
+  }
   logger.info("create farm {}    {}     {}", [
     event.params.pair.toHexString(),
     event.params.token0.toHexString(),

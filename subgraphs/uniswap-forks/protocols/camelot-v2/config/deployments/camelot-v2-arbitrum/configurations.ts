@@ -11,8 +11,7 @@ import {
 } from "../../../../../src/common/constants";
 import {
   FACTORY_ADDRESS,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
-  MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND,
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
@@ -140,18 +139,75 @@ export class CamelotV2Configurations implements Configurations {
       "0xc027954c90039f77c3e062dabb44e7c6996800f4",
       "0xcf3a9dfa47a9ddd95c3da9946cb7c0fdcd76d1f3",
       "0xe3770e273985503a49727bb5062a61e0bdbcd799",
+      "0x49fe80f28abd3464c0131f07667f23aba906a109",
+      "0x3aca67ce7ce58a23c11f7acb1fdcd7ca97a87280",
+      "0xcf3d4223059eadc0cab11ce9e9b8b0cbe28f7320",
+      "0x5f60e272ffd18d1a9e08441a55d7e8b19dd3f596",
+      "0x30141cd8bc39cda323488c31b0d21f766b43b4a3",
+      "0x0c8df98817977bf5c09d45e811249e5a878bdac7",
+      "0x3bb71b8d7c1756494a57fea97d14601febc08d50",
+      "0x0f3074c55478a5c46c8af963b669ca663c2435e8",
+      "0xc6488b0fccde76176bf4808067c243909ab91020",
+      "0xee1d570036f96afbf43b1e711a19165bb35a5593",
     ];
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x91427b0171f4121a5c19f78dd0a4cfe683bcc447",
+      "0xff8a64397bec16cc26ea9ae71048c60a22901bd3",
+      "0x6b06ff14e09295fe55989b90206d488e4a293983",
+      "0xc8951290cbe3562a67f1df199ef6eed72dd4603f",
+      "0xe3e7226acb38f772e90c0e4bd6afdbc9c968349b",
+      "0x76d849a7a854a0fe6bb787d9c244b3b6463db6e4",
+      "0x9f20edeb6bfbdc0fe837ec138fd9b6333c61a123",
+      "0xb8387311cfcaf8715ec7a1e6adad8561189b1843",
+      "0x61203473a0c0f93717e95d084343350dcbbdc221",
+      "0xb88719d85e427dad0fa7a978809c00789fb3b06d",
+      "0x43ecebb59dff5e3d12ed29dd3904a8ccfe0044b7",
+      "0xfaf84ac3720802139b05eb766a6f0227bef626cf",
+      "0x8daab57941c36b833e3947c7d056d63a0b2ee6f8",
+      "0x88f6e85a785ed9feac5b0269f1321c6b6131a2c3",
+      "0x4ee7fd445ea06474cda563ec74822a3bfeb8a408",
+      "0xa79c0ad52686a67c3b3a819ea2ab91fee82f66f3",
+      "0x01f93865c7762a87bf3131179b8bd9866de6ee85",
+      "0xdd6d1a48950599bb1fa748109ab8c313cd1e61fc",
+      "0x0546e8508b3a26bf2a56eda3c1a434e2cda85c1d",
+      "0xaa64fdb22aeea0ac949eb353307893d3b33f83e3",
+      "0xacb74db7d881c076263cd261e50d6714b78cfc6f",
+      "0x520b3c9b05932dfb40496a9988c878a02a5c99af",
+      "0x278e1b4ab074464f006bd73d63e0ec2b8715f0c5",
+      "0xac6d43d01da88c012516347de21baf26e56073c5",
+      "0xf133254d607fbf7650ea4f1191f959752ea18a02",
+      "0x7e1a59f281cd1128cd4d1ab2c90a2e27bfe5e70b",
+      "0xf62a50717ff598aba123b0fa1858384ba5313b96",
+      "0x97b63c981fb2274f51f623c6f3272d422cd1d6f5",
+      "0xf03e44322fb768e618da5facad81b53636bfa234",
+      "0xc221f7c573a5ad287921a7015ff11027f2232c18",
+      "0xa453baf6611e43fa5ba698116ba649b308f18dc7",
+      "0x96baa39d1d59dfa972516aa11e0761dbb7db7fa4",
+      "0x7756d6f51dc2a2ace8211a74918cde9fff08201c",
+      "0x7b4b76cec96064642b7bd81c0cca386fb0b7ff78",
+      "0x8aa764f42288827bbcb3238ccf62d095ec7bfd24",
+      "0x070622449e7980a1709c576ecbfa1c02b3fd8681",
+      "0x0bd45dbda61f99393f4504a5807065eeea235624",
+      "0x3c45ff1c0487a4e9aa259905f6a8eef07319c49d",
+      "0x06eaa2c25d97c23419032535b42142e63caf185d",
+      "0x60efcbdb8deb71f851fc641428f1088e828af6e3",
+      "0xa7138f3e2c855ccea2380dc21bfca17543604228",
+      "0x96ebb9ffd819dd259006de147c3742f9f0a6df57",
+      "0x939f9b559a0a81fcac639111e3476d17497fadbb",
+      "0xc971b8a0dd289be391c8a21b6f5df49c9962b848",
+      "0x3fbb75df858e5b0164b27e294678fc78d0097d54",
+      "0x3fa8d66caa837681d71a05a2c032b1c3f52e84e1",
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
   }
 }
