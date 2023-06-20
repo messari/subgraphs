@@ -8882,6 +8882,10 @@
           "decentralized-network": {
             "slug": "ebtc-goerli",
             "query-id": "QmdZphstRBDgd6teT5dhQDZ84H6bsqwTy8tEj579JFhqwU"
+          },
+          "hosted-service": {
+            "slug": "ebtc-goerli",
+            "query-id": "ebtc-goerli"
           }
         }
       }
