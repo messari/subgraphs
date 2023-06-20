@@ -8875,7 +8875,6 @@
           "template": "ebtc.template.yaml"
         },
         "options": {
-          "prepare:yaml": true,
           "prepare:constants": true
         },
         "services": {
