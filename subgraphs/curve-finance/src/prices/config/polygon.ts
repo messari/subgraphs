@@ -73,6 +73,7 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x60d55f02a771d515e077c9c2403a1ef324885cec"), // Aave Matic Market USDT
   Address.fromString("0xe2aa7db6da1dae97c5f5c6914d285fbfcc32a128"), // PAR Stablecoin (PAR)
   Address.fromString("0x7bdf330f423ea880ff95fc41a280fd5ecfd3d09f"), // Euro Tether (PoS)
+  Address.fromString("0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171"), // Curve.fi amDAI/amUSDC/amUSDT
 ];
 
 ///////////////////////////////////////////////////////////////////////////

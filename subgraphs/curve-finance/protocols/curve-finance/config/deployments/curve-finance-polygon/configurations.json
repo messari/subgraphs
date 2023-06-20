@@ -34,6 +34,13 @@
     }
   ],
 
+  "basePoolsLpToken": [
+    {
+      "name": "Curve.fi amDAI/amUSDC/amUSDT",
+      "address": "0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171"
+    }
+  ],
+
   "graftEnabled": false,
   "subgraphId": "QmRMetcuDNRuvEoSggdModza9TPRe99jzJDL7ygQwJKgym",
   "graftStartBlock": "14905747"

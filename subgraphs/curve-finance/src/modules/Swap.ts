@@ -118,12 +118,19 @@ export function Swap(
     tokenIn = underlyingCoins[soldId.toI32()].toHexString();
     tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
 
-    if (
-      pool._isMetapool &&
-      boughtId.equals(constants.BIGINT_ZERO) &&
-      utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)
-    )
-      tokenIn = pool._inputTokensOrdered.at(-1);
+    if (pool._isMetapool && boughtId.equals(constants.BIGINT_ZERO)) {
+      if (
+        utils.equalsIgnoreCase(
+          dataSource.network(),
+          constants.Network.MAINNET
+        ) ||
+        utils.equalsIgnoreCase(
+          dataSource.network(),
+          constants.Network.ARBITRUM_ONE
+        )
+      )
+        tokenIn = pool._inputTokensOrdered.at(-1);
+    }
   }
 
   const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
