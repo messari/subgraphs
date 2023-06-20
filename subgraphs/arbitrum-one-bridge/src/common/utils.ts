@@ -134,10 +134,9 @@ export function undoAlias(aliasAddress: Address): string {
   const aliasAddressBigInt = BigInt.fromUnsignedBytes(aliasAddressBytes);
 
   // offsetAddress stuff
-  const offsetAddress = Address.fromString(
+  const offsetBytes = Bytes.fromHexString(
     "0x1111000000000000000000000000000000001111"
   );
-  const offsetBytes = Bytes.fromHexString(offsetAddress.toHexString());
   const offsetBigInt = BigInt.fromUnsignedBytes(offsetBytes);
 
   // actualAddress stuff; aliasBigInt should never overflow
