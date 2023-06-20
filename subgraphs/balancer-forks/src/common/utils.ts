@@ -1,10 +1,10 @@
 import {
+  log,
   Bytes,
   BigInt,
   Address,
   ethereum,
   BigDecimal,
-  log,
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
@@ -156,7 +156,7 @@ export function getPoolScalingFactors(
   return scales;
 }
 
-export function getPoolTokenWeightsForDynamicWeightPools(
+export function getWeightsForDynamicWeightPools(
   poolAddress: Address,
   inputTokens: string[]
 ): BigDecimal[] {
@@ -181,7 +181,7 @@ export function getPoolTokenWeightsForDynamicWeightPools(
   return inputTokenWeights;
 }
 
-export function getPoolTokenWeightsForNormalizedPools(
+export function getWeightsForNormalizedPools(
   poolAddress: Address
 ): BigDecimal[] {
   const poolContract = WeightedPoolContract.bind(poolAddress);
@@ -207,14 +207,10 @@ export function getPoolTokenWeights(
   poolAddress: Address,
   inputTokens: string[]
 ): BigDecimal[] {
-  let inputTokenWeights = getPoolTokenWeightsForNormalizedPools(poolAddress);
+  let inputTokenWeights = getWeightsForNormalizedPools(poolAddress);
   if (inputTokenWeights.length > 0) return inputTokenWeights;
 
-  inputTokenWeights = getPoolTokenWeightsForDynamicWeightPools(
-    poolAddress,
-    inputTokens
-  );
-
+  inputTokenWeights = getWeightsForDynamicWeightPools(poolAddress, inputTokens);
   return inputTokenWeights;
 }
 
@@ -278,7 +274,7 @@ export function getOutputTokenSupply(
   return totalSupply;
 }
 
-export function getPoolFees(poolAddress: Address): PoolFeesType {
+export function calculatePoolFees(poolAddress: Address): PoolFeesType {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
   const swapFee = readValue<BigInt>(
@@ -320,6 +316,34 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
     lpFeeId,
     constants.LiquidityPoolFeeType.FIXED_LP_FEE,
     protocolFees.times(swapFee).times(constants.BIGDECIMAL_HUNDRED)
+  );
+
+  return new PoolFeesType(tradingFee, protocolFee, lpFee);
+}
+
+export function getPoolFees(poolAddress: Address): PoolFeesType {
+  const tradingFeeId =
+    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_TRADING_FEE) +
+    poolAddress.toHexString();
+  const tradingFee = getOrCreateLiquidityPoolFee(
+    tradingFeeId,
+    constants.LiquidityPoolFeeType.FIXED_TRADING_FEE
+  );
+
+  const protocolFeeId =
+    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE) +
+    poolAddress.toHexString();
+  const protocolFee = getOrCreateLiquidityPoolFee(
+    protocolFeeId,
+    constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
+  );
+
+  const lpFeeId =
+    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_LP_FEE) +
+    poolAddress.toHexString();
+  const lpFee = getOrCreateLiquidityPoolFee(
+    lpFeeId,
+    constants.LiquidityPoolFeeType.FIXED_LP_FEE
   );
 
   return new PoolFeesType(tradingFee, protocolFee, lpFee);

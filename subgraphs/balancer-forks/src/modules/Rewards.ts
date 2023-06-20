@@ -1,10 +1,9 @@
 import {
+  getOrCreateToken,
   getOrCreateRewardToken,
   getOrCreateLiquidityPool,
-  getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { readValue } from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -191,7 +190,7 @@ export function updateRewardTokenEmissions(
 export function getPoolFromGauge(gaugeAddress: Address): Address | null {
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  const poolAddress = readValue<Address>(
+  const poolAddress = utils.readValue<Address>(
     gaugeContract.try_lp_token(),
     constants.NULL.TYPE_ADDRESS
   );

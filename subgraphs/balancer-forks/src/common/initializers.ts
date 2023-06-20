@@ -427,7 +427,7 @@ export function getOrCreateLiquidityPool(
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
 
-    pool.fees = utils.getPoolFees(poolAddress).stringIds();
+    pool.fees = utils.calculatePoolFees(poolAddress).stringIds();
     pool.isSingleSided = false;
 
     pool.createdBlockNumber = block.number;
