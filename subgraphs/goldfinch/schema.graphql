@@ -1260,7 +1260,7 @@ type ActiveAccount @entity {
 
 # Helper entity for mapping TokenID to market (tranched pool) for calculating
 # reward emission
-type _PoolToken @entity {
+type _PoolTokenStore @entity {
   " ERC721 PoolToken ID "
   id: ID!
   " market id (pool address) "
@@ -1377,7 +1377,7 @@ type User @entity {
     @derivedFrom(field: "user")
   vaultedStakedPositions: [VaultedStakedPosition!]! @derivedFrom(field: "user")
 
-  tranchedPoolTokens: [TranchedPoolToken!]!
+  poolTokens: [PoolToken!]!
   vaultedPoolTokens: [VaultedPoolToken!]! @derivedFrom(field: "user")
   zaps: [Zap!]! @derivedFrom(field: "user")
 
@@ -1448,7 +1448,24 @@ enum UidType {
   NON_US_ENTITY
 }
 
-type TranchedPool @entity {
+interface Loan {
+  id: ID!
+  """
+  The amount of interest determined to be owed to this pool, calculated at the very beginning
+  """
+  initialInterestOwed: BigInt!
+  totalDeposited: BigInt!
+  remainingCapacity: BigInt!
+  allowedUidTypes: [UidType!]!
+  backers: [User!]!
+  numBackers: Int!
+  isPaused: Boolean!
+  tokens: [PoolToken!]!
+  principalAmountRepaid: BigInt!
+  interestAmountRepaid: BigInt!
+}
+
+type TranchedPool implements Loan @entity {
   id: ID!
   estimatedJuniorApy: BigDecimal!
   estimatedJuniorApyFromGfiRaw: BigDecimal!
@@ -1474,14 +1491,12 @@ type TranchedPool @entity {
   estimatedSeniorPoolContribution: BigInt!
   backers: [User!]!
   numBackers: Int!
-  tokens: [TranchedPoolToken!]!
+  tokens: [PoolToken!]!
   seniorTranches: [SeniorTrancheInfo!]! @derivedFrom(field: "tranchedPool")
   juniorTranches: [JuniorTrancheInfo!]! @derivedFrom(field: "tranchedPool")
   version: TranchedPoolCreditLineVersion!
   createdAt: BigInt!
   allowedUidTypes: [UidType!]!
-
-  transactions: [Transaction!]! @derivedFrom(field: "tranchedPool")
 
   principalAmountRepaid: BigInt!
   interestAmountRepaid: BigInt!
@@ -1491,11 +1506,11 @@ type TranchedPool @entity {
   initialInterestOwed: BigInt!
 }
 
-type TranchedPoolToken @entity {
+type PoolToken @entity {
   id: ID! # Set to tokenId
   mintedAt: BigInt!
   user: User!
-  tranchedPool: TranchedPool!
+  loan: Loan!
   tranche: BigInt!
   principalAmount: BigInt!
   principalRedeemed: BigInt!
@@ -1514,6 +1529,19 @@ type TranchedPoolToken @entity {
   Refers to the rewards that are received from LP rewards matching
   """
   stakingRewardsClaimed: BigInt!
+
+  """
+  Only applicable to Pool Tokens that belong to a Callable Loan. This will be always `false` for other loan types.
+  """
+  isCapitalCalled: Boolean!
+  """
+  Only applicable to Pool Tokens that belong to a Callable Loan. This will be always `null` for other loan types.
+  """
+  calledAt: Int
+  """
+  Only applicable to Pool Tokens that belong to a Callable Loan. This will be always `null` for other loan types.
+  """
+  callDueAt: Int
 }
 
 type StakingRewardsData @entity {
@@ -1610,7 +1638,7 @@ type Transaction @entity(immutable: true) {
   receivedNftId: String
   receivedNftType: SupportedNft
 
-  tranchedPool: TranchedPool
+  loan: Loan
 
   fiduPrice: BigInt
 }
@@ -1623,7 +1651,7 @@ type Zap @entity {
   amount: BigInt!
   user: User!
   seniorPoolStakedPosition: SeniorPoolStakedPosition!
-  poolToken: TranchedPoolToken!
+  poolToken: PoolToken!
   tranchedPool: TranchedPool!
 }
 
@@ -1675,7 +1703,7 @@ type VaultedPoolToken @entity {
   user: User!
   usdcEquivalent: BigInt!
   vaultedAt: Int!
-  poolToken: TranchedPoolToken!
+  poolToken: PoolToken!
   tranchedPool: TranchedPool!
 }
 
@@ -1699,4 +1727,38 @@ type MembershipRewardDisbursement @entity(immutable: true) {
   epoch: BigInt! # The epoch number
   allocatedAt: Int!
   rewards: BigInt!
+}
+
+type CallableLoan implements Loan @entity {
+  id: ID!
+  address: Bytes!
+  fundingLimit: BigInt!
+  principalAmount: BigInt!
+  initialInterestOwed: BigInt!
+  usdcApy: BigDecimal!
+  rawGfiApy: BigDecimal!
+  totalDeposited: BigInt!
+  remainingCapacity: BigInt!
+  fundableAt: Int!
+  createdAt: Int!
+  allowedUidTypes: [UidType!]!
+  backers: [User!]!
+  numBackers: Int!
+  isPaused: Boolean!
+  drawdownsPaused: Boolean!
+  tokens: [PoolToken!]!
+
+  balance: BigInt!
+  termEndTime: BigInt!
+  termStartTime: BigInt!
+  interestRate: BigDecimal!
+  interestRateBigInt: BigInt! # For use in calculations that have to be done with integers (to mimic on-chain math)
+  lateFeeRate: BigDecimal!
+  lastFullPaymentTime: Int!
+  availableForDrawdown: BigInt!
+
+  creditLineAddress: Bytes!
+
+  principalAmountRepaid: BigInt!
+  interestAmountRepaid: BigInt!
 }

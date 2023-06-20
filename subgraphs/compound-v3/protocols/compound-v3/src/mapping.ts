@@ -107,6 +107,12 @@ export function handleCometDeployed(event: CometDeployed): void {
       protocolData
     );
 
+    if (!manager.isNewMarket()) {
+      return;
+    }
+
+    manager.updateBorrowIndex(BASE_INDEX_SCALE);
+    manager.updateSupplyIndex(BASE_INDEX_SCALE);
     const market = manager.getMarket();
     market.canBorrowFrom = true;
 
@@ -123,8 +129,6 @@ export function handleCometDeployed(event: CometDeployed): void {
     market._baseTrackingBorrowSpeed = BIGINT_ZERO;
     market._baseTrackingSupplySpeed = BIGINT_ZERO;
     market.canBorrowFrom = true;
-    market._baseBorrowIndex = BASE_INDEX_SCALE;
-    market._baseSupplyIndex = BASE_INDEX_SCALE;
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
@@ -1108,15 +1112,6 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     return;
   }
 
-  const totalBorrowBase = tryTotalsBasic.value.totalBorrowBase;
-  const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
-
-  const baseBorrowIndexDiff = newBaseBorrowIndex.minus(
-    market._baseBorrowIndex!
-  );
-  market._baseBorrowIndex = newBaseBorrowIndex;
-  market._baseSupplyIndex = tryTotalsBasic.value.baseSupplyIndex;
-
   // the reserve factor is dynamic and is essentially
   // the spread between supply and borrow interest rates
   // reserveFactor = (borrowRate - supplyRate) / borrowRate
@@ -1133,6 +1128,23 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const reserveFactor = borrowRate.minus(supplyRate).div(borrowRate);
   market.reserveFactor = reserveFactor;
   market.save();
+
+  const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
+  if (
+    newBaseBorrowIndex.lt(market.borrowIndex!) ||
+    newBaseBorrowIndex == BASE_INDEX_SCALE
+  ) {
+    log.error(
+      "[updateRevenue] New base borrow index is less than old on market {}",
+      [market.id.toHexString()]
+    );
+    return;
+  }
+  const totalBorrowBase = tryTotalsBasic.value.totalBorrowBase;
+  const baseBorrowIndexDiff = newBaseBorrowIndex.minus(market.borrowIndex!);
+
+  dataManager.updateBorrowIndex(newBaseBorrowIndex);
+  dataManager.updateSupplyIndex(tryTotalsBasic.value.baseSupplyIndex);
 
   const totalRevenueDeltaUSD = baseBorrowIndexDiff
     .toBigDecimal()

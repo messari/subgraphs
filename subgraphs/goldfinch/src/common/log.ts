@@ -10,7 +10,7 @@ import {
   _MembershipStakingPosition,
   _MembershipStakingTx,
   _MembershipCapitalStaked,
-  _PoolToken,
+  _PoolTokenStore,
 } from "../../generated/schema";
 import {
   BIGINT_ZERO,
@@ -282,9 +282,9 @@ function getMarketID(assetAddress: Address, tokenID: BigInt): string | null {
 
   if (assetAddress.equals(Address.fromString(POOL_TOKENS_ADDRESS))) {
     // staking ERC 721 tranched pool token, use tokenID to look up tranched pool address
-    const poolToken = _PoolToken.load(tokenID.toString());
+    const poolToken = _PoolTokenStore.load(tokenID.toString());
     if (!poolToken) {
-      log.error("[getMarketID]tokenID {} does not exist in _PoolToken", [
+      log.error("[getMarketID]tokenID {} does not exist in _PoolTokenStore", [
         tokenID.toString(),
       ]);
       return null;

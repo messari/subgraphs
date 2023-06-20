@@ -1,6 +1,6 @@
 import { Schema, Versions } from "../../constants";
 
-export const versionsList = ["1.3.0", "2.0.1", "3.0.0"];
+export const versionsList = ["1.3.0", "2.0.1", "3.0.0", "3.0.1", "3.1.0"];
 
 export const schema = (version: string): Schema => {
   // The version group uses the first two digits  of the schema version and defaults to that schema.
@@ -10,12 +10,14 @@ export const schema = (version: string): Schema => {
   switch (versionGroup) {
     case Versions.Schema130:
       return schema130();
-    case Versions.Schema201:
-      return schema201();
+    case Versions.Schema200:
+      return schema200();
     case Versions.Schema300:
       return schema300();
+    case Versions.Schema310:
+      return schema310();
     default:
-      return schema201();
+      return schema310();
   }
 };
 
@@ -373,9 +375,9 @@ export const schema130 = (): Schema => {
   };
 };
 
-export const schema201 = (): Schema => {
+export const schema200 = (): Schema => {
   const prevSchema = schema130();
-  const entities = [...prevSchema.entities, "positionSnapshot"];
+  const entities = [...prevSchema.entities, "positionSnapshots"];
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: prevSchema.entitiesData.financialsDailySnapshots,
@@ -422,7 +424,7 @@ export const schema201 = (): Schema => {
     adjustedMarketHourlyFields.join(",") +
     "}";
 
-  const eventsFields = ["hash", "nonce", "position", "timestamp", "amount", "amountUSD"];
+  const eventsFields = ["hash", "nonce", "position{id}", "timestamp", "amount", "amountUSD"];
 
   const events: string[] = ["deposits", "withdraws", "borrows", "repays", "liquidates"];
   const eventsQuery: any[] = events.map((event) => {
@@ -433,7 +435,7 @@ export const schema201 = (): Schema => {
     if (event === "liquidates") {
       fields += ", profitUSD, liquidatee{id}, liquidator{id}";
     } else {
-      fields += ", account{id}, position{id}";
+      fields += ", account{id}";
     }
     return baseStr + fields + " }";
   });
@@ -670,18 +672,13 @@ export const schema201 = (): Schema => {
 };
 
 export const schema300 = (): Schema => {
-  const prevSchema = schema201();
-  const entities = [...prevSchema.entities, "positionSnapshot"];
+  const prevSchema = schema200();
+  const entities = prevSchema.entities;
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
       ...prevSchema.entitiesData.financialsDailySnapshots,
       days: "BigInt!",
-      dailyDepositUSD: "BigDecimal!",
-      dailyBorrowUSD: "BigDecimal!",
-      cumulativeBorrowUSD: "BigDecimal!",
-      dailyLiquidateUSD: "BigDecimal!",
-      cumulativeLiquidateUSD: "BigDecimal!",
       dailyWithdrawUSD: "BigDecimal!",
       dailyRepayUSD: "BigDecimal!",
       dailyTransferUSD: "BigDecimal!",
@@ -733,10 +730,6 @@ export const schema300 = (): Schema => {
     marketHourlySnapshots: {
       ...prevSchema.entitiesData.marketHourlySnapshots,
       hours: "BigInt!",
-      hourlyTotalRevenueUSD: "BigDecimal!",
-      hourlyDepositUSD: "BigDecimal!",
-      hourlyBorrowUSD: "BigDecimal!",
-      hourlyLiquidateUSD: "BigDecimal!",
       hourlyWithdrawUSD: "BigDecimal!",
       hourlyRepayUSD: "BigDecimal!",
       hourlyTransferUSD: "BigDecimal!",
@@ -1047,16 +1040,363 @@ export const schema300 = (): Schema => {
       cumulativeUniqueLiquidatees
       cumulativeUniqueTransferrers
       cumulativeUniqueFlashloaners
-      oracle
+      oracle {
+        id
+        oracleAddress
+        oracleSource
+      }
       canIsolate
       reserves
       reserveFactor
-      borrowedToken
+      borrowedToken {
+        id
+        decimals
+        name
+        symbol
+      }
       variableBorrowedTokenBalance
       stableBorrowedTokenBalance
       supplyCap
       borrowCap
-      revenueDetail
+      revenueDetail {
+        id
+      }
+      ${positionsQuery}
+    }
+  }`;
+
+  protocolFields["mintedTokens"] = "[Token!]";
+  protocolFields["mintedTokenSupplies"] = "[BigInt!]";
+
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery,
+    financialsQuery,
+    hourlyUsageQuery,
+    dailyUsageQuery,
+    protocolTableQuery,
+    poolsQuery,
+    positionsQuery,
+  };
+};
+
+export const schema310 = (): Schema => {
+  const prevSchema = schema300();
+  const entities = prevSchema.entities;
+  const entitiesData = {
+    // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
+    financialsDailySnapshots: prevSchema.entitiesData.financialsDailySnapshots,
+    usageMetricsDailySnapshots: prevSchema.entitiesData.usageMetricsDailySnapshots,
+    marketDailySnapshots: prevSchema.entitiesData.marketDailySnapshots,
+    usageMetricsHourlySnapshots: prevSchema.entitiesData.usageMetricsHourlySnapshots,
+    marketHourlySnapshots: prevSchema.entitiesData.marketHourlySnapshots,
+  };
+
+  const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
+  const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf("rates")] = "rates{id,side,rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf("rates")] = "rates{id,side,rate,type}";
+
+  const finanQuery =
+    "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.financialsDailySnapshots).join(",") +
+    "}";
+  const usageDailyQuery =
+    "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsDailySnapshots).join(",") +
+    "}";
+  const usageHourlyQuery =
+    "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsHourlySnapshots).join(",") +
+    "}";
+
+  const marketDailyQuery =
+    "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" +
+    adjustedMarketDailyFields.join(",") +
+    "}";
+  const marketHourlyQuery =
+    "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" +
+    adjustedMarketHourlyFields.join(",") +
+    "}";
+
+  const eventsFields = ["hash", "nonce", "timestamp", "amount", "amountUSD"];
+
+  const events: string[] = ["deposits", "withdraws", "borrows", "repays", "liquidates", "transfers", "flashloans"];
+  const eventsQuery: any[] = events.map((event) => {
+    let options = "";
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
+    let fields = eventsFields.join(", ");
+    if (event === "liquidates") {
+      fields += ", positions, profitUSD, liquidatee{id}, liquidator{id}";
+    } else if (event !== "transfers") {
+      fields += ", account{id}";
+      if (event !== "flashloans") {
+        fields += ", position{id}";
+      }
+    }
+    return baseStr + fields + " }";
+  });
+
+  const protocolFields: any = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    lendingType: "LendingType",
+    riskType: "RiskType",
+    cumulativeUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    totalPoolCount: "Int!",
+    totalDepositBalanceUSD: "BigDecimal!",
+    cumulativeDepositUSD: "BigDecimal!",
+    totalBorrowBalanceUSD: "BigDecimal!",
+    cumulativeBorrowUSD: "BigDecimal!",
+    cumulativeLiquidateUSD: "BigDecimal!",
+    cumulativeUniqueDepositors: "Int!",
+    cumulativeUniqueBorrowers: "Int!",
+    cumulativeUniqueLiquidators: "Int!",
+    cumulativeUniqueLiquidatees: "Int!",
+    openPositionCount: "Int!",
+    cumulativePositionCount: "Int!",
+    transactionCount: "Int!",
+    depositCount: "Int!",
+    withdrawCount: "Int!",
+    borrowCount: "Int!",
+    repayCount: "Int!",
+    liquidationCount: "Int!",
+    transferCount: "Int!",
+    flashloanCount: "Int!",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
+
+  const financialsQuery = `
+  query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      lendingProtocol(id:$protocolId) {
+        ${protocolQueryFields}
+        mintedTokens {
+          id
+          decimals
+        }
+        mintedTokenSupplies
+      }
+    }`;
+
+  const poolsQuery = `
+    query Data {
+      markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+        id
+          name
+        }
+      }
+      `;
+
+  const poolTimeseriesQuery = `
+      query Data($poolId: String) {
+        ${marketDailyQuery}
+        ${marketHourlyQuery}
+      }
+      `;
+
+  const positionsQuery = `
+      positions(first: 1000) {
+        id
+        account {
+          id
+        }
+        hashOpened
+        hashClosed
+        timestampOpened
+        timestampClosed
+        blockNumberOpened
+        blockNumberClosed
+        side
+        isCollateral
+        balance
+        principal
+        depositCount
+        withdrawCount
+        borrowCount
+        repayCount
+        liquidationCount
+        repays {
+          hash
+        }
+        borrows {
+          hash
+        }
+        withdraws {
+          hash
+        }
+        deposits {
+          hash
+        }
+        liquidations {
+          hash
+        }
+      }
+      `;
+
+  const poolData: { [x: string]: string } = {
+    ...prevSchema.poolData,
+    indexLastUpdatedTimestamp: "BigInt",
+    supplyIndex: "BigInt",
+    borrowIndex: "BigInt",
+  };
+
+  const query = `
+      query Data($poolId: String, $protocolId: String){
+    _meta {
+      block {
+        number
+      }
+      deployment
+    }
+    protocols {
+      id
+      name
+      slug
+      type
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+    }
+    
+    lendingProtocols {
+      ${protocolQueryFields}
+      mintedTokens {
+        id
+        decimals
+      }
+      mintedTokenSupplies
+    }
+
+    ${eventsQuery}
+    market(id:$poolId){
+      id
+      name
+      inputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      outputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      rewardTokens {
+        id
+        type
+        token {
+          id
+          decimals
+          name
+          symbol
+        }
+      }
+      rates {
+        id
+        side
+        rate
+        type
+      }
+      isActive
+      canUseAsCollateral
+      canBorrowFrom
+      maximumLTV
+      liquidationThreshold
+      liquidationPenalty
+      totalValueLockedUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      inputTokenBalance
+      inputTokenPriceUSD
+      outputTokenSupply
+      outputTokenPriceUSD
+      exchangeRate
+      rewardTokenEmissionsAmount
+      rewardTokenEmissionsUSD
+      positionCount
+      openPositionCount
+      closedPositionCount
+      lendingPositionCount
+      borrowingPositionCount
+      cumulativeTransferUSD
+      cumulativeFlashloanUSD
+      transactionCount
+      depositCount
+      withdrawCount
+      borrowCount
+      repayCount
+      liquidationCount
+      transferCount
+      flashloanCount
+      cumulativeUniqueDepositors
+      cumulativeUniqueBorrowers
+      cumulativeUniqueLiquidators
+      cumulativeUniqueLiquidatees
+      cumulativeUniqueTransferrers
+      cumulativeUniqueFlashloaners
+      oracle {
+        id
+        oracleAddress
+        oracleSource
+      }
+      canIsolate
+      reserves
+      reserveFactor
+      borrowedToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      variableBorrowedTokenBalance
+      stableBorrowedTokenBalance
+      indexLastUpdatedTimestamp
+      supplyIndex
+      supplyCap
+      borrowIndex
+      borrowCap
+      revenueDetail {
+        id
+      }
       ${positionsQuery}
     }
   }`;

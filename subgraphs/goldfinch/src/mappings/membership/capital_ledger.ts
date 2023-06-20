@@ -7,7 +7,7 @@ import {
 import {
   VaultedStakedPosition,
   VaultedPoolToken,
-  TranchedPoolToken,
+  PoolToken,
   _MembershipCapitalStaked,
   _MembershipDirector,
 } from "../../../generated/schema";
@@ -55,9 +55,9 @@ export function handleCapitalErc721Deposit(event: CapitalERC721Deposit): void {
     vaultedPoolToken.vaultedAt = event.block.timestamp.toI32();
     vaultedPoolToken.poolToken = event.params.assetTokenId.toString();
     const poolToken = assert(
-      TranchedPoolToken.load(event.params.assetTokenId.toString())
+      PoolToken.load(event.params.assetTokenId.toString())
     );
-    vaultedPoolToken.tranchedPool = poolToken.tranchedPool;
+    vaultedPoolToken.tranchedPool = poolToken.loan;
     vaultedPoolToken.save();
 
     const transaction = createTransactionFromEvent(
