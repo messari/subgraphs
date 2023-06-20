@@ -10,6 +10,9 @@ export function protocolLevelPriceValidation(
 ): BigDecimal {
   const protocol = getOrCreateDexAmmProtocol();
 
+  if (constants.BLACKLISTED_TOKENS.includes(Address.fromString(token.id)))
+    return constants.BIGDECIMAL_ZERO;
+
   const tokenTVLDelta = utils.absBigDecimal(
     latestPrice
       .times(
