@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 3.0.1
+# Version: 3.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -870,8 +870,17 @@ type Market @entity @regularPolling {
   " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
   stableBorrowedTokenBalance: BigInt
 
+  " Last updated timestamp of supply/borrow index. "
+  indexLastUpdatedTimestamp: BigInt
+
+  " Index used by the protocol to calculate interest generated on the supply token (ie, liquidityIndex in Aave)"
+  supplyIndex: BigInt
+
   " Allowed limit to how much of the underlying asset can be supplied to this market. "
   supplyCap: BigInt
+
+  " Index used by the protocol to calculate the interest paid on the borrowed token (ie, variableBorrowIndex in Aave))"
+  borrowIndex: BigInt
 
   " Allowed limit for how much of the underlying asset can be borrowed from this market. "
   borrowCap: BigInt
@@ -1011,12 +1020,6 @@ type Market @entity @regularPolling {
   flashloans: [Flashloan!]! @derivedFrom(field: "market")
 
   ##### Add Ons #####
-
-  " Base token interest multiplier for interest. Used to get revenue "
-  _baseBorrowIndex: BigInt
-
-  " Base token interest multiplier for the supply side. Can be used to get interest accrued per position. "
-  _baseSupplyIndex: BigInt
 
   " Rewards borrow speed for this market"
   _baseTrackingBorrowSpeed: BigInt
@@ -1506,6 +1509,9 @@ type Position @entity @regularPolling {
   " Token balance in this position, in native amounts "
   balance: BigInt!
 
+  " The token balance of this position without interest generated (Used to calculate interest generated on a position) "
+  principal: BigInt
+
   " Number of deposits related to this position "
   depositCount: Int!
 
@@ -1547,11 +1553,6 @@ type Position @entity @regularPolling {
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
-
-  ##### Interest Tracking Fields #####
-
-  " The principal value without interest accrued. Used to calculate interest per position. "
-  _principalValue: BigInt
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position
@@ -1594,10 +1595,10 @@ type PositionSnapshot @entity(immutable: true) @hourlySnapshot {
   ##### Interest Tracking Fields #####
 
   " The principal value without interest accrued. Used to calculate interest per position. "
-  _principalValue: BigInt
+  principal: BigInt
 
   " Base borrow OR supply index (based on the position side). Used to calculate interest across snapshots. "
-  _baseIndex: BigInt
+  index: BigInt
 }
 
 # Helper entity for calculating daily/hourly active users
