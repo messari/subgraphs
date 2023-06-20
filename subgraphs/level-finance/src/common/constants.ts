@@ -114,7 +114,7 @@ export namespace NULL {
 ///// Type Helpers /////
 ////////////////////////
 
-export const DEFAULT_DECIMALS = 18;
+export const DEFAULT_DECIMALS = 18 as i8;
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
@@ -177,19 +177,28 @@ export const VAULT_ADDRESS = Address.fromString(
 export const OUTPUT_TOKEN_ADDRESS = Address.fromString(
   "0xb5c42f84ab3f786bca9761240546aa9cec1f8821"
 );
+export const SENIOR_LLP_ADDRESS = Address.fromString(
+  "0xb5c42f84ab3f786bca9761240546aa9cec1f8821"
+);
+export const LEVEL_TOKEN_ADDRESS = Address.fromString(
+  "0xb64e280e9d1b5dbec4accedb2257a87b400db149"
+);
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PRICE_PRECISION_DECIMALS = 12;
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
-export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.15");
-export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
-export const SUPPLY_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
+export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.35");
+export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.20");
+export const SUPPLY_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.45");
 
 export const VALUE_DECIMALS = 30 as i8;
 export const INTEREST_RATE_DECIMALS = 10 as i8;
 export const PRICE_FEED_DECIMALS = 12 as i8;
 export const FEE_PRECISION = BigInt.fromI32(10).pow(10);
 export const VALUE_PRECISION = BigInt.fromI32(10).pow(VALUE_DECIMALS);
+export const DEFAULT_DECIMALS_PRECISION =
+  BigInt.fromI32(10).pow(DEFAULT_DECIMALS);
+
 export const PRICE_FEED_PRECISION = BigInt.fromI32(10).pow(PRICE_FEED_DECIMALS);
 
 export enum Side {

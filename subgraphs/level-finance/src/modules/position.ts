@@ -69,9 +69,7 @@ export function updatePosition(
           .div(collateralToken.lastPriceUSD!)
       );
     } else {
-      collateralTokenAmountDelta = collateralDelta.div(
-        constants.PRICE_FEED_PRECISION
-      );
+      collateralTokenAmountDelta = collateralDelta;
     }
   }
 
@@ -208,6 +206,7 @@ export function updateUserPosition(
   );
 
   if (transactionType == TransactionType.COLLATERAL_IN) {
+    position.openPosition();
     position.addCollateralInCount();
   }
   if (transactionType == TransactionType.COLLATERAL_OUT) {
