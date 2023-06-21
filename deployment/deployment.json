@@ -27,7 +27,7 @@
           },
           "decentralized-network": {
             "slug": "abracadabra-money-arbitrum",
-            "query-id": "GnroBYmeLLtKuHNyTNS38hzKki5n4CWaHeaMRqZpU4cr"
+            "query-id": "3m97d2dJ2pXwPFuiHrm8T37V9TCoAHBpMqRwdguyUZXF"
           }
         }
       },
@@ -53,7 +53,7 @@
           },
           "decentralized-network": {
             "slug": "abracadabra-money-avalanche",
-            "query-id": "CZBD7e8VGvNa6WkBHZAaC688bsZ35UvAM1AuDdVng2aE"
+            "query-id": "3Gkei7B24o9C2bCoAbQpApZqMStPta7oCAnNhmNv5dab"
           }
         }
       },
@@ -123,7 +123,7 @@
           },
           "decentralized-network": {
             "slug": "abracadabra-money-ethereum",
-            "query-id": "3Gkei7B24o9C2bCoAbQpApZqMStPta7oCAnNhmNv5dab"
+            "query-id": "GLAu42kvVs7ixfXcmkAsRiS7Xt1NCpgkKsnz3qiriuvV"
           }
         }
       }
@@ -157,7 +157,7 @@
           },
           "decentralized-network": {
             "slug": "aave-arc-ethereum",
-            "query-id": "BmQSQaXsivq866kUobQSbyxycjk3D7CiaczKgu3P9ifB"
+            "query-id": "5hyqnEzjZbwFBU1rk4JBknCeiF2Mj93qBzsyQfpAa3QA"
           }
         }
       }
@@ -191,7 +191,7 @@
           },
           "decentralized-network": {
             "slug": "aave-amm-ethereum",
-            "query-id": "7bGfWPBTJTqGqdW5bzVLrChsGH5dJftvUPE5jcR4QqoB"
+            "query-id": "41ooPWnDYKwckqyG1mvg7ZEndy5zMemXinx6uQxscrBS"
           }
         }
       }
@@ -225,7 +225,7 @@
           },
           "decentralized-network": {
             "slug": "aave-rwa-ethereum",
-            "query-id": "Crag42fFb8PrXnbTjHe1UG5KjgzoiUJbqwzJxZ1W8XNJ"
+            "query-id": "C8ynQrjVKcmqxb9fWrLvSCBFNf2ChFkxCg7Q8gknJrza"
           }
         }
       }
@@ -259,7 +259,7 @@
           },
           "decentralized-network": {
             "slug": "aave-v2-avalanche",
-            "query-id": "AQHJdvUMkPfSxi6Q2LxXYjWXjGvfCST8DFFYE4VUKtU6"
+            "query-id": "9nh6Ums63wFcoZpmegyPcAFtY3CAzQc3S6cuERALYMqa"
           }
         }
       },
@@ -285,7 +285,7 @@
           },
           "decentralized-network": {
             "slug": "aave-v2-ethereum",
-            "query-id": "84CvqQHYhydZzr2KSth8s1AFYpBRzUbVJXq6PWuZm9U9"
+            "query-id": "C2zniPn45RnLDGzVeGZCx2Sw3GXrbc9gL4ZfL8B8Em2j"
           }
         }
       },
@@ -341,7 +341,7 @@
           },
           "decentralized-network": {
             "slug": "aave-v3-arbitrum",
-            "query-id": "J9dtvE11PWNZH74frWyx9QZonyC1Db2UWDMUegmT3zkG"
+            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
           }
         }
       },
@@ -367,7 +367,7 @@
           },
           "decentralized-network": {
             "slug": "aave-v3-avalanche",
-            "query-id": "94D1g2jHHqKUS5uhbEPHWyRgfp4bYeZPn5Cr5R3zvoYH"
+            "query-id": "72Cez54APnySAn6h8MswzYkwaL9KjvuuKnKArnPJ8yxb"
           }
         }
       },
@@ -481,7 +481,7 @@
           },
           "decentralized-network": {
             "slug": "aave-v3-ethereum",
-            "query-id": "HB1Z2EAw4rtPRYVb2Nz8QGFLHCpym6ByBX6vbCViuE9F"
+            "query-id": "JCNWRypm7FYwV8fx5HhzZPSFaMxgkPuw4TnR3Gpi81zk"
           }
         }
       }
@@ -567,7 +567,7 @@
           },
           "decentralized-network": {
             "slug": "arrakis-finance-ethereum",
-            "query-id": "9WiZHUk2d3rM4sEQ4NSz6ihFRc2zWmPj7yk8w51dNdhT"
+            "query-id": "GnroBYmeLLtKuHNyTNS38hzKki5n4CWaHeaMRqZpU4cr"
           }
         }
       },
@@ -645,7 +645,7 @@
           },
           "decentralized-network": {
             "slug": "convex-finance-ethereum",
-            "query-id": "CVVEQi1VRgQYwX5r6tPjD1Leiao2nETLYC6pHTWVNPtk"
+            "query-id": "7rFZ2x6aLQ7EZsNx8F5yenk4xcqwqR3Dynf9rdixCSME"
           }
         }
       }
@@ -723,7 +723,7 @@
           },
           "decentralized-network": {
             "slug": "balancer-v2-ethereum",
-            "query-id": "Ei5typKWPepPSgqkaKf3p5bPhgJesnu1RuRpyt69Pcrx"
+            "query-id": "794H6CNzdGF5YfBK9nPsUgGn7EBbdJSCTjgcKPEPyFnn"
           }
         }
       }
@@ -1133,7 +1133,7 @@
           },
           "decentralized-network": {
             "slug": "bancor-v3-ethereum",
-            "query-id": "B35cLTayreXTML6fXPTrFNSYx7mKyDuuV51LjVxWwWjp"
+            "query-id": "4Q4eEMDBjYM8JGsvnWCafFB5wCu6XntmsgxsxwYSnMib"
           }
         }
       }
@@ -1197,7 +1197,7 @@
           },
           "decentralized-network": {
             "slug": "banker-joe-avalanche",
-            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
+            "query-id": "9NjYuG2BFU1BPacNdKymd9eNdfVCaJM6LhsgD8zSQgDK"
           }
         }
       }
@@ -1291,7 +1291,7 @@
           },
           "decentralized-network": {
             "slug": "benqi-avalanche",
-            "query-id": "EcNHwEGXq3KW1vCbHHj1iwvtf62ae5kxzEQhKtRqPygt"
+            "query-id": "8ZjJGsaKea7WwLJPJNdHXPGsvXDe3iq2231aRjgBPisi"
           }
         }
       }
@@ -1437,7 +1437,7 @@
           },
           "decentralized-network": {
             "slug": "compound-v2-ethereum",
-            "query-id": "6tGbL7WBx287EZwGUvvcQdL6m67JGMJrma3JSTtt5SV7"
+            "query-id": "4TbqVA8p2DoBd5qDbPMwmDZv3CsJjWtxo8nVSqF2tA9a"
           }
         }
       }
@@ -1471,7 +1471,7 @@
           },
           "decentralized-network": {
             "slug": "cream-finance-arbitrum",
-            "query-id": "4TbqVA8p2DoBd5qDbPMwmDZv3CsJjWtxo8nVSqF2tA9a"
+            "query-id": "GzHkVNf7BBqUjV8Sy6U6xUaWdGheFMdin1cB6sNvfdzs"
           }
         }
       },
@@ -1519,7 +1519,7 @@
           },
           "decentralized-network": {
             "slug": "cream-finance-ethereum",
-            "query-id": "9NjYuG2BFU1BPacNdKymd9eNdfVCaJM6LhsgD8zSQgDK"
+            "query-id": "43NeT7UTACLUkohKBaG7auvkhsj4Kwux9kNTJr6sFdNe"
           }
         }
       },
@@ -1575,7 +1575,7 @@
           },
           "decentralized-network": {
             "slug": "dforce-arbitrum",
-            "query-id": "FFK9Fa8fdBrAugNVFqRZVAtrej7FjsQNq1s9LVBhF4FX"
+            "query-id": "Dpk4Gen22wxQ3Laojf7DR2me8wGzjaHwjsKAsLf2rCFV"
           }
         }
       },
@@ -1645,7 +1645,7 @@
           },
           "decentralized-network": {
             "slug": "dforce-ethereum",
-            "query-id": "ECtdoov16DUmk5qbhFx4PVVN7vidiNDwzFNsui6FoHEo"
+            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
           }
         }
       },
@@ -1723,7 +1723,7 @@
           },
           "decentralized-network": {
             "slug": "iron-bank-avalanche",
-            "query-id": "7ziHxbouaMXhSzxf5nfTXLYYASajU9bTCcxWoTKEAkBe"
+            "query-id": "9YiJM9oHy25estSJjB1Z71Hdz5C814R3vDoS2ezpN27C"
           }
         }
       },
@@ -1749,7 +1749,7 @@
           },
           "decentralized-network": {
             "slug": "iron-bank-ethereum",
-            "query-id": "98GG74FxxsG25Ltd8qvJ9BRfFmQWyN1AkS92MZBG1BsR"
+            "query-id": "5YoxED3bbWV9byvn3x3S3ebZ3idrQmQmsJhL5LMyY26v"
           }
         }
       },
@@ -1879,7 +1879,7 @@
           },
           "decentralized-network": {
             "slug": "notional-finance-ethereum",
-            "query-id": "346UaR2Lgxg8yJ2Vq2r8wid1pWaYQNH6N1GmzGCJkHRV"
+            "query-id": "2t4T7bts8ZQCpGcVq9VSzDyPVCQc5Y7TFwZKfmXKeSVx"
           }
         }
       }
@@ -1913,7 +1913,7 @@
           },
           "decentralized-network": {
             "slug": "rari-fuse-arbitrum",
-            "query-id": "DbD7U3k8trdQUC2KqC2Fu2WcS42QUZHr2YXJzZXjH719"
+            "query-id": "HnV3fhwsWfmQGdD2AeGzqvRVTDBqnMH74jCsDVq1DXYP"
           }
         }
       },
@@ -1939,7 +1939,7 @@
           },
           "decentralized-network": {
             "slug": "rari-fuse-ethereum",
-            "query-id": "9YiJM9oHy25estSJjB1Z71Hdz5C814R3vDoS2ezpN27C"
+            "query-id": "kecp6SPMvbB4GTqg9r5PXvztYriexj5F3ZCaATpjmb2"
           }
         }
       }
@@ -2063,7 +2063,7 @@
           },
           "decentralized-network": {
             "slug": "compound-v3-ethereum",
-            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
+            "query-id": "AwoxEZbiWLvv6e3QdvdMZw4WDURdGbvPfHmZRc8Dpfz9"
           }
         }
       },
@@ -2207,7 +2207,7 @@
           },
           "decentralized-network": {
             "slug": "curve-finance-ethereum",
-            "query-id": "GAGwGKc4ArNKKq9eFTcwgd1UGymvqhTier9Npqo1YvZB"
+            "query-id": "3fy93eAT56UJsRCEht8iFhfi6wjHWXtZ9dnnbQmvFopF"
           }
         }
       },
@@ -2463,7 +2463,7 @@
           },
           "decentralized-network": {
             "slug": "euler-finance-ethereum",
-            "query-id": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2"
+            "query-id": "95nyAWFFaiz6gykko3HtBCyhRuP5vZzuKYsZiLxHxLhr"
           }
         }
       }
@@ -2497,7 +2497,7 @@
           },
           "decentralized-network": {
             "slug": "goldfinch-ethereum",
-            "query-id": "72Cez54APnySAn6h8MswzYkwaL9KjvuuKnKArnPJ8yxb"
+            "query-id": "GRwpFCPYyQPdz84sCnKemzrNvgFPuKkFLcRLR6jsRxHr"
           }
         }
       }
@@ -2531,7 +2531,7 @@
           },
           "decentralized-network": {
             "slug": "inverse-finance-ethereum",
-            "query-id": "FQ6JYszEKApsBpAmiHesRsd9Ygc6mzmpNRANeVQFYoVX"
+            "query-id": "EXuutY6qkZbXjYeJZdiDBf2imJswTNdfm8YZCqhAthfW"
           }
         }
       }
@@ -2565,7 +2565,7 @@
           },
           "decentralized-network": {
             "slug": "lido-ethereum",
-            "query-id": "XYcD9VeUvSvuqrsV5pFauXk7jQy9hrnhe5Kb7REyuxm"
+            "query-id": "F7qb71hWab6SuRL5sf6LQLTpNahmqMsBnnweYHzLGUyG"
           }
         }
       }
@@ -2629,7 +2629,7 @@
           },
           "decentralized-network": {
             "slug": "liquity-ethereum",
-            "query-id": "GQ8aYQ1kdQPGDSQzeF6cPo9MzdzqkPxqmuCaMCJoNLrF"
+            "query-id": "2D2dFCLjUt3MfFgTKW8cBxiRQ3Adss7KUtYh2rTcFVY"
           }
         }
       }
@@ -2715,7 +2715,7 @@
           },
           "decentralized-network": {
             "slug": "vesta-finance-arbitrum",
-            "query-id": "9RFPnB3zNjtc7x9kowTyBU2YVGUFSJRe27EBJWLMVgy6"
+            "query-id": "zGuPrsVqtY5ehJDCmweb9ZnBrae3tSQWRux8Mz1M4Gn"
           }
         }
       }
@@ -2749,7 +2749,7 @@
           },
           "decentralized-network": {
             "slug": "truefi-ethereum",
-            "query-id": "EfbqRompqd9DVYJHgNqnB9Ni2kiWCBfVagWxcBQ7EUCz"
+            "query-id": "39F8fYCvLYmutjqpzEwx3dcEJTtFFVupvBzJqkEzftA7"
           }
         }
       }
@@ -2805,7 +2805,7 @@
           },
           "decentralized-network": {
             "slug": "gamma-ethereum",
-            "query-id": "8PUSqUn6dSkoxJb3LDLmdKHzbHFn1cz7XjbSob5uiR4v"
+            "query-id": "ANz3TpZdY2syZGQvGA85ANNG7KiSWdPmv55kP4H4sRPJ"
           }
         }
       },
@@ -2883,7 +2883,7 @@
           },
           "decentralized-network": {
             "slug": "makerdao-ethereum",
-            "query-id": "G1KHEQkA7shnPZahHUmKcerfpqBMNnL9xJzWGAVrj7n7"
+            "query-id": "8sE6rTNkPhzZXZC6c8UQy2ghFTu5PPdGauwUBm4t7HZ1"
           }
         }
       }
@@ -2917,7 +2917,7 @@
           },
           "decentralized-network": {
             "slug": "maple-finance-ethereum",
-            "query-id": "5H97eNhy9fVHcqRXZtCV2UxHG2DbzcFA7yth1TaVZ45x"
+            "query-id": "J9dtvE11PWNZH74frWyx9QZonyC1Db2UWDMUegmT3zkG"
           }
         }
       }
@@ -2947,7 +2947,7 @@
         "services": {
           "hosted-service": {
             "slug": "maple-finance-v2-ethereum",
-            "query-id": "maple-finance-v2-ethereum"
+            "query-id": "94swSaaFChsQoZzb9Vc7Lo6FWFV6YZUMNSdFVTMAeRgj"
           }
         }
       }
@@ -3189,7 +3189,7 @@
           },
           "decentralized-network": {
             "slug": "ribbon-finance-ethereum",
-            "query-id": "GQdCg4oR8tFB4tH8svyL1PfgDABKnRXz4GjwFYH68pPG"
+            "query-id": "Crag42fFb8PrXnbTjHe1UG5KjgzoiUJbqwzJxZ1W8XNJ"
           }
         }
       },
@@ -3215,7 +3215,7 @@
           },
           "decentralized-network": {
             "slug": "ribbon-finance-avalanche",
-            "query-id": "8qztgeMTJrq2kQHK7LzmbmDUpuBvDc6eFASDqN8SJBM5"
+            "query-id": "FxhN13aCD2H1f9vagrVueGjHwguZ7JkfuDZrMvKthdk5"
           }
         }
       }
@@ -3309,7 +3309,7 @@
           },
           "decentralized-network": {
             "slug": "saddle-finance-arbitrum",
-            "query-id": "FsT2DES8UdhfDkXCtE56h5WCDrrSXrtJiSMgNWvSdyYL"
+            "query-id": "H36tAWQeYVioE4hHtaKJEMJMxwzVJWjfg2mimva2wcUj"
           }
         }
       },
@@ -3436,6 +3436,10 @@
           "hosted-service": {
             "slug": "spark-lend-ethereum",
             "query-id": "spark-lend-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "spark-lend-ethereum",
+            "query-id": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
           }
         }
       }
@@ -3469,7 +3473,7 @@
           },
           "decentralized-network": {
             "slug": "radiant-arbitrum",
-            "query-id": "43NeT7UTACLUkohKBaG7auvkhsj4Kwux9kNTJr6sFdNe"
+            "query-id": "8PUSqUn6dSkoxJb3LDLmdKHzbHFn1cz7XjbSob5uiR4v"
           }
         }
       }
@@ -3555,7 +3559,7 @@
           },
           "decentralized-network": {
             "slug": "uwu-lend-ethereum",
-            "query-id": "2BswCADQePcuqwduGqBHhCE7pMQiPY4y6UkbTL8xsWjt"
+            "query-id": "CZBD7e8VGvNa6WkBHZAaC688bsZ35UvAM1AuDdVng2aE"
           }
         }
       }
@@ -3619,7 +3623,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-arbitrum",
-            "query-id": "8sE6rTNkPhzZXZC6c8UQy2ghFTu5PPdGauwUBm4t7HZ1"
+            "query-id": "FQ6JYszEKApsBpAmiHesRsd9Ygc6mzmpNRANeVQFYoVX"
           }
         }
       },
@@ -3667,7 +3671,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-celo",
-            "query-id": "9nh6Ums63wFcoZpmegyPcAFtY3CAzQc3S6cuERALYMqa"
+            "query-id": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2"
           }
         }
       },
@@ -3693,7 +3697,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-ethereum",
-            "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
+            "query-id": "4cKy6QQMc5tpfdx8yxfYeb9TLZmgLQe44ddW1G7NwkA6"
           }
         }
       },
@@ -3790,6 +3794,10 @@
           "hosted-service": {
             "slug": "pancakeswap-v3-ethereum",
             "query-id": "pancakeswap-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "pancakeswap-v3-ethereum",
+            "query-id": "JAGXF8B14mpB8QGKnwhKTs5JxsQZBJQvbDGFcWwL7gbm"
           }
         }
       }
@@ -3820,6 +3828,10 @@
           "hosted-service": {
             "slug": "sushiswap-v3-ethereum",
             "query-id": "sushiswap-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-v3-ethereum",
+            "query-id": "2tGWMrDha4164KkFAfkU3rDCtuxGb4q1emXmFdLLzJ8x"
           }
         }
       },
@@ -3842,6 +3854,10 @@
           "hosted-service": {
             "slug": "sushiswap-v3-arbitrum",
             "query-id": "sushiswap-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-v3-arbitrum",
+            "query-id": "3oHCddbQGTi42kPZBwyGzD2JzZR33zK2MwXtxAerNJy2"
           }
         }
       },
@@ -3864,6 +3880,10 @@
           "hosted-service": {
             "slug": "sushiswap-v3-avalanche",
             "query-id": "sushiswap-v3-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-v3-avalanche",
+            "query-id": "9WGqYsU8h1KVZeKz32663gFrbjVUNhBgmhRavMFqiSZz"
           }
         }
       },
@@ -3952,6 +3972,10 @@
           "hosted-service": {
             "slug": "sushiswap-v3-gnosis",
             "query-id": "sushiswap-v3-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-v3-gnosis",
+            "query-id": "9LC6MvaFHXyY3dmxM7VCwGNA9dvM6g2AuZxEGCyfvck3"
           }
         }
       },
@@ -4081,7 +4105,7 @@
           },
           "decentralized-network": {
             "slug": "qidao-arbitrum",
-            "query-id": "Dy1yVPfbS27HTrqEq3nLGFGi3TMYxPzSfY7Zxxj5ZJhf"
+            "query-id": "Duw2tSACo9uRGFctAGsCc9pF7ZGMyqpjkAHPwm49dZe6"
           }
         }
       },
@@ -4107,7 +4131,7 @@
           },
           "decentralized-network": {
             "slug": "qidao-avalanche",
-            "query-id": "4cKy6QQMc5tpfdx8yxfYeb9TLZmgLQe44ddW1G7NwkA6"
+            "query-id": "98GG74FxxsG25Ltd8qvJ9BRfFmQWyN1AkS92MZBG1BsR"
           }
         }
       },
@@ -4155,7 +4179,7 @@
           },
           "decentralized-network": {
             "slug": "qidao-ethereum",
-            "query-id": "EXuutY6qkZbXjYeJZdiDBf2imJswTNdfm8YZCqhAthfW"
+            "query-id": "BmQSQaXsivq866kUobQSbyxycjk3D7CiaczKgu3P9ifB"
           }
         }
       },
@@ -4269,7 +4293,7 @@
           },
           "decentralized-network": {
             "slug": "qidao-gnosis",
-            "query-id": "3cMswgcjkpLmuF99ViQRZfCPRyCsnimqQsR9z6mY5e2i"
+            "query-id": "7vJEsy8pJmRQZQh5kTXNz68SRHXBS859hMq3o5uWF1Ac"
           }
         }
       },
@@ -4325,7 +4349,7 @@
           },
           "decentralized-network": {
             "slug": "rari-vaults-ethereum",
-            "query-id": "Duw2tSACo9uRGFctAGsCc9pF7ZGMyqpjkAHPwm49dZe6"
+            "query-id": "Dy1yVPfbS27HTrqEq3nLGFGi3TMYxPzSfY7Zxxj5ZJhf"
           }
         }
       }
@@ -4580,6 +4604,10 @@
           "hosted-service": {
             "slug": "sushiswap-arbitrum",
             "query-id": "sushiswap-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-arbitrum",
+            "query-id": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP"
           }
         }
       },
@@ -4602,6 +4630,10 @@
           "hosted-service": {
             "slug": "sushiswap-avalanche",
             "query-id": "sushiswap-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-avalanche",
+            "query-id": "4KgG6aek9cEp8MXQZKWCmeJWj5Y77mK9tPRAD1kDQa8Q"
           }
         }
       },
@@ -4649,7 +4681,7 @@
           },
           "decentralized-network": {
             "slug": "sushiswap-celo",
-            "query-id": "94swSaaFChsQoZzb9Vc7Lo6FWFV6YZUMNSdFVTMAeRgj"
+            "query-id": "5H97eNhy9fVHcqRXZtCV2UxHG2DbzcFA7yth1TaVZ45x"
           }
         }
       },
@@ -4719,7 +4751,7 @@
           },
           "decentralized-network": {
             "slug": "sushiswap-ethereum",
-            "query-id": "7h1x51fyT5KigAhXd8sdE3kzzxQDJxxz1y66LTFiC3mS"
+            "query-id": "77jZ9KWeyi3CJ96zkkj5s1CojKPHt6XJKjLFzsDCd8Fd"
           }
         }
       },
@@ -4833,7 +4865,7 @@
           },
           "decentralized-network": {
             "slug": "sushiswap-gnosis",
-            "query-id": "5YoxED3bbWV9byvn3x3S3ebZ3idrQmQmsJhL5LMyY26v"
+            "query-id": "GvgkY82DTAkYqRShBbPQMjF1WJyUcknXre3QPWiXrPnS"
           }
         }
       }
@@ -4927,7 +4959,7 @@
           },
           "decentralized-network": {
             "slug": "ubeswap-celo",
-            "query-id": "6f3YqP75bLuLZAv7Cm1BohFot17kT3Svekg6giuvaTmg"
+            "query-id": "9WiZHUk2d3rM4sEQ4NSz6ihFRc2zWmPj7yk8w51dNdhT"
           }
         }
       }
@@ -5021,7 +5053,7 @@
           },
           "decentralized-network": {
             "slug": "honeyswap-gnosis",
-            "query-id": "GLAu42kvVs7ixfXcmkAsRiS7Xt1NCpgkKsnz3qiriuvV"
+            "query-id": "33aQTj7abtAR5zGcG9JBd1fd1sodgKDjoTsKuA8QrUW7"
           }
         }
       },
@@ -5107,7 +5139,7 @@
           },
           "decentralized-network": {
             "slug": "yearn-v2-arbitrum",
-            "query-id": "39F8fYCvLYmutjqpzEwx3dcEJTtFFVupvBzJqkEzftA7"
+            "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
           }
         }
       },
@@ -5133,7 +5165,7 @@
           },
           "decentralized-network": {
             "slug": "yearn-v2-ethereum",
-            "query-id": "3CDiQ2hSrftreri8FLqsVAVTv9QNkEBszGZiDdmL4UQJ"
+            "query-id": "FDLuaz69DbMADuBjJDEcLnTuPnjhZqNbFVrkNiBLGkEg"
           }
         }
       },
@@ -5216,6 +5248,10 @@
           "hosted-service": {
             "slug": "aave-governance",
             "query-id": "aave-governance"
+          },
+          "decentralized-network": {
+            "slug": "aave-governance",
+            "query-id": "8EBbn3tNayccBZrnW9ae6Q4NLHfVEcozvkB3YAp5Qatr"
           }
         }
       }
@@ -5246,6 +5282,10 @@
           "hosted-service": {
             "slug": "dydx-governance",
             "query-id": "dydx-governance"
+          },
+          "decentralized-network": {
+            "slug": "dydx-governance",
+            "query-id": "FFK9Fa8fdBrAugNVFqRZVAtrej7FjsQNq1s9LVBhF4FX"
           }
         }
       }
@@ -5276,6 +5316,10 @@
           "hosted-service": {
             "slug": "angle-governance",
             "query-id": "angle-governance"
+          },
+          "decentralized-network": {
+            "slug": "angle-governance",
+            "query-id": "94D1g2jHHqKUS5uhbEPHWyRgfp4bYeZPn5Cr5R3zvoYH"
           }
         }
       }
@@ -5339,7 +5383,7 @@
           },
           "decentralized-network": {
             "slug": "ens-governance",
-            "query-id": "F7MznC87sv5y5jNUaBSrKFgCqTqP9Vgc11xcreZQpX7e"
+            "query-id": "GyijYxW9yiSRcEd5u2gfquSvneQKi5QuvU3WZgFyfFSn"
           }
         }
       }
@@ -5373,7 +5417,7 @@
           },
           "decentralized-network": {
             "slug": "euler-governance",
-            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
+            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
           }
         }
       }
@@ -5437,7 +5481,7 @@
           },
           "decentralized-network": {
             "slug": "hop-governance",
-            "query-id": "zGuPrsVqtY5ehJDCmweb9ZnBrae3tSQWRux8Mz1M4Gn"
+            "query-id": "9RFPnB3zNjtc7x9kowTyBU2YVGUFSJRe27EBJWLMVgy6"
           }
         }
       }
@@ -5471,7 +5515,7 @@
           },
           "decentralized-network": {
             "slug": "silo-governance",
-            "query-id": "HnV3fhwsWfmQGdD2AeGzqvRVTDBqnMH74jCsDVq1DXYP"
+            "query-id": "8qztgeMTJrq2kQHK7LzmbmDUpuBvDc6eFASDqN8SJBM5"
           }
         }
       }
@@ -5505,7 +5549,7 @@
           },
           "decentralized-network": {
             "slug": "truefi-governance",
-            "query-id": "H36tAWQeYVioE4hHtaKJEMJMxwzVJWjfg2mimva2wcUj"
+            "query-id": "DbD7U3k8trdQUC2KqC2Fu2WcS42QUZHr2YXJzZXjH719"
           }
         }
       }
@@ -5538,8 +5582,8 @@
             "query-id": "unlock-governance"
           },
           "decentralized-network": {
-            "slug": "unlock-governance",
-            "query-id": "Dpk4Gen22wxQ3Laojf7DR2me8wGzjaHwjsKAsLf2rCFV"
+            "slug": "unlock-governance-ethereum",
+            "query-id": "7ziHxbouaMXhSzxf5nfTXLYYASajU9bTCcxWoTKEAkBe"
           }
         }
       }
@@ -6233,7 +6277,7 @@
           },
           "decentralized-network": {
             "slug": "vesper-ethereum",
-            "query-id": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
+            "query-id": "GQdCg4oR8tFB4tH8svyL1PfgDABKnRXz4GjwFYH68pPG"
           }
         }
       }
@@ -6297,7 +6341,7 @@
           },
           "decentralized-network": {
             "slug": "platypus-finance-avalanche",
-            "query-id": "8EBbn3tNayccBZrnW9ae6Q4NLHfVEcozvkB3YAp5Qatr"
+            "query-id": "B35cLTayreXTML6fXPTrFNSYx7mKyDuuV51LjVxWwWjp"
           }
         }
       }
@@ -6471,7 +6515,7 @@
           },
           "decentralized-network": {
             "slug": "opensea-v1-ethereum",
-            "query-id": "2t4T7bts8ZQCpGcVq9VSzDyPVCQc5Y7TFwZKfmXKeSVx"
+            "query-id": "GSjXo5Vd1EPaMGRJBYe6HoBKv7WSq3miCrRRZJbTCHkT"
           }
         }
       }
@@ -6505,7 +6549,7 @@
           },
           "decentralized-network": {
             "slug": "opensea-v2-ethereum",
-            "query-id": "AwoxEZbiWLvv6e3QdvdMZw4WDURdGbvPfHmZRc8Dpfz9"
+            "query-id": "ECtdoov16DUmk5qbhFx4PVVN7vidiNDwzFNsui6FoHEo"
           }
         }
       }
@@ -6539,7 +6583,7 @@
           },
           "decentralized-network": {
             "slug": "opensea-seaport-ethereum",
-            "query-id": "9ZvDz8qtx3PrnaUw1duQ7EhgGphgQcgSHqhLzQXBa16u"
+            "query-id": "2GmLsgYGWoFoouZzKjp8biYDkfmeLTkEY3VDQyZqSJHA"
           }
         }
       }
@@ -6570,6 +6614,10 @@
           "hosted-service": {
             "slug": "x2y2-ethereum",
             "query-id": "x2y2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "x2y2-ethereum",
+            "query-id": "3cMswgcjkpLmuF99ViQRZfCPRyCsnimqQsR9z6mY5e2i"
           }
         }
       }
@@ -6603,7 +6651,7 @@
           },
           "decentralized-network": {
             "slug": "looksrare-ethereum",
-            "query-id": "GvgkY82DTAkYqRShBbPQMjF1WJyUcknXre3QPWiXrPnS"
+            "query-id": "FsT2DES8UdhfDkXCtE56h5WCDrrSXrtJiSMgNWvSdyYL"
           }
         }
       }
@@ -6630,7 +6678,7 @@
           },
           "decentralized-network": {
             "slug": "tornado-cash-classic-ethereum",
-            "query-id": "FxhN13aCD2H1f9vagrVueGjHwguZ7JkfuDZrMvKthdk5"
+            "query-id": "346UaR2Lgxg8yJ2Vq2r8wid1pWaYQNH6N1GmzGCJkHRV"
           }
         },
         "files": {
@@ -6712,7 +6760,7 @@
           },
           "decentralized-network": {
             "slug": "the-graph-ethereum",
-            "query-id": "3m97d2dJ2pXwPFuiHrm8T37V9TCoAHBpMqRwdguyUZXF"
+            "query-id": "AQHJdvUMkPfSxi6Q2LxXYjWXjGvfCST8DFFYE4VUKtU6"
           }
         },
         "files": {
@@ -6746,7 +6794,7 @@
           },
           "decentralized-network": {
             "slug": "aura-finance-ethereum",
-            "query-id": "33aQTj7abtAR5zGcG9JBd1fd1sodgKDjoTsKuA8QrUW7"
+            "query-id": "EcNHwEGXq3KW1vCbHHj1iwvtf62ae5kxzEQhKtRqPygt"
           }
         },
         "files": {
@@ -6777,6 +6825,10 @@
           "hosted-service": {
             "slug": "pangolin-avalanche",
             "query-id": "pangolin-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "pangolin-avalanche",
+            "query-id": "6f3YqP75bLuLZAv7Cm1BohFot17kT3Svekg6giuvaTmg"
           }
         },
         "files": {
@@ -6810,7 +6862,7 @@
           },
           "decentralized-network": {
             "slug": "rocket-pool-ethereum",
-            "query-id": "GSjXo5Vd1EPaMGRJBYe6HoBKv7WSq3miCrRRZJbTCHkT"
+            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
           }
         },
         "files": {
@@ -6851,7 +6903,7 @@
           },
           "decentralized-network": {
             "slug": "cryptopunks-ethereum",
-            "query-id": "7vJEsy8pJmRQZQh5kTXNz68SRHXBS859hMq3o5uWF1Ac"
+            "query-id": "HdVdERFUe8h61vm2fDyycHgxjsde5PbB832NHgJfZNqK"
           }
         }
       }
@@ -8163,6 +8215,10 @@
           "hosted-service": {
             "slug": "opyn-gamma-ethereum",
             "query-id": "opyn-gamma-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "opyn-gamma-ethereum",
+            "query-id": "3zUv74ekxpiy92MQ2MwemR8fJhjvgyBFaGzQLkYHmaUy"
           }
         },
         "files": {
@@ -8185,6 +8241,10 @@
           "hosted-service": {
             "slug": "opyn-gamma-avalanche",
             "query-id": "opyn-gamma-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "opyn-gamma-avalanche",
+            "query-id": "3eaTJDJ1Y867jkDMY1iEJJLRZTSREfGZjusgmucptWJE"
           }
         },
         "files": {
@@ -8207,6 +8267,10 @@
           "hosted-service": {
             "slug": "opyn-gamma-arbitrum",
             "query-id": "opyn-gamma-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "opyn-gamma-arbitrum",
+            "query-id": "BC766cXkcBxAwQ6LAYnQytdHJLpJX1C1bbrMFhLCHx7C"
           }
         },
         "files": {
@@ -8229,6 +8293,10 @@
           "hosted-service": {
             "slug": "opyn-gamma-polygon",
             "query-id": "opyn-gamma-polygon"
+          },
+          "decentralized-network": {
+            "slug": "opyn-gamma-polygon",
+            "query-id": "6WbUbvCBtjhKyf9ddZEfVReHNHHunzspGBp3hFsy1c8P"
           }
         },
         "files": {

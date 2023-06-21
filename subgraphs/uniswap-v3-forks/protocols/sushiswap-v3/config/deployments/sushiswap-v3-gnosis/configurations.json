@@ -1,5 +1,5 @@
 {
-  "network": "xdai",
+  "network": "gnosis",
   "factoryAddress": "0xf78031cbca409f2fb6876bdfdbc1b2df24cf9bef",
   "factoryAddressStartBlock": 27232871,
   "nonFungiblePositionManagerAddress": "0xab235da7f52d35fb4551afba11bfb56e18774a65",
