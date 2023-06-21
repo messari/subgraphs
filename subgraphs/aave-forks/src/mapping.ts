@@ -35,6 +35,7 @@ import {
   rayToWad,
   RAY_OFFSET,
   ZERO_ADDRESS,
+  INIT_LIQUIDITY_INDEX,
 } from "./constants";
 import {
   addPosition,
