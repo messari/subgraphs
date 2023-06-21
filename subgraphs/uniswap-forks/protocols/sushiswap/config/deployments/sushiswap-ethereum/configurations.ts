@@ -145,6 +145,9 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0x1337def16f9b486faed0293eb623dc8395dfe46a", // Armor Token
       "0x4b4d2e899658fb59b1d518b68fe836b100ee8958", // MIS
       "0xa487bf43cf3b10dffc97a9a744cbb7036965d3b9", // Deri
+      "0x948a9bb69d1d1202c160d26804aefff0634a492e", // Stable Yield Credit
+      "0x46ecb116aba95a7c3365a1b159efc3254e86819a", // Doggo
+      "0xea14af7ba0103c4d60ced5f6e6829148a613f0f3", // PHB
     ];
   }
   getBrokenERC20Tokens(): string[] {
