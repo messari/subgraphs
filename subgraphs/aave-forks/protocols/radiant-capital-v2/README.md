@@ -100,15 +100,15 @@ Note: This refers to RDNT/WETH liquidity pool on SushiSwap and staking the LP to
 
 ### Supply Side Revenue
 
-> Supply Side Revenue = 50% \* Total Revenue
+> Supply Side Revenue = 25% \* Total Revenue
 
-Note: 50% of the total revenue goes to lenders who supply assets
+Note: 25% of the total revenue goes to lenders who supply assets
 
 ### Protocol Side Revenue
 
-> Protocol Side Revenue = 50% \* Total Revenue
+> Protocol Side Revenue = 75% \* Total Revenue
 
-Note: 50% of total revenue goes to vested and locked RDNT tokens
+Note: 60% of total revenue goes to Radiant dynamic liquidity providers (dLP) who restake LP with RDNT token. The remainder goes to DAO.
 
 ### Deposit Balance
 
