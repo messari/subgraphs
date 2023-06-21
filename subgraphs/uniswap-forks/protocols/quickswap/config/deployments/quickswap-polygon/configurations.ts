@@ -111,6 +111,7 @@ export class QuickswapMaticConfigurations implements Configurations {
     return [
       "0x1518820879bc87d4dfea5664bb1b6c240d20d4f2", // Drop
       "0x26d41380012d698e0a65c0f268cfa8ed0148f6f3", // Flamingo
+      "0xb4ebbe7f64cf74320fe64ab679a378eb39a80d49", // FIL
     ];
   }
   getBrokenERC20Tokens(): string[] {
