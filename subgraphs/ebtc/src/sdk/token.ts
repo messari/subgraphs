@@ -9,7 +9,7 @@ import {
   INT_NINE,
   INT_SIX,
   INT_SIXTEEN,
-} from "./constants";
+} from "./util/constants";
 
 /**
  * This file contains the TokenClass, which acts as

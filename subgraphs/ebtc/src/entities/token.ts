@@ -1,7 +1,7 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { BTC_ADDRESS, EBTC_ADDRESS, STETH_ADDRESS } from "../constants";
-import { BIGDECIMAL_ONE } from "../sdk/constants";
+import { BIGDECIMAL_ONE } from "../sdk/util/constants";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { getUsdPrice } from "../prices";
 

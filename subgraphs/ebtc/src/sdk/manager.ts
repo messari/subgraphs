@@ -38,10 +38,10 @@ import {
   ProtocolType,
   Transaction,
   TransactionType,
-} from "./constants";
+} from "./util/constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
-import { insert } from "./constants";
+import { insert } from "./util/constants";
 import { PositionManager } from "./position";
 
 /**

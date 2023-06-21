@@ -1,4 +1,5 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { _ActiveAccount } from "../../../generated/schema";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -10,125 +11,34 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const AVALANCHE = "AVALANCHE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
-
-  // other networks
-  export const UBIQ = "UBIQ";
-  export const SONGBIRD = "SONGBIRD";
-  export const ELASTOS = "ELASTOS";
-  export const KARDIACHAIN = "KARDIACHAIN";
-  export const CRONOS = "CRONOS";
-  export const RSK = "RSK";
-  export const TELOS = "TELOS";
-  export const XDC = "XDC";
-  export const ZYX = "ZYX";
-  export const CSC = "CSC";
-  export const SYSCOIN = "SYSCOIN";
-  export const GOCHAIN = "GOCHAIN";
-  export const ETHEREUMCLASSIC = "ETHEREUMCLASSIC";
-  export const OKEXCHAIN = "OKEXCHAIN";
-  export const HOO = "HOO";
-  export const METER = "METER";
-  export const NOVA_NETWORK = "NOVA_NETWORK";
-  export const TOMOCHAIN = "TOMOCHAIN";
-  export const VELAS = "VELAS";
-  export const THUNDERCORE = "THUNDERCORE";
-  export const HECO = "HECO";
-  export const XDAIARB = "XDAIARB";
-  export const ENERGYWEB = "ENERGYWEB";
-  export const HPB = "HPB";
-  export const BOBA = "BOBA";
-  export const KUCOIN = "KUCOIN";
-  export const SHIDEN = "SHIDEN";
-  export const THETA = "THETA";
-  export const SX = "SX";
-  export const CANDLE = "CANDLE";
-  export const ASTAR = "ASTAR";
-  export const CALLISTO = "CALLISTO";
-  export const WANCHAIN = "WANCHAIN";
-  export const METIS = "METIS";
-  export const ULTRON = "ULTRON";
-  export const STEP = "STEP";
-  export const DOGECHAIN = "DOGECHAIN";
-  export const RONIN = "RONIN";
-  export const KAVA = "KAVA";
-  export const IOTEX = "IOTEX";
-  export const XLC = "XLC";
-  export const NAHMII = "NAHMII";
-  export const TOMBCHAIN = "TOMBCHAIN";
-  export const CANTO = "CANTO";
-  export const KLAYTN = "KLAYTN";
-  export const EVMOS = "EVMOS";
-  export const SMARTBCH = "SMARTBCH";
-  export const BITGERT = "BITGERT";
-  export const FUSION = "FUSION";
-  export const OHO = "OHO";
-  export const ARB_NOVA = "ARB_NOVA";
-  export const OASIS = "OASIS";
-  export const REI = "REI";
-  export const REICHAIN = "REICHAIN";
-  export const GODWOKEN = "GODWOKEN";
-  export const POLIS = "POLIS";
-  export const KEKCHAIN = "KEKCHAIN";
-  export const VISION = "VISION";
-  export const HARMONY = "HARMONY";
-  export const PALM = "PALM";
-  export const CURIO = "CURIO";
-
-  export const UNKNOWN_NETWORK = "UNKNOWN_NETWORK";
 }
-export type Network = string;
 
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
   export const LENDING = "LENDING";
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
-  export const OPTION = "OPTION";
-  export const PERPETUAL = "PERPETUAL";
   export const GENERIC = "GENERIC";
-}
-
-export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
-  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
-  export const DEPOSIT_FEE = "DEPOSIT_FEE";
-  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
-}
-
-export namespace LiquidityPoolFeeType {
-  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
-  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
-  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
-  export const FIXED_LP_FEE = "FIXED_LP_FEE";
-  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
-  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
-  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
-}
-export type LiquidityPoolFeeType = string;
-
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
-  export const STAKE = "STAKE";
-}
-export type RewardTokenType = string;
-
-export namespace ActivityInterval {
-  export const HOURLY = "HOURLY";
-  export const DAILY = "DAILY";
 }
 
 export namespace LendingType {
@@ -136,15 +46,33 @@ export namespace LendingType {
   export const POOLED = "POOLED";
 }
 
+export namespace PermissionType {
+  export const WHITELIST_ONLY = "WHITELIST_ONLY";
+  export const PERMISSIONED = "PERMISSIONED";
+  export const PERMISSIONLESS = "PERMISSIONLESS";
+  export const ADMIN = "ADMIN";
+}
+
 export namespace RiskType {
   export const GLOBAL = "GLOBAL";
   export const ISOLATED = "ISOLATED";
 }
 
+export namespace CollateralizationType {
+  export const OVER_COLLATERALIZED = "OVER_COLLATERALIZED";
+  export const UNDER_COLLATERALIZED = "UNDER_COLLATERALIZED";
+  export const UNCOLLATERALIZED = "UNCOLLATERALIZED";
+}
+
+export namespace TokenType {
+  export const REBASING = "REBASING";
+  export const NON_REBASING = "NON_REBASING";
+}
+
 export namespace InterestRateType {
   export const STABLE = "STABLE";
   export const VARIABLE = "VARIABLE";
-  export const FIXED_TERM = "FIXED_TERM";
+  export const FIXED = "FIXED";
 }
 
 export namespace InterestRateSide {
@@ -152,51 +80,91 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
-export namespace UsageType {
-  export const DEPOSIT = "DEPOSIT";
-  export const WITHDRAW = "WITHDRAW";
-  export const SWAP = "SWAP";
+export namespace FeeType {
+  export const LIQUIDATION_FEE = "LIQUIDATION_FEE";
+  export const ADMIN_FEE = "ADMIN_FEE";
+  export const PROTOCOL_FEE = "PROTOCOL_FEE";
+  export const MINT_FEE = "MINT_FEE";
+  export const WITHDRAW_FEE = "WITHDRAW_FEE";
+  export const OTHER = "OTHER";
 }
 
 export namespace PositionSide {
-  export const LONG = "LONG";
-  export const SHORT = "SHORT";
+  export const COLLATERAL = "COLLATERAL";
+  export const BORROWER = "BORROWER";
 }
-export type PositionSide = string;
 
-//////////////////////////////
-///// Ethereum Addresses /////
-//////////////////////////////
+export namespace OracleSource {
+  export const UNISWAP = "UNISWAP";
+  export const BALANCER = "BALANCER";
+  export const CHAINLINK = "CHAINLINK";
+  export const YEARN = "YEARN";
+  export const SUSHISWAP = "SUSHISWAP";
+  export const CURVE = "CURVE";
+}
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+export namespace TransactionType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATE = "LIQUIDATE";
+  export const TRANSFER = "TRANSFER";
+  export const FLASHLOAN = "FLASHLOAN";
+
+  export const LIQUIDATOR = "LIQUIDATOR";
+  export const LIQUIDATEE = "LIQUIDATEE";
+}
+
+export namespace AccountActivity {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const VARIABLE_BORROW = "VARIABLE_BORROW";
+  export const STABLE_BORROW = "STABLE_BORROW";
+  export const STAKE = "STAKE";
+}
+
+export enum Transaction {
+  DEPOSIT = 0,
+  WITHDRAW = 1,
+  BORROW = 2,
+  REPAY = 3,
+  LIQUIDATE = 4,
+  TRANSFER = 5,
+  FLASHLOAN = 6,
+}
 
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
-
-export const DEFAULT_DECIMALS = 18;
-
-export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
-
-export const BIGINT_ZERO = BigInt.fromI32(0);
-export const BIGINT_ONE = BigInt.fromI32(1);
-export const BIGINT_TWO = BigInt.fromI32(2);
-export const BIGINT_TEN = BigInt.fromI32(10);
-export const BIGINT_HUNDRED = BigInt.fromI32(100);
-export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
-export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
-export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-);
 
 export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_SIX = 6 as i32;
+export const INT_NINE = 9 as i32;
+export const INT_SIXTEEN = 16 as i32;
+export const INT_EIGHTTEEN = 18 as i32;
+
+export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
+export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_THREE_HUNDRED = BigInt.fromI32(300);
+export const BIGINT_THOUSAND = BigInt.fromI32(1000);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
+export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
+export const BIGINT_MAX = BigInt.fromString(
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -210,19 +178,109 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 ///// Date/Time /////
 /////////////////////
 
+export const DAYS_PER_YEAR = 365;
+export const SECONDS_PER_YEAR = 60 * 60 * 24 * DAYS_PER_YEAR;
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
-export const SECONDS_PER_DAY_BI = BigInt.fromI32(SECONDS_PER_DAY);
-export const SECONDS_PER_HOUR_BI = BigInt.fromI32(SECONDS_PER_HOUR);
-export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
-);
 
-////////////////
-///// Misc /////
-////////////////
+export const ETHEREUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 13; // 13 = seconds per block
+export const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds per block. This is NOT ideal since avalanche has variable block time.
+export const FANTOM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
+export const BSC_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 3; // 3 = seconds per block
+export const MATIC_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds per block
+export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block.
 
-export const ETH_SYMBOL = "ETH";
-export const ETH_NAME = "Ether";
+/////////////////////////////
+/////        Math       /////
+/////////////////////////////
+
+export const mantissaFactor = 18;
+export const cTokenDecimals = 8;
+export const mantissaFactorBD = exponentToBigDecimal(mantissaFactor);
+export const cTokenDecimalsBD = exponentToBigDecimal(cTokenDecimals);
+
+// n => 10^n
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let result = BIGINT_ONE;
+  const ten = BigInt.fromI32(10);
+  for (let i = 0; i < decimals; i++) {
+    result = result.times(ten);
+  }
+  return result.toBigDecimal();
+}
+
+// BigInt to BigDecimal
+export function bigIntToBigDecimal(x: BigInt, decimals: i32): BigDecimal {
+  return x.toBigDecimal().div(exponentToBigDecimal(decimals));
+}
+
+//change number of decimals for BigDecimal
+export function BDChangeDecimals(
+  x: BigDecimal,
+  from: i32,
+  to: i32
+): BigDecimal {
+  if (to > from) {
+    // increase number of decimals
+    const diffMagnitude = exponentToBigDecimal(to - from);
+    return x.times(diffMagnitude);
+  } else if (to < from) {
+    // decrease number of decimals
+    const diffMagnitude = exponentToBigDecimal(from - to);
+    return x.div(diffMagnitude);
+  } else {
+    return x;
+  }
+}
+
+// insert value into arr at index
+export function insert<Type>(
+  arr: Array<Type>,
+  index: i32,
+  value: Type
+): Array<Type> {
+  const result: Type[] = [];
+  for (let i = 0; i < index; i++) {
+    result.push(arr[i]);
+  }
+  result.push(value);
+  for (let i = index; i < arr.length; i++) {
+    result.push(arr[i]);
+  }
+  return result;
+}
+
+// returns the increment to update the usage activity by
+// 1 for a new account in the specified period, otherwise 0
+export function activityCounter(
+  account: Bytes,
+  transactionType: string,
+  useTransactionType: boolean,
+  intervalID: i32, // 0 = no intervalID
+  marketID: Bytes | null = null
+): i32 {
+  let activityID = account
+    .toHexString()
+    .concat("-")
+    .concat(intervalID.toString());
+  if (marketID) {
+    activityID = activityID.concat("-").concat(marketID.toHexString());
+  }
+  if (useTransactionType) {
+    activityID = activityID.concat("-").concat(transactionType);
+  }
+  let activeAccount = _ActiveAccount.load(activityID);
+  if (!activeAccount) {
+    // if account / market only + transactionType is LIQUIDATEE
+    // then do not count that account as it did not spend gas to use the protocol
+    if (!useTransactionType && transactionType == TransactionType.LIQUIDATEE) {
+      return INT_ZERO;
+    }
+
+    activeAccount = new _ActiveAccount(activityID);
+    activeAccount.save();
+    return INT_ONE;
+  }
+
+  return INT_ZERO;
+}

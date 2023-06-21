@@ -20,7 +20,7 @@ import {
   INT_ZERO,
   SECONDS_PER_DAY,
   TransactionType,
-} from "./constants";
+} from "./util/constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
 

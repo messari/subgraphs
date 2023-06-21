@@ -26,7 +26,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   TransactionType,
-} from "./constants";
+} from "./util/constants";
 
 /**
  * This file contains the SnapshotManager, which is used to
