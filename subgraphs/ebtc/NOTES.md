@@ -9,6 +9,8 @@
 - collEthCLFeed: `0xb4c4a493AB6356497713A78FFA6c60FB53517c63`
 - ethBtcCLFeed: `0x779877A7B0D9E8603169DdbD7836e478b4624789`
 - testMsig (account holder for decentralised subgraph studio): `0xfA87ce273f8C254F345Bc7de42F30e2d2FEe6779`
+- ebtc/wbtc bpt pool: `0x070d3BDf2cd2e7067AFADC40857E8b657a057417`
+- ebtc/collateral bpt pool: `0xB1d4d8eFe062C83F1e7C816E9fbd74D752927250`
 
 ### CLI Commands
 
