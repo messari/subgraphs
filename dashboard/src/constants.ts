@@ -26,6 +26,7 @@ export namespace Versions {
   export const Schema300 = "3.0.0";
   export const Schema301 = "3.0.1";
   export const Schema302 = "3.0.2";
+  export const Schema310 = "3.1.0";
   export const Schema400 = "4.0.0";
 }
 
@@ -36,7 +37,7 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
       return true;
     }
   } else if (schema === "lending") {
-    if (["3.0.1"].includes(versionStr)) {
+    if (["3.1.0"].includes(versionStr)) {
       return true;
     }
   } else if (schema === "vaults") {

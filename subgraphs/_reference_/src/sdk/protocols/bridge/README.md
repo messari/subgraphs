@@ -302,8 +302,7 @@ import { Versions } from "./versions";
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
-    const price = getUsdPricePerToken(Address.fromBytes(token.id));
-    return price.usdPrice;
+    return getUsdPrice(Address.fromBytes(token.id), BIGDECIMAL_ONE);
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
