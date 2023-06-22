@@ -10,7 +10,7 @@
     "bo": "messari b hop-protocol-optimism -l",
     "bx": "messari b hop-protocol-xdai -l",
     "bp": "messari b hop-protocol-polygon -l",
-    "da": "messari b hop-protocol-arbitrum -d -r subgraph-substreams -l",
+    "da": "messari b hop-protocol-arbitrum -d -r itsjerryokolo -l",
     "de": "messari b hop-protocol-ethereum -d -r itsjerryokolo -l",
     "do": "messari b hop-protocol-optimism -d -r itsjerryokolo -l",
     "dp": "messari b hop-protocol-polygon -d -r itsjerryokolo -l",
