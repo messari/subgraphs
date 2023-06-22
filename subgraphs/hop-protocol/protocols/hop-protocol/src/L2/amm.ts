@@ -28,7 +28,7 @@ import {
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
-import { BIGINT_TEN_TO_EIGHTEENTH } from "../../../../src/common/constants";
+import { BIGINT_TEN_TO_EIGHTEENTH } from "../../../../src/sdk/util/constants";
 import { updateAMMTVE } from "../../../../src/sdk/util/tokens";
 
 class Pricer implements TokenPricer {

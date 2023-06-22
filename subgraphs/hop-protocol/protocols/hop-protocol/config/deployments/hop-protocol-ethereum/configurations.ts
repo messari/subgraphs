@@ -32,6 +32,10 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return ["SNX", "SNX", "18", MainnetBridge.SNX];
     } else if (this.getEthTokens().includes(tokenAddress)) {
       return ["ETH", "Ethereum", "18", MainnetBridge.ETH];
+    } else if (this.getSusdTokens().includes(tokenAddress)) {
+      return ["sUSD", "Synthetix Usd", "18", MainnetBridge.sUSD];
+    } else if (this.getRethTokens().includes(tokenAddress)) {
+      return ["rETH", "Rocket Pool Ethereum", "18", MainnetBridge.rETH];
     } else {
       log.critical("Token details not found", []);
       return [];
@@ -51,6 +55,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return ["HOP-SNX", "hSNX/SNX"];
     } else if (this.getEthPools().includes(poolAddress)) {
       return ["HOP-ETH", "hETH/ETH"];
+    } else if (this.getRethPools().includes(poolAddress)) {
+      return ["HOP-rETH", "hrETH/ETH"];
     } else {
       log.critical("Pool not found", []);
       return [];
@@ -70,6 +76,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.USDT) return [MainnetToken.USDT];
     else if (bridgeAddress == MainnetBridge.ETH) return [MainnetToken.ETH];
     else if (bridgeAddress == MainnetBridge.SNX) return [MainnetToken.SNX];
+    else if (bridgeAddress == MainnetBridge.rETH) return [MainnetToken.rETH];
+    else if (bridgeAddress == MainnetBridge.sUSD) return [MainnetToken.sUSD];
     else if (bridgeAddress == MainnetBridge.MATIC) return [MainnetToken.MATIC];
     else {
       log.critical("Token not found", []);
@@ -82,6 +90,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.DAI) return ArbitrumAmm.DAI;
     else if (bridgeAddress == MainnetBridge.USDT) return ArbitrumAmm.USDT;
     else if (bridgeAddress == MainnetBridge.ETH) return ArbitrumAmm.ETH;
+    else if (bridgeAddress == MainnetBridge.ETH) return ArbitrumAmm.rETH;
     else {
       log.critical("Token not found", []);
 
@@ -195,6 +204,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   getEthPools(): string[] {
     return [XdaiAmm.ETH, ArbitrumAmm.ETH, PolygonAmm.ETH, OptimismAmm.ETH];
   }
+
   getEthTokens(): string[] {
     return [
       MainnetToken.ETH,
@@ -212,6 +222,20 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     return [MainnetToken.SNX, OptimismToken.SNX];
   }
 
+  getRethPools(): string[] {
+    return [ArbitrumAmm.rETH, OptimismAmm.rETH];
+  }
+  getRethTokens(): string[] {
+    return [OptimismToken.rETH, ArbitrumToken.rETH];
+  }
+
+  getSusdPools(): string[] {
+    return [OptimismAmm.sUSD];
+  }
+  getSusdTokens(): string[] {
+    return [OptimismToken.sUSD];
+  }
+
   getMaticPools(): string[] {
     return [PolygonAmm.MATIC, XdaiAmm.MATIC];
   }
@@ -227,6 +251,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       MainnetBridge.ETH,
       MainnetBridge.MATIC,
       MainnetBridge.SNX,
+      MainnetBridge.rETH,
+      MainnetBridge.sUSD,
     ];
   }
 
@@ -266,6 +292,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (tokenAddress == MainnetToken.DAI) return ArbitrumToken.DAI;
     else if (tokenAddress == MainnetToken.USDT) return ArbitrumToken.USDT;
     else if (tokenAddress == MainnetToken.ETH) return ArbitrumToken.ETH;
+    else if (tokenAddress == MainnetToken.rETH) return ArbitrumToken.rETH;
     else {
       log.critical("Arb Crosstoken not found", []);
       return "";

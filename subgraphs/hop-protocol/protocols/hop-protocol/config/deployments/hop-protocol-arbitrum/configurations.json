@@ -30,11 +30,17 @@
       "token": "ETH",
       "address": "0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97",
       "startBlock": 2135591
+    },
+    {
+      "dataSourceName": "HopL2AmmRETH",
+      "token": "rETH",
+      "address": "0x0Ded0d521AC7B0d312871D18EA4FDE79f03Ee7CA",
+      "startBlock": 85020157
     }
   ],
   "bridges": [
     {
-      "dataSourceName": "HopL2Bridge",
+      "dataSourceName": "Bridge",
       "token": "USDC",
       "address": "0x0e0E3d2C5c292161999474247956EF542caBF8dd",
       "startBlock": 440027
@@ -56,6 +62,12 @@
       "token": "ETH",
       "address": "0x3749C4f034022c39ecafFaBA182555d4508caCCC",
       "startBlock": 2135598
+    },
+    {
+      "dataSourceName": "HopL2BridgeRETH",
+      "token": "rETH",
+      "address": "0xc315239cFb05F1E130E7E28E603CEa4C014c57f0",
+      "startBlock": 85020329
     },
     {
       "dataSourceName": "HopL2BridgeHOP",
@@ -88,6 +100,12 @@
       "token": "ETH",
       "address": "0x755569159598f3702bdD7DFF6233A317C156d3Dd",
       "startBlock": 30834058
+    },
+    {
+      "dataSourceName": "HopL2RewardsRETH",
+      "token": "rETH",
+      "address": "0x3D4cAD734B464Ed6EdCF6254C2A3e5fA5D449b32",
+      "startBlock": 86349647
     }
   ]
 }

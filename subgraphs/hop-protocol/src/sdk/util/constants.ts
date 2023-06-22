@@ -123,12 +123,6 @@ export namespace LiquidityPoolFeeType {
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
-
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
-}
-
 export namespace LendingType {
   export const CDP = "CDP";
   export const POOLED = "POOLED";
@@ -160,7 +154,11 @@ export namespace UsageType {
   export const WITHDRAW = "WITHDRAW";
   export const SWAP = "SWAP";
 }
-
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
+}
+export type RewardTokenType = string;
 export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
 
 //////////////////////////////
@@ -314,6 +312,10 @@ export namespace MainnetToken {
   export const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F".toLowerCase();
   export const ETH = ZERO_ADDRESS.toLowerCase();
   export const SNX = "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f".toLowerCase();
+  export const sUSD =
+    "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51".toLowerCase();
+  export const rETH =
+    "0xae78736Cd615f374D3085123A210448E74Fc6393".toLowerCase();
 }
 
 export namespace MainnetBridge {
@@ -326,6 +328,10 @@ export namespace MainnetBridge {
   export const DAI = "0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1".toLowerCase();
   export const ETH = "0xb8901acB165ed027E32754E0FFe830802919727f".toLowerCase();
   export const SNX = "0x893246FACF345c99e4235E5A7bbEE7404c988b96".toLowerCase();
+  export const sUSD =
+    "0x36443fC70E073fe9D50425f82a3eE19feF697d62".toLowerCase();
+  export const rETH =
+    "0x87269B23e73305117D0404557bAdc459CEd0dbEc".toLowerCase();
 }
 
 export namespace ArbitrumBridge {
@@ -335,6 +341,8 @@ export namespace ArbitrumBridge {
     "0x72209Fe68386b37A40d6bCA04f78356fd342491f".toLowerCase();
   export const DAI = "0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6".toLowerCase();
   export const ETH = "0x3749C4f034022c39ecafFaBA182555d4508caCCC".toLowerCase();
+  export const rETH =
+    "0xc315239cFb05F1E130E7E28E603CEa4C014c57f0".toLowerCase();
 }
 export namespace ArbitrumAmm {
   export const USDC =
@@ -343,6 +351,8 @@ export namespace ArbitrumAmm {
     "0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a".toLowerCase();
   export const DAI = "0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742".toLowerCase();
   export const ETH = "0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97".toLowerCase();
+  export const rETH =
+    "0x0Ded0d521AC7B0d312871D18EA4FDE79f03Ee7CA".toLowerCase();
 }
 
 export namespace ArbitrumToken {
@@ -352,6 +362,8 @@ export namespace ArbitrumToken {
     "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9".toLowerCase();
   export const DAI = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1".toLowerCase();
   export const ETH = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase();
+  export const rETH =
+    "0xEC70Dcb4A1EFa46b8F2D97C310C9c4790ba5ffA8".toLowerCase();
 }
 
 export namespace ArbitrumHtoken {
@@ -361,6 +373,8 @@ export namespace ArbitrumHtoken {
     "0x12e59C59D282D2C00f3166915BED6DC2F5e2B5C7".toLowerCase();
   export const DAI = "0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61".toLowerCase();
   export const ETH = "0xDa7c0de432a9346bB6e96aC74e3B61A36d8a77eB".toLowerCase();
+  export const rETH =
+    "0x588Bae9C85a605a7F14E551d144279984469423B".toLowerCase();
 }
 
 export namespace ArbitrumRewardToken {
@@ -370,6 +384,8 @@ export namespace ArbitrumRewardToken {
     "0x9Dd8685463285aD5a94D2c128bda3c5e8a6173c8".toLowerCase();
   export const DAI = "0xd4D28588ac1D9EF272aa29d4424e3E2A03789D1E".toLowerCase();
   export const ETH = "0x755569159598f3702bdD7DFF6233A317C156d3Dd".toLowerCase();
+  export const rETH =
+    "0x3D4cAD734B464Ed6EdCF6254C2A3e5fA5D449b32".toLowerCase();
 }
 
 export namespace OptimismBridge {
@@ -379,7 +395,11 @@ export namespace OptimismBridge {
     "0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61".toLowerCase();
   export const DAI = "0x7191061D5d4C60f598214cC6913502184BAddf18".toLowerCase();
   export const ETH = "0x83f6244Bd87662118d96D9a6D44f09dffF14b30E".toLowerCase();
-  export const SNX = "0x16284c7323c35F4960540583998C98B1CfC581a7".toLowerCase();
+  export const SNX = "0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73".toLowerCase();
+  export const rETH =
+    "0xA0075E8cE43dcB9970cB7709b9526c1232cc39c2".toLowerCase();
+  export const sUSD =
+    "0x33Fe5bB8DA466dA55a8A32D6ADE2BB104E2C5201".toLowerCase();
 }
 export namespace OptimismAmm {
   export const USDC =
@@ -388,6 +408,10 @@ export namespace OptimismAmm {
     "0xeC4B41Af04cF917b54AEb6Df58c0f8D78895b5Ef".toLowerCase();
   export const DAI = "0xF181eD90D6CfaC84B8073FdEA6D34Aa744B41810".toLowerCase();
   export const ETH = "0xaa30D6bba6285d0585722e2440Ff89E23EF68864".toLowerCase();
+  export const rETH =
+    "0x9Dd8685463285aD5a94D2c128bda3c5e8a6173c8".toLowerCase();
+  export const sUSD =
+    "0x8d4063E82A4Db8CdAed46932E1c71e03CA69Bede".toLowerCase();
   export const SNX = "0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73".toLowerCase();
 }
 
@@ -397,7 +421,11 @@ export namespace OptimismToken {
   export const USDT =
     "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58".toLowerCase();
   export const DAI = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1".toLowerCase();
+  export const sUSD =
+    "0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9".toLowerCase();
   export const ETH = "0x4200000000000000000000000000000000000006".toLowerCase();
+  export const rETH =
+    "0x9Bcef72be871e61ED4fBbc7630889beE758eb81D".toLowerCase();
   export const SNX = "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4".toLowerCase();
 }
 
@@ -409,6 +437,10 @@ export namespace OptimismHtoken {
   export const DAI = "0x56900d66D74Cb14E3c86895789901C9135c95b16".toLowerCase();
   export const ETH = "0xE38faf9040c7F09958c638bBDB977083722c5156".toLowerCase();
   export const SNX = "0x13B7F51BD865410c3AcC4d56083C5B56aB38D203".toLowerCase();
+  export const rETH =
+    "0x755569159598f3702bdD7DFF6233A317C156d3Dd".toLowerCase();
+  export const sUSD =
+    "0x6F03052743CD99ce1b29265E377e320CD24Eb632".toLowerCase();
 }
 
 export namespace OptimismRewardToken {
@@ -422,6 +454,12 @@ export namespace OptimismRewardToken {
     "0x25a5A48C35e75BD2EFf53D94f0BB60d5A00E36ea".toLowerCase();
   export const SNX_B =
     "0x09992Dd7B32f7b35D347DE9Bdaf1919a57d38E82".toLowerCase();
+  export const rETH =
+    "0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778".toLowerCase();
+  export const sUSD_A =
+    "0x2935008eE9943f859C4fbb863c5402fFC06f462E".toLowerCase();
+  export const sUSD_B =
+    "0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266".toLowerCase();
 }
 
 export namespace PolygonBridge {
@@ -536,12 +574,6 @@ export const XDAI_L1_SIGNATURE =
 export const ARBITRUM_L1_SIGNATURE =
   "0xff64905f73a67fb594e0f940a8075a860db489ad991e032f48c81123eb52d60b"; //ARBITRUM_L1
 
-export const TRANSFERTOL2 =
-  "0x0a0607688c86ec1775abcdbab7b33a3a35a6c9cde677c9be880150c231cc6b0b"; //HOPL1BRIDGE
-
-export const MESSAGEDELIVERED =
-  "0x5e3c1311ea442664e8b1611bfabef659120ea7a0a2cfc0667700bebc69cbffe1"; //HOPL1BRIDGE
-
 export const MESSENGER_EVENT_SIGNATURES = [
   ARBITRUM_L1_SIGNATURE,
   XDAI_L1_SIGNATURE,
@@ -553,6 +585,8 @@ export namespace RewardTokens {
   export const HOP = "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC".toLowerCase();
   export const OP = "0x4200000000000000000000000000000000000042".toLowerCase();
   export const GNO = "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb".toLowerCase();
+  export const rETH =
+    "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb".toLowerCase();
 }
 export const GNO_REWARDS = [
   XdaiRewardToken.DAI_A,
@@ -567,6 +601,8 @@ export const HOP_REWARDS = [
   OptimismRewardToken.DAI,
   OptimismRewardToken.SNX_A,
   OptimismRewardToken.ETH,
+  OptimismRewardToken.rETH,
+  OptimismRewardToken.sUSD_A,
   OptimismRewardToken.USDC,
   OptimismRewardToken.USDT,
   PolygonRewardToken.ETH,
@@ -590,4 +626,8 @@ export const SIX_DECIMAL_TOKENS = [
   XdaiToken.USDC,
 ];
 
-export const OP_REWARDS = [OptimismRewardToken.SNX_B];
+export const OP_REWARDS = [
+  OptimismRewardToken.SNX_B,
+  OptimismRewardToken.sUSD_B,
+];
+export const RPL_REWARDS = [OptimismRewardToken.rETH];

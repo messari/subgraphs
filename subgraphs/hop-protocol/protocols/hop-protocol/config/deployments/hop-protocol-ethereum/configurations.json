@@ -19,6 +19,12 @@
       "startBlock": 12860139
     },
     {
+      "dataSourceName": "HopL1BridgeRETH",
+      "token": "rETH",
+      "address": "0x87269B23e73305117D0404557bAdc459CEd0dbEc",
+      "startBlock": 17141336
+    },
+    {
       "dataSourceName": "HopL1BridgeMATIC",
       "token": "MATIC",
       "address": "0x22B1Cbb8D98a01a3B71D034BB899775A76Eb1cc2",
@@ -35,12 +41,6 @@
       "token": "ETH",
       "address": "0xb8901acB165ed027E32754E0FFe830802919727f",
       "startBlock": 13331564
-    },
-    {
-      "dataSourceName": "HopL1BridgeWBTC",
-      "token": "WBTC",
-      "address": "0xb98454270065A31D71Bf635F6F7Ee6A518dFb849",
-      "startBlock": 13476113
     },
     {
       "dataSourceName": "HopL1BridgeSNX",

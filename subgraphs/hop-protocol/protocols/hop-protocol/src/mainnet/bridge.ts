@@ -24,7 +24,7 @@ import { TransferSentToL2 } from "../../../../generated/Bridge/Bridge";
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
-import { updateBridgeMessage } from "../../../../src/sdk/util/bridge";
+import { updateL1OutgoingBridgeMessage } from "../../../../src/sdk/util/bridge";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -164,7 +164,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
       event.transaction.hash.toHexString(),
     ]);
 
-    updateBridgeMessage(
+    updateL1OutgoingBridgeMessage(
       event,
       event.params.recipient,
       event.params.chainId,

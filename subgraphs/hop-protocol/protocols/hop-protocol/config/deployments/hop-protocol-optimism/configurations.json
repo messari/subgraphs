@@ -43,11 +43,17 @@
       "token": "sUSD",
       "address": "0x8d4063E82A4Db8CdAed46932E1c71e03CA69Bede",
       "startBlock": 27410231
+    },
+    {
+      "dataSourceName": "HopL2AmmrETH",
+      "token": "rETH",
+      "address": "0x9Dd8685463285aD5a94D2c128bda3c5e8a6173c8",
+      "startBlock": 94877549
     }
   ],
   "bridges": [
     {
-      "dataSourceName": "HopL2Bridge",
+      "dataSourceName": "Bridge",
       "token": "USDC",
       "address": "0xa81D244A1814468C734E5b4101F7b9c0c577a8fC",
       "startBlock": 0
@@ -71,12 +77,6 @@
       "startBlock": 0
     },
     {
-      "dataSourceName": "HopL2BridgeWBTC",
-      "token": "WBTC",
-      "address": "0xB1ea9FeD58a317F81eEEFC18715Dd323FDEf45c4",
-      "startBlock": 0
-    },
-    {
       "dataSourceName": "HopL2BridgeSNX",
       "token": "SNX",
       "address": "0x16284c7323c35F4960540583998C98B1CfC581a7",
@@ -87,6 +87,12 @@
       "token": "sUSD",
       "address": "0x33Fe5bB8DA466dA55a8A32D6ADE2BB104E2C5201",
       "startBlock": 27410328
+    },
+    {
+      "dataSourceName": "HopL2BridgeRETH",
+      "token": "rETH",
+      "address": "0xA0075E8cE43dcB9970cB7709b9526c1232cc39c2",
+      "startBlock": 94877802
     },
     {
       "dataSourceName": "HopL2BridgeHOP",
@@ -121,16 +127,22 @@
       "startBlock": 30117251
     },
     {
-      "dataSourceName": "HopL2RewardsSNX_A",
-      "token": "ETH",
-      "address": "0x25a5A48C35e75BD2EFf53D94f0BB60d5A00E36ea",
-      "startBlock": 30117322
+      "dataSourceName": "HopL2RewardsSUSD_A",
+      "token": "sUSD",
+      "address": "0x2935008eE9943f859C4fbb863c5402fFC06f462E",
+      "startBlock": 88615959
     },
     {
-      "dataSourceName": "HopL2RewardsSNX_B",
-      "token": "ETH",
-      "address": "0x09992Dd7B32f7b35D347DE9Bdaf1919a57d38E82",
-      "startBlock": 30297161
+      "dataSourceName": "HopL2RewardsSUSD_B",
+      "token": "sUSD",
+      "address": "0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266",
+      "startBlock": 88607165
+    },
+    {
+      "dataSourceName": "HopL2RewardsRETH",
+      "token": "rETH",
+      "address": "0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778",
+      "startBlock": 95771182
     }
   ]
 }

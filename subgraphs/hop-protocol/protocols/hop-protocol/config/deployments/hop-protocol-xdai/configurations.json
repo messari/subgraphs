@@ -40,7 +40,7 @@
   ],
   "bridges": [
     {
-      "dataSourceName": "HopL2Bridge",
+      "dataSourceName": "Bridge",
       "token": "USDC",
       "address": "0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8",
       "startBlock": 16617211

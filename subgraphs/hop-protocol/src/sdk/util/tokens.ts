@@ -7,7 +7,7 @@ import {
   BIGINT_TEN_TO_EIGHTEENTH,
 } from "./constants";
 import { BIGINT_TEN_TO_SIX, SIX_DECIMAL_TOKENS } from "./constants";
-import { L2_Amm } from "../../generated/HopL2Amm/L2_Amm";
+import { L2_Amm } from "../../../generated/HopL2Amm/L2_Amm";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
