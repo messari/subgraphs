@@ -4,18 +4,7 @@
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/hop-protocol/config/templates/hop-protocol.template.yaml > subgraph.yaml",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
-    "ba": "messari b hop-protocol-arbitrum -l",
-    "be": "messari b hop-protocol-ethereum -l",
-    "bo": "messari b hop-protocol-optimism -l",
-    "bx": "messari b hop-protocol-xdai -l",
-    "bp": "messari b hop-protocol-polygon -l",
-    "da": "messari b hop-protocol-arbitrum -d -r itsjerryokolo -l",
-    "de": "messari b hop-protocol-ethereum -d -r itsjerryokolo -l",
-    "do": "messari b hop-protocol-optimism -d -r itsjerryokolo -l",
-    "dp": "messari b hop-protocol-polygon -d -r itsjerryokolo -l",
-    "dx": "messari b hop-protocol-xdai -d -r itsjerryokolo -l",
-    "dl2": "yarn do && yarn dp && yarn dx && yarn da"
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.49.0",
