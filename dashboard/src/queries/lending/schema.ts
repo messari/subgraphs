@@ -50,6 +50,7 @@ export const schema130 = (): Schema => {
       cumulativeLiquidateUSD: "BigDecimal!",
       mintedTokenSupplies: "[BigInt!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -63,6 +64,7 @@ export const schema130 = (): Schema => {
       dailyLiquidateCount: "Int!",
       totalPoolCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     marketDailySnapshots: {
       id: "ID!",
@@ -90,6 +92,7 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -102,6 +105,7 @@ export const schema130 = (): Schema => {
       hourlyRepayCount: "Int!",
       hourlyLiquidateCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     marketHourlySnapshots: {
       id: "ID!",
@@ -129,6 +133,7 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
