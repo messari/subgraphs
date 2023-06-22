@@ -586,7 +586,7 @@ function ProtocolSection({
             decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey]?.id;
           }
           let endpointURL =
-            "https://gateway.thegraph.com/api/" +
+            "https://gateway-arbitrum.network.thegraph.com/api/" +
             process.env.REACT_APP_GRAPH_API_KEY +
             "/subgraphs/id/" +
             decenSubgraphId;
