@@ -18,19 +18,19 @@ import {
   exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
-  PositionSide,
   SECONDS_PER_DAY,
   TransactionType,
 } from "./constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
+import { PositionSide } from "./constants";
 
 /**
  * This file contains the PositionManager class, which is used to
  * make changes to a given position.
  *
- * Schema Version:  3.0.0
- * SDK Version:     1.0.1
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.4
  * Author(s):
  *  - @dmelotik
  */
@@ -100,7 +100,7 @@ export class PositionManager {
     newBalance: BigInt,
     transactionType: string,
     priceUSD: BigDecimal,
-    _principal: BigInt | null = null
+    principal: BigInt | null = null
   ): void {
     let positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -119,7 +119,7 @@ export class PositionManager {
       // update existing position
       position = position!;
       position.balance = newBalance;
-      position._principalValue = _principal;
+      if (principal) position.principal = principal;
       if (transactionType == TransactionType.DEPOSIT) {
         position.depositCount += INT_ONE;
       } else if (transactionType == TransactionType.BORROW) {
@@ -134,7 +134,7 @@ export class PositionManager {
       //
       // take position snapshot
       //
-      this.snapshotPosition(event, priceUSD, _principal);
+      this.snapshotPosition(event, priceUSD);
       return;
     }
     position = new Position(positionID);
@@ -149,7 +149,7 @@ export class PositionManager {
       position.type = this.interestType;
     }
     position.balance = newBalance;
-    position._principalValue = _principal;
+    if (principal) position.principal = principal;
     position.depositCount = INT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.borrowCount = INT_ZERO;
@@ -202,7 +202,7 @@ export class PositionManager {
     //
     // take position snapshot
     //
-    this.snapshotPosition(event, priceUSD, _principal);
+    this.snapshotPosition(event, priceUSD);
     this.dailyActivePosition(positionCounter, event, protocol);
   }
 
@@ -212,7 +212,7 @@ export class PositionManager {
     newBalance: BigInt,
     transactionType: string,
     priceUSD: BigDecimal,
-    _principal: BigInt | null = null
+    principal: BigInt | null = null
   ): void {
     const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -231,7 +231,7 @@ export class PositionManager {
     }
 
     position.balance = newBalance;
-    position._principalValue = _principal;
+    if (principal) position.principal = principal;
 
     if (transactionType == TransactionType.WITHDRAW) {
       position.withdrawCount += INT_ONE;
@@ -285,15 +285,11 @@ export class PositionManager {
     //
     // update position snapshot
     //
-    this.snapshotPosition(event, priceUSD, _principal);
+    this.snapshotPosition(event, priceUSD);
     this.dailyActivePosition(positionCounter, event, protocol);
   }
 
-  private snapshotPosition(
-    event: ethereum.Event,
-    priceUSD: BigDecimal,
-    _principal: BigInt | null = null
-  ): void {
+  private snapshotPosition(event: ethereum.Event, priceUSD: BigDecimal): void {
     const snapshot = new PositionSnapshot(
       this.position!.id.concat("-")
         .concat(event.transaction.hash.toHexString())
@@ -313,11 +309,20 @@ export class PositionManager {
       .times(priceUSD);
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
-    snapshot._principalValue = _principal;
-    if (_principal && this.position!.side == PositionSide.BORROWER)
-      snapshot._baseIndex = this.market._baseBorrowIndex;
-    if (_principal && this.position!.side == PositionSide.COLLATERAL)
-      snapshot._baseIndex = this.market._baseSupplyIndex;
+
+    if (this.position!.principal) snapshot.principal = this.position!.principal;
+    if (
+      this.market.borrowIndex &&
+      this.position!.side == PositionSide.BORROWER
+    ) {
+      snapshot.index = this.market.borrowIndex;
+    } else if (
+      this.market.supplyIndex &&
+      this.position!.side == PositionSide.COLLATERAL
+    ) {
+      snapshot.index = this.market.supplyIndex;
+    }
+
     snapshot.save();
   }
 

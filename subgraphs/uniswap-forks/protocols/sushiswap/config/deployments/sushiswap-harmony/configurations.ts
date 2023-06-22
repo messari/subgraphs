@@ -112,7 +112,9 @@ export class SushiswapHarmonyConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0xed0b4b0f0e2c17646682fc98ace09feb99af3ade", // Reverse Token
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

@@ -92,6 +92,10 @@ export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; 
 ///// Numbers /////
 ///////////////////
 
+export const INIT_LIQUIDITY_INDEX = BigInt.fromString(
+  "1000000000000000000000000000"
+);
+
 export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
