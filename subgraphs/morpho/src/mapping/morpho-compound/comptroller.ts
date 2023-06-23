@@ -13,8 +13,8 @@ import {
 import { getCompoundProtocol } from "./fetchers";
 import { Address } from "@graphprotocol/graph-ts";
 import { Market } from "../../../generated/schema";
-import { getMarket } from "../../utils/initializers";
 import { CompoundOracle } from "../../../generated/templates";
+import { getMarket, getOrInitMarketList } from "../../utils/initializers";
 
 export function handleNewBorrowCap(event: NewBorrowCap): void {
   const market = Market.load(event.params.cToken);
@@ -24,11 +24,12 @@ export function handleNewBorrowCap(event: NewBorrowCap): void {
 }
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
-  const protocol = getCompoundProtocol(MORPHO_COMPOUND_ADDRESS);
+  const protocol = getOrInitMarketList(MORPHO_COMPOUND_ADDRESS);
   const closeFactor = event.params.newCloseFactorMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .minus(BIGDECIMAL_ONE);
+
   for (let i = 0; i < protocol.markets.length; i++) {
     const market = getMarket(protocol.markets[i]);
     market.liquidationPenalty = closeFactor;
