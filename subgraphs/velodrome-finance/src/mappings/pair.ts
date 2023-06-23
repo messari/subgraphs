@@ -26,7 +26,6 @@ import {
   handleTransferMint,
   handleTransferToPoolBurn,
 } from "../common/handlers";
-import { _PoolPricingHelper } from "../../generated/schema";
 import { updatePoolPriceFromSwap } from "./helpers/pricing";
 import {
   updateAllPoolFees,

@@ -20,9 +20,9 @@ import { applyDecimals } from "./utils/numbers";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetricsDaily.blockNumber = event.block.number;
@@ -40,30 +40,30 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 export function updateRevenue(pool: LiquidityPool, event: Fees): void {
-  let protocol = getOrCreateDex();
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const protocol = getOrCreateDex();
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     event.address,
     pool,
     event.block
   );
-  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     event.address,
     pool,
     event.block
   );
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
-  let amount0USD = applyDecimals(event.params.amount0, token0.decimals).times(
+  const amount0USD = applyDecimals(event.params.amount0, token0.decimals).times(
     token0.lastPriceUSD!
   );
-  let amount1USD = applyDecimals(event.params.amount1, token1.decimals).times(
+  const amount1USD = applyDecimals(event.params.amount1, token1.decimals).times(
     token1.lastPriceUSD!
   );
 
-  let protocolSideRevenue = amount0USD.plus(amount1USD);
+  const protocolSideRevenue = amount0USD.plus(amount1USD);
   // no need to calculate supply side, as all fees are protocol side.
 
   //Update pool cumulatives
@@ -134,12 +134,12 @@ export function updateUsageMetrics(
   fromAddress: Address,
   usageType: string
 ): void {
-  let from = fromAddress.toHexString();
+  const from = fromAddress.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
@@ -162,14 +162,14 @@ export function updateUsageMetrics(
   }
 
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = "daily".concat(from).concat("-").concat(dayId);
+  const dailyActiveAccountId = "daily".concat(from).concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -177,7 +177,10 @@ export function updateUsageMetrics(
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = "hourly".concat(from).concat("-").concat(hourId);
+  const hourlyActiveAccountId = "hourly"
+    .concat(from)
+    .concat("-")
+    .concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -207,12 +210,12 @@ export function updatePoolMetrics(
   block: ethereum.Block
 ): void {
   // get or create pool metrics
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(
     poolAddress,
     pool,
     block
   );
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(
     poolAddress,
     pool,
     block

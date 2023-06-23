@@ -6,6 +6,7 @@ import {
 } from "../../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_SEVEN,
   BIGINT_ZERO,
   VELO_ADDRESS,
 } from "../../common/constants";
@@ -43,7 +44,7 @@ export function updateStaked(
 }
 
 export function updateRewards(pool: LiquidityPool, amount: BigInt): void {
-  const rewardTokenEmissionsAmount = amount.div(BigInt.fromI32(7));
+  const rewardTokenEmissionsAmount = amount.div(BIGINT_SEVEN);
 
   // Emissions are weekly
   pool.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];

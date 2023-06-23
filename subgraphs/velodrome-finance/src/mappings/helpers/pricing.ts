@@ -17,7 +17,7 @@ export function updatePoolPriceFromSwap(
   pool: LiquidityPool,
   event: Swap
 ): void {
-  let helper = _PoolPricingHelper.load(event.address.toHex())!;
+  const helper = _PoolPricingHelper.load(event.address.toHex())!;
 
   if (!helper.whitelisted) {
     return;
@@ -27,12 +27,11 @@ export function updatePoolPriceFromSwap(
     return;
   }
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
-  let token0IsBase = helper.baseTokenIndex == 0 ? true : false;
+  const token0IsBase = helper.baseTokenIndex == 0 ? true : false;
 
-  let base = token0;
   let token = token1;
   let amountBaseIn = event.params.amount0In.toBigDecimal();
   let amountBaseOut = event.params.amount0Out.toBigDecimal();
@@ -40,7 +39,6 @@ export function updatePoolPriceFromSwap(
   let amountTokenOut = event.params.amount1Out.toBigDecimal();
 
   if (!token0IsBase) {
-    base = token1;
     token = token0;
     amountBaseIn = event.params.amount1In.toBigDecimal();
     amountBaseOut = event.params.amount1Out.toBigDecimal();
@@ -88,7 +86,7 @@ export function updatePoolPriceFromSwap(
 
 export function getBaseTokenRateInUSDC(poolAddress: Address): BigDecimal {
   let rate = BIGDECIMAL_ZERO;
-  let helper = _PoolPricingHelper.load(poolAddress.toHex());
+  const helper = _PoolPricingHelper.load(poolAddress.toHex());
   if (helper != null) {
     if (helper.baseToken == ZERO_ADDRESS) {
       rate = BIGDECIMAL_ZERO;
@@ -97,7 +95,7 @@ export function getBaseTokenRateInUSDC(poolAddress: Address): BigDecimal {
     } else {
       rate = BIGDECIMAL_ONE;
       for (let i = 0; i < helper.usdPath.length; i++) {
-        let intermediateRate = getExchangeRate(
+        const intermediateRate = getExchangeRate(
           Address.fromString(helper.usdPath[i]),
           helper.usdPathBaseTokenIndex[i]
         );
@@ -112,7 +110,7 @@ export function getExchangeRate(
   poolAddress: Address,
   baseTokenIndex: i32
 ): BigDecimal {
-  let helper = _PoolPricingHelper.load(poolAddress.toHex())!;
+  const helper = _PoolPricingHelper.load(poolAddress.toHex())!;
   let rate = BIGDECIMAL_ZERO;
   if (baseTokenIndex == helper.baseTokenIndex) {
     rate = helper.priceTokenInBase;
@@ -122,5 +120,3 @@ export function getExchangeRate(
 
   return rate;
 }
-
-export function updateLPTokenPrice(poolAddress: Address): void {}
