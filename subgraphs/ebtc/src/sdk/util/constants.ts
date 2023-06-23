@@ -142,6 +142,8 @@ export enum Transaction {
 ///// Type Helpers /////
 ////////////////////////
 
+export const DEFAULT_DECIMALS = 18;
+
 export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
