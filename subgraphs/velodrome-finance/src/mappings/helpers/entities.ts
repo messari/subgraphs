@@ -24,7 +24,6 @@ import {
   ZERO_ADDRESS,
 } from "../../common/constants";
 import {
-  getLiquidityPool,
   getOrCreateDex,
   getOrCreateToken,
   getOrCreateTransfer,
@@ -39,14 +38,14 @@ export function createLiquidityPool(
   token1Address: Address,
   stable: boolean
 ): void {
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
-  let token0 = getOrCreateToken(token0Address);
-  let token1 = getOrCreateToken(token1Address);
-  let LPtoken = getOrCreateToken(poolAddress);
+  const token0 = getOrCreateToken(token0Address);
+  const token1 = getOrCreateToken(token1Address);
+  const LPtoken = getOrCreateToken(poolAddress);
 
-  let pool = new LiquidityPool(poolAddress.toHexString());
+  const pool = new LiquidityPool(poolAddress.toHexString());
 
   pool.protocol = protocol.id;
   pool.name = protocol.name + " " + LPtoken.symbol;
@@ -85,12 +84,12 @@ export function createLiquidityPool(
 
   createPoolPricingHelper(poolAddress, token0Address, token1Address);
 
-  let poolList = stable ? protocol._stablePools : protocol._volatilePools;
-  poolList.push(poolAddress)
+  const poolList = stable ? protocol._stablePools : protocol._volatilePools;
+  poolList.push(poolAddress);
   if (stable) {
-    protocol._stablePools = poolList
+    protocol._stablePools = poolList;
   } else {
-    protocol._volatilePools = poolList
+    protocol._volatilePools = poolList;
   }
 
   protocol.totalPoolCount += 1;
@@ -111,8 +110,8 @@ export function createPoolPricingHelper(
   if (!helper) {
     helper = new _PoolPricingHelper(poolAddress.toHex());
 
-    let token0Lookup = getBaseTokenLookup(token0Address);
-    let token1Lookup = getBaseTokenLookup(token1Address);
+    const token0Lookup = getBaseTokenLookup(token0Address);
+    const token1Lookup = getBaseTokenLookup(token1Address);
 
     // Reference arrays are in reverse order of priority. i.e. larger index take precedence
     if (token0Lookup.priority > token1Lookup.priority) {
@@ -150,7 +149,7 @@ export function createPoolFees(
   poolAddress: Address,
   feePercentage: BigDecimal
 ): LiquidityPoolFee {
-  let poolFee = new LiquidityPoolFee(
+  const poolFee = new LiquidityPoolFee(
     LiquidityPoolFeeType.FIXED_TRADING_FEE.concat(poolAddress.toHex())
   );
   poolFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
@@ -162,18 +161,17 @@ export function createPoolFees(
 }
 
 // Generate the deposit entity and update deposit account for the according pool.
-export function createDeposit(event: Mint): void {
-  let transfer = getOrCreateTransfer(event);
-  let pool = getLiquidityPool(event.address);
+export function createDeposit(pool: LiquidityPool, event: Mint): void {
+  const transfer = getOrCreateTransfer(event);
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
   // update exchange info (except balances, sync will cover that)
-  let token0Adjusted = applyDecimals(event.params.amount0, token0.decimals);
-  let token1Adjusted = applyDecimals(event.params.amount1, token1.decimals);
+  const token0Adjusted = applyDecimals(event.params.amount0, token0.decimals);
+  const token1Adjusted = applyDecimals(event.params.amount1, token1.decimals);
 
-  let deposit = new Deposit(
+  const deposit = new Deposit(
     "deposit"
       .concat("-")
       .concat(event.transaction.hash.toHex())
@@ -200,19 +198,16 @@ export function createDeposit(event: Mint): void {
 }
 
 // Generate the withdraw entity
-export function createWithdraw(event: Burn): void {
-  let transfer = getOrCreateTransfer(event);
-
-  let pool = getLiquidityPool(event.address);
-
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+export function createWithdraw(pool: LiquidityPool, event: Burn): void {
+  const transfer = getOrCreateTransfer(event);
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
   // update exchange info (except balances, sync will cover that)
-  let token0Adjusted = applyDecimals(event.params.amount0, token0.decimals);
-  let token1Adjusted = applyDecimals(event.params.amount1, token1.decimals);
+  const token0Adjusted = applyDecimals(event.params.amount0, token0.decimals);
+  const token1Adjusted = applyDecimals(event.params.amount1, token1.decimals);
 
-  let withdrawal = new Withdraw(
+  const withdrawal = new Withdraw(
     "withdraw"
       .concat("-")
       .concat(event.transaction.hash.toHex())
@@ -240,22 +235,18 @@ export function createWithdraw(event: Burn): void {
   withdrawal.save();
 }
 
-export function createSwap(event: SwapEvent): void {
-  let transfer = getOrCreateTransfer(event);
+export function createSwap(pool: LiquidityPool, event: SwapEvent): void {
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
-  let pool = getLiquidityPool(event.address);
-
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
-
-  let amount0Total = event.params.amount0Out.plus(event.params.amount0In);
-  let amount1Total = event.params.amount1Out.plus(event.params.amount1In);
+  const amount0Total = event.params.amount0Out.plus(event.params.amount0In);
+  const amount1Total = event.params.amount1Out.plus(event.params.amount1In);
 
   // update exchange info (except balances, sync will cover that)
-  let amount0Adjusted = applyDecimals(amount0Total, token0.decimals);
-  let amount1Adjusted = applyDecimals(amount1Total, token1.decimals);
+  const amount0Adjusted = applyDecimals(amount0Total, token0.decimals);
+  const amount1Adjusted = applyDecimals(amount1Total, token1.decimals);
 
-  let swap = new Swap(
+  const swap = new Swap(
     "swap"
       .concat("-")
       .concat(event.transaction.hash.toHex())
@@ -291,10 +282,14 @@ export function createSwap(event: SwapEvent): void {
   swap.save();
 }
 
-export function getOrCreateGauge(gaugeAddress: Address): _LiquidityGauge {
-  let gauge = _LiquidityGauge.load(gaugeAddress.toHex());
-  if (!gauge) {
-    gauge = new _LiquidityGauge(gaugeAddress.toHex());
-  }
+export function createLiquidityGauge(
+  gaugeAddress: Address,
+  poolAddress: Address
+): _LiquidityGauge {
+  const gauge = new _LiquidityGauge(gaugeAddress.toHex());
+  gauge.pool = poolAddress.toHex();
+  gauge.active = true;
+  gauge.save();
+
   return gauge;
 }

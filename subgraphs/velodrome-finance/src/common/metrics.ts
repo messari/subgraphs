@@ -1,5 +1,5 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount } from "../../generated/schema";
+import { Account, ActiveAccount, LiquidityPool } from "../../generated/schema";
 import { Fees } from "../../generated/templates/Pair/Pair";
 import {
   INT_ONE,
@@ -8,7 +8,6 @@ import {
   UsageType,
 } from "./constants";
 import {
-  getLiquidityPool,
   getOrCreateDex,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateLiquidityPoolDailySnapshot,
@@ -40,16 +39,17 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetricsDaily.save();
 }
 
-export function updateRevenue(event: Fees): void {
+export function updateRevenue(pool: LiquidityPool, event: Fees): void {
   let protocol = getOrCreateDex();
-  let pool = getLiquidityPool(event.address);
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
   let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     event.address,
+    pool,
     event.block
   );
   let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     event.address,
+    pool,
     event.block
   );
 
@@ -203,19 +203,20 @@ export function updateUsageMetrics(
 // Update Pool Snapshots entities
 export function updatePoolMetrics(
   poolAddress: Address,
+  pool: LiquidityPool,
   block: ethereum.Block
 ): void {
   // get or create pool metrics
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(
     poolAddress,
+    pool,
     block
   );
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(
     poolAddress,
+    pool,
     block
   );
-
-  let pool = getLiquidityPool(poolAddress);
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;

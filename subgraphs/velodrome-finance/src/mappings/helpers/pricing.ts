@@ -1,5 +1,5 @@
 import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
-import { _PoolPricingHelper } from "../../../generated/schema";
+import { LiquidityPool, _PoolPricingHelper } from "../../../generated/schema";
 import { Swap } from "../../../generated/templates/Pair/Pair";
 import {
   BIGDECIMAL_ONE,
@@ -10,11 +10,13 @@ import {
   USDC_DECIMALS,
   ZERO_ADDRESS,
 } from "../../common/constants";
-import { getLiquidityPool, getOrCreateToken } from "../../common/getters";
+import { getOrCreateToken } from "../../common/getters";
 import { exponentToBigDecimal, safeDiv } from "../../common/utils/numbers";
 
-export function updatePoolPriceFromSwap(event: Swap): void {
-  let pool = getLiquidityPool(event.address);
+export function updatePoolPriceFromSwap(
+  pool: LiquidityPool,
+  event: Swap
+): void {
   let helper = _PoolPricingHelper.load(event.address.toHex())!;
 
   if (!helper.whitelisted) {

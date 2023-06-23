@@ -111,9 +111,9 @@ export namespace TransferType {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export const UNISWAP_V2_FACTORY = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
 
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
@@ -178,7 +178,7 @@ export const USDC_ADDRESS = "0x7f5c764cbc14f9669b88837ca1490cca17c31607";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const FACTORY_ADDRESS = "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746";
+export const FACTORY_ADDRESS = "0x25cbddb98b35ab1ff77413456b31ec81a6b6b746";
 export const VELO_ADDRESS = "0x3c8b650257cfb5f272f799f5e2b4e65093a11a05";
 export const FEE_CHECK_INTERVAL_BLOCKS = BigInt.fromI32(900); // ~ 1 block every 2 seconds on optimism. 900 blocks ~ 30 mins.
 export const MINIMUM_LIQUIDITY_USD = BIGDECIMAL_THOUSAND;

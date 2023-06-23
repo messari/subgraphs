@@ -14,7 +14,6 @@ import {
   FEE_CHECK_INTERVAL_BLOCKS,
 } from "../../common/constants";
 import {
-  getLiquidityPool,
   getOrCreateDex,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateLiquidityPoolDailySnapshot,
@@ -23,14 +22,14 @@ import {
 } from "../../common/getters";
 import { applyDecimals, safeDiv } from "../../common/utils/numbers";
 import { createPoolFees } from "./entities";
+import { LiquidityPool } from "../../../generated/schema";
 
 //  Update token balances, which also
 export function updateTokenBalances(
-  poolAddress: Address,
+  pool: LiquidityPool,
   balance0: BigInt,
   balance1: BigInt
 ): void {
-  let pool = getLiquidityPool(poolAddress);
   pool.inputTokenBalances = [balance0, balance1];
   pool.save();
 }
@@ -38,20 +37,19 @@ export function updateTokenBalances(
 // Updates TVL and output token price
 export function updatePoolValue(
   poolAddress: Address,
+  pool: LiquidityPool,
   block: ethereum.Block
 ): void {
-  let protocol = getOrCreateDex();
-  let pool = getLiquidityPool(poolAddress);
+  const protocol = getOrCreateDex();
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+  const lpToken = getOrCreateToken(poolAddress);
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
-  let lpToken = getOrCreateToken(poolAddress);
-
-  let reserve0USD = applyDecimals(
+  const reserve0USD = applyDecimals(
     pool.inputTokenBalances[0],
     token0.decimals
   ).times(token0.lastPriceUSD!);
-  let reserve1USD = applyDecimals(
+  const reserve1USD = applyDecimals(
     pool.inputTokenBalances[1],
     token1.decimals
   ).times(token1.lastPriceUSD!);
@@ -77,16 +75,14 @@ export function updatePoolValue(
 }
 
 export function updatePoolVolume(
-  poolAddress: Address,
+  pool: LiquidityPool,
   amount0: BigInt,
   amount1: BigInt,
   event: ethereum.Event
 ): void {
-  let pool = getLiquidityPool(poolAddress);
-  let protocol = getOrCreateDex();
-
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+  const protocol = getOrCreateDex();
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
   // Need token USD (0,1)
   let amount0USD = applyDecimals(amount0, token0.decimals).times(
@@ -98,20 +94,20 @@ export function updatePoolVolume(
 
   let amountTotalUSD = BIGDECIMAL_ZERO;
   if (
-    token0.lastPriceUSD != BIGDECIMAL_ZERO &&
-    token1.lastPriceUSD != BIGDECIMAL_ZERO
+    token0.lastPriceUSD! != BIGDECIMAL_ZERO &&
+    token1.lastPriceUSD! != BIGDECIMAL_ZERO
   ) {
     amountTotalUSD = amount0USD.plus(amount1USD).div(BIGDECIMAL_TWO);
   } else if (
-    token0.lastPriceUSD == BIGDECIMAL_ZERO &&
-    token1.lastPriceUSD != BIGDECIMAL_ZERO
+    token0.lastPriceUSD! == BIGDECIMAL_ZERO &&
+    token1.lastPriceUSD! != BIGDECIMAL_ZERO
   ) {
     // Token0 price is zero but token1 is not. Use token1 amount only
     amount0USD = amount1USD;
     amountTotalUSD = amount1USD.times(BIGDECIMAL_TWO);
   } else if (
-    token0.lastPriceUSD != BIGDECIMAL_ZERO &&
-    token1.lastPriceUSD == BIGDECIMAL_ZERO
+    token0.lastPriceUSD! != BIGDECIMAL_ZERO &&
+    token1.lastPriceUSD! == BIGDECIMAL_ZERO
   ) {
     // Token1 price is zero but token0 is not. Use 2x token1
     amount1USD = amount0USD;
@@ -127,7 +123,7 @@ export function updatePoolVolume(
   protocol.cumulativeVolumeUSD =
     protocol.cumulativeVolumeUSD.plus(amountTotalUSD);
 
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
   financialsDailySnapshot.dailyVolumeUSD =
     financialsDailySnapshot.dailyVolumeUSD.plus(amountTotalUSD);
   financialsDailySnapshot.cumulativeVolumeUSD =
@@ -135,8 +131,9 @@ export function updatePoolVolume(
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
-  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     event.address,
+    pool,
     event.block
   );
   poolDailySnapshot.dailyVolumeUSD =
@@ -154,8 +151,9 @@ export function updatePoolVolume(
   poolDailySnapshot.blockNumber = event.block.number;
   poolDailySnapshot.timestamp = event.block.timestamp;
 
-  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     event.address,
+    pool,
     event.block
   );
   poolHourlySnapshot.hourlyVolumeUSD =
@@ -184,17 +182,17 @@ export function updateAllPoolFees(
   block: ethereum.Block,
   forceUpdate: boolean = false
 ): void {
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   const blocksSinceLastChecked = block.number.minus(
     protocol._lastFeeCheckBlockNumber
   );
 
-  if (!forceUpdate && (blocksSinceLastChecked < FEE_CHECK_INTERVAL_BLOCKS)) {
+  if (!forceUpdate && blocksSinceLastChecked < FEE_CHECK_INTERVAL_BLOCKS) {
     return;
   }
 
-  let factoryContract = PairFactory.bind(Address.fromString(FACTORY_ADDRESS));
+  const factoryContract = PairFactory.bind(Address.fromString(FACTORY_ADDRESS));
   const stableFee = factoryContract
     .getFee(true)
     .toBigDecimal()

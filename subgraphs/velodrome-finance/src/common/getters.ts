@@ -11,6 +11,7 @@ import {
   LiquidityPool,
   RewardToken,
   _Transfer,
+  _LiquidityGauge,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -66,8 +67,8 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
   return rewardToken as RewardToken;
 }
 
-export function getLiquidityPool(poolAddress: Address): LiquidityPool {
-  return LiquidityPool.load(poolAddress.toHex())!;
+export function getLiquidityPool(poolAddress: Address): LiquidityPool | null {
+  return LiquidityPool.load(poolAddress.toHex());
 }
 
 export function getOrCreateUsageMetricDailySnapshot(
@@ -131,6 +132,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
 export function getOrCreateLiquidityPoolDailySnapshot(
   poolAddress: Address,
+  pool: LiquidityPool,
   block: ethereum.Block
 ): LiquidityPoolDailySnapshot {
   let day = block.timestamp.toI32() / SECONDS_PER_DAY;
@@ -140,8 +142,6 @@ export function getOrCreateLiquidityPoolDailySnapshot(
   );
 
   if (!poolMetrics) {
-    let pool = getLiquidityPool(poolAddress);
-
     poolMetrics = new LiquidityPoolDailySnapshot(
       poolAddress.toHexString().concat("-").concat(dayId)
     );
@@ -176,6 +176,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(
 
 export function getOrCreateLiquidityPoolHourlySnapshot(
   poolAddress: Address,
+  pool: LiquidityPool,
   block: ethereum.Block
 ): LiquidityPoolHourlySnapshot {
   let hour = block.timestamp.toI32() / SECONDS_PER_HOUR;
@@ -186,7 +187,6 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
   );
 
   if (!poolMetrics) {
-    let pool = getLiquidityPool(poolAddress);
     poolMetrics = new LiquidityPoolHourlySnapshot(
       poolAddress.toHexString().concat("-").concat(hourId)
     );
@@ -307,4 +307,10 @@ export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
   }
   transfer.save();
   return transfer;
+}
+
+export function getLiquidityGauge(
+  gaugeAddress: Address
+): _LiquidityGauge | null {
+  return _LiquidityGauge.load(gaugeAddress.toHex());
 }

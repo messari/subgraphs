@@ -11,5 +11,8 @@
       "address": "0x09236cfF45047DBee6B921e00704bed6D6B8Cf7e",
       "startBlock": 10078745
     }
-  ]
+  ],
+  "graft": false,
+  "base": "",
+  "block": 0
 }
