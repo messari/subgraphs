@@ -1,14 +1,16 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_TEN,
+  DEFAULT_DECIMALS,
+  INT_TWO,
+} from "./constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
-  decimals: i32 = 18
+  decimals: i32 = DEFAULT_DECIMALS
 ): BigDecimal {
-  return quantity.divDecimal(
-    BigInt.fromI32(10)
-      .pow(decimals as u8)
-      .toBigDecimal()
-  );
+  return quantity.divDecimal(BIGINT_TEN.pow(decimals as u8).toBigDecimal());
 }
 
 export function bigDecimalToBigInt(input: BigDecimal): BigInt {
@@ -17,7 +19,7 @@ export function bigDecimalToBigInt(input: BigDecimal): BigInt {
 }
 
 // returns 10^exp
-export function exponentToBigDecimal(exp: i32 = 18): BigDecimal {
+export function exponentToBigDecimal(exp: i32 = DEFAULT_DECIMALS): BigDecimal {
   let bd = BigDecimal.fromString("1");
   const ten = BigDecimal.fromString("10");
   for (let i = 0; i < exp; i++) {
@@ -44,8 +46,16 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 
   const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
-    return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
+    return sorted[mid]
+      .plus(sorted[mid - 1])
+      .div(BigDecimal.fromString(INT_TWO.toString()));
   }
 
   return sorted[mid - 1];
+}
+
+export function safeDivide(a: BigDecimal, b: BigDecimal): BigDecimal {
+  if (b == BIGDECIMAL_ZERO) return BIGDECIMAL_ZERO;
+
+  return a.div(b);
 }
