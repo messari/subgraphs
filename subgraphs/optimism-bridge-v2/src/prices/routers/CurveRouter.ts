@@ -91,13 +91,13 @@ export function getCurvePriceUsdc(
       constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
     );
 
-  const counterLiquidity = getLpTokenCounterLiquidityUsdc(lpAddress, block);
+  const liquidity = getLpTokenLiquidityUsdc(lpAddress, block);
 
   return CustomPriceType.initialize(
     priceUsdc,
     decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8,
     constants.OracleType.CURVE_ROUTER,
-    counterLiquidity.usdPrice
+    liquidity.usdPrice
   );
 }
 
@@ -329,14 +329,14 @@ export function getPriceUsdc(
   );
 }
 
-function getLpTokenCounterLiquidityUsdc(
+function getLpTokenLiquidityUsdc(
   lpAddress: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {
   const poolAddress = getPoolFromLpToken(lpAddress, block);
   const poolContract = CurvePoolContract.bind(poolAddress);
 
-  let counterLiquidity = constants.BIGDECIMAL_ZERO;
+  let liquidity = constants.BIGDECIMAL_ZERO;
   for (let i = 0; i < 8; i++) {
     const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(i)),
@@ -352,16 +352,16 @@ function getLpTokenCounterLiquidityUsdc(
     );
 
     const price = getPriceUsdcRecommended(coin, block);
-    const liquidity = balance
-      .div(constants.BIGINT_TEN.pow(decimals.toI32() as u8))
-      .toBigDecimal()
-      .times(price.usdPrice);
-
-    counterLiquidity = counterLiquidity.plus(liquidity);
+    liquidity = liquidity.plus(
+      balance
+        .div(constants.BIGINT_TEN.pow(decimals.toI32() as u8))
+        .toBigDecimal()
+        .times(price.usdPrice)
+    );
   }
 
   return CustomPriceType.initialize(
-    counterLiquidity,
+    liquidity,
     constants.DEFAULT_USDC_DECIMALS,
     constants.OracleType.CURVE_ROUTER
   );

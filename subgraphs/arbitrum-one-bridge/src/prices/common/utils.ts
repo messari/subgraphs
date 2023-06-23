@@ -1,11 +1,3 @@
-import {
-  Address,
-  BigInt,
-  dataSource,
-  ethereum,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
-
 import * as BSC from "../config/bsc";
 import * as CELO from "../config/celo";
 import * as FUSE from "../config/fuse";
@@ -24,8 +16,14 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 import { Configurations, CustomPriceType } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-
 import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
+import {
+  Address,
+  BigInt,
+  BigDecimal,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 
 export function isNullAddress(tokenAddr: Address): boolean {
   return tokenAddr.equals(constants.NULL.TYPE_ADDRESS);

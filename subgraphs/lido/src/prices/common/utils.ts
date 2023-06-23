@@ -1,16 +1,33 @@
+import * as BSC from "../config/bsc";
+import * as CELO from "../config/celo";
+import * as FUSE from "../config/fuse";
+import * as XDAI from "../config/gnosis";
+import * as CRONOS from "../config/cronos";
+import * as AURORA from "../config/aurora";
+import * as FANTOM from "../config/fantom";
+import * as POLYGON from "../config/polygon";
+import * as MAINNET from "../config/mainnet";
+import * as HARMONY from "../config/harmony";
+import * as MOONBEAM from "../config/moonbeam";
+import * as OPTIMISM from "../config/optimism";
+import * as AVALANCHE from "../config/avalanche";
+import * as ARBITRUM_ONE from "../config/arbitrum";
+
+import { Configurations, CustomPriceType } from "./types";
+import * as constants from "./constants";
+import * as TEMPLATE from "../config/template";
+import { _ERC20 } from "../../../generated/Lido/_ERC20";
 import {
   Address,
-  BigDecimal,
   BigInt,
+  BigDecimal,
   dataSource,
   ethereum,
 } from "@graphprotocol/graph-ts";
 
-import { Configurations, CustomPriceType } from "./types";
-import * as constants from "./constants";
-import * as MAINNET from "../config/mainnet";
-
-import { _ERC20 } from "../../../generated/Lido/_ERC20";
+export function isNullAddress(tokenAddr: Address): boolean {
+  return tokenAddr.equals(constants.NULL.TYPE_ADDRESS);
+}
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
@@ -19,33 +36,78 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
+export function getTokenName(tokenAddr: Address): string {
+  const tokenContract = _ERC20.bind(tokenAddr);
+  const name = readValue<string>(tokenContract.try_name(), "");
+
+  return name;
+}
+
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = _ERC20.bind(tokenAddr);
+  const tokenContract = _ERC20.bind(tokenAddr);
 
   const decimals = readValue<BigInt>(
-    token.try_decimals(),
+    tokenContract.try_decimals(),
     constants.DEFAULT_DECIMALS
   );
 
   return decimals;
 }
 
+export function getTokenSupply(tokenAddr: Address): BigInt {
+  const tokenContract = _ERC20.bind(tokenAddr);
+
+  const totalSupply = readValue<BigInt>(
+    tokenContract.try_totalSupply(),
+    constants.BIGINT_ONE
+  );
+
+  return totalSupply;
+}
+
 export function getConfig(): Configurations {
   const network = dataSource.network();
-  if (network == MAINNET.NETWORK_STRING) {
+
+  if (network == XDAI.NETWORK_STRING) {
+    return new XDAI.config();
+  } else if (network == AURORA.NETWORK_STRING) {
+    return new AURORA.config();
+  } else if (network == BSC.NETWORK_STRING) {
+    return new BSC.config();
+  } else if (network == FANTOM.NETWORK_STRING) {
+    return new FANTOM.config();
+  } else if (network == POLYGON.NETWORK_STRING) {
+    return new POLYGON.config();
+  } else if (network == MAINNET.NETWORK_STRING) {
     return new MAINNET.config();
+  } else if (network == HARMONY.NETWORK_STRING) {
+    return new HARMONY.config();
+  } else if (network == MOONBEAM.NETWORK_STRING) {
+    return new MOONBEAM.config();
+  } else if (network == OPTIMISM.NETWORK_STRING) {
+    return new OPTIMISM.config();
+  } else if (network == AVALANCHE.NETWORK_STRING) {
+    return new AVALANCHE.config();
+  } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
+    return new ARBITRUM_ONE.config();
+  } else if (network == CRONOS.NETWORK_STRING) {
+    return new CRONOS.config();
+  } else if (network == CELO.NETWORK_STRING) {
+    return new CELO.config();
+  } else if (network == FUSE.NETWORK_STRING) {
+    return new FUSE.config();
   }
 
-  return new MAINNET.config();
+  return new TEMPLATE.config();
 }
 
 function sortByPrices(prices: CustomPriceType[]): CustomPriceType[] {
   const pricesSorted = prices.sort(function (a, b) {
-    const x = a.usdPrice.div(a.decimalsBaseTen);
-    const y = b.usdPrice.div(b.decimalsBaseTen);
+    const x = a.usdPrice;
+    const y = b.usdPrice;
 
-    if (x < y) return constants.INT_NEGATIVE_ONE;
-    if (x > y) return constants.INT_ONE;
+    if (x < y) return -1;
+    if (x > y) return 1;
     return 0;
   });
 
@@ -55,8 +117,8 @@ function sortByPrices(prices: CustomPriceType[]): CustomPriceType[] {
 function pairwiseDiffOfPrices(prices: CustomPriceType[]): BigDecimal[] {
   const diff: BigDecimal[] = [];
   for (let i = 1; i < prices.length; i++) {
-    const x = prices[i].usdPrice.div(prices[i].decimalsBaseTen);
-    const y = prices[i - 1].usdPrice.div(prices[i - 1].decimalsBaseTen);
+    const x = prices[i].usdPrice;
+    const y = prices[i - 1].usdPrice;
 
     diff.push(x.minus(y));
   }
@@ -100,19 +162,11 @@ export function kClosestPrices(
 export function averagePrice(prices: CustomPriceType[]): CustomPriceType {
   let summationUSDPrice = constants.BIGDECIMAL_ZERO;
   for (let i = 0; i < prices.length; i++) {
-    summationUSDPrice = summationUSDPrice.plus(
-      prices[i].usdPrice.div(prices[i].decimalsBaseTen)
-    );
+    summationUSDPrice = summationUSDPrice.plus(prices[i].usdPrice);
   }
 
   return CustomPriceType.initialize(
-    summationUSDPrice
-      .div(new BigDecimal(BigInt.fromI32(prices.length as i32)))
-      .times(
-        constants.BIGINT_TEN.pow(
-          constants.DEFAULT_USDC_DECIMALS as u8
-        ).toBigDecimal()
-      ),
+    summationUSDPrice.div(new BigDecimal(BigInt.fromI32(prices.length as i32))),
     constants.DEFAULT_USDC_DECIMALS
   );
 }

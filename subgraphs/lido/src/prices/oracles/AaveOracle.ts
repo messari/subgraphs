@@ -2,19 +2,19 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/ERC20Gateway/CalculationsSushiSwap";
+import { AaveOracleContract } from "../../../generated/Lido/AaveOracleContract";
 
-export function getSushiSwapContract(
+export function getAaveOracleContract(
   contract: OracleContract,
   block: ethereum.Block | null = null
-): CalculationsSushiContract | null {
+): AaveOracleContract | null {
   if (
     (block && contract.startBlock.gt(block.number)) ||
     utils.isNullAddress(contract.address)
   )
     return null;
 
-  return CalculationsSushiContract.bind(contract.address);
+  return AaveOracleContract.bind(contract.address);
 }
 
 export function getTokenPriceUSDC(
@@ -23,25 +23,22 @@ export function getTokenPriceUSDC(
 ): CustomPriceType {
   const config = utils.getConfig();
 
-  if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
+  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const calculationSushiContract = getSushiSwapContract(
-    config.sushiCalculations(),
-    block
-  );
-  if (!calculationSushiContract) return new CustomPriceType();
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle(), block);
+  if (!aaveOracleContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      calculationSushiContract.try_getPriceUsdc(tokenAddr),
+      aaveOracleContract.try_getAssetPrice(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS,
-    constants.OracleType.SUSHI_CALCULATIONS
+    constants.AAVE_ORACLE_DECIMALS,
+    constants.OracleType.AAVE_ORACLE
   );
 }

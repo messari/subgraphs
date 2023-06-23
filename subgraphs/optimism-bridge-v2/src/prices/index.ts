@@ -5,7 +5,7 @@ import {
   BigDecimal,
   dataSource,
 } from "@graphprotocol/graph-ts";
-import { CustomPriceType } from "./common/types";
+import { CustomPriceType, OracleType } from "./common/types";
 
 import * as utils from "./common/utils";
 import * as constants from "./common/constants";
@@ -41,9 +41,13 @@ export function getUsdPricePerToken(
     );
   }
 
-  const oracleConfig = config.getOracleConfig(tokenAddr, block);
-  const oracleCount = oracleConfig.oracleCount();
-  const oracleOrder = oracleConfig.oracleOrder();
+  const oracle = new OracleType();
+  const override = config.getOracleOverride(tokenAddr, block);
+  if (override) {
+    oracle.setOracleConfig(override);
+  }
+  const oracleCount = oracle.oracleCount;
+  const oracleOrder = oracle.oracleOrder;
 
   const prices: CustomPriceType[] = [];
   for (let i = 0; i < oracleOrder.length; i++) {
@@ -98,14 +102,11 @@ export function getLiquidityBoundPrice(
   amount: BigDecimal
 ): BigDecimal {
   const reportedPriceUSD = tokenPrice.usdPrice.times(amount);
-  const counterLiquidity = tokenPrice.counterLiquidity;
+  const liquidity = tokenPrice.liquidity;
 
   let liquidityBoundPriceUSD = reportedPriceUSD;
-  if (
-    counterLiquidity > constants.BIGDECIMAL_ZERO &&
-    reportedPriceUSD > counterLiquidity
-  ) {
-    liquidityBoundPriceUSD = counterLiquidity
+  if (liquidity > constants.BIGDECIMAL_ZERO && reportedPriceUSD > liquidity) {
+    liquidityBoundPriceUSD = liquidity
       .div(
         constants.BIGINT_TEN.pow(
           constants.DEFAULT_USDC_DECIMALS as u8
@@ -121,7 +122,7 @@ export function getLiquidityBoundPrice(
         amount.toString(),
         liquidityBoundPriceUSD.toString(),
         tokenAddress.toHexString(),
-        counterLiquidity.toString(),
+        liquidity.toString(),
       ]
     );
   }

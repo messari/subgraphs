@@ -98,25 +98,44 @@ export const HARDCODED_STABLES: Address[] = [
 ];
 
 ///////////////////////////////////////////////////////////////////////////
-////////////////////////// ORACLE CONFIGURATIONS //////////////////////////
+///////////////////////// ORACLE CONFIG OVERRIDES /////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-class DefaultOracleConfig implements OracleConfig {
+// https://github.com/messari/subgraphs/issues/2090
+class spellOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
   oracleOrder(): string[] {
     return [
-      constants.OracleType.YEARN_LENS_ORACLE,
       constants.OracleType.CHAINLINK_FEED,
       constants.OracleType.CURVE_CALCULATIONS,
       constants.OracleType.SUSHI_CALCULATIONS,
       constants.OracleType.CURVE_ROUTER,
       constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
     ];
   }
 }
 
+// https://github.com/messari/subgraphs/issues/726
+class stETHOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+// https://github.com/messari/subgraphs/issues/2097
 class baxaOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
@@ -210,11 +229,30 @@ export class config implements Configurations {
     return USDC_TOKEN_DECIMALS;
   }
 
-  getOracleConfig(
+  getOracleOverride(
     tokenAddr: Address | null,
     block: ethereum.Block | null
-  ): OracleConfig {
+  ): OracleConfig | null {
     if (tokenAddr || block) {
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x090185f2135308bad17527004364ebcc2d37e5f6"), // SPELL
+        ].includes(tokenAddr)
+      ) {
+        return new spellOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
+        ].includes(tokenAddr) &&
+        block &&
+        block.number.gt(BigInt.fromString("14019699")) &&
+        block.number.lt(BigInt.fromString("14941265"))
+      ) {
+        return new stETHOverride();
+      }
       if (
         tokenAddr &&
         [
@@ -225,6 +263,6 @@ export class config implements Configurations {
       }
     }
 
-    return new DefaultOracleConfig();
+    return null;
   }
 }

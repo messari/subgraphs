@@ -3,9 +3,9 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { UniswapPair as UniswapPairContract } from "../../../generated/ERC20Gateway/UniswapPair";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/ERC20Gateway/UniswapRouter";
-import { UniswapFactory as UniswapFactoryContract } from "../../../generated/ERC20Gateway/UniswapFactory";
+import { UniswapPair as UniswapPairContract } from "../../../generated/Lido/UniswapPair";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/Lido/UniswapRouter";
+import { UniswapFactory as UniswapFactoryContract } from "../../../generated/Lido/UniswapFactory";
 
 export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   if (tokenAddress.equals(ethAddress)) return false;

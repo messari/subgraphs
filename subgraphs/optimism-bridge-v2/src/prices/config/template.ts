@@ -43,10 +43,10 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 export const HARDCODED_STABLES: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
-////////////////////////// ORACLE CONFIGURATIONS //////////////////////////
+///////////////////////// ORACLE CONFIG OVERRIDES /////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-class DefaultOracleConfig implements OracleConfig {
+class someOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -133,10 +133,10 @@ export class config implements Configurations {
     return USDC_TOKEN_DECIMALS;
   }
 
-  getOracleConfig(
+  getOracleOverride(
     tokenAddr: Address | null,
     block: ethereum.Block | null
-  ): OracleConfig {
-    return new DefaultOracleConfig();
+  ): OracleConfig | null {
+    return new someOverride();
   }
 }

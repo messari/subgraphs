@@ -5,7 +5,7 @@ import {
   BigDecimal,
   dataSource,
 } from "@graphprotocol/graph-ts";
-import { CustomPriceType } from "./common/types";
+import { CustomPriceType, OracleType } from "./common/types";
 
 import * as utils from "./common/utils";
 import * as constants from "./common/constants";
@@ -19,7 +19,7 @@ import * as SushiCalculations from "./calculations/CalculationsSushiswap";
 
 export function getUsdPricePerToken(
   tokenAddr: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
     return new CustomPriceType();
@@ -41,9 +41,13 @@ export function getUsdPricePerToken(
     );
   }
 
-  const oracleConfig = config.getOracleConfig(tokenAddr, block);
-  const oracleCount = oracleConfig.oracleCount();
-  const oracleOrder = oracleConfig.oracleOrder();
+  const oracle = new OracleType();
+  const override = config.getOracleOverride(tokenAddr, block);
+  if (override) {
+    oracle.setOracleConfig(override);
+  }
+  const oracleCount = oracle.oracleCount;
+  const oracleOrder = oracle.oracleOrder;
 
   const prices: CustomPriceType[] = [];
   for (let i = 0; i < oracleOrder.length; i++) {
@@ -92,14 +96,54 @@ export function getUsdPricePerToken(
   return utils.averagePrice(closestPrices);
 }
 
+export function getLiquidityBoundPrice(
+  tokenAddress: Address,
+  tokenPrice: CustomPriceType,
+  amount: BigDecimal
+): BigDecimal {
+  const reportedPriceUSD = tokenPrice.usdPrice.times(amount);
+  const liquidity = tokenPrice.liquidity;
+
+  let liquidityBoundPriceUSD = reportedPriceUSD;
+  if (liquidity > constants.BIGDECIMAL_ZERO && reportedPriceUSD > liquidity) {
+    liquidityBoundPriceUSD = liquidity
+      .div(
+        constants.BIGINT_TEN.pow(
+          constants.DEFAULT_USDC_DECIMALS as u8
+        ).toBigDecimal()
+      )
+      .times(constants.BIGINT_TEN.pow(tokenPrice.decimals as u8).toBigDecimal())
+      .div(amount);
+
+    log.warning(
+      "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {}",
+      [
+        tokenPrice.usdPrice.toString(),
+        amount.toString(),
+        liquidityBoundPriceUSD.toString(),
+        tokenAddress.toHexString(),
+        liquidity.toString(),
+      ]
+    );
+  }
+
+  return liquidityBoundPriceUSD;
+}
+
 export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): BigDecimal {
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
+    if (
+      tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
+      tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
+    ) {
+      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
+    }
     return tokenPrice.usdPrice.times(amount);
   }
 
