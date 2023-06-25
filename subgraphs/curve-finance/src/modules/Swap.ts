@@ -124,7 +124,8 @@ export function Swap(
       boughtId.equals(constants.BIGINT_ZERO) &&
       (equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET) ||
         equalsIgnoreCase(dataSource.network(), constants.Network.FANTOM) ||
-        equalsIgnoreCase(dataSource.network(), constants.Network.MATIC))
+        equalsIgnoreCase(dataSource.network(), constants.Network.MATIC) ||
+        equalsIgnoreCase(dataSource.network(), constants.Network.ARBITRUM_ONE))
     )
       tokenIn = pool._inputTokensOrdered.at(-1);
   }
