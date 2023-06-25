@@ -5,6 +5,7 @@ import { CustomPriceType } from "../common/types";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { UniswapPair as UniswapPairContract } from "../../../generated/UniswapV2Factory/UniswapPair";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/UniswapV2Factory/UniswapRouter";
+import { UniswapFactory as UniswapFactoryContract } from "../../../generated/UniswapV2Factory/UniswapFactory";
 
 export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   if (tokenAddress.equals(ethAddress)) return false;
@@ -85,15 +86,17 @@ export function getPriceFromRouter(
 
   const routerAddresses = config.uniswapForks();
 
+  let routerAddress = constants.NULL.TYPE_ADDRESS;
   let amountOut = constants.BIGINT_ZERO;
   for (let idx = 0; idx < routerAddresses.length; idx++) {
-    const routerAddress = routerAddresses[idx];
-    if (block && routerAddress.startBlock.gt(block.number)) continue;
+    const router = routerAddresses[idx];
+    if (block && router.startBlock.gt(block.number)) continue;
 
-    const uniswapForkRouter = UniswapRouterContract.bind(routerAddress.address);
+    const uniswapForkRouter = UniswapRouterContract.bind(router.address);
     const amountOutArray = uniswapForkRouter.try_getAmountsOut(amountIn, path);
 
     if (!amountOutArray.reverted) {
+      routerAddress = router.address;
       amountOut = amountOutArray.value[amountOutArray.value.length - 1];
       break;
     }
@@ -106,11 +109,37 @@ export function getPriceFromRouter(
     .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
     .toBigDecimal();
 
-  return CustomPriceType.initialize(
+  const priceFromRouter = CustomPriceType.initialize(
     amountOutBigDecimal,
     config.usdcTokenDecimals().toI32() as u8,
     constants.OracleType.UNISWAP_FORKS_ROUTER
   );
+
+  const routerContract = UniswapRouterContract.bind(routerAddress);
+  const factoryAddress = utils.readValue(
+    routerContract.try_factory(),
+    constants.NULL.TYPE_ADDRESS
+  );
+  if (factoryAddress.equals(constants.NULL.TYPE_ADDRESS))
+    return priceFromRouter;
+
+  const factoryContract = UniswapFactoryContract.bind(factoryAddress);
+  let tokenPair = utils.readValue(
+    factoryContract.try_getPair(token0Address, wethAddress),
+    constants.NULL.TYPE_ADDRESS
+  );
+  if (tokenPair.equals(constants.NULL.TYPE_ADDRESS)) {
+    tokenPair = utils.readValue(
+      factoryContract.try_getPair(wethAddress, token0Address),
+      constants.NULL.TYPE_ADDRESS
+    );
+  }
+  if (tokenPair.equals(constants.NULL.TYPE_ADDRESS)) return priceFromRouter;
+
+  const liquidityUSD = getLpTokenLiquidityUsdc(tokenPair, block);
+  priceFromRouter.setLiquidity(liquidityUSD.usdPrice);
+
+  return priceFromRouter;
 }
 
 export function getLpTokenPriceUsdc(
@@ -201,19 +230,67 @@ export function getLpTokenTotalLiquidityUsdc(
     reserve1.notEqual(constants.BIGINT_ZERO)
   ) {
     const liquidity0 = reserve0
-      .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
       .toBigDecimal()
+      .div(
+        constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8).toBigDecimal()
+      )
       .times(token0Price.usdPrice);
 
     const liquidity1 = reserve1
-      .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
       .toBigDecimal()
+      .div(
+        constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8).toBigDecimal()
+      )
       .times(token1Price.usdPrice);
 
     const totalLiquidity = liquidity0.plus(liquidity1);
 
     return CustomPriceType.initialize(
       totalLiquidity,
+      constants.DEFAULT_USDC_DECIMALS,
+      constants.OracleType.UNISWAP_FORKS_ROUTER
+    );
+  }
+  return new CustomPriceType();
+}
+
+function getLpTokenLiquidityUsdc(
+  lpAddress: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
+  const uniSwapPair = UniswapPairContract.bind(lpAddress);
+
+  const token1Address = utils.readValue<Address>(
+    uniSwapPair.try_token1(),
+    constants.NULL.TYPE_ADDRESS
+  );
+  if (token1Address.equals(constants.NULL.TYPE_ADDRESS)) {
+    return new CustomPriceType();
+  }
+
+  const token1Price = getTokenPriceUSDC(token1Address, block);
+  if (token1Price.reverted) {
+    return new CustomPriceType();
+  }
+
+  const token1Decimals = utils.getTokenDecimals(token1Address);
+
+  const reservesCall = uniSwapPair.try_getReserves();
+  if (reservesCall.reverted) return new CustomPriceType();
+
+  const reserves = reservesCall.value;
+  const reserve1 = reserves.value1;
+
+  if (reserve1.notEqual(constants.BIGINT_ZERO)) {
+    const liquidity1 = reserve1
+      .toBigDecimal()
+      .div(
+        constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8).toBigDecimal()
+      )
+      .times(token1Price.usdPrice);
+
+    return CustomPriceType.initialize(
+      liquidity1,
       constants.DEFAULT_USDC_DECIMALS,
       constants.OracleType.UNISWAP_FORKS_ROUTER
     );

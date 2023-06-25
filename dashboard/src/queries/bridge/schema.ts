@@ -46,6 +46,7 @@ export const schema100 = (): Schema => {
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -80,6 +81,7 @@ export const schema100 = (): Schema => {
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
       totalSupportedTokenCount: "Int!",
+      blockNumber: "BigInt!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -111,6 +113,7 @@ export const schema100 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -140,6 +143,7 @@ export const schema100 = (): Schema => {
       cumulativeMessageReceivedCount: "Int!",
       hourlyMessageReceivedCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     poolHourlySnapshots: {
       id: "ID!",
@@ -171,6 +175,7 @@ export const schema100 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -437,6 +442,7 @@ export const schema110 = (): Schema => {
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -471,6 +477,7 @@ export const schema110 = (): Schema => {
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
       totalSupportedTokenCount: "Int!",
+      blockNumber: "BigInt!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -502,6 +509,7 @@ export const schema110 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -531,6 +539,7 @@ export const schema110 = (): Schema => {
       cumulativeMessageReceivedCount: "Int!",
       hourlyMessageReceivedCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     poolHourlySnapshots: {
       id: "ID!",
@@ -562,6 +571,7 @@ export const schema110 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -839,6 +849,7 @@ export const schema120 = (): Schema => {
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -873,6 +884,7 @@ export const schema120 = (): Schema => {
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
       totalSupportedTokenCount: "Int!",
+      blockNumber: "BigInt!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -905,6 +917,7 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -934,6 +947,7 @@ export const schema120 = (): Schema => {
       cumulativeMessageReceivedCount: "Int!",
       hourlyMessageReceivedCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     poolHourlySnapshots: {
       id: "ID!",
@@ -966,6 +980,7 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 

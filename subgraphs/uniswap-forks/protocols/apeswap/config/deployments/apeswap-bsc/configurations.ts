@@ -113,7 +113,10 @@ export class ApeswapBscConfigurations implements Configurations {
     return [];
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x87bade473ea0513d4aa7085484aeaa6cb6ebe7e3", // Mor Stablecoin
+      "0x7e7d3556310830581815b1aa1bbbc9e5d7097580", // NFTGirl
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

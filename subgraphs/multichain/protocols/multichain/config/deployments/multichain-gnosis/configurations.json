@@ -1,6 +1,6 @@
 {
   "deployment": "MULTICHAIN_GNOSIS",
-  "network": "xdai",
+  "network": "gnosis",
   "file": "./src/mappings/handlers.ts",
   "bridgeConfig": [
     {

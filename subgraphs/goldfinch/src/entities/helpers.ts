@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   JuniorTrancheInfo,
@@ -64,7 +65,7 @@ export function getJuniorDeposited(
 }
 
 const fixedLeverageRatioAddress = Address.fromString(
-  "0x9b2ACD3fd9aa6c60B26CF748bfFF682f27893320"
+  "0x9b2acd3fd9aa6c60b26cf748bfff682f27893320"
 ); // This is hardcoded from mainnet. When running off the local chain, this shouldn't be needed.
 
 export function getEstimatedSeniorPoolInvestment(

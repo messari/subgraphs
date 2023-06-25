@@ -23,7 +23,12 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000348"
 );
 
-export const PRICE_LIB_VERSION = "1.2.0";
+export const PRICE_LIB_VERSION = "1.3.0";
+
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+export const INT_TWO = 2 as i32;
+export const INT_NEGATIVE_ONE = -1 as i32;
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
