@@ -97,7 +97,7 @@ export function getOrCreateToken(
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
   ) {
-    const tokenPrice = getUsdPricePerToken(address);
+    const tokenPrice = getUsdPricePerToken(address, block);
     token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = block.number;
 
