@@ -51,7 +51,11 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = [];
+export const HARDCODED_STABLES: Address[] = [
+  Address.fromString("0x4988a896b1227218e4a686fde5eabdcabd91571f"),
+  Address.fromString("0xb12bfca5a55806aaf64e99521918a4bf0fc40802"),
+  Address.fromString("0xe3520349f477a5f6eb06107066048508498a291b"),
+];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
