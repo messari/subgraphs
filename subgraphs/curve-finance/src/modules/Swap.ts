@@ -24,6 +24,7 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { equalsIgnoreCase } from "../common/utils";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -121,7 +122,9 @@ export function Swap(
     if (
       pool._isMetapool &&
       boughtId.equals(constants.BIGINT_ZERO) &&
-      utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)
+      (equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET) ||
+        equalsIgnoreCase(dataSource.network(), constants.Network.FANTOM) ||
+        equalsIgnoreCase(dataSource.network(), constants.Network.MATIC))
     )
       tokenIn = pool._inputTokensOrdered.at(-1);
   }

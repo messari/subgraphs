@@ -75,6 +75,8 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x0316eb71485b0ab14103307bf65a021042c6d380"), // Huobi BTC
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
   Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
+  Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
+  Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
 ];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
@@ -131,6 +133,7 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x956f47f50a910163d8bf957cf5846d573e7f87ca"), // Fei USD
   Address.fromString("0xc7d9c108d4e1dd1484d3e2568d7f74bfd763d356"), // SORA Synthetic USD
   Address.fromString("0xd71ecff9342a5ced620049e616c5035f1db98620"), // Synth sEUR
+  Address.fromString("0x056fd409e1d7a124bd7017459dfea2f387b6d5cd"), // gUSD
 ];
 
 ///////////////////////////////////////////////////////////////////////////
