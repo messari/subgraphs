@@ -11,7 +11,7 @@ import {
   INT_ZERO,
   SECONDS_PER_HOUR,
 } from "../common/constants";
-import { getTokenFromCurrency } from "../common/util";
+import { getNameFromCurrency, getTokenFromCurrency } from "../common/util";
 import { getOrCreateLendingProtocol } from "./protocol";
 import { getOrCreateInterestRate } from "./interestRate";
 
@@ -27,11 +27,12 @@ export function getOrCreateMarket(
     protocol.save();
 
     const currencyId = marketId.split("-")[0];
+    const maturity = marketId.split("-")[1];
 
     // market metadata
     market = new Market(marketId);
     market.protocol = protocol.id;
-    market.name = marketId;
+    market.name = getNameFromCurrency(currencyId) + "-" + maturity;
 
     // market properties
     market.isActive = true;
