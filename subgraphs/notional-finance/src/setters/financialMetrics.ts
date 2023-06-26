@@ -283,8 +283,10 @@ export function updateMarket(
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
-  let totalDepositBalanceUSD;
-  let totalBorrowBalanceUSD;
+  // initialize with existing balances
+  let totalDepositBalanceUSD: BigDecimal = market.totalDepositBalanceUSD;
+  let totalBorrowBalanceUSD: BigDecimal = market.totalBorrowBalanceUSD;
+
   if (transactionType == TransactionType.DEPOSIT) {
     // input token balance
     const inputTokenBalance =
