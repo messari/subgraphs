@@ -64,7 +64,7 @@ function ProtocolTabEntity({
 
   // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
   const [dataFieldsState, setDataFieldsState] = useState<{
-    [data: string]: { [dataField: string]: { date: number; value: number }[] };
+    [data: string]: { [dataField: string]: { date: number; value: number; blockNumber: number | null }[] };
   }>({});
   // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
   const [dataFieldMetricsState, setDataFieldMetricsState] = useState<{
@@ -72,7 +72,7 @@ function ProtocolTabEntity({
   }>({});
   // For the current entity, loop through all instances of that entity
   const [overlayDataFieldsState, setOverlayDataFieldsState] = useState<{
-    [dataField: string]: { date: number; value: number }[];
+    [dataField: string]: { date: number; value: number; blockNumber: number | null }[];
   }>({});
 
   useEffect(() => {
@@ -117,11 +117,12 @@ function ProtocolTabEntity({
         );
       }
       // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
-      let dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+      let dataFields: { [dataField: string]: { date: number; value: number; blockNumber: number | null }[] } = {};
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       let dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
-      let overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+      let overlayDataFields: { [dataField: string]: { date: number; value: number; blockNumber: number | null }[] } =
+        {};
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       if (
         !dataFieldsState?.data ||
@@ -129,6 +130,7 @@ function ProtocolTabEntity({
       ) {
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          const blockNumber = "blockNumber" in timeseriesInstance ? timeseriesInstance["blockNumber"] : null;
           let dateVal: number = Number(timeseriesInstance["timestamp"]);
           dateValueKeys.forEach((key: string) => {
             let factor = 86400;
@@ -145,7 +147,10 @@ function ProtocolTabEntity({
             overlayIndex = x - overlayDifference;
           }
           const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
-
+          const overlayBlockNumber =
+            overlayTimeseriesInstance && "blockNumber" in overlayTimeseriesInstance
+              ? overlayTimeseriesInstance["blockNumber"]
+              : null;
           let overlayDateVal: number = Number(overlayTimeseriesInstance?.["timestamp"]) || 0;
           if (!!overlayTimeseriesInstance) {
             dateValueKeys.forEach((key: string) => {
@@ -183,12 +188,15 @@ function ProtocolTabEntity({
                 // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
                 // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
                 if (!dataFields[fieldName]) {
-                  dataFields[fieldName] = [{ value: Number(currentInstanceField), date: dateVal }];
+                  dataFields[fieldName] = [
+                    { value: Number(currentInstanceField), date: dateVal, blockNumber: blockNumber },
+                  ];
                   dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
                 } else {
                   dataFields[fieldName].push({
                     value: Number(currentInstanceField),
                     date: dateVal,
+                    blockNumber: blockNumber,
                   });
                   dataFieldMetrics[fieldName].sum += Number(currentInstanceField);
                 }
@@ -281,10 +289,10 @@ function ProtocolTabEntity({
                     console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                   }
                   if (!dataFields[dataFieldKey]) {
-                    dataFields[dataFieldKey] = [{ value: value, date: dateVal }];
+                    dataFields[dataFieldKey] = [{ value: value, date: dateVal, blockNumber: blockNumber }];
                     dataFieldMetrics[dataFieldKey] = { sum: value };
                   } else {
-                    dataFields[dataFieldKey].push({ value: value, date: dateVal });
+                    dataFields[dataFieldKey].push({ value: value, date: dateVal, blockNumber: blockNumber });
                     dataFieldMetrics[dataFieldKey].sum += value;
                   }
                   if (Number(value) < 0) {
@@ -313,7 +321,7 @@ function ProtocolTabEntity({
               if (x < overlayDifference && currentOverlayEntityData.length > 0) {
                 overlayDataFields[fieldName] = [
                   ...overlayDataFields[fieldName],
-                  { value: 0, date: Number(timeseriesInstance.timestamp) },
+                  { value: 0, date: Number(timeseriesInstance.timestamp), blockNumber: blockNumber },
                 ];
               } else if (overlayTimeseriesInstance) {
                 if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField)) {
@@ -321,12 +329,17 @@ function ProtocolTabEntity({
                   // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
                   if (!overlayDataFields[fieldName]) {
                     overlayDataFields[fieldName] = [
-                      { value: Number(currentOverlayInstanceField), date: overlayDateVal },
+                      {
+                        value: Number(currentOverlayInstanceField),
+                        date: overlayDateVal,
+                        blockNumber: overlayBlockNumber,
+                      },
                     ];
                   } else {
                     overlayDataFields[fieldName].push({
                       value: Number(currentOverlayInstanceField),
                       date: overlayDateVal,
+                      blockNumber: overlayBlockNumber,
                     });
                   }
                 } else if (Array.isArray(currentOverlayInstanceField)) {
@@ -349,9 +362,15 @@ function ProtocolTabEntity({
                       console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                     }
                     if (!overlayDataFields[dataFieldKey]) {
-                      overlayDataFields[dataFieldKey] = [{ value: value, date: overlayDateVal }];
+                      overlayDataFields[dataFieldKey] = [
+                        { value: value, date: overlayDateVal, blockNumber: overlayBlockNumber },
+                      ];
                     } else {
-                      overlayDataFields[dataFieldKey].push({ value: value, date: overlayDateVal });
+                      overlayDataFields[dataFieldKey].push({
+                        value: value,
+                        date: overlayDateVal,
+                        blockNumber: overlayBlockNumber,
+                      });
                     }
                   }
                 }

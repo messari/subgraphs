@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt, Address } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
 
