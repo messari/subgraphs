@@ -14,6 +14,7 @@ import {
   PROTOCOL_ID,
   DAYS_PER_YEAR,
   SECONDS_PER_DAY,
+  BIGDECIMAL_HUNDRED,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getTokenFromCurrency } from "../common/util";
@@ -59,6 +60,7 @@ export function updateRevenues(event: ethereum.Event, marketId: string): void {
   // normalized lending rate
   const normalizedLendingRate = getOrCreateInterestRate(market.id)
     .rate.div(DAYS_PER_YEAR)
+    .div(BIGDECIMAL_HUNDRED)
     .times(daysSincePrevSnapshot);
 
   // total/cumulative revenue calculation (at event time)
