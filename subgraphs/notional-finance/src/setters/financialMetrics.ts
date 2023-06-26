@@ -283,6 +283,8 @@ export function updateMarket(
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
+  let totalDepositBalanceUSD;
+  let totalBorrowBalanceUSD;
   if (transactionType == TransactionType.DEPOSIT) {
     // input token balance
     const inputTokenBalance =
@@ -291,17 +293,12 @@ export function updateMarket(
         : market.inputTokenBalance.plus(amount);
     market.inputTokenBalance = inputTokenBalance;
 
-    // tvl in market
-    market.totalValueLockedUSD = bigIntToBigDecimal(
-      inputTokenBalance,
-      token.decimals
-    ).times(priceUSD);
-
     // update total deposit amount
-    market.totalDepositBalanceUSD = bigIntToBigDecimal(
+    totalDepositBalanceUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
     ).times(priceUSD);
+    market.totalDepositBalanceUSD = totalDepositBalanceUSD;
 
     // update deposit amounts
     market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
@@ -327,17 +324,12 @@ export function updateMarket(
         : market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
 
-    // tvl in market
-    market.totalValueLockedUSD = bigIntToBigDecimal(
-      inputTokenBalance,
-      token.decimals
-    ).times(priceUSD);
-
     // update total deposit amount
-    market.totalDepositBalanceUSD = bigIntToBigDecimal(
+    totalDepositBalanceUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
     ).times(priceUSD);
+    market.totalDepositBalanceUSD = totalDepositBalanceUSD;
 
     // update withdraw amounts
     marketDailySnapshot.dailyWithdrawUSD =
@@ -347,7 +339,8 @@ export function updateMarket(
   } else if (transactionType == TransactionType.BORROW) {
     // update total borrow amount
     // take add/sub approach since we don't have fCash supply info available
-    market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
+    totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
+    market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
 
     // update borrow amounts
     market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
@@ -367,8 +360,8 @@ export function updateMarket(
   } else if (transactionType == TransactionType.REPAY) {
     // update total borrow amount
     // take add/sub approach since we don't have fCash supply info available
-    market.totalBorrowBalanceUSD =
-      market.totalBorrowBalanceUSD.minus(amountUSD);
+    totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.minus(amountUSD);
+    market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
 
     // update repay amounts
     marketDailySnapshot.dailyRepayUSD =
@@ -376,6 +369,11 @@ export function updateMarket(
     financialsDailySnapshot.dailyRepayUSD =
       financialsDailySnapshot.dailyRepayUSD.plus(amountUSD);
   }
+
+  // tvl in market
+  market.totalValueLockedUSD = totalDepositBalanceUSD!.plus(
+    totalBorrowBalanceUSD!
+  );
 
   // requires market and protocol to be udpated before snapshots
   market.save();
