@@ -46,6 +46,13 @@
       "abi": "TokenGateway",
       "startBlock": 14199457,
       "handlerSuffix": "3pGateway"
+    },
+    {
+      "name": "ArbGateway",
+      "address": "0xbbcE8aA77782F13D4202a230d978F361B011dB27",
+      "abi": "TokenGateway",
+      "startBlock": 16840302,
+      "handlerSuffix": "3pGateway"
     }
   ]
 }

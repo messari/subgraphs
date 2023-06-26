@@ -49,6 +49,7 @@ export const schema130 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -60,6 +61,7 @@ export const schema130 = (): Schema => {
       dailySwapCount: "Int!",
       timestamp: "BigInt!",
       totalPoolCount: "Int!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -82,6 +84,7 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -92,6 +95,7 @@ export const schema130 = (): Schema => {
       hourlyWithdrawCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
       id: "ID!",
@@ -114,6 +118,7 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -344,6 +349,7 @@ export const schema132 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -355,6 +361,7 @@ export const schema132 = (): Schema => {
       dailySwapCount: "Int!",
       timestamp: "BigInt!",
       totalPoolCount: "Int!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -377,6 +384,7 @@ export const schema132 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -387,6 +395,7 @@ export const schema132 = (): Schema => {
       hourlyWithdrawCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
       id: "ID!",
@@ -409,6 +418,7 @@ export const schema132 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -640,6 +650,7 @@ export const schema200 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -648,6 +659,7 @@ export const schema200 = (): Schema => {
       dailyTransactionCount: "Int!",
       timestamp: "BigInt!",
       totalPoolCount: "Int!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -670,6 +682,7 @@ export const schema200 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -677,6 +690,7 @@ export const schema200 = (): Schema => {
       hourlyActiveUsers: "Int!",
       hourlyTransactionCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
       id: "ID!",
@@ -699,6 +713,7 @@ export const schema200 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -970,6 +985,7 @@ export const schema303 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -982,6 +998,7 @@ export const schema303 = (): Schema => {
       dailySwapCount: "Int"!,
       totalPoolCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -1024,6 +1041,7 @@ export const schema303 = (): Schema => {
       cumulativeSwapCount: "Int!",
       dailySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -1035,6 +1053,7 @@ export const schema303 = (): Schema => {
       hourlyWithdrawCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
       id: "ID!",
@@ -1077,6 +1096,7 @@ export const schema303 = (): Schema => {
       cumulativeSwapCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -1391,6 +1411,7 @@ export const schema304 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -1403,6 +1424,7 @@ export const schema304 = (): Schema => {
       dailySwapCount: "Int"!,
       totalPoolCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -1445,6 +1467,7 @@ export const schema304 = (): Schema => {
       cumulativeSwapCount: "Int!",
       dailySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -1456,6 +1479,7 @@ export const schema304 = (): Schema => {
       hourlyWithdrawCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
       id: "ID!",
@@ -1498,6 +1522,7 @@ export const schema304 = (): Schema => {
       cumulativeSwapCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -1813,6 +1838,7 @@ export const schema400 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -1825,6 +1851,7 @@ export const schema400 = (): Schema => {
       dailySwapCount: "Int"!,
       totalPoolCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -1867,6 +1894,7 @@ export const schema400 = (): Schema => {
       cumulativeSwapCount: "Int!",
       dailySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -1878,6 +1906,7 @@ export const schema400 = (): Schema => {
       hourlyWithdrawCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
       id: "ID!",
@@ -1920,6 +1949,7 @@ export const schema400 = (): Schema => {
       cumulativeSwapCount: "Int!",
       hourlySwapCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 

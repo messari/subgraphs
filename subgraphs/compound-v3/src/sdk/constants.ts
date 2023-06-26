@@ -147,6 +147,10 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_SIX = 6 as i32;
+export const INT_NINE = 9 as i32;
+export const INT_SIXTEEN = 16 as i32;
+export const INT_EIGHTTEEN = 18 as i32;
 
 export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);

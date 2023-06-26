@@ -34,3 +34,9 @@ The bridge supports both token transfers and cross-chain messaging.
 
 - This is a canonical bridge implemented by Offchain Labs. Bridging involves fees (L2 gas, L1 calldata fees, L1 gas fees) to cover the transaction costs on L1 and L2.
 - A portion of the transaction costs (from sequencer) goes to Offchain Labs but the bridge protocol doesn't earn any fees/revenue.
+
+## Other
+
+### Disabled Yearn Oracle
+
+Yearn Oracle was disabled in prices lib because of price inconsistencies for SPELL token. See [Issue-2090](https://github.com/messari/subgraphs/issues/2090).

@@ -26,7 +26,7 @@ import {
   SECONDS_PER_DAY,
   PositionSide,
   BIGDECIMAL_ONE,
-  BIGINT_ONE,
+  INIT_LIQUIDITY_INDEX,
 } from "./constants";
 import {
   Account,
@@ -1021,7 +1021,7 @@ export function getOrCreateMarket(
     market.rewardTokens = []; // updated once used
     market.rewardTokenEmissionsAmount = [];
     market.rewardTokenEmissionsUSD = [];
-    market._liquidityIndex = BIGINT_ONE; // this is init to 1e27
+    market._liquidityIndex = INIT_LIQUIDITY_INDEX; // this is init to 1e27
     // these are set in reserveInitialized()
     market.createdTimestamp = BIGINT_ZERO;
     market.createdBlockNumber = BIGINT_ZERO;

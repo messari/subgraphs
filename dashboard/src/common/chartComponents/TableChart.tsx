@@ -60,7 +60,8 @@ export const TableChart = ({
         xHeaderName = "Days";
       }
     }
-    const columns = [
+
+    let columns = [
       { field: "date", headerName: xHeaderName, width: 120 },
       {
         field: "value",
@@ -71,6 +72,16 @@ export const TableChart = ({
         align: "left" as GridAlignment,
       },
     ];
+    if (dataTable[0]["blockNumber"]) {
+      columns.push({
+        field: "blockNumber",
+        headerName: "Block",
+        flex: 0,
+        type: "number",
+        headerAlign: "left" as GridAlignment,
+        align: "left" as GridAlignment,
+      });
+    }
     let suffix = "";
     if (isPercentageField) {
       suffix = "%";
@@ -97,6 +108,14 @@ export const TableChart = ({
         returnVal = dataPoint.value;
       }
 
+      if (dataPoint.blockNumber) {
+        return {
+          id: idx,
+          date: dateColumn,
+          value: returnVal,
+          blockNumber: dataPoint.blockNumber,
+        };
+      }
       return {
         id: idx,
         date: dateColumn,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
@@ -21,7 +22,7 @@ export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
 
 export function getTokenPriceUSDC(
   tokenAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
   if (!config) return new CustomPriceType();
@@ -38,7 +39,7 @@ export function getTokenPriceUSDC(
 export function getPriceFromRouterUSDC(
   tokenAddress: Address,
   usdcAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   return getPriceFromRouter(tokenAddress, usdcAddress, block);
 }
@@ -46,7 +47,7 @@ export function getPriceFromRouterUSDC(
 export function getPriceFromRouter(
   token0Address: Address,
   token1Address: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 
@@ -87,7 +88,7 @@ export function getPriceFromRouter(
   let amountOut = constants.BIGINT_ZERO;
   for (let idx = 0; idx < routerAddresses.length; idx++) {
     const routerAddress = routerAddresses[idx];
-    if (routerAddress.startBlock.gt(block.number)) continue;
+    if (block && routerAddress.startBlock.gt(block.number)) continue;
 
     const uniswapForkRouter = UniswapRouterContract.bind(routerAddress.address);
     const amountOutArray = uniswapForkRouter.try_getAmountsOut(amountIn, path);
@@ -114,7 +115,7 @@ export function getPriceFromRouter(
 
 export function getLpTokenPriceUsdc(
   tokenAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 
@@ -157,7 +158,7 @@ export function getLpTokenPriceUsdc(
 
 export function getLpTokenTotalLiquidityUsdc(
   tokenAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 

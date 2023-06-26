@@ -46,7 +46,7 @@ export const DeploymentOverlayDropDown = ({
     if (protocolObj) {
       if (decentralizedDeployments[data.protocols[0].slug]) {
         protocolObj[decentralizedDeployments[data.protocols[0].slug].network + " (DECENTRALIZED)"] =
-          "https://gateway.thegraph.com/api/" +
+          "https://gateway-arbitrum.network.thegraph.com/api/" +
           process.env.REACT_APP_GRAPH_API_KEY +
           "/subgraphs/id/" +
           decentralizedDeployments[data.protocols[0].slug].subgraphId;
