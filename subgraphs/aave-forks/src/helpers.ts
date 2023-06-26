@@ -21,6 +21,7 @@ import {
   BIGDECIMAL_ZERO,
   IavsTokenType,
   INT_TWO,
+  BIGINT_THREE,
 } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
 import {
@@ -138,7 +139,6 @@ export function getOrCreateFlashloanPremium(
     flashloanPremium = new _FlashLoanPremium(procotolData.protocolID);
     flashloanPremium.premiumRateTotal = BIGDECIMAL_ZERO;
     flashloanPremium.premiumRateToProtocol = BIGDECIMAL_ZERO;
-    flashloanPremium.premiumUSDToDeduct = BIGDECIMAL_ZERO;
     flashloanPremium.save();
   }
   return flashloanPremium;
@@ -276,4 +276,84 @@ export function getInterestRateType(
     );
   }
   return null;
+}
+
+export function getFlashloanPremiumAmount(
+  event: ethereum.Event,
+  assetAddress: Address
+): BigInt {
+  let flashloanPremiumAmount = BIGINT_ZERO;
+  const FLASHLOAN =
+    "FlashLoan(address,address,address,uint256,uint8,uint256,uint16)";
+  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(FLASHLOAN));
+  const logs = event.receipt!.logs;
+  //ReserveDataUpdated emitted before Flashloan's event.logIndex
+  // e.g. https://etherscan.io/tx/0xeb87ebc0a18aca7d2a9ffcabf61aa69c9e8d3c6efade9e2303f8857717fb9eb7#eventlog
+  const ReserveDateUpdatedEventLogIndex = event.logIndex;
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.le(ReserveDateUpdatedEventLogIndex)) {
+      // skip log before ReserveDataUpdated
+      continue;
+    }
+    //FlashLoan Event equals ReserveDateUpdatedEventLogIndex + 2 or 3 (there may be an Approval event)
+    if (
+      thisLog.logIndex.gt(ReserveDateUpdatedEventLogIndex.plus(BIGINT_THREE))
+    ) {
+      // skip if no matched FlashLoan event at ReserveDateUpdatedEventLogIndex+3
+      break;
+    }
+
+    // topics[0] - signature
+    const ADDRESS = "address";
+    const DATA_TYPE_TUPLE = "(address,uint256,uint8,uint256)";
+    const logSignature = thisLog.topics[0];
+    if (thisLog.address == event.address && logSignature == eventSignature) {
+      log.info(
+        "[getFlashloanPremiumAmount]tx={}-{} thisLog.logIndex={} thisLog.topics=(1:{},2:{}),thisLog.data={}",
+        [
+          event.transaction.hash.toHexString(),
+          event.logIndex.toString(),
+          thisLog.logIndex.toString(),
+          thisLog.topics.at(1).toHexString(),
+          thisLog.topics.at(2).toHexString(),
+          thisLog.data.toHexString(),
+        ]
+      );
+      const flashLoanAssetAddress = ethereum
+        .decode(ADDRESS, thisLog.topics.at(2))!
+        .toAddress();
+      if (flashLoanAssetAddress.notEqual(assetAddress)) {
+        //
+        continue;
+      }
+      const decoded = ethereum.decode(DATA_TYPE_TUPLE, thisLog.data)!.toTuple();
+      flashloanPremiumAmount = decoded[3].toBigInt();
+
+      log.info("[getFlashloanPremiumAmount]flashLoan premium={} for tx {}-{}", [
+        flashloanPremiumAmount.toString(),
+        thisLog.transactionHash.toHexString(),
+        thisLog.logIndex.toString(),
+      ]);
+      break;
+    }
+  }
+  return flashloanPremiumAmount;
+}
+
+// flashLoanPremiumRateToProtocol is rate of flashLoan premium directly accrue to
+// protocol treasury
+export function calcuateFlashLoanPremiumToLPUSD(
+  flashLoanPremiumUSD: BigDecimal,
+  flashLoanPremiumRateToProtocol: BigDecimal
+): BigDecimal {
+  let premiumToLPUSD = BIGDECIMAL_ZERO;
+  if (flashLoanPremiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
+    // according to https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/interfaces/IPool.sol#L634
+    // premiumRateToProtocol is the percentage (bps) of premium to protocol
+    premiumToLPUSD = flashLoanPremiumUSD.minus(
+      flashLoanPremiumUSD.times(flashLoanPremiumRateToProtocol)
+    );
+  }
+  return premiumToLPUSD;
 }

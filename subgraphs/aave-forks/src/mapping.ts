@@ -50,6 +50,8 @@ import {
   getMarketFromToken,
   getOrCreateFlashloanPremium,
   getInterestRateType,
+  getFlashloanPremiumAmount,
+  calcuateFlashLoanPremiumToLPUSD,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -561,14 +563,30 @@ export function _handleReserveDataUpdated(
     .times(liquidityIndexDiff);
   let totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
 
+  const receipt = event.receipt;
+  let FlashLoanPremiumToLPUSD = BIGDECIMAL_ZERO;
+  if (!receipt) {
+    log.warning(
+      "[_handleReserveDataUpdated]No receipt for tx {}; cannot subtract Flashloan revenue",
+      [event.transaction.hash.toHexString()]
+    );
+  } else {
+    const flashLoanPremiumAmount = getFlashloanPremiumAmount(event, asset);
+    const flashLoanPremiumUSD = flashLoanPremiumAmount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(inputToken.decimals))
+      .times(assetPriceUSD);
+    const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+    FlashLoanPremiumToLPUSD = calcuateFlashLoanPremiumToLPUSD(
+      flashLoanPremiumUSD,
+      flashloanPremium.premiumRateToProtocol
+    );
+  }
+
   // deduct flashloan premium that may have already been accounted for in
   // _handleFlashloan()
-  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
-  totalRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
-    flashloanPremium.premiumUSDToDeduct
-  );
-  flashloanPremium.premiumUSDToDeduct = BIGDECIMAL_ZERO;
-  flashloanPremium.save();
+  const totalRevenueDeltaUSD0 = totalRevenueDeltaUSD;
+  totalRevenueDeltaUSD = totalRevenueDeltaUSD.minus(FlashLoanPremiumToLPUSD);
 
   let reserveFactor = market.reserveFactor;
   if (!reserveFactor) {
@@ -588,6 +606,25 @@ export function _handleReserveDataUpdated(
     FeeType.PROTOCOL_FEE,
     null,
     market.reserveFactor
+  );
+  log.info(
+    "[_handleReserveDataUpdated]liquidityIndex={} liquidityIndexDiff={} newRevenueBD={} assetPriceUSD={} totalRevenueDeltaUSD0={} totalRevenueDeltaUSD={} protocolSideRevenueDeltaUSD={} supplySideRevenueDeltaUSD={} flashloandPremiumToDeduct={} reserveFactor={} market={} tx={}-{} timestamp={}",
+    [
+      liquidityIndex.toString(),
+      liquidityIndexDiff.toString(),
+      newRevenueBD.toString(),
+      assetPriceUSD.toString(),
+      totalRevenueDeltaUSD0.toString(),
+      totalRevenueDeltaUSD.toString(),
+      protocolSideRevenueDeltaUSD.toString(),
+      supplySideRevenueDeltaUSD.toString(),
+      FlashLoanPremiumToLPUSD.toString(),
+      reserveFactor.toString(),
+      market.id.toHexString(),
+      event.transaction.hash.toHexString(),
+      event.logIndex.toString(),
+      event.block.timestamp.toString(),
+    ]
   );
   manager.addProtocolRevenue(protocolSideRevenueDeltaUSD, fee);
   manager.addSupplyRevenue(supplySideRevenueDeltaUSD, fee);
@@ -1031,7 +1068,6 @@ export function _handleFlashLoan(
   const protocolRevenueShare = reserveFactor;
   let premiumUSDToProtocol = premiumUSDTotal.times(protocolRevenueShare);
   let premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
-  let premiumUSDToDeduct = premiumUSDTotal;
   const premiumRateTotal = flashloanPremium.premiumRateTotal;
   let premiumRateToProtocol = premiumRateTotal.times(protocolRevenueShare);
   let premiumRateToLP = premiumRateTotal.minus(premiumRateToProtocol);
@@ -1051,9 +1087,6 @@ export function _handleFlashLoan(
     premiumRateToLP = premiumRateTotal.minus(premiumRateToProtocol);
     // this part of the premium is transferred to the treasury and not
     // accrued to liquidityIndex and thus no need to deduct
-    premiumUSDToDeduct = premiumUSDToDeduct.minus(
-      premiumUSDTotal.times(flashloanPremium.premiumRateToProtocol)
-    );
   }
 
   const feeToProtocol = manager.getOrUpdateFee(
@@ -1061,6 +1094,22 @@ export function _handleFlashLoan(
     null,
     premiumRateToProtocol
   );
+
+  log.info(
+    "[_handleFlashLoan]premiumAmount={} premiumUSDTotal={} premiumUSDToProtocol={} premiumUSDToLP={} market={} tx={}-{} timestamp={}",
+    [
+      premiumAmount.toString(),
+      premiumUSDTotal.toString(),
+      premiumUSDToProtocol.toString(),
+      premiumUSDToLP.toString(),
+      //premiumUSDToDeduct.toString(),
+      market.id.toHexString(),
+      event.transaction.hash.toHexString(),
+      event.logIndex.toString(),
+      event.block.timestamp.toString(),
+    ]
+  );
+
   manager.addProtocolRevenue(premiumUSDToProtocol, feeToProtocol);
 
   // flashloan premium to LP is accrued in liquidityIndex and handled in
@@ -1073,9 +1122,6 @@ export function _handleFlashLoan(
   );
 
   manager.addSupplyRevenue(premiumUSDToLP, feeToLP);
-  // save premiumUSDToDeduct to be deducted from total revenue to avoid double counting
-  flashloanPremium.premiumUSDToDeduct = premiumUSDToDeduct;
-  flashloanPremium.save();
 }
 
 /////////////////////////

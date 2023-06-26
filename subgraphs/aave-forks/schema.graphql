@@ -2079,6 +2079,4 @@ type _FlashLoanPremium @entity {
   premiumRateTotal: BigDecimal!
   " premium rate to protocol "
   premiumRateToProtocol: BigDecimal!
-  " premium to be deducted from revenue, used to avoid double counting "
-  premiumUSDToDeduct: BigDecimal!
 }

@@ -119,6 +119,7 @@ dataSources:
           receipt: true
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
+          receipt: true
         - event: Supply(indexed address,address,indexed address,uint256,indexed uint16)
           handler: handleDeposit
         - event: Withdraw(indexed address,indexed address,indexed address,uint256)
