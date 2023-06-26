@@ -285,3 +285,5 @@ However, this might be technically cumbersome to recitify this error. In any cas
 - ERC1155: Notional finance represents positions (asset deposits/borrows) using ERC1155 tokens (currencyfCash-maturityDate pairs). The contracts expose `tokenId` but do not expose any metadata. Therefore, we create token entities with only id param available and set to `ERC1155-{tokenAddress}-{tokenId}`.
 
 - Repay and Deposit, Withdraw and Borrow: Notional team confirmed that these can happen in a single action. However, such actions seem to happen through [BatchActions](https://github.com/notional-finance/contracts-v2/blob/63eb0b46ec37e5fc5447bdde3d951dd90f245741/contracts/external/actions/BatchAction.sol#L78) which should still result in individual LendBorrow trades. Further, I didn't find any occurrences of `repay and deposit` and `withdraw and borrow` in single LendBorrow trade based on logging observations. Hence, I include those conditionals for such events and log.warn any such occurrences for future.
+
+- Negative Input Token Balances: When we observe negative token balances, we set it to 0. This results in totalDepositBalanceUSD and supply side revenue to be 0 as well.

@@ -15,6 +15,7 @@ import {
   DAYS_PER_YEAR,
   SECONDS_PER_DAY,
   BIGDECIMAL_HUNDRED,
+  BIGINT_ZERO,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getTokenFromCurrency } from "../common/util";
@@ -283,9 +284,14 @@ export function updateMarket(
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
   if (transactionType == TransactionType.DEPOSIT) {
-    // tvl in market
-    const inputTokenBalance = market.inputTokenBalance.plus(amount);
+    // input token balance
+    const inputTokenBalance =
+      market.inputTokenBalance.plus(amount) < BIGINT_ZERO
+        ? BIGINT_ZERO
+        : market.inputTokenBalance.plus(amount);
     market.inputTokenBalance = inputTokenBalance;
+
+    // tvl in market
     market.totalValueLockedUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
@@ -314,9 +320,14 @@ export function updateMarket(
     financialsDailySnapshot.dailyDepositUSD =
       financialsDailySnapshot.dailyDepositUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.WITHDRAW) {
-    // tvl in market
-    const inputTokenBalance = market.inputTokenBalance.minus(amount);
+    // input token balance
+    const inputTokenBalance =
+      market.inputTokenBalance.minus(amount) < BIGINT_ZERO
+        ? BIGINT_ZERO
+        : market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
+
+    // tvl in market
     market.totalValueLockedUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
