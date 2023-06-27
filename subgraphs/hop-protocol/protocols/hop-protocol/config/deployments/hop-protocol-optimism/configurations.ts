@@ -70,6 +70,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return ["DAI", "DAI Stablecoin", "18", OptimismBridge.DAI];
     } else if (this.getUsdtTokens().includes(tokenAddress)) {
       return ["USDT", "Tether USD", "6", OptimismBridge.USDT];
+    } else if (this.getsUSDTokens().includes(tokenAddress)) {
+      return ["sUSD", "sUSD", "18", OptimismBridge.sUSD];
+    } else if (this.getRethTokens().includes(tokenAddress)) {
+      return ["rETH", "Rocket Pool Ethereum", "18", OptimismBridge.rETH];
     } else if (this.getEthTokens().includes(tokenAddress)) {
       return ["ETH", "Ethereum", "18", OptimismBridge.ETH];
     } else if (this.getSnxTokens().includes(tokenAddress)) {
