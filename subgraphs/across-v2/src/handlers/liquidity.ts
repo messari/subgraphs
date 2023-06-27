@@ -16,6 +16,7 @@ import {
 import { _OutputTokenToPool } from "../../generated/schema";
 import { _ERC20 } from "../../generated/SpokePool1/_ERC20";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
+import { BIGINT_ZERO } from "../prices/common/constants";
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
   const tokenPricer = new Pricer(event.block);
@@ -70,13 +71,15 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   }
 
   // output token price
-  const exchangeRate = bigIntToBigDecimal(event.params.amount).div(
-    bigIntToBigDecimal(event.params.lpTokensMinted)
-  );
-  pool.pool.outputTokenPriceUSD = tokenPricer
-    .getTokenPrice(token)
-    .times(exchangeRate);
-  pool.save();
+  if (event.params.lpTokensMinted > BIGINT_ZERO) {
+    const exchangeRate = bigIntToBigDecimal(event.params.amount).div(
+      bigIntToBigDecimal(event.params.lpTokensMinted)
+    );
+    pool.pool.outputTokenPriceUSD = tokenPricer
+      .getTokenPrice(token)
+      .times(exchangeRate);
+    pool.save();
+  }
 
   // account
   const amount = event.params.amount;
@@ -151,13 +154,16 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   }
 
   // output token price
-  const exchangeRate = bigIntToBigDecimal(event.params.amount).div(
-    bigIntToBigDecimal(event.params.lpTokensBurnt)
-  );
-  pool.pool.outputTokenPriceUSD = tokenPricer
-    .getTokenPrice(token)
-    .times(exchangeRate);
-  pool.save();
+  if (event.params.lpTokensBurnt > BIGINT_ZERO) {
+    const exchangeRate = bigIntToBigDecimal(event.params.amount).div(
+      bigIntToBigDecimal(event.params.lpTokensBurnt)
+    );
+
+    pool.pool.outputTokenPriceUSD = tokenPricer
+      .getTokenPrice(token)
+      .times(exchangeRate);
+    pool.save();
+  }
 
   // account
   const amount = event.params.amount;
