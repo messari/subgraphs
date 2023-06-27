@@ -5,7 +5,7 @@ import { Network } from "../../../src/constants";
 ///// Ethereum Addresses /////
 //////////////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -22,7 +22,7 @@ export const AAVE_DECIMALS = 8;
 ////////////////////////////
 
 export const ARC_ADDRESS = Address.fromString(
-  "0x6FdfafB66d39cD72CFE7984D3Bbcc76632faAb00"
+  "0x6fdfafb66d39cd72cfe7984d3bbcc76632faab00"
 ); // protocol id
 
 export class NetworkSpecificConstant {

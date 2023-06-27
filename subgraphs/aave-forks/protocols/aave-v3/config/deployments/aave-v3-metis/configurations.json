@@ -1,0 +1,18 @@
+{
+  "network": "andromeda",
+  "PoolAddressesProviderRegistry": {
+    "address": "0x9E7B73ffD9D2026F3ff4212c29E209E09C8A91F5",
+    "startBlock": 5445183
+  },
+  "RewardsController": {
+    "address": "0x30C1b8F0490fa0908863d6Cbd2E36400b4310A6B",
+    "startBlock": 5445232
+  },
+  "LendingPool": {
+    "address": "0x90df02551bB792286e8D4f13E0e357b4Bf1D6a57",
+    "startBlock": 5445224
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

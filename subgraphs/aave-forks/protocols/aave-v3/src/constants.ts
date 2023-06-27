@@ -5,7 +5,7 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 ///// Ethereum Addresses /////
 //////////////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // ETH
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // ETH
 export const USDC_POS_TOKEN_ADDRESS =
   "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // Polygon
 
@@ -42,7 +42,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x770ef9f4fe897e59daCc474EF11238303F9552b6"),
+      Address.fromString("0x770ef9f4fe897e59dacc474ef11238303f9552b6"),
       Network.ARBITRUM_ONE
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
@@ -74,6 +74,11 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
     return new NetworkSpecificConstant(
       Address.fromString("0xbaa999ac55eace41ccae355c77809e68bb345170"),
       Network.MAINNET
+    );
+  } else if (equalsIgnoreCase(network, Network.METIS)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x9e7b73ffd9d2026f3ff4212c29e209e09c8a91f5"),
+      Network.METIS
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
