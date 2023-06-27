@@ -311,4 +311,17 @@ export class HopProtocolPolygonConfigurations implements Configurations {
   getMaticPools(): string[] {
     return [];
   }
+  getRethPools(): string[] {
+    return [];
+  }
+  getRethTokens(): string[] {
+    return [];
+  }
+
+  getsUSDPools(): string[] {
+    return [];
+  }
+  getsUSDTokens(): string[] {
+    return [];
+  }
 }

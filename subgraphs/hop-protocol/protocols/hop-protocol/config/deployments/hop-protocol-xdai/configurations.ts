@@ -305,4 +305,17 @@ export class HopProtocolxDaiConfigurations implements Configurations {
   getMaticTokens(): string[] {
     return [XdaiToken.MATIC, XdaiHtoken.MATIC];
   }
+  getRethPools(): string[] {
+    return [];
+  }
+  getRethTokens(): string[] {
+    return [];
+  }
+
+  getsUSDPools(): string[] {
+    return [];
+  }
+  getsUSDTokens(): string[] {
+    return [];
+  }
 }

@@ -40,6 +40,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (tokenAddress == OptimismToken.USDT) return OptimismAmm.USDT;
     else if (tokenAddress == OptimismToken.ETH) return OptimismAmm.ETH;
     else if (tokenAddress == OptimismToken.SNX) return OptimismAmm.SNX;
+    else if (tokenAddress == OptimismToken.rETH) return OptimismAmm.rETH;
+    else if (tokenAddress == OptimismToken.sUSD) return OptimismAmm.sUSD;
     else {
       log.critical("Token not found", []);
       return "";
@@ -51,6 +53,9 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (rewardToken == OptimismRewardToken.SNX_B) return OptimismAmm.SNX;
     else if (rewardToken == OptimismRewardToken.DAI) return OptimismAmm.DAI;
     else if (rewardToken == OptimismRewardToken.ETH) return OptimismAmm.ETH;
+    else if (rewardToken == OptimismRewardToken.rETH) return OptimismAmm.rETH;
+    else if (rewardToken == OptimismRewardToken.sUSD_A) return OptimismAmm.sUSD;
+    else if (rewardToken == OptimismRewardToken.sUSD_B) return OptimismAmm.sUSD;
     else if (rewardToken == OptimismRewardToken.USDC) return OptimismAmm.USDC;
     else if (rewardToken == OptimismRewardToken.USDT) return OptimismAmm.USDT;
     else {
@@ -102,6 +107,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (tokenAddress == OptimismToken.DAI) return ArbitrumToken.DAI;
     else if (tokenAddress == OptimismToken.USDT) return ArbitrumToken.USDT;
     else if (tokenAddress == OptimismToken.ETH) return ArbitrumToken.ETH;
+    else if (tokenAddress == OptimismToken.rETH) return ArbitrumToken.rETH;
     else {
       log.critical("Token not found", []);
     }
@@ -139,6 +145,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (tokenAddress == OptimismToken.USDT) return MainnetToken.USDT;
     else if (tokenAddress == OptimismToken.SNX) return MainnetToken.SNX;
     else if (tokenAddress == OptimismToken.ETH) return MainnetToken.ETH;
+    else if (tokenAddress == OptimismToken.sUSD) return MainnetToken.sUSD;
+    else if (tokenAddress == OptimismToken.rETH) return MainnetToken.rETH;
     else {
       log.critical("Token not found", []);
     }
@@ -156,6 +164,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return [OptimismToken.ETH, OptimismHtoken.ETH];
     } else if (bridgeAddress == OptimismBridge.SNX) {
       return [OptimismToken.SNX, OptimismHtoken.SNX];
+    } else if (bridgeAddress == OptimismBridge.sUSD) {
+      return [OptimismToken.sUSD, OptimismHtoken.sUSD];
+    } else if (bridgeAddress == OptimismBridge.rETH) {
+      return [OptimismToken.rETH, OptimismHtoken.rETH];
     } else {
       log.critical("Token not found", []);
       return [""];
@@ -172,6 +184,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return [OptimismToken.ETH, OptimismHtoken.ETH];
     else if (poolAddress == OptimismAmm.SNX)
       return [OptimismToken.SNX, OptimismHtoken.SNX];
+    else if (poolAddress == OptimismAmm.sUSD)
+      return [OptimismToken.sUSD, OptimismHtoken.sUSD];
+    else if (poolAddress == OptimismAmm.rETH)
+      return [OptimismToken.rETH, OptimismHtoken.rETH];
     else {
       log.critical("Token not found", []);
       return [""];
@@ -184,6 +200,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (bridgeAddress == OptimismBridge.USDT) return OptimismAmm.USDT;
     else if (bridgeAddress == OptimismBridge.ETH) return OptimismAmm.ETH;
     else if (bridgeAddress == OptimismBridge.SNX) return OptimismAmm.SNX;
+    else if (bridgeAddress == OptimismBridge.sUSD) return OptimismAmm.sUSD;
+    else if (bridgeAddress == OptimismBridge.rETH) return OptimismAmm.rETH;
     else {
       log.critical("Address not found", []);
       return "";
@@ -201,6 +219,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return ["HOP-ETH", "hETH/ETH Pool - ETH", "hETH/ETH Pool - hETH"];
     } else if (poolAddress == OptimismAmm.SNX) {
       return ["HOP-SNX", "hSNX/SNX Pool - SNX", "hSNX/SNX Pool - hSNX"];
+    } else if (poolAddress == OptimismAmm.rETH) {
+      return ["HOP-rETH", "hrETH/rETH Pool - rETH", "hrETH/rETH Pool - hrETH"];
+    } else if (poolAddress == OptimismAmm.sUSD) {
+      return ["HOP-sUSD", "hsUSD/sUSD Pool - SNX", "hsUSD /sUSD Pool - hsUSD"];
     } else if (poolAddress == ZERO_ADDRESS) {
       return ["HOP-POOL", "HOP/HOP Pool - HOP", "hHOP/HOP Pool - hHOP"];
     } else {
@@ -216,6 +238,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       OptimismToken.USDT,
       OptimismToken.ETH,
       OptimismToken.SNX,
+      OptimismToken.sUSD,
+      OptimismToken.rETH,
     ];
   }
   getPoolsList(): string[] {
@@ -225,6 +249,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       OptimismAmm.USDT,
       OptimismAmm.SNX,
       OptimismAmm.ETH,
+      OptimismAmm.rETH,
+      OptimismAmm.sUSD,
     ];
   }
   getBridgeList(): string[] {
@@ -234,6 +260,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       OptimismBridge.USDT,
       OptimismBridge.SNX,
       OptimismBridge.ETH,
+      OptimismBridge.rETH,
+      OptimismBridge.sUSD,
     ];
   }
   getRewardTokenList(): string[] {
@@ -241,6 +269,9 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       OptimismRewardToken.SNX_A,
       OptimismRewardToken.SNX_B,
       OptimismRewardToken.DAI,
+      OptimismRewardToken.sUSD_A,
+      OptimismRewardToken.sUSD_B,
+      OptimismRewardToken.rETH,
       OptimismRewardToken.ETH,
       OptimismRewardToken.USDC,
       OptimismRewardToken.USDT,
@@ -252,6 +283,20 @@ export class HopProtocolOptimismConfigurations implements Configurations {
   }
   getUsdcTokens(): string[] {
     return [OptimismToken.USDC, OptimismHtoken.USDC];
+  }
+
+  getRethPools(): string[] {
+    return [];
+  }
+  getRethTokens(): string[] {
+    return [OptimismToken.rETH, OptimismHtoken.rETH];
+  }
+
+  getsUSDPools(): string[] {
+    return [];
+  }
+  getsUSDTokens(): string[] {
+    return [OptimismToken.sUSD, OptimismHtoken.sUSD];
   }
   getDaiPools(): string[] {
     return [];

@@ -32,7 +32,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return ["SNX", "SNX", "18", MainnetBridge.SNX];
     } else if (this.getEthTokens().includes(tokenAddress)) {
       return ["ETH", "Ethereum", "18", MainnetBridge.ETH];
-    } else if (this.getSusdTokens().includes(tokenAddress)) {
+    } else if (this.getsUSDTokens().includes(tokenAddress)) {
       return ["sUSD", "Synthetix Usd", "18", MainnetBridge.sUSD];
     } else if (this.getRethTokens().includes(tokenAddress)) {
       return ["rETH", "Rocket Pool Ethereum", "18", MainnetBridge.rETH];
@@ -229,10 +229,10 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     return [OptimismToken.rETH, ArbitrumToken.rETH];
   }
 
-  getSusdPools(): string[] {
+  getsUSDPools(): string[] {
     return [OptimismAmm.sUSD];
   }
-  getSusdTokens(): string[] {
+  getsUSDTokens(): string[] {
     return [OptimismToken.sUSD];
   }
 
@@ -315,6 +315,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (tokenAddress == MainnetToken.USDT) return OptimismToken.USDT;
     else if (tokenAddress == MainnetToken.ETH) return OptimismToken.ETH;
     else if (tokenAddress == MainnetToken.SNX) return OptimismToken.SNX;
+    else if (tokenAddress == MainnetToken.rETH) return OptimismToken.rETH;
+    else if (tokenAddress == MainnetToken.sUSD) return OptimismToken.sUSD;
     else {
       log.critical("Optimism Crosstoken not found", []);
       return "";

@@ -24,6 +24,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     else if (tokenAddress == ArbitrumToken.DAI) return ArbitrumAmm.DAI;
     else if (tokenAddress == ArbitrumToken.USDT) return ArbitrumAmm.USDT;
     else if (tokenAddress == ArbitrumToken.ETH) return ArbitrumAmm.ETH;
+    else if (tokenAddress == ArbitrumToken.rETH) return ArbitrumAmm.rETH;
     else {
       log.critical("Token not found", []);
       return "";
@@ -101,6 +102,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return OptimismToken.USDT;
     } else if (tokenAddress == ArbitrumToken.ETH) {
       return OptimismToken.ETH;
+    } else if (tokenAddress == ArbitrumToken.rETH) {
+      return OptimismToken.rETH;
     } else {
       log.critical("Token not found", []);
     }
@@ -145,6 +148,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return [ArbitrumToken.USDT, ArbitrumHtoken.USDT];
     else if (poolAddress == ArbitrumAmm.ETH)
       return [ArbitrumToken.ETH, ArbitrumHtoken.ETH];
+    else if (poolAddress == ArbitrumAmm.rETH)
+      return [ArbitrumToken.rETH, ArbitrumHtoken.rETH];
     else {
       log.critical("Token not found", []);
       return [""];
@@ -186,6 +191,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumToken.DAI,
       ArbitrumToken.USDT,
       ArbitrumToken.ETH,
+      ArbitrumToken.rETH,
     ];
   }
   getPoolsList(): string[] {
@@ -194,6 +200,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumAmm.DAI,
       ArbitrumAmm.USDT,
       ArbitrumAmm.ETH,
+      ArbitrumAmm.rETH,
     ];
   }
   getBridgeList(): string[] {
@@ -202,6 +209,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumBridge.DAI,
       ArbitrumBridge.USDT,
       ArbitrumBridge.ETH,
+      ArbitrumBridge.rETH,
     ];
   }
   getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
@@ -238,6 +246,15 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   getRethTokens(): string[] {
     return [ArbitrumToken.rETH, ArbitrumHtoken.rETH];
   }
+  getRethPools(): string[] {
+    return [];
+  }
+  getsUSDPools(): string[] {
+    return [];
+  }
+  getsUSDTokens(): string[] {
+    return [];
+  }
   getDaiPools(): string[] {
     return [];
   }
@@ -265,6 +282,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumRewardToken.DAI,
       ArbitrumRewardToken.ETH,
       ArbitrumRewardToken.USDC,
+      ArbitrumRewardToken.rETH,
       ArbitrumRewardToken.USDT,
     ];
   }
@@ -273,6 +291,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     else if (rewardToken == ArbitrumRewardToken.ETH) return ArbitrumAmm.USDT;
     else if (rewardToken == ArbitrumRewardToken.USDC) return ArbitrumAmm.ETH;
     else if (rewardToken == ArbitrumRewardToken.USDT) return ArbitrumAmm.ETH;
+    else if (rewardToken == ArbitrumRewardToken.rETH) return ArbitrumAmm.rETH;
     else {
       log.critical("RewardToken not found", []);
       return "";
