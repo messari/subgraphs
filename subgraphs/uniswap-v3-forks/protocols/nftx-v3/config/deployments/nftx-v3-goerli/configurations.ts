@@ -28,11 +28,11 @@ export class NftxV3GoerliConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): Bytes {
-    return Bytes.fromHexString("0x81d7bf1c11a3cb21efb4bffb58866193fad15db9"); // shouldn't these be in the configuration.json?
+    return Bytes.fromHexString("0x8206bf754a12205c52a98d39634393f51f38718f"); // shouldn't these be in the configuration.json?
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x81d7bf1c11a3cb21efb4bffb58866193fad15db9") // shouldn't these be in the configuration.json?
+      Address.fromString("0x8206bf754a12205c52a98d39634393f51f38718f") // shouldn't these be in the configuration.json?
     );
   }
   getProtocolFeeOnOff(): string {
@@ -72,7 +72,7 @@ export class NftxV3GoerliConfigurations implements Configurations {
   }
   getStableOraclePools(): Bytes[] {
     return stringToBytesList([
-      "0xf8492c75a6c7477da43dbea5f3bf2dece0b23320", // DAI/wETH get the DAI pool that Apoorv created.
+      "0xf8492c75a6c7477da43dbea5f3bf2dece0b23320", // UPDATE THIS WITH NEW USDC/WETH POOL - DAI/wETH get the DAI pool that Apoorv created.
     ]);
   }
   getUntrackedPairs(): Bytes[] {

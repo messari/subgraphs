@@ -2,7 +2,7 @@
   "network": "goerli",
   "factoryAddress": "0x8206bf754a12205c52a98d39634393f51f38718f",
   "factoryAddressStartBlock": 8975976,
-  "nonFungiblePositionManagerAddress": "0x7398417c94d02556c371fe1e7a11d1bddafe73f3",
+  "nonFungiblePositionManagerAddress": "0x7C49E1Aaaefb8f5E288AA45294C7B1129Ecbf544",
   "nonFungiblePositionManagerAddressStartBlock": 8975979,
   "deployment": "NFTX_V3_GOERLI",
   "graftEnabled": false,
