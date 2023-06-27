@@ -14,13 +14,18 @@ import {
   ETH_ADDRESS_OPTIMISM,
   WETH_ADDRESS_OPTIMISM,
 } from "./constants";
-import { getUsdPrice, getUsdPricePerToken } from "./prices";
+import { getUsdPrice } from "./prices";
 import { SDK } from "./sdk/protocols/bridge";
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
 import { BridgePermissionType } from "./sdk/protocols/bridge/enums";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { TokenPricer } from "./sdk/protocols/config";
-import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "./sdk/util/constants";
+import {
+  BIGDECIMAL_ONE,
+  ETH_ADDRESS,
+  ETH_NAME,
+  ETH_SYMBOL,
+} from "./sdk/util/constants";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { Versions } from "./versions";
 
@@ -39,8 +44,8 @@ class Pricer implements TokenPricer {
     if (address == Address.fromString(ETH_ADDRESS_OPTIMISM)) {
       address = Address.fromString(WETH_ADDRESS_OPTIMISM);
     }
-    const price = getUsdPricePerToken(address);
-    return price.usdPrice;
+
+    return getUsdPrice(address, BIGDECIMAL_ONE);
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {

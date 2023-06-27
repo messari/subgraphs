@@ -1,5 +1,5 @@
 {
-  "graftEnabled": true,
-  "subgraphId": "Qme9Vb2FTRRKaoR25bDbtL6JzTcmuQfTgbfmoQXigUynNd",
-  "graftStartBlock": 17172465
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
 }

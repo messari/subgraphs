@@ -6,14 +6,14 @@ import {
   BigDecimal,
   dataSource,
 } from "@graphprotocol/graph-ts";
-import { CustomPriceType } from "./common/types";
+import { CustomPriceType, OracleType } from "./common/types";
 
 import * as utils from "./common/utils";
 import * as constants from "./common/constants";
 import * as AaveOracle from "./oracles/AaveOracle";
 import * as CurveRouter from "./routers/CurveRouter";
 import * as ChainLinkFeed from "./oracles/ChainLinkFeed";
-// import * as YearnLensOracle from "./oracles/YearnLensOracle";
+import * as YearnLensOracle from "./oracles/YearnLensOracle";
 import * as UniswapForksRouter from "./routers/UniswapForksRouter";
 import * as CurveCalculations from "./calculations/CalculationsCurve";
 import * as SushiCalculations from "./calculations/CalculationsSushiswap";
@@ -42,89 +42,93 @@ export function getUsdPricePerToken(
     );
   }
 
-  // Commented to resolve Issue #2090
-  // 1. Yearn Lens Oracle
-  // const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
-  // if (!yearnLensPrice.reverted) {
-  //   log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
-  //     tokenAddr.toHexString(),
-  //     yearnLensPrice.usdPrice.toString(),
-  //   ]);
-  //   return yearnLensPrice;
-  // }
+  const oracle = new OracleType();
+  const override = config.getOracleOverride(tokenAddr, block);
+  if (override) {
+    oracle.setOracleConfig(override);
+  }
+  const oracleCount = oracle.oracleCount;
+  const oracleOrder = oracle.oracleOrder;
 
-  // 2. ChainLink Feed Registry
-  const chainLinkPrice = ChainLinkFeed.getTokenPriceUSDC(tokenAddr, block);
-  if (!chainLinkPrice.reverted) {
-    log.info("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.toString(),
-    ]);
-    return chainLinkPrice;
+  const prices: CustomPriceType[] = [];
+  for (let i = 0; i < oracleOrder.length; i++) {
+    if (prices.length >= oracleCount) {
+      break;
+    }
+
+    let oraclePrice = new CustomPriceType();
+
+    if (oracleOrder[i] == constants.OracleType.YEARN_LENS_ORACLE) {
+      oraclePrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
+    } else if (oracleOrder[i] == constants.OracleType.CHAINLINK_FEED) {
+      oraclePrice = ChainLinkFeed.getTokenPriceUSDC(tokenAddr, block);
+    } else if (oracleOrder[i] == constants.OracleType.CURVE_CALCULATIONS) {
+      oraclePrice = CurveCalculations.getTokenPriceUSDC(tokenAddr, block);
+    } else if (oracleOrder[i] == constants.OracleType.SUSHI_CALCULATIONS) {
+      oraclePrice = SushiCalculations.getTokenPriceUSDC(tokenAddr, block);
+    } else if (oracleOrder[i] == constants.OracleType.AAVE_ORACLE) {
+      oraclePrice = AaveOracle.getTokenPriceUSDC(tokenAddr, block);
+    } else if (oracleOrder[i] == constants.OracleType.CURVE_ROUTER) {
+      oraclePrice = CurveRouter.getCurvePriceUsdc(tokenAddr, block);
+    } else if (oracleOrder[i] == constants.OracleType.UNISWAP_FORKS_ROUTER) {
+      oraclePrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, block);
+    }
+
+    if (!oraclePrice.reverted) {
+      prices.push(oraclePrice);
+    }
   }
 
-  // 3. CalculationsCurve
-  const calculationsCurvePrice = CurveCalculations.getTokenPriceUSDC(
-    tokenAddr,
-    block
-  );
-  if (!calculationsCurvePrice.reverted) {
-    log.info("[CalculationsCurve] tokenAddress: {}, Price: {}", [
+  if (prices.length == constants.INT_ZERO) {
+    log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.toString(),
     ]);
-    return calculationsCurvePrice;
+
+    return new CustomPriceType();
+  } else if (prices.length == constants.INT_ONE) {
+    return prices[constants.INT_ZERO];
+  } else if (prices.length == constants.INT_TWO) {
+    return utils.averagePrice(prices);
   }
 
-  // 4. CalculationsSushiSwap
-  const calculationsSushiSwapPrice = SushiCalculations.getTokenPriceUSDC(
-    tokenAddr,
-    block
-  );
-  if (!calculationsSushiSwapPrice.reverted) {
-    log.info("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.toString(),
-    ]);
-    return calculationsSushiSwapPrice;
+  const k = Math.ceil(prices.length / constants.INT_TWO) as i32;
+  const closestPrices = utils.kClosestPrices(k, prices);
+
+  return utils.averagePrice(closestPrices);
+}
+
+export function getLiquidityBoundPrice(
+  tokenAddress: Address,
+  tokenPrice: CustomPriceType,
+  amount: BigDecimal
+): BigDecimal {
+  const reportedPriceUSD = tokenPrice.usdPrice.times(amount);
+  const liquidity = tokenPrice.liquidity;
+
+  let liquidityBoundPriceUSD = reportedPriceUSD;
+  if (liquidity > constants.BIGDECIMAL_ZERO && reportedPriceUSD > liquidity) {
+    liquidityBoundPriceUSD = liquidity
+      .div(
+        constants.BIGINT_TEN.pow(
+          constants.DEFAULT_USDC_DECIMALS as u8
+        ).toBigDecimal()
+      )
+      .times(constants.BIGINT_TEN.pow(tokenPrice.decimals as u8).toBigDecimal())
+      .div(amount);
+
+    log.warning(
+      "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {}",
+      [
+        tokenPrice.usdPrice.toString(),
+        amount.toString(),
+        liquidityBoundPriceUSD.toString(),
+        tokenAddress.toHexString(),
+        liquidity.toString(),
+      ]
+    );
   }
 
-  // 6. Aave Oracle
-  const aaveOraclePrice = AaveOracle.getTokenPriceUSDC(tokenAddr, block);
-  if (!aaveOraclePrice.reverted) {
-    log.info("[AaveOracle] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      aaveOraclePrice.usdPrice.toString(),
-    ]);
-    return aaveOraclePrice;
-  }
-
-  // 7. Curve Router
-  const curvePrice = CurveRouter.getCurvePriceUsdc(tokenAddr, block);
-  if (!curvePrice.reverted) {
-    log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      curvePrice.usdPrice.toString(),
-    ]);
-    return curvePrice;
-  }
-
-  // 8. Uniswap Router
-  const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, block);
-  if (!uniswapPrice.reverted) {
-    log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.toString(),
-    ]);
-    return uniswapPrice;
-  }
-
-  log.warning("[Oracle] Failed to Fetch Price, Name: {} Address: {}", [
-    utils.getTokenName(tokenAddr),
-    tokenAddr.toHexString(),
-  ]);
-
-  return new CustomPriceType();
+  return liquidityBoundPriceUSD;
 }
 
 export function getUsdPrice(
@@ -135,6 +139,12 @@ export function getUsdPrice(
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
+    if (
+      tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
+      tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
+    ) {
+      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
+    }
     return tokenPrice.usdPrice.times(amount);
   }
 

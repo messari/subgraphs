@@ -2,19 +2,19 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/Lido/CalculationsCurve";
+import { AaveOracleContract } from "../../../generated/Lido/AaveOracleContract";
 
-export function getCalculationsCurveContract(
+export function getAaveOracleContract(
   contract: OracleContract,
   block: ethereum.Block | null = null
-): CalculationsCurveContract | null {
+): AaveOracleContract | null {
   if (
     (block && contract.startBlock.gt(block.number)) ||
     utils.isNullAddress(contract.address)
   )
     return null;
 
-  return CalculationsCurveContract.bind(contract.address);
+  return AaveOracleContract.bind(contract.address);
 }
 
 export function getTokenPriceUSDC(
@@ -23,25 +23,22 @@ export function getTokenPriceUSDC(
 ): CustomPriceType {
   const config = utils.getConfig();
 
-  if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
+  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const calculationCurveContract = getCalculationsCurveContract(
-    config.curveCalculations(),
-    block
-  );
-  if (!calculationCurveContract) return new CustomPriceType();
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle(), block);
+  if (!aaveOracleContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
+      aaveOracleContract.try_getAssetPrice(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS,
-    constants.OracleType.CURVE_CALCULATIONS
+    constants.AAVE_ORACLE_DECIMALS,
+    constants.OracleType.AAVE_ORACLE
   );
 }
