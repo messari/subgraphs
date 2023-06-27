@@ -1881,7 +1881,7 @@
     "deployments": {
       "notional-finance-ethereum": {
         "network": "ethereum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.0.2",
