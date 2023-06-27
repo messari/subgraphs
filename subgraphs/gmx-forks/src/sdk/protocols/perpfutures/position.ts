@@ -10,6 +10,7 @@ import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import * as constants from "../../util/constants";
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { addToArrayAtIndex } from "../../util/arrays";
 
 /**
  * This file contains the Position class, which is used to
@@ -33,8 +34,10 @@ export class PositionManager {
   }
 
   getPositionId(
+    identifier: Bytes,
     pool: Pool,
     account: Account,
+    asset: Token,
     positionSide: constants.PositionSide
   ): Bytes {
     const positionId = account
@@ -42,30 +45,40 @@ export class PositionManager {
       .concat(Bytes.fromUTF8("-"))
       .concat(pool.getBytesID())
       .concat(Bytes.fromUTF8("-"))
+      .concat(asset.id)
+      .concat(Bytes.fromUTF8("-"))
       .concat(Bytes.fromUTF8(positionSide));
 
     let positionCounter = _PositionCounter.load(positionId);
     if (!positionCounter) {
       positionCounter = new _PositionCounter(positionId);
-      positionCounter.nextCount = 0;
-    } else {
-      positionCounter.nextCount += 1;
+      positionCounter.uniquePositions = [];
+    }
+    if (positionCounter.uniquePositions.indexOf(identifier) == -1) {
+      addToArrayAtIndex(positionCounter.uniquePositions, identifier);
     }
     positionCounter.save();
 
-    return positionCounter.id
+    return positionId
       .concat(Bytes.fromUTF8("-"))
-      .concatI32(positionCounter.nextCount);
+      .concatI32(positionCounter.uniquePositions.length);
   }
 
   loadPosition(
+    identifier: Bytes,
     pool: Pool,
     account: Account,
     asset: Token,
     collateral: Token,
     positionSide: constants.PositionSide
   ): Position {
-    const positionId = this.getPositionId(pool, account, positionSide);
+    const positionId = this.getPositionId(
+      identifier,
+      pool,
+      account,
+      asset,
+      positionSide
+    );
 
     let entity = PositionSchema.load(positionId);
     if (!entity) {
