@@ -2969,7 +2969,7 @@
         "services": {
           "hosted-service": {
             "slug": "maple-finance-v2-ethereum",
-            "query-id": "94swSaaFChsQoZzb9Vc7Lo6FWFV6YZUMNSdFVTMAeRgj"
+            "query-id": "maple-finance-v2-ethereum"
           }
         }
       }
