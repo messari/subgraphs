@@ -295,3 +295,6 @@ However, this might be technically cumbersome to recitify this error. In any cas
 - Protocol level TVL is 0
 - The pool TVLs don't add up to a number that is reasonable (after cross referencing)
 - `market.totalBorrowBalanceUSD` is negative
+- For context, initial issue was `supplySideRevenue` was negative due to nature of Notional setting fixed interest from DEX market
+  - Attempted to resolve this by tracking open and closing positions and measuring the difference. This lead to negative balances in pools and incorrect TVL.
+  - Recommendation: As the DEX and Lending components are required for accurate data, attempting to build one without the other leads to failed QAs and multiple problems. Subgraph needs to be built to consider both elements.
