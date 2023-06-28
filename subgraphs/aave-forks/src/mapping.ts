@@ -586,7 +586,6 @@ export function _handleReserveDataUpdated(
 
   // deduct flashloan premium that may have already been accounted for in
   // _handleFlashloan()
-  const totalRevenueDeltaUSD0 = totalRevenueDeltaUSD;
   totalRevenueDeltaUSD = totalRevenueDeltaUSD.minus(FlashLoanPremiumToLPUSD);
   if (
     totalRevenueDeltaUSD.lt(BIGDECIMAL_ZERO) &&

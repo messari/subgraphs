@@ -10,32 +10,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import { ProtocolData } from "./sdk/manager";
 import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  equalsIgnoreCase,
-  exponentToBigDecimal,
-  INT_ZERO,
-  LendingType,
-  Network,
-  ProtocolType,
-  readValue,
-  RiskType,
-  USDC_TOKEN_ADDRESS,
-  ZERO_ADDRESS,
-  ActivityType,
-  EventType,
-  SECONDS_PER_HOUR,
-  SECONDS_PER_DAY,
-  PositionSide,
-  BIGDECIMAL_ONE,
-  INIT_LIQUIDITY_INDEX,
-} from "./constants";
-import {
-  Account,
-  ActiveAccount,
-  FinancialsDailySnapshot,
-  InterestRate,
-  LendingProtocol,
   Market,
   Token,
   _FlashLoanPremium,
@@ -44,10 +18,13 @@ import {
 import {
   BIGINT_ZERO,
   BIGINT_ONE,
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   IavsTokenType,
+  INT_ZERO,
   INT_TWO,
   BIGINT_THREE,
+  INIT_LIQUIDITY_INDEX,
 } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
 import {
@@ -374,7 +351,7 @@ export function calcuateFlashLoanPremiumToLPUSD(
     premiumToLPUSD = flashLoanPremiumUSD.minus(
       flashLoanPremiumUSD.times(flashLoanPremiumRateToProtocol)
     );
-    }
+  }
   return premiumToLPUSD;
 }
 
