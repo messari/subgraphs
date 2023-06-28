@@ -3,9 +3,36 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
+  - name: ActivePool
+    kind: ethereum/contract
+    network: "{{ network.slug }}"
+    source:
+      abi: ActivePool
+      address: "{{ activePool.address }}"
+      startBlock: {{ activePool.startBlock }}
+    mapping:
+      file: ./src/mapping/ActivePool.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      entities: []
+      abis:
+        - name: ActivePool
+          file: ./abis/ActivePool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: ActivePoolCollBalanceUpdated(uint256)
+          handler: handleActivePoolCollBalanceUpdated
+        - event: ActivePoolEBTCDebtUpdated(uint256)
+          handler: handleActivePoolEBTCDebtUpdated
   - name: PriceFeed
     kind: ethereum/contract
-    network: {{ network }}
+    network: "{{ network.slug }}"
     source:
       abi: PriceFeed
       address: "{{ priceFeed.address }}"
@@ -25,7 +52,7 @@ dataSources:
         ###########################################
         # ERC20
         - name: _ERC20
-          file: ./abis/Prices/ERC20.json
+          file: ./abis/ERC20.json
         # Curve Contracts
         - name: CurvePool
           file: ./abis/Prices/Curve/Pool.json

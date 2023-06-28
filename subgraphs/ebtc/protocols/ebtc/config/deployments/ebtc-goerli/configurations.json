@@ -1,5 +1,8 @@
 {
-  "network": "goerli",
+  "network": {
+    "slug": "goerli",
+    "object": "Network.GOERLI"
+  },
   "stethToken": {
     "address": "0x6B842CEA279aB886119F66fdCf6F864B5305008f"
   },
