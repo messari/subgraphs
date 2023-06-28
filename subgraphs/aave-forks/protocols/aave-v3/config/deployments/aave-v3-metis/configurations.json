@@ -1,6 +1,6 @@
 {
   "network": "andromeda",
-  "factor": {
+  "factory": {
     "address": "0x9E7B73ffD9D2026F3ff4212c29E209E09C8A91F5",
     "startBlock": 5445183
   },
