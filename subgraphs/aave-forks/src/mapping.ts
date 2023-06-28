@@ -29,6 +29,7 @@ import {
   ZERO_ADDRESS,
   BIGDECIMAL_ONE,
   BIGINT_ONE_RAY,
+  BIGDECIMAL_NEG_ONE_CENT,
 } from "./constants";
 import {
   InterestRateSide,
@@ -587,7 +588,16 @@ export function _handleReserveDataUpdated(
   // _handleFlashloan()
   const totalRevenueDeltaUSD0 = totalRevenueDeltaUSD;
   totalRevenueDeltaUSD = totalRevenueDeltaUSD.minus(FlashLoanPremiumToLPUSD);
-
+  if (
+    totalRevenueDeltaUSD.lt(BIGDECIMAL_ZERO) &&
+    totalRevenueDeltaUSD.gt(BIGDECIMAL_NEG_ONE_CENT)
+  ) {
+    // totalRevenueDeltaUSD may become a tiny negative number after
+    // subtracting flashloan premium due to rounding
+    // see https://github.com/messari/subgraphs/pull/1993#issuecomment-1608414803
+    // for more details
+    totalRevenueDeltaUSD = BIGDECIMAL_ZERO;
+  }
   let reserveFactor = market.reserveFactor;
   if (!reserveFactor) {
     log.warning(
@@ -607,25 +617,7 @@ export function _handleReserveDataUpdated(
     null,
     market.reserveFactor
   );
-  log.info(
-    "[_handleReserveDataUpdated]liquidityIndex={} liquidityIndexDiff={} newRevenueBD={} assetPriceUSD={} totalRevenueDeltaUSD0={} totalRevenueDeltaUSD={} protocolSideRevenueDeltaUSD={} supplySideRevenueDeltaUSD={} flashloandPremiumToDeduct={} reserveFactor={} market={} tx={}-{} timestamp={}",
-    [
-      liquidityIndex.toString(),
-      liquidityIndexDiff.toString(),
-      newRevenueBD.toString(),
-      assetPriceUSD.toString(),
-      totalRevenueDeltaUSD0.toString(),
-      totalRevenueDeltaUSD.toString(),
-      protocolSideRevenueDeltaUSD.toString(),
-      supplySideRevenueDeltaUSD.toString(),
-      FlashLoanPremiumToLPUSD.toString(),
-      reserveFactor.toString(),
-      market.id.toHexString(),
-      event.transaction.hash.toHexString(),
-      event.logIndex.toString(),
-      event.block.timestamp.toString(),
-    ]
-  );
+
   manager.addProtocolRevenue(protocolSideRevenueDeltaUSD, fee);
   manager.addSupplyRevenue(supplySideRevenueDeltaUSD, fee);
 
@@ -1093,21 +1085,6 @@ export function _handleFlashLoan(
     FeeType.FLASHLOAN_PROTOCOL_FEE,
     null,
     premiumRateToProtocol
-  );
-
-  log.info(
-    "[_handleFlashLoan]premiumAmount={} premiumUSDTotal={} premiumUSDToProtocol={} premiumUSDToLP={} market={} tx={}-{} timestamp={}",
-    [
-      premiumAmount.toString(),
-      premiumUSDTotal.toString(),
-      premiumUSDToProtocol.toString(),
-      premiumUSDToLP.toString(),
-      //premiumUSDToDeduct.toString(),
-      market.id.toHexString(),
-      event.transaction.hash.toHexString(),
-      event.logIndex.toString(),
-      event.block.timestamp.toString(),
-    ]
   );
 
   manager.addProtocolRevenue(premiumUSDToProtocol, feeToProtocol);

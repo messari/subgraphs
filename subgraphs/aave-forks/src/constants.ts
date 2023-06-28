@@ -99,6 +99,7 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_THREE = new BigDecimal(BIGINT_THREE);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BigInt.fromI32(100));
+export const BIGDECIMAL_NEG_ONE_CENT = BigDecimal.fromString("-0.01");
 
 export const DEFAULT_DECIMALS = 18;
 export const RAY_OFFSET = 27;
