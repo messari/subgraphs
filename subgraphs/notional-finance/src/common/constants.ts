@@ -90,14 +90,14 @@ export namespace PoolState {
 //////////////////////////////
 
 export const ZERO_ADDRESS = Address.zero();
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const UNPROVIDED_NAME: string = "NOT_PROVIDED";
 
 export const cETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
-export const cDAI_ADDRESS = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
-export const cUSDC_ADDRESS = "0x39AA39c021dfbaE8faC545936693aC917d5E7563";
+export const cDAI_ADDRESS = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
+export const cUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
 // export const cWBTC_ADDRESS = "0xC11b1268C1A384e55C48c2391d8d480264A3A7F4";
 export const cWBTC_ADDRESS = "0xccf4429db6322d5c611ee964527d42e5d685dd6a";
 
@@ -164,12 +164,13 @@ export const PROTOCOL_INTEREST_RATE_TYPE = InterestRateType.FIXED;
 export const PROTOCOL_INTEREST_RATE_SIDE = InterestRateSide.BORROWER;
 
 // contracts/addresses
-export const PROTOCOL_ID = "0x1344A36A1B56144C3Bc62E7757377D288fDE0369";
+export const PROTOCOL_ID = "0x1344a36a1b56144c3bc62e7757377d288fde0369";
 
 // revenue
-export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
-export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BigDecimal.fromString("0.80");
-export const NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
+// note: not being used, fee amounts left for reference
+// export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
+// export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
+// export const NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
 
 export const RATE_PRECISION = 1000000000;
 export const RATE_PRECISION_DECIMALS: i32 = 9;

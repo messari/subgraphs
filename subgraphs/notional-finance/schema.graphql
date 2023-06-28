@@ -661,6 +661,11 @@ type Market @entity @regularPolling {
 
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
+
+  ##### Helper #####
+
+  " Helper to track of previous daily id for revenue calculation "
+  _prevDailyId: String!
 }
 
 #################################
