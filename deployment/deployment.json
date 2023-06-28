@@ -3658,7 +3658,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "sushiswapV3Template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3666,21 +3666,21 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "sushiswap-v3-bsc",
-            "query-id": "sushiswap-v3-bsc"
+            "slug": "uniswap-v3-bsc",
+            "query-id": "uniswap-v3-bsc"
           }
         }
       },
-      "sushiswap-v3-fantom": {
-        "network": "fantom",
-        "status": "dev",
+      "uniswap-v3-celo": {
+        "network": "celo",
+        "status": "prod",
         "versions": {
           "schema": "4.0.0",
           "subgraph": "1.4.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "sushiswapV3Template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3697,16 +3697,16 @@
           }
         }
       },
-      "sushiswap-v3-fuse": {
-        "network": "fuse",
-        "status": "dev",
+      "uniswap-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
         "versions": {
           "schema": "4.0.0",
           "subgraph": "1.5.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "sushiswapV3Template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3723,60 +3723,68 @@
           }
         }
       },
-      "sushiswap-v3-gnosis": {
-        "network": "gnosis",
-        "status": "dev",
-        "versions": {
-          "schema": "4.0.0",
-          "subgraph": "1.5.0",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "sushiswapV3Template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "sushiswap-v3-gnosis",
-            "query-id": "sushiswap-v3-gnosis"
-          }
-        }
-      },
-      "sushiswap-v3-moonriver": {
-        "network": "moonriver",
-        "status": "dev",
-        "versions": {
-          "schema": "4.0.0",
-          "subgraph": "1.5.0",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "sushiswapV3Template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "sushiswap-v3-moonriver",
-            "query-id": "sushiswap-v3-moonriver"
-          }
-        }
-      },
-      "sushiswap-v3-optimism": {
+      "uniswap-v3-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
+        "versions": {
+          "schema": "4.0.0",
+          "subgraph": "1.5.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-optimism",
+            "query-id": "uniswap-v3-optimism"
+          }
+        }
+      },
+      "uniswap-v3-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "4.0.0",
+          "subgraph": "1.5.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-polygon",
+            "query-id": "uniswap-v3-polygon"
+          }
+        }
+      }
+    }
+  },
+  "pancakeswap-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "pancakeswap-v3",
+    "project": "pancakeswap",
+    "deployments": {
+      "pancakeswap-v3-bsc": {
+        "network": "bsc",
+        "status": "prod",
         "versions": {
           "schema": "4.0.0",
           "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "sushiswapV3Template.yaml"
+          "template": "pancakeswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3784,14 +3792,14 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "sushiswap-v3-optimism",
-            "query-id": "sushiswap-v3-optimism"
+            "slug": "pancakeswap-v3-bsc",
+            "query-id": "pancakeswap-v3-bsc"
           }
         }
       },
-      "sushiswap-v3-polygon": {
-        "network": "polygon",
-        "status": "dev",
+      "pancakeswap-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
         "versions": {
           "schema": "4.0.0",
           "subgraph": "1.3.0",
@@ -6846,19 +6854,27 @@
           }
         },
         "files": {
-          "template": "multichain.template.yaml"
+          "template": "pangolin.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
         }
-      },
-      "multichain-fantom": {
-        "network": "fantom",
+      }
+    }
+  },
+  "rocket-pool": {
+    "schema": "generic",
+    "base": "rocket-pool",
+    "protocol": "rocket-pool",
+    "project": "rocket-pool",
+    "deployments": {
+      "rocket-pool-ethereum": {
+        "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.0.0",
-          "subgraph": "1.0.2",
+          "schema": "1.4.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6872,29 +6888,31 @@
           }
         },
         "files": {
-          "template": "multichain.template.yaml"
+          "template": "rocket-pool.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
-      },
-      "multichain-gnosis": {
-        "network": "gnosis",
+      }
+    }
+  },
+  "cryptopunks": {
+    "schema": "nft-marketplace",
+    "base": "cryptopunks",
+    "protocol": "cryptopunks",
+    "project": "cryptopunks",
+    "deployments": {
+      "cryptopunks-ethereum": {
+        "network": "ethereum",
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "multichain-gnosis",
-            "query-id": "multichain-gnosis"
-          }
-        },
         "files": {
-          "template": "multichain.template.yaml"
+          "template": "cryptopunks.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -8417,7 +8435,6 @@
       }
     }
   },
-
   "vela-exchange": {
     "schema": "derivatives-perpfutures",
     "base": "vela-exchange",

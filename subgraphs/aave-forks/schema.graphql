@@ -23,8 +23,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  XDAI # aka Gnosis Chain
-  METIS
+  GNOSIS
 }
 
 enum ProtocolType {
@@ -182,8 +181,7 @@ enum PositionSide {
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
-
-type InterestRate @entity @regularPolling{
+type InterestRate @entity @regularPolling {
   " { Interest rate side }-{ Interest rate type }-{ Market ID }-{ Optional: Tranche }-{ Optional: # days/hours since epoch time } "
   id: ID!
 
@@ -232,7 +230,7 @@ enum FeeType {
   OTHER
 }
 
-type Fee @entity {
+type Fee @entity @regularPolling {
   " { Fee type } "
   id: ID!
 
@@ -248,7 +246,7 @@ type Fee @entity {
 
 # This entity offers a more nuanced view of revenue types
 # Use this to provide the sources of revenue and amounts of each
-type RevenueDetail @entity {
+type RevenueDetail @entity @regularPolling {
   " { Market/Protocol ID }{ Optional: Snapshot ID } "
   id: Bytes!
 
@@ -272,7 +270,7 @@ enum OracleSource {
 # Most lending protocols get token prices through onchain oracles.
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
-type Oracle @entity {
+type Oracle @entity @regularPolling {
   " { Market Address }{ Token Address } "
   id: Bytes!
 
@@ -788,7 +786,6 @@ A market is defined by the input token.
 At a minimum that means being able to deposit/withdraw that token.
 e.g. there may be related markets as they only act as collateral for other markets.
 """
-
 type Market @entity @regularPolling {
   " Smart contract address of the market "
   id: Bytes!
@@ -1063,7 +1060,7 @@ type Market @entity @regularPolling {
 ##### Pool-Level Timeseries #####
 #################################
 
-type MarketDailySnapshot @entity @dailySnapshot{
+type MarketDailySnapshot @entity @dailySnapshot {
   " { Smart contract address of the market }{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -1660,7 +1657,6 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-
 interface Event {
   " { Transaction hash }{ Log index } "
   id: Bytes!
@@ -1702,7 +1698,7 @@ interface Event {
   amountUSD: BigDecimal!
 }
 
-type Deposit implements Event @entity(immutable: true) {
+type Deposit implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1752,7 +1748,7 @@ type Deposit implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Withdraw implements Event @entity(immutable: true) {
+type Withdraw implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1807,7 +1803,7 @@ type Withdraw implements Event @entity(immutable: true) {
 }
 
 # For CDPs, use this for mint events
-type Borrow implements Event @entity(immutable: true) {
+type Borrow implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1858,7 +1854,7 @@ type Borrow implements Event @entity(immutable: true) {
 }
 
 # For CDPs, use this for burn events
-type Repay implements Event @entity(immutable: true) {
+type Repay implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -1908,7 +1904,7 @@ type Repay implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Liquidate implements Event @entity(immutable: true) {
+type Liquidate implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
@@ -2015,7 +2011,7 @@ type Transfer implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Flashloan implements Event @entity(immutable: true) {
+type Flashloan implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 
