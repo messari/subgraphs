@@ -2,35 +2,30 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
 
-export const NETWORK_STRING = "fantom";
+export const NETWORK_STRING = "avalanche";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
-  "0x57aa88a0810dfe3f9b71a9b179dd8bf5f956c46a",
-  17091856
-);
+export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract();
 export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
-export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
-export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x44536de2220987d098d1d29d3aafc7f7348e9ee4",
-  3809480
+export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
+
+export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
+  "0xebd36016b3ed09d4693ed4251c67bd858c3c7c9c",
+  11970477
 );
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x0b53e9df372e72d8fdcdbedfbb56059957a37128",
-  27067399
-);
+export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x0f854ea9f38cea4b1c2fc79047e9d0134419d5d6", 5655918),
-  new OracleContract("0x4fb93d7d320e8a263f22f62c2059dfc2a8bcbc4c", 27552509),
+  new OracleContract("0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6", 5254206),
+  new OracleContract("0x90f421832199e93d01b64daf378b183809eb0988", 9384663),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -38,9 +33,9 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xbe4fc72f8293f9d3512d58b969c98c3f676cb957", 3796241), // Uniswap v2
-  new OracleContract("0x16327e3fbdaca3bcf7e38f5af2599d2ddc33ae52", 4250168), // Spiritswap
-  new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 2457904), // Sushiswap
+  new OracleContract("0x60ae616a2155ee3d9a68541ba4544862310933d4", 2486393), // TraderJOE
+  new OracleContract("0xe54ca86531e17ef3616d22ca28b0d458b6c89106", 56879), // Pangolin
+  new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 506236), // Sushiswap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -65,13 +60,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad"
+  "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"
+  "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+  "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 );
 
 export class config implements Configurations {
