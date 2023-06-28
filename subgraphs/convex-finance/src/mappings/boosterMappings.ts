@@ -37,7 +37,13 @@ export function handleDeposited(event: DepositedEvent): void {
 
   const vault = getOrCreateVault(poolId, event.block);
   if (vault) {
-    Deposit(vault, depositAmount, event.transaction, event.block);
+    Deposit(
+      vault,
+      depositAmount,
+      event.params.user,
+      event.transaction,
+      event.block
+    );
   }
 
   updateFinancials(event.block);

@@ -25,6 +25,7 @@ export function createDepositTransaction(
   vault: VaultStore,
   amount: BigInt,
   amountUSD: BigDecimal,
+  depositFrom: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
@@ -36,10 +37,11 @@ export function createDepositTransaction(
     depositTransaction = new DepositTransaction(transactionId);
 
     depositTransaction.vault = vault.id;
-    depositTransaction.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
+    depositTransaction.protocol =
+      constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
     depositTransaction.to = vault.id;
-    depositTransaction.from = transaction.from.toHexString();
+    depositTransaction.from = depositFrom.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
     depositTransaction.logIndex = transaction.index.toI32();
@@ -76,6 +78,7 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
 export function Deposit(
   vault: VaultStore,
   depositAmount: BigInt,
+  depositFrom: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
@@ -90,9 +93,8 @@ export function Deposit(
   let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
   if (constants.MISSING_POOLS_MAP.get(inputTokenAddress)) {
-    const poolTokenAddress = constants.MISSING_POOLS_MAP.get(
-      inputTokenAddress
-    )!;
+    const poolTokenAddress =
+      constants.MISSING_POOLS_MAP.get(inputTokenAddress)!;
 
     inputTokenPrice = getUsdPricePerToken(poolTokenAddress, block);
     inputTokenDecimals = utils.getTokenDecimals(poolTokenAddress);
@@ -130,6 +132,7 @@ export function Deposit(
     vault,
     depositAmount,
     depositAmountUSD,
+    depositFrom,
     transaction,
     block
   );

@@ -40,7 +40,7 @@ export function createWithdrawTransaction(
       constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
     withdrawTransaction.to = withdrawnTo.toHexString();
-    withdrawTransaction.from = transaction.from.toHexString();
+    withdrawTransaction.from = vault.id;
 
     withdrawTransaction.hash = transaction.hash.toHexString();
     withdrawTransaction.logIndex = transaction.index.toI32();
