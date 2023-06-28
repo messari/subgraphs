@@ -1,6 +1,13 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graft}}
+features:
+  - grafting
+graft:
+  base: {{base}}
+  block: {{block}}
+{{/graft}}
 dataSources:
   - kind: ethereum
     name: Booster

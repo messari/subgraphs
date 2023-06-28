@@ -24,6 +24,7 @@ export function createWithdrawTransaction(
   vault: VaultStore,
   amount: BigInt,
   amountUSD: BigDecimal,
+  withdrawnTo: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
@@ -35,9 +36,10 @@ export function createWithdrawTransaction(
     withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
     withdrawTransaction.vault = vault.id;
-    withdrawTransaction.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
+    withdrawTransaction.protocol =
+      constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
+    withdrawTransaction.to = withdrawnTo.toHexString();
     withdrawTransaction.from = transaction.from.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
@@ -75,6 +77,7 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
 export function withdraw(
   vault: VaultStore,
   withdrawAmount: BigInt,
+  withdrawnTo: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
@@ -89,9 +92,8 @@ export function withdraw(
   let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
   if (constants.MISSING_POOLS_MAP.get(inputTokenAddress)) {
-    const poolTokenAddress = constants.MISSING_POOLS_MAP.get(
-      inputTokenAddress
-    )!;
+    const poolTokenAddress =
+      constants.MISSING_POOLS_MAP.get(inputTokenAddress)!;
 
     inputTokenPrice = getUsdPricePerToken(poolTokenAddress, block);
     inputTokenDecimals = utils.getTokenDecimals(poolTokenAddress);
@@ -127,6 +129,7 @@ export function withdraw(
     vault,
     withdrawAmount,
     withdrawAmountUSD,
+    withdrawnTo,
     transaction,
     block
   );

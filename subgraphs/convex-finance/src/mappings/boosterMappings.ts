@@ -52,7 +52,13 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
   const vault = getOrCreateVault(poolId, event.block);
 
   if (vault) {
-    withdraw(vault, withdrawAmount, event.transaction, event.block);
+    withdraw(
+      vault,
+      withdrawAmount,
+      event.params.user,
+      event.transaction,
+      event.block
+    );
   }
 
   updateFinancials(event.block);
