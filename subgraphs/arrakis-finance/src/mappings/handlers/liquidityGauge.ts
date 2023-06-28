@@ -15,11 +15,12 @@ import {
   removeRewardToken,
   updateRewardEmissions,
   addRewardToken,
+  updateRewardData,
 } from "../helpers/liquidityGauge";
 import { getOrCreateVault, updateVaultSnapshots } from "../helpers/vaults";
 import { Vault } from "../../../generated/schema";
 import { RewardTokenType } from "../../common/constants";
-import { getOrCreateRewardToken } from "../../common/getters";
+import { getOrCreateRewardToken, getOrCreateToken } from "../../common/getters";
 
 export function handleAddGauge(event: AddGauge): void {
   const gaugeAddress = event.params.gauge;
@@ -54,6 +55,15 @@ export function handleAddGauge(event: AddGauge): void {
     );
     return;
   }
+  const rewardToken = getOrCreateToken(spiceResult.value);
+  const FAKE = "FAKE";
+  if (rewardToken.symbol.startsWith(FAKE)) {
+    log.info("[handleAddGauge]Fake reward token {} for gauge {} skipped", [
+      rewardToken.symbol,
+      gaugeAddress.toHexString(),
+    ]);
+    return;
+  }
 
   addRewardToken(spiceResult.value, RewardTokenType.DEPOSIT, vault);
   updateVaultSnapshots(vault, event.block);
@@ -63,7 +73,8 @@ export function handleRemoveGauge(event: RemoveGauge): void {
   const gaugeAddress = event.params.gauge;
   const vaultAddress = event.params.vault;
   const gauge = getOrCreateLiquidityGauge(gaugeAddress);
-  store.remove("_LiquidityGauge", gauge.id);
+  const LIQUIDITY_GAUGE = "_LiquidityGauge";
+  store.remove(LIQUIDITY_GAUGE, gauge.id);
   gauge.save();
 
   const vault = Vault.load(vaultAddress.toHexString());
@@ -95,7 +106,7 @@ export function handleRemoveGauge(event: RemoveGauge): void {
     const rewardTokenResult = gaugeContract.try_reward_tokens(
       BigInt.fromI32(i)
     );
-    if (rewardCountResult.reverted) {
+    if (rewardTokenResult.reverted) {
       log.error(
         "[handleRemoveGauge]reward_tokens(i) call for gauge {} reverted tx {}-{}",
         [
@@ -107,6 +118,12 @@ export function handleRemoveGauge(event: RemoveGauge): void {
       );
       continue;
     }
+    const token = getOrCreateToken(rewardTokenResult.value);
+    const FAKE = "FAKE";
+    if (token.symbol.startsWith(FAKE)) {
+      continue;
+    }
+
     const rewardToken = getOrCreateRewardToken(
       rewardTokenResult.value,
       RewardTokenType.DEPOSIT
@@ -150,6 +167,15 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
   const gaugeAddress = event.address;
   const rewardTokenAddress = event.params._token;
 
+  const rewardToken = getOrCreateToken(rewardTokenAddress);
+  const FAKE = "FAKE";
+  if (rewardToken.symbol.startsWith(FAKE)) {
+    log.info(
+      "[handleRewardDataUpdate]Fake reward token {} for gauge {} skipped",
+      [rewardToken.symbol, gaugeAddress.toHexString()]
+    );
+    return;
+  }
   const gauge = getOrCreateLiquidityGauge(gaugeAddress);
   const vaultAddress = Address.fromString(gauge.vault);
   const vault = Vault.load(vaultAddress.toHexString());
@@ -163,6 +189,7 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
   }
 
   addRewardToken(rewardTokenAddress, RewardTokenType.DEPOSIT, vault);
+  updateRewardData(gaugeAddress, rewardTokenAddress, event);
   // Update vaults with new reward emissions
   updateRewardEmissions(vault, gaugeAddress, event);
   updateVaultSnapshots(vault, event.block);

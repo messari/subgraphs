@@ -4,13 +4,16 @@ import {
   WithdrawalInitiated,
   TokenGateway,
 } from "../../../generated/ERC20Gateway/TokenGateway";
-import {
-  BridgePoolType,
-  CrosschainTokenType,
-} from "../../sdk/protocols/bridge/enums";
+import { CrosschainTokenType } from "../../sdk/protocols/bridge/enums";
 import { SDK } from "../../sdk/protocols/bridge";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import { arbSideConf, Pricer, TokenInit } from "../../common/utils";
+import {
+  arbSideConf,
+  bridgePoolType,
+  isArbToken,
+  Pricer,
+  TokenInit,
+} from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
 import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
@@ -71,6 +74,7 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- POOL
 
+  const isInputArbToken = isArbToken(inputTokenAddress!);
   const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
@@ -78,7 +82,7 @@ export function handleTransferIn(event: DepositFinalized): void {
     pool.initialize(
       inputToken.name,
       inputToken.symbol,
-      BridgePoolType.BURN_MINT,
+      bridgePoolType(isInputArbToken, Network.ARBITRUM_ONE),
       inputToken
     );
   }
@@ -98,15 +102,17 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- TVL
 
-  let inputTokenBalance: BigInt;
-  const erc20 = _ERC20.bind(inputTokenAddress!);
-  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
-  if (inputTokenBalanceResult.reverted) {
-    log.info("calculate token balance owned by bridge contract reverted", []);
-  } else {
-    inputTokenBalance = inputTokenBalanceResult.value;
+  if (isInputArbToken) {
+    let inputTokenBalance: BigInt;
+    const erc20 = _ERC20.bind(inputTokenAddress!);
+    const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
+    if (inputTokenBalanceResult.reverted) {
+      log.info("calculate token balance owned by bridge contract reverted", []);
+    } else {
+      inputTokenBalance = inputTokenBalanceResult.value;
+      pool.setInputTokenBalance(inputTokenBalance);
+    }
   }
-  pool.setInputTokenBalance(inputTokenBalance!);
 }
 
 // ###################################################################################################
@@ -181,6 +187,7 @@ export function handleTransferOut(event: WithdrawalInitiated): void {
 
   // -- POOL
 
+  const isInputArbToken = isArbToken(inputTokenAddress!);
   const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
@@ -188,7 +195,7 @@ export function handleTransferOut(event: WithdrawalInitiated): void {
     pool.initialize(
       inputToken.name,
       inputToken.symbol,
-      BridgePoolType.BURN_MINT,
+      bridgePoolType(isInputArbToken, Network.ARBITRUM_ONE),
       inputToken
     );
   }
@@ -208,13 +215,15 @@ export function handleTransferOut(event: WithdrawalInitiated): void {
 
   // -- TVL
 
-  let inputTokenBalance: BigInt;
-  const erc20 = _ERC20.bind(inputTokenAddress!);
-  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
-  if (inputTokenBalanceResult.reverted) {
-    log.info("calculate token balance owned by bridge contract reverted", []);
-  } else {
-    inputTokenBalance = inputTokenBalanceResult.value;
+  if (isInputArbToken) {
+    let inputTokenBalance: BigInt;
+    const erc20 = _ERC20.bind(inputTokenAddress!);
+    const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
+    if (inputTokenBalanceResult.reverted) {
+      log.info("calculate token balance owned by bridge contract reverted", []);
+    } else {
+      inputTokenBalance = inputTokenBalanceResult.value;
+      pool.setInputTokenBalance(inputTokenBalance);
+    }
   }
-  pool.setInputTokenBalance(inputTokenBalance!);
 }

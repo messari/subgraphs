@@ -1,35 +1,47 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/RouterV6/CalculationsSushiSwap";
+import { CustomPriceType, OracleContract } from "../common/types";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/Router-0/CalculationsSushiSwap";
 
 export function getSushiSwapContract(
-  network: string
-): CalculationsSushiContract {
-  return CalculationsSushiContract.bind(
-    constants.SUSHISWAP_CALCULATIONS_ADDRESS_MAP.get(network)!
-  );
+  contract: OracleContract,
+  block: ethereum.Block | null = null
+): CalculationsSushiContract | null {
+  if (
+    (block && contract.startBlock.gt(block.number)) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return CalculationsSushiContract.bind(contract.address);
 }
 
-export function getTokenPriceFromSushiSwap(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
-  network: string
+  block: ethereum.Block | null = null
 ): CustomPriceType {
-  const curveContract = getSushiSwapContract(network);
-  if (!curveContract) {
+  const config = utils.getConfig();
+
+  if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
+
+  const calculationSushiContract = getSushiSwapContract(
+    config.sushiCalculations(),
+    block
+  );
+  if (!calculationSushiContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      curveContract.try_getPriceUsdc(tokenAddr),
+      calculationSushiContract.try_getPriceUsdc(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.DEFAULT_USDC_DECIMALS,
+    constants.OracleType.SUSHI_CALCULATIONS
   );
 }

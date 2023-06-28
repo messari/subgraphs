@@ -24,7 +24,6 @@ function App() {
       method: "GET",
       headers: {
         Accept: "*/*",
-        Authorization: "Bearer " + process.env.REACT_APP_GITHUB_API_KEY,
       },
     })
       .then(function (res) {
@@ -214,7 +213,7 @@ function App() {
   }>({});
 
   const clientDecentralizedEndpoint = useMemo(
-    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
+    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum"),
     [],
   );
 
@@ -231,7 +230,7 @@ function App() {
       const decenDepos: { [x: string]: any } = {};
       const subgraphsOnDecenAcct = [
         ...decentralized.graphAccounts[0].subgraphs,
-        ...decentralized.graphAccounts[1].subgraphs,
+        // ...decentralized.graphAccounts[1].subgraphs,
       ];
       subgraphsOnDecenAcct.forEach((sub: { [x: string]: any }) => {
         try {

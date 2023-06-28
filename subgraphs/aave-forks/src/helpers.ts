@@ -10,6 +10,32 @@ import {
 } from "@graphprotocol/graph-ts";
 import { ProtocolData } from "./sdk/manager";
 import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  equalsIgnoreCase,
+  exponentToBigDecimal,
+  INT_ZERO,
+  LendingType,
+  Network,
+  ProtocolType,
+  readValue,
+  RiskType,
+  USDC_TOKEN_ADDRESS,
+  ZERO_ADDRESS,
+  ActivityType,
+  EventType,
+  SECONDS_PER_HOUR,
+  SECONDS_PER_DAY,
+  PositionSide,
+  BIGDECIMAL_ONE,
+  INIT_LIQUIDITY_INDEX,
+} from "./constants";
+import {
+  Account,
+  ActiveAccount,
+  FinancialsDailySnapshot,
+  InterestRate,
+  LendingProtocol,
   Market,
   Token,
   _FlashLoanPremium,
@@ -348,6 +374,105 @@ export function calcuateFlashLoanPremiumToLPUSD(
     premiumToLPUSD = flashLoanPremiumUSD.minus(
       flashLoanPremiumUSD.times(flashLoanPremiumRateToProtocol)
     );
-  }
+    }
   return premiumToLPUSD;
+}
+
+export function getOrCreateMarket(
+  marketId: Address,
+  protocolData: ProtocolData
+): Market {
+  let market = Market.load(marketId.toHexString());
+
+  if (!market) {
+    log.info("[getOrCreateMarket] Creating new market {}", [
+      marketId.toHexString(),
+    ]);
+
+    // get protocol
+    const protocol = getOrCreateLendingProtocol(protocolData);
+    protocol.totalPoolCount++;
+    const markets = protocol._marketIDs;
+    markets.push(marketId.toHexString());
+    protocol._marketIDs = markets;
+    protocol.save();
+
+    // create inputToken
+    const inputToken = getOrCreateToken(marketId);
+
+    // Create a new Market
+    market = new Market(marketId.toHexString());
+
+    market.protocol = protocol.id;
+    market.isActive = true; // initialized to true on creation
+    market.canUseAsCollateral = true; // only stopped when protocol is paused
+    market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
+    market.maximumLTV = BIGDECIMAL_ZERO;
+    market.liquidationThreshold = BIGDECIMAL_ZERO;
+    market.liquidationPenalty = BIGDECIMAL_ZERO;
+    market.inputToken = inputToken.id;
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.exchangeRate = BIGDECIMAL_ONE; // this is constant
+    market._reserveFactor = BIGDECIMAL_ZERO;
+    market.rewardTokens = []; // updated once used
+    market.rewardTokenEmissionsAmount = [];
+    market.rewardTokenEmissionsUSD = [];
+    market._liquidityIndex = INIT_LIQUIDITY_INDEX; // this is init to 1e27
+    // these are set in reserveInitialized()
+    market.createdTimestamp = BIGINT_ZERO;
+    market.createdBlockNumber = BIGINT_ZERO;
+    market.positionCount = INT_ZERO;
+    market.openPositionCount = INT_ZERO;
+    market.closedPositionCount = INT_ZERO;
+    market.lendingPositionCount = INT_ZERO;
+    market.borrowingPositionCount = INT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.rates = []; // calculated in event ReserveDataUpdated
+    market._prePauseState = [true, true, true];
+
+    market.save();
+  }
+
+  return market;
+}
+
+export function getBorrowBalance(
+  market: Market,
+  account: Address
+): ethereum.CallResult<BigInt> {
+  let sDebtTokenBalance = BIGINT_ZERO;
+  let vDebtTokenBalance = BIGINT_ZERO;
+
+  // get account's balance of variable debt
+  if (market._vToken) {
+    const vTokenContract = AToken.bind(Address.fromString(market._vToken!));
+    const tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
+    vDebtTokenBalance = tryVDebtTokenBalance.reverted
+      ? BIGINT_ZERO
+      : tryVDebtTokenBalance.value;
+  }
+
+  // get account's balance of stable debt
+  if (market._sToken) {
+    const sTokenContract = AToken.bind(Address.fromString(market._sToken!));
+    const trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
+    sDebtTokenBalance = trySDebtTokenBalance.reverted
+      ? BIGINT_ZERO
+      : trySDebtTokenBalance.value;
+  }
+
+  const totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
+
+  return ethereum.CallResult.fromValue(totalDebt);
 }

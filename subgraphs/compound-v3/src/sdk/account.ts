@@ -10,8 +10,8 @@ import { INT_ONE, INT_ZERO } from "./constants";
  *  - Making a position
  *  - Making position snapshots
  *
- * Schema Version:  3.0.0
- * SDK Version:     1.0.1
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.4
  * Author(s):
  *  - @dmelotik
  */

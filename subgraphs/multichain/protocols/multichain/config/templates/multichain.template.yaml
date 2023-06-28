@@ -11,7 +11,7 @@ features:
   - grafting
 {{/graftEnabled}}
 dataSources:
-  {{#bridges}}
+  {{#bridgeConfig}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ network }}
@@ -39,8 +39,8 @@ dataSources:
       abis:
         - name: Router
           file: ./abis/Multichain/Router.json
-        - name: anyTOKEN
-          file: ./abis/Multichain/anyTOKEN.json
+        - name: anyToken
+          file: ./abis/Multichain/anyToken.json
 
         ###########################################
         ################# Tokens ##################
@@ -59,24 +59,24 @@ dataSources:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
-        # 1Inch Contracts
-        - name: OneInchOracleContract
-          file: ./abis/Prices/1Inch/Oracle.json
-        # Aave Contracts
-        - name: AaveOracleContract
-          file: ./abis/Prices/Aave/Oracle.json
         # Uniswap Contracts
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
@@ -84,22 +84,13 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: LogSwapin(indexed bytes32,indexed address,uint256)
           handler: handlerSwapInV2
         - event: LogSwapout(indexed address,indexed address,uint256)
           handler: handlerSwapOutV2
-  {{/bridges}}
-  {{#routers}}
+  {{/bridgeConfig}}
+  {{#routerConfig}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ network }}
@@ -127,8 +118,8 @@ dataSources:
       abis:
         - name: Router
           file: ./abis/Multichain/Router.json
-        - name: anyTOKEN
-          file: ./abis/Multichain/anyTOKEN.json
+        - name: anyToken
+          file: ./abis/Multichain/anyToken.json
 
         ###########################################
         ################# Tokens ##################
@@ -147,24 +138,24 @@ dataSources:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
-        # 1Inch Contracts
-        - name: OneInchOracleContract
-          file: ./abis/Prices/1Inch/Oracle.json
-        # Aave Contracts
-        - name: AaveOracleContract
-          file: ./abis/Prices/Aave/Oracle.json
         # Uniswap Contracts
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
@@ -172,27 +163,18 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: LogAnySwapIn(indexed bytes32,indexed address,indexed address,uint256,uint256,uint256)
           handler: handleSwapIn
         - event: LogAnySwapOut(indexed address,indexed address,indexed address,uint256,uint256,uint256)
           handler: handleSwapOut
-  {{/routers}}
+  {{/routerConfig}}
 templates:
   - name: LiquidityPoolTemplate
     kind: ethereum
     network: {{ network }}
     source:
-      abi: anyTOKEN
+      abi: anyToken
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -206,8 +188,8 @@ templates:
       abis:
         - name: Router
           file: ./abis/Multichain/Router.json
-        - name: anyTOKEN
-          file: ./abis/Multichain/anyTOKEN.json
+        - name: anyToken
+          file: ./abis/Multichain/anyToken.json
 
         ###########################################
         ################# Tokens ##################
@@ -226,24 +208,24 @@ templates:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
-        # 1Inch Contracts
-        - name: OneInchOracleContract
-          file: ./abis/Prices/1Inch/Oracle.json
-        # Aave Contracts
-        - name: AaveOracleContract
-          file: ./abis/Prices/Aave/Oracle.json
         # Uniswap Contracts
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
@@ -251,21 +233,6 @@ templates:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      callHandlers:
-        - function: deposit(uint256,address)
-          handler: handleDeposit
-        - function: depositVault(uint256,address)
-          handler: handleDepositVault
-        - function: withdraw(uint256,address)
-          handler: handleWithdraw
-        - function: withdrawVault(address,uint256,address)
-          handler: handleWithdrawVault
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer

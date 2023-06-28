@@ -37,6 +37,7 @@ export const schema120 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -46,6 +47,7 @@ export const schema120 = (): Schema => {
       dailyDepositCount: "Int!",
       dailyWithdrawCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     vaultDailySnapshots: {
       id: "ID!",
@@ -58,6 +60,7 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -67,6 +70,7 @@ export const schema120 = (): Schema => {
       hourlyDepositCount: "Int!",
       hourlyWithdrawCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     vaultHourlySnapshots: {
       id: "ID!",
@@ -79,6 +83,7 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -291,6 +296,7 @@ export const schema130 = (): Schema => {
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -301,6 +307,7 @@ export const schema130 = (): Schema => {
       dailyWithdrawCount: "Int!",
       timestamp: "BigInt!",
       totalPoolCount: "Int!",
+      blockNumber: "BigInt!",
     },
     vaultDailySnapshots: {
       id: "ID!",
@@ -319,6 +326,7 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -328,6 +336,7 @@ export const schema130 = (): Schema => {
       hourlyDepositCount: "Int!",
       hourlyWithdrawCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     vaultHourlySnapshots: {
       id: "ID!",
@@ -346,6 +355,7 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 

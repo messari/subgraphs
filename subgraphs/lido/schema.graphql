@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: ID!
 
@@ -63,7 +63,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -78,7 +78,7 @@ type RewardToken @entity {
 ##### Protocol Metadata #####
 #############################
 
-type Protocol @entity {
+type Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
@@ -149,7 +149,7 @@ type Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -175,7 +175,7 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: ID!
 
@@ -198,7 +198,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -240,7 +240,7 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Data #####
 ###########################
 
-type Pool @entity {
+type Pool @entity @regularPolling {
   " Smart contract address of the pool "
   id: ID!
 
@@ -315,7 +315,7 @@ type Pool @entity {
   hourlySnapshots: [PoolHourlySnapshot!]! @derivedFrom(field: "pool")
 }
 
-type PoolDailySnapshot @entity {
+type PoolDailySnapshot @entity @dailySnapshot {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
 
@@ -376,7 +376,7 @@ type PoolDailySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type PoolHourlySnapshot @entity {
+type PoolHourlySnapshot @entity @hourlySnapshot {
   " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: ID!
 
@@ -439,13 +439,13 @@ type PoolHourlySnapshot @entity {
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity @regularPolling {
   " Address of the account "
   id: ID!
 }
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity {
+type ActiveAccount @entity @regularPolling {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }

@@ -154,11 +154,14 @@ function updateRewardEmission(
 ): void {
   const rewardToken = RewardToken.load(rewardTokenId);
   if (!rewardToken) {
-    log.error("[]no RewardToken found for reward token {} tx {}-{}", [
-      rewardTokenId,
-      event.transaction.hash.toHexString(),
-      event.transactionLogIndex.toString(),
-    ]);
+    log.error(
+      "[updateRewardEmission]no RewardToken found for reward token {} tx {}-{}",
+      [
+        rewardTokenId,
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
     return;
   }
 

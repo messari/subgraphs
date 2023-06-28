@@ -102,7 +102,9 @@ export class MMFinanceMaticConfigurations implements Configurations {
     return [];
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x21e0401aacfcec454b0da7faab7e8a000ce28480", // MM Finance Test Token
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

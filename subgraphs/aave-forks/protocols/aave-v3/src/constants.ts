@@ -75,6 +75,11 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Address.fromString("0xbaa999ac55eace41ccae355c77809e68bb345170"),
       Network.MAINNET
     );
+  } else if (equalsIgnoreCase(network, Network.METIS)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x9e7b73ffd9d2026f3ff4212c29e209e09c8a91f5"),
+      Network.METIS
+    );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
       network,
