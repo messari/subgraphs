@@ -28,7 +28,7 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -87,7 +87,7 @@ export function withdraw(
     Address.fromString(vault.outputToken!)
   );
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress, block);
   let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
@@ -99,7 +99,7 @@ export function withdraw(
     inputTokenDecimals = utils.getTokenDecimals(poolTokenAddress);
   }
 
-  let withdrawAmountUSD = withdrawAmount
+  const withdrawAmountUSD = withdrawAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)

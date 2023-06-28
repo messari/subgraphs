@@ -1,5 +1,4 @@
 import {
-  Token,
   Vault as VaultStore,
   Deposit as DepositTransaction,
 } from "../../generated/schema";
@@ -29,7 +28,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  const transactionId = "deposit-" + transaction.hash.toHexString();
 
   let depositTransaction = DepositTransaction.load(transactionId);
 
@@ -88,7 +87,7 @@ export function Deposit(
     Address.fromString(vault.outputToken!)
   );
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress, block);
   let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
@@ -100,7 +99,7 @@ export function Deposit(
     inputTokenDecimals = utils.getTokenDecimals(poolTokenAddress);
   }
 
-  let depositAmountUSD = depositAmount
+  const depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
