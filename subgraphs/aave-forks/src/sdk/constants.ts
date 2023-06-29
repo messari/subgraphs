@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { _ActiveAccount } from "../../../../generated/schema";
+import { _ActiveAccount } from "../../generated/schema";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -74,6 +74,7 @@ export namespace InterestRateType {
   export const VARIABLE = "VARIABLE";
   export const FIXED = "FIXED";
 }
+export type InterestRateType = string;
 
 export namespace InterestRateSide {
   export const LENDER = "LENDER";
@@ -116,6 +117,8 @@ export namespace TransactionType {
 
   export const LIQUIDATOR = "LIQUIDATOR";
   export const LIQUIDATEE = "LIQUIDATEE";
+
+  export const SWAP = "SWAP"; // Swap between interest rate types
 }
 
 export namespace AccountActivity {
@@ -148,11 +151,17 @@ export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
+export const INT_THREE = 3 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_FIVE = 5 as i32;
 export const INT_SIX = 6 as i32;
 export const INT_NINE = 9 as i32;
+export const INT_TEN = 10 as i32;
 export const INT_SIXTEEN = 16 as i32;
 export const INT_EIGHTTEEN = 18 as i32;
+export const INT_THIRTY_TWO = 32 as i32;
+export const INT_SIXTY_FOUR = 64 as i32;
+export const INT_152 = 152 as i32;
 
 export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);
@@ -203,6 +212,11 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 // BigInt to BigDecimal
 export function bigIntToBigDecimal(x: BigInt, decimals: i32): BigDecimal {
   return x.toBigDecimal().div(exponentToBigDecimal(decimals));
+}
+
+// bigDecimal to BigInt
+export function bigDecimalToBigInt(x: BigDecimal): BigInt {
+  return BigInt.fromString(x.truncate(0).toString());
 }
 
 //change number of decimals for BigDecimal
