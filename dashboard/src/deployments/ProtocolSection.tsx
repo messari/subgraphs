@@ -579,7 +579,7 @@ function ProtocolSection({
           }
 
           const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(
-            (x) => x.includes(subgraphName) || x.includes(depo?.decentralizedNetworkId),
+            (x) => x.includes(subgraphName + "-" + depo?.chain) || x.includes(depo?.decentralizedNetworkId),
           );
           let decenSubgraphId = decenObject?.subgraph;
           if (decenSubgraphKey) {
