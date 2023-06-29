@@ -1,5 +1,4 @@
 import {
-  Token,
   Vault as VaultStore,
   Deposit as DepositTransaction,
 } from "../../generated/schema";
@@ -25,10 +24,11 @@ export function createDepositTransaction(
   vault: VaultStore,
   amount: BigInt,
   amountUSD: BigDecimal,
+  depositFrom: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  const transactionId = "deposit-" + transaction.hash.toHexString();
 
   let depositTransaction = DepositTransaction.load(transactionId);
 
@@ -36,10 +36,11 @@ export function createDepositTransaction(
     depositTransaction = new DepositTransaction(transactionId);
 
     depositTransaction.vault = vault.id;
-    depositTransaction.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
+    depositTransaction.protocol =
+      constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
     depositTransaction.to = vault.id;
-    depositTransaction.from = transaction.from.toHexString();
+    depositTransaction.from = depositFrom.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
     depositTransaction.logIndex = transaction.index.toI32();
@@ -76,6 +77,7 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
 export function Deposit(
   vault: VaultStore,
   depositAmount: BigInt,
+  depositFrom: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
@@ -85,20 +87,19 @@ export function Deposit(
     Address.fromString(vault.outputToken!)
   );
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress, block);
   let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
   if (constants.MISSING_POOLS_MAP.get(inputTokenAddress)) {
-    const poolTokenAddress = constants.MISSING_POOLS_MAP.get(
-      inputTokenAddress
-    )!;
+    const poolTokenAddress =
+      constants.MISSING_POOLS_MAP.get(inputTokenAddress)!;
 
     inputTokenPrice = getUsdPricePerToken(poolTokenAddress, block);
     inputTokenDecimals = utils.getTokenDecimals(poolTokenAddress);
   }
 
-  let depositAmountUSD = depositAmount
+  const depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
@@ -130,6 +131,7 @@ export function Deposit(
     vault,
     depositAmount,
     depositAmountUSD,
+    depositFrom,
     transaction,
     block
   );
