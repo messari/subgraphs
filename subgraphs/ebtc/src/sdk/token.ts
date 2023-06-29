@@ -158,7 +158,7 @@ export class TokenManager {
     const decimalResult = contract.try_decimals();
     if (!decimalResult.reverted) {
       const decimalValue = decimalResult.value;
-      return decimalValue;
+      return decimalValue.toI32();
     }
 
     // try with the static definition
