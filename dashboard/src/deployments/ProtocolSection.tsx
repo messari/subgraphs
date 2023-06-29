@@ -664,7 +664,10 @@ function ProtocolSection({
               onClick={(event) => {
                 if (event.ctrlKey) {
                   if (!validationSupported) {
-                    window.open(`https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`, "_blank");
+                    window.open(
+                      `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview&chain=arbitrum-one`,
+                      "_blank",
+                    );
                     return;
                   }
                   if (!decenObject?.fatalError) {
@@ -674,7 +677,7 @@ function ProtocolSection({
                   }
                 } else {
                   if (!validationSupported) {
-                    window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`;
+                    window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview&chain=arbitrum-one`;
                     return;
                   }
                   if (!decenObject?.fatalError) {

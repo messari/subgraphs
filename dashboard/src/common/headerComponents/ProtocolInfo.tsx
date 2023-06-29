@@ -48,7 +48,7 @@ function ProtocolInfo({
     }
   } else if (subgraphToQueryURL.includes("https://gateway-arbitrum.network.thegraph.com")) {
     const subId = subgraphToQueryURL.split("id/")[1];
-    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview`;
+    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview&chain=arbitrum-one`;
   } else {
     link = subgraphToQueryURL;
   }
