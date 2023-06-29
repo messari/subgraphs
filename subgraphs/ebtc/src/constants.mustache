@@ -36,6 +36,9 @@ export const CDP_MANAGER = Bytes.fromHexString(
 export const ACTIVE_POOL = Bytes.fromHexString(
   "{{ activePool.address }}"
 );
+export const PRICE_FEED = Bytes.fromHexString(
+  "{{ priceFeed.address }}"
+);
 
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32({{ activePool.startBlock }});
 export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32({{ activePool.createdAt }});
