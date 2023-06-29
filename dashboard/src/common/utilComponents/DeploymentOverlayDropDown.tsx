@@ -45,11 +45,15 @@ export const DeploymentOverlayDropDown = ({
 
     if (protocolObj) {
       if (decentralizedDeployments[data.protocols[0].slug]) {
-        protocolObj[decentralizedDeployments[data.protocols[0].slug].network + " (DECENTRALIZED)"] =
-          "https://gateway-arbitrum.network.thegraph.com/api/" +
-          process.env.REACT_APP_GRAPH_API_KEY +
-          "/subgraphs/id/" +
-          decentralizedDeployments[data.protocols[0].slug].subgraphId;
+        decentralizedDeployments[data.protocols[0].slug].forEach((item: any) => {
+          if (item.signalledTokens > 0) {
+            protocolObj[item.network + " (DECENTRALIZED)"] =
+              "https://gateway-arbitrum.network.thegraph.com/api/" +
+              process.env.REACT_APP_GRAPH_API_KEY +
+              "/subgraphs/id/" +
+              item.subgraphId;
+          }
+        });
       }
       if (pendingSubgraphData) {
         if (Object.keys(pendingSubgraphData).length > 0) {
