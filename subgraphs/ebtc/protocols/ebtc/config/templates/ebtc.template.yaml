@@ -3,6 +3,27 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
+  - name: CdpManager
+    kind: ethereum/contract
+    network: "{{ network.slug }}"
+    source:
+      abi: CdpManager
+      address: "{{ cdpManager.address }}"
+      startBlock: {{ cdpManager.startBlock }}
+    mapping:
+      file: ./src/mapping/CdpManager.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      entities: []
+      abis:
+        - name: CdpManager
+          file: ./abis/CdpManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: ActivePoolAddressChanged(address)
+          handler: handleSystemDeployed
   - name: ActivePool
     kind: ethereum/contract
     network: "{{ network.slug }}"

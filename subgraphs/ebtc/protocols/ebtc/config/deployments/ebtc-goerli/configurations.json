@@ -24,7 +24,8 @@
   },
   "cdpManager": {
     "address": "0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f",
-    "verification": "https://goerli.etherscan.io/address/0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f#code"
+    "verification": "https://goerli.etherscan.io/address/0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f#code",
+    "startBlock": 9129595
   },
   "borrowerOperations": {
     "address": "0x11d823a74104A4E9D2E49672BAa6Ab9B5d321D06",
