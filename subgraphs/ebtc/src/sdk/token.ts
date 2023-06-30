@@ -1,6 +1,6 @@
-import { ERC20 } from "../../generated/ActivePool/ERC20";
-import { ERC20SymbolBytes } from "../../generated/ActivePool/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/ActivePool/ERC20NameBytes";
+import { ERC20 } from "../../generated/PriceFeed/ERC20";
+import { ERC20SymbolBytes } from "../../generated/PriceFeed/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/PriceFeed/ERC20NameBytes";
 import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
 import {
