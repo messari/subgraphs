@@ -72,7 +72,7 @@ dataSources:
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: _ERC20
+        - name: ERC20
           file: ./abis/ERC20.json
         # Curve Contracts
         - name: CurvePool
