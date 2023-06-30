@@ -1,24 +1,32 @@
 import { Address, log } from "@graphprotocol/graph-ts";
-import { ActivePoolAddressChanged } from "../../generated/CdpManager/CdpManager";
-import { ActivePool } from "../../generated/ActivePool/ActivePool";
-import { OracleSource } from "../sdk/util/constants";
+import {
+  ActivePool,
+  CdpManagerAddressChanged,
+} from "../../generated/ActivePool/ActivePool";
+import { OracleSource, BIGDECIMAL_ZERO } from "../sdk/util/constants";
 import { DataManager } from "../sdk/manager";
 import {
   ACTIVE_POOL,
+  EBTC_ADDRESS,
+  LIQUIDATION_FEE_PERCENT,
+  MAXIMUM_LTV,
   PRICE_FEED,
   STETH_ADDRESS,
   getProtocolData,
 } from "../constants";
 
-////////////////////////////////////////
-//// Initialise Protocol and Oracle ////
-////////////////////////////////////////
-export function handleSystemDeployed(event: ActivePoolAddressChanged): void {
-  const activePool = ActivePool.bind(event.params._activePoolAddress);
+/**
+ * On deployment of the pool, initialise and populate the market,
+ * lendingProtocol and oracle entities.
+ * @param event An event emitted by the constructor of the ActivePool proving
+ * it was deployed successfully.
+ */
+export function handleSystemDeployed(event: CdpManagerAddressChanged): void {
+  const activePool = ActivePool.bind(event.address);
   if (activePool._address != ACTIVE_POOL) {
     log.error(
       "deployed ActivePool address {} does not match expected address",
-      [event.params._activePoolAddress.toHexString()]
+      [event.address.toHexString()]
     );
     return;
   }
@@ -32,21 +40,17 @@ export function handleSystemDeployed(event: ActivePoolAddressChanged): void {
 
   const market = manager.getMarket();
 
-  // TODO: update market with ebtc specifics
-  // market.name = outputToken.getToken().name;
-  // market.outputToken = outputToken.getToken().id;
-  // market.outputTokenSupply = BIGINT_ZERO;
-  // market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  // market.exchangeRate = BIGDECIMAL_ZERO; // exchange rate = (inputTokenBalance / outputTokenSupply) OR (totalAssets() / totalSupply())
-  // market.isActive = false; // controlled with setAsActive
-  // market.canBorrowFrom = false; // controlled with setAsActive
-  // market.canUseAsCollateral = false; // collateral is posted during loans separate from any deposits
-  // market.borrowedToken = tryInputToken.value;
-  // market.stableBorrowedTokenBalance = BIGINT_ZERO;
-  // market._poolManager = event.params.instance_;
-  // market.save();
+  // update market with ebtc specifics
+  market.canBorrowFrom = true;
+  market.maximumLTV = MAXIMUM_LTV;
+  market.liquidationThreshold = MAXIMUM_LTV;
+  market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
+  market.borrowedToken = EBTC_ADDRESS;
+  market.save();
 
-  const lendingProtocol = manager.getOrCreateLendingProtocol(getProtocolData());
+  const lendingProtocol = manager.getOrCreateLendingProtocol(
+    getProtocolData() // data: ProtocolData
+  );
 
   const oracle = manager.getOrCreateOracle(
     Address.fromBytes(PRICE_FEED), // oracleAddress: Address
