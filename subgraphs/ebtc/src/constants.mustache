@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigDecimal, Bytes } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_HUNDRED,
@@ -39,9 +39,6 @@ export const ACTIVE_POOL = Bytes.fromHexString(
 export const PRICE_FEED = Bytes.fromHexString(
   "{{ priceFeed.address }}"
 );
-
-export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32({{ activePool.startBlock }});
-export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32({{ activePool.createdAt }});
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO).times(
