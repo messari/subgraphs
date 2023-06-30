@@ -1,8 +1,8 @@
-import { ERC20 } from "../../../../generated/Configurator/ERC20";
-import { ERC20SymbolBytes } from "../../../../generated/Configurator/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../../../generated/Configurator/ERC20NameBytes";
+import { ERC20 } from "../../generated/ActivePool/ERC20";
+import { ERC20SymbolBytes } from "../../generated/ActivePool/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/ActivePool/ERC20NameBytes";
 import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { RewardToken, Token } from "../../../../generated/schema";
+import { RewardToken, Token } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   INT_EIGHTTEEN,
@@ -158,7 +158,7 @@ export class TokenManager {
     const decimalResult = contract.try_decimals();
     if (!decimalResult.reverted) {
       const decimalValue = decimalResult.value;
-      return decimalValue;
+      return decimalValue.toI32();
     }
 
     // try with the static definition

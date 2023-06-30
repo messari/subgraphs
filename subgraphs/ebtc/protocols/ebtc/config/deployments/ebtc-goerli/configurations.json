@@ -1,5 +1,8 @@
 {
-  "network": "goerli",
+  "network": {
+    "slug": "goerli",
+    "object": "Network.GOERLI"
+  },
   "stethToken": {
     "address": "0x6B842CEA279aB886119F66fdCf6F864B5305008f"
   },
@@ -21,7 +24,8 @@
   },
   "cdpManager": {
     "address": "0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f",
-    "verification": "https://goerli.etherscan.io/address/0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f#code"
+    "verification": "https://goerli.etherscan.io/address/0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f#code",
+    "startBlock": 9129595
   },
   "borrowerOperations": {
     "address": "0x11d823a74104A4E9D2E49672BAa6Ab9B5d321D06",
@@ -39,8 +43,7 @@
   "activePool": {
     "address": "0xB230cDa730CF515795Ad047fD8320D3e4480C8b8",
     "verification": "https://goerli.etherscan.io/address/0xB230cDa730CF515795Ad047fD8320D3e4480C8b8#code",
-    "startBlock": 9129672,
-    "createdAt": 1686026808
+    "startBlock": 9129672
   },
   "collSurplusPool": {
     "address": "0xDB58AfEb24C44EAe3F0f211f71D1a88F92F0c5d9",
