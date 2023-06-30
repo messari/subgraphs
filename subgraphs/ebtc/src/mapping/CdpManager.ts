@@ -3,7 +3,7 @@ import {
   ActivePool,
   CdpManagerAddressChanged,
 } from "../../generated/ActivePool/ActivePool";
-import { OracleSource, BIGDECIMAL_ZERO } from "../sdk/util/constants";
+import { OracleSource } from "../sdk/util/constants";
 import { DataManager } from "../sdk/manager";
 import {
   ACTIVE_POOL,
