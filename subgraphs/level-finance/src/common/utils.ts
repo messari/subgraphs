@@ -8,14 +8,9 @@ import {
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { Token as TokenSchema, _Tranche } from "../../generated/schema";
+import { Token as TokenSchema } from "../../generated/schema";
 import { LpToken as LpTokenContract } from "../../generated/Pool/LpToken";
-import { SDK } from "../sdk/protocols/perpfutures";
-import {
-  getOrCreatePool,
-  getOrCreateTranche,
-  initializeSDK,
-} from "./initializers";
+import { getOrCreateTranche } from "./initializers";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -181,4 +176,17 @@ export function getOutputTokenSupply(pool: Pool): BigInt {
   }
   if (tranchesAddresses!.length <= 0) return constants.BIGINT_ZERO;
   return totalSupply;
+}
+
+export function roundToWholeNumber(n: BigDecimal): BigDecimal {
+  return n.truncate(0);
+}
+
+export function calculateFundingRate(
+  borrowedAssetUSD: BigDecimal,
+  totalAssetUSD: BigDecimal
+): BigDecimal {
+  return borrowedAssetUSD
+    .div(totalAssetUSD)
+    .times(BigDecimal.fromString("0.00001"));
 }

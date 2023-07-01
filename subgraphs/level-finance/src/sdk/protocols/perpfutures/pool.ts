@@ -15,10 +15,12 @@ import * as constants from "../../util/constants";
 import { PositionType, TransactionType } from "./enums";
 import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import {
+  bigIntToBigDecimal,
   exponentToBigDecimal,
   poolArraySort,
   safeDivide,
 } from "../../util/numbers";
+import { getOrCreateTranche } from "../../../common/initializers";
 
 /**
  * This file contains the PoolManager, which is used to
@@ -182,6 +184,7 @@ export class Pool {
     this.pool._lastUpdateTimestamp = event.block.timestamp;
 
     this.pool._tranches = [];
+    this.pool._borrowedAssetsAmountUSD = [];
 
     this.save();
 
@@ -614,10 +617,20 @@ export class Pool {
       price.equals(constants.BIGDECIMAL_ZERO) &&
       !this.pool.outputTokenSupply!.equals(constants.BIGINT_ZERO)
     ) {
-      price = this.pool.totalValueLockedUSD.div(
-        this.pool
-          .outputTokenSupply!.toBigDecimal()
-          .div(constants.BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal())
+      const tranchesAddresses = this.pool._tranches;
+      let pricesSum = constants.BIGDECIMAL_ZERO;
+
+      for (let i = 0; i < tranchesAddresses!.length; i++) {
+        const tranche = getOrCreateTranche(tranchesAddresses![i]);
+        pricesSum = pricesSum.plus(
+          tranche.tvl.div(
+            bigIntToBigDecimal(tranche.totalSupply, constants.DEFAULT_DECIMALS)
+          )
+        );
+      }
+      if (tranchesAddresses!.length <= 0) price = constants.BIGDECIMAL_ZERO;
+      price = pricesSum.div(
+        BigDecimal.fromString(tranchesAddresses!.length.toString())
       );
     }
 
@@ -756,6 +769,7 @@ export class Pool {
       this.pool.cumulativeOutflowVolumeByTokenAmount;
     const cumulativeOutflowVolumeByTokenUSD =
       this.pool.cumulativeOutflowVolumeByTokenUSD;
+    const _borrowedAssetsAmountUSD = this.pool._borrowedAssetsAmountUSD;
 
     inputTokens.push(token.id);
     inputTokenBalances.push(newTokenBalance);
@@ -769,6 +783,7 @@ export class Pool {
     cumulativeClosedInflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
     cumulativeOutflowVolumeByTokenAmount.push(constants.BIGINT_ZERO);
     cumulativeOutflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
+    _borrowedAssetsAmountUSD.push(constants.BIGDECIMAL_ZERO);
 
     poolArraySort(
       inputTokens,
@@ -781,7 +796,8 @@ export class Pool {
       cumulativeClosedInflowVolumeByTokenAmount,
       cumulativeClosedInflowVolumeByTokenUSD,
       cumulativeOutflowVolumeByTokenAmount,
-      cumulativeOutflowVolumeByTokenUSD
+      cumulativeOutflowVolumeByTokenUSD,
+      _borrowedAssetsAmountUSD
     );
 
     this.pool.inputTokens = inputTokens;
@@ -800,6 +816,7 @@ export class Pool {
       cumulativeOutflowVolumeByTokenAmount;
     this.pool.cumulativeOutflowVolumeByTokenUSD =
       cumulativeOutflowVolumeByTokenUSD;
+    this.pool._borrowedAssetsAmountUSD = _borrowedAssetsAmountUSD;
     this.pool.save();
     this.setInputTokenBalances(inputTokenBalances, true);
   }
@@ -1122,5 +1139,40 @@ export class Pool {
       this.pool._tranches = newTranches;
       this.save();
     }
+  }
+
+  setBorrowedAssetAmountUSD(amountsUSD: BigDecimal[]): void {
+    this.pool._borrowedAssetsAmountUSD = amountsUSD;
+    this.save();
+  }
+
+  updateFundingRates(): void {
+    // Get total borrowed amountUSD of an asset from pool
+    // Get total amountUSD of that asset in pool
+    // Get funding rate of that token from the pool
+    // update funding rate
+    const fundingRate: BigDecimal[] = [];
+    for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
+      const inputTokenBalance = this.pool.inputTokenBalances[idx];
+      const borrowedAssetAmountUSD = this.pool._borrowedAssetsAmountUSD[idx];
+      const inputToken = this.tokens.getOrCreateTokenFromBytes(
+        this.pool.inputTokens[idx]
+      );
+      const amountUSD = this.getInputTokenAmountPrice(
+        inputToken,
+        inputTokenBalance
+      );
+      if (amountUSD.equals(constants.BIGDECIMAL_ZERO)) {
+        fundingRate.push(constants.BIGDECIMAL_ZERO);
+      } else {
+        fundingRate.push(
+          borrowedAssetAmountUSD
+            .div(amountUSD)
+            .times(BigDecimal.fromString("0.00001"))
+        );
+      }
+    }
+
+    this.setFundingRate(fundingRate);
   }
 }

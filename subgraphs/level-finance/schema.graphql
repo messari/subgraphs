@@ -868,6 +868,8 @@ type LiquidityPool @entity {
   _lastUpdateTimestamp: BigInt
 
   _tranches: [_Tranche!]
+
+  _borrowedAssetsAmountUSD: [BigDecimal!]!
 }
 
 #################################
@@ -1798,7 +1800,7 @@ enum PositionSide {
 
 # A position is defined as who has what position in the protocol and distribution of longs and shorts at a positional level
 type Position @entity {
-  " { Account address }-{ Pool address }-{ Position Side }-{ Counter } "
+  " { Account address }-{ Pool address }-{ Asset }-{ Position Side }-{ Counter } "
   id: Bytes!
 
   " Account that owns this position "
@@ -1954,11 +1956,11 @@ type _ActivityHelper @entity {
 
 # Helper entity for getting positions
 type _PositionCounter @entity {
-  " { Account address }-{ Pool address }-{ Position Side } "
+  " { Account address }-{ Pool address }-{ Asset }-{ Position Side } "
   id: Bytes!
 
-  " Next count "
-  nextCount: Int!
+  " Unique Positions "
+  uniquePositions: [Bytes!]!
 }
 
 # Helper entity to map position key to position id

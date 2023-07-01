@@ -4,6 +4,7 @@ import {
   ethereum,
   BigInt,
   BigDecimal,
+  log,
 } from "@graphprotocol/graph-ts";
 import * as utils from "../common/utils";
 import { increasePoolVolume } from "./volume";
@@ -38,6 +39,8 @@ export function updatePosition(
 ): void {
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
+  utils.checkAndUpdateInputTokens(pool, indexToken);
+
   sdk.Tokens.updateTokenPrice(
     indexToken,
     utils.bigIntToBigDecimal(
@@ -51,6 +54,7 @@ export function updatePosition(
     constants.VALUE_DECIMALS
   );
   const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
+  utils.checkAndUpdateInputTokens(pool, collateralToken);
   let collateralUSDDelta = constants.BIGDECIMAL_ZERO;
 
   let collateralTokenAmountDelta = constants.BIGINT_ZERO;
@@ -113,8 +117,13 @@ export function updatePosition(
     false,
     sdk
   );
-  //update openInterest
-  //create transaction
+
+  const indexTokenIdx = pool
+    .getInputTokens()
+    .indexOf(Bytes.fromHexString(indexTokenAddress.toHexString()));
+
+  const borrowedAssetAmountUSD = pool.pool._borrowedAssetsAmountUSD;
+
   if (transactionType == TransactionType.COLLATERAL_IN) {
     updatePoolOpenInterestUSD(pool, sizeUSDDelta, true, isLong);
     account.collateralIn(
@@ -144,6 +153,8 @@ export function updatePosition(
         indexTokenAmountDelta,
         true
       );
+      borrowedAssetAmountUSD[indexTokenIdx] =
+        borrowedAssetAmountUSD[indexTokenIdx].plus(sizeUSDDelta);
     }
   }
   if (transactionType == TransactionType.COLLATERAL_OUT) {
@@ -155,6 +166,9 @@ export function updatePosition(
       constants.BIGINT_ZERO,
       true
     );
+
+    borrowedAssetAmountUSD[indexTokenIdx] =
+      borrowedAssetAmountUSD[indexTokenIdx].minus(sizeUSDDelta);
   }
   if (transactionType == TransactionType.LIQUIDATE) {
     updatePoolOpenInterestUSD(pool, sizeUSDDelta, false, isLong);
@@ -174,7 +188,12 @@ export function updatePosition(
     );
 
     getOrCreateAccount(event.transaction.from, pool, sdk);
+
+    borrowedAssetAmountUSD[indexTokenIdx] =
+      borrowedAssetAmountUSD[indexTokenIdx].minus(sizeUSDDelta);
   }
+  pool.setBorrowedAssetAmountUSD(borrowedAssetAmountUSD);
+  pool.updateFundingRates();
 }
 
 export function updateUserPosition(
@@ -190,6 +209,7 @@ export function updateUserPosition(
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
   const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
   const position = sdk.Positions.loadPosition(
+    positionKey,
     pool,
     account,
     indexToken,
@@ -206,7 +226,6 @@ export function updateUserPosition(
   );
 
   if (transactionType == TransactionType.COLLATERAL_IN) {
-    position.openPosition();
     position.addCollateralInCount();
   }
   if (transactionType == TransactionType.COLLATERAL_OUT) {
@@ -272,7 +291,14 @@ export function updateUserPosition(
     position.setCollateralBalanceClosed(collateralToken, prevCollateralBalance);
     position.closePosition();
   }
-
+  log.warning(
+    "[UpdateUserPosition] positionKey {}  transactionType {} tryGetPosition.reverted {}",
+    [
+      positionKey.toHexString(),
+      transactionType,
+      tryGetPosition.reverted.toString(),
+    ]
+  );
   return position;
 }
 
@@ -297,6 +323,7 @@ export function updatePositionRealisedPnlUSD(
   );
 
   const position = sdk.Positions.loadPosition(
+    positionKey,
     pool,
     account,
     asset,

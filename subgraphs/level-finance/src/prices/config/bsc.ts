@@ -25,6 +25,11 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ),
 ];
 
+export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
+  Address.fromString("0x27950ecaebb4462e18e8041aaf6ea13ca47af001"),
+  BigInt.fromI32(27113941)
+);
+
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -101,7 +106,7 @@ export class config implements Configurations {
   }
 
   inchOracle(): ContractInfo | null {
-    return null;
+    return INCH_ORACLE_CONTRACT_ADDRESS;
   }
   inchOracleBlacklist(): Address[] {
     return INCH_ORACLE_BLACKLIST;

@@ -1,97 +1,184 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+// import { Address, BigInt } from "@graphprotocol/graph-ts";
+// import {
+//   Deposit,
+//   Withdraw,
+//   Harvest,
+//   LevelMaster,
+// } from "../../generated/LevelMaster/LevelMaster";
+// import * as utils from "../common/utils";
+// import * as constants from "../common/constants";
+// import { getOrCreatePool, initializeSDK } from "../common/initializers";
+
+// // A deposit or stake for the pool specific MasterChef.
+// export function handleDeposit(event: Deposit): void {
+//   const sdk = initializeSDK(event);
+//   const pool = getOrCreatePool(sdk);
+//   const chefContract = LevelMaster.bind(
+//     Address.fromString("0x5aE081b6647aEF897dEc738642089D4BDa93C0e7")
+//   );
+//   const rewardPerSecond = utils.readValue(
+//     chefContract.try_rewardPerSecond(),
+//     constants.BIGINT_ZERO
+//   );
+//   const seniorLlpToken = sdk.Tokens.getOrCreateToken(
+//     constants.SENIOR_LLP_ADDRESS
+//   );
+//   const rewardToken = sdk.Tokens.getOrCreateRewardToken(
+//     seniorLlpToken,
+//     constants.RewardTokenType.DEPOSIT
+//   );
+//   const rewardTokenEmission = rewardPerSecond.times(
+//     BigInt.fromI32(constants.SECONDS_PER_DAY)
+//   );
+
+//   pool.setRewardEmissions(
+//     constants.RewardTokenType.DEPOSIT,
+//     seniorLlpToken,
+//     rewardTokenEmission
+//   );
+// }
+
+// // A withdraw or unstaking for the pool specific MasterChef.
+// export function handleWithdraw(event: Withdraw): void {
+//   const sdk = initializeSDK(event);
+//   const pool = getOrCreatePool(sdk);
+//   const chefContract = LevelMaster.bind(
+//     Address.fromString("0x5aE081b6647aEF897dEc738642089D4BDa93C0e7")
+//   );
+//   const rewardPerSecond = utils.readValue(
+//     chefContract.try_rewardPerSecond(),
+//     constants.BIGINT_ZERO
+//   );
+//   const seniorLlpToken = sdk.Tokens.getOrCreateToken(
+//     constants.SENIOR_LLP_ADDRESS
+//   );
+//   const rewardToken = sdk.Tokens.getOrCreateRewardToken(
+//     seniorLlpToken,
+//     constants.RewardTokenType.DEPOSIT
+//   );
+//   const rewardTokenEmission = rewardPerSecond.times(
+//     BigInt.fromI32(constants.SECONDS_PER_DAY)
+//   );
+
+//   pool.setRewardEmissions(
+//     constants.RewardTokenType.DEPOSIT,
+//     seniorLlpToken,
+//     rewardTokenEmission
+//   );
+// }
+
+// // Update the allocation points of the pool.
+// export function handleHarvest(event: Harvest): void {
+//   const sdk = initializeSDK(event);
+//   const pool = getOrCreatePool(sdk);
+//   const chefContract = LevelMaster.bind(
+//     Address.fromString("0x5aE081b6647aEF897dEc738642089D4BDa93C0e7")
+//   );
+//   const rewardPerSecond = utils.readValue(
+//     chefContract.try_rewardPerSecond(),
+//     constants.BIGINT_ZERO
+//   );
+//   const seniorLlpToken = sdk.Tokens.getOrCreateToken(
+//     constants.SENIOR_LLP_ADDRESS
+//   );
+//   const rewardToken = sdk.Tokens.getOrCreateRewardToken(
+//     seniorLlpToken,
+//     constants.RewardTokenType.DEPOSIT
+//   );
+//   const rewardTokenEmission = rewardPerSecond.times(
+//     BigInt.fromI32(constants.SECONDS_PER_DAY)
+//   );
+
+//   pool.setRewardEmissions(
+//     constants.RewardTokenType.DEPOSIT,
+//     seniorLlpToken,
+//     rewardTokenEmission
+//   );
+// }
+
+// Reward as LVL
 import {
   Deposit,
   Withdraw,
-  Harvest,
-  LevelMaster,
-} from "../../generated/LevelMaster/LevelMaster";
-import * as utils from "../common/utils";
+  LogSetPool,
+  LogPoolAddition,
+  EmergencyWithdraw,
+  LogRewardPerSecond,
+} from "../../generated/LevelMasterV2/LevelMaster";
+import {
+  getOrCreateMasterChef,
+  createMasterChefStakingPool,
+  updateMasterChefTotalAllocation,
+} from "../../src/common/initializers";
+import { _MasterChefStakingPool } from "../../generated/schema";
+import { updateMasterChef } from "../modules/chef";
 import * as constants from "../common/constants";
-import { getOrCreatePool, initializeSDK } from "../common/initializers";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {
-  const sdk = initializeSDK(event);
-  const pool = getOrCreatePool(sdk);
-  const chefContract = LevelMaster.bind(
-    Address.fromString("0x5aE081b6647aEF897dEc738642089D4BDa93C0e7")
-  );
-  const rewardPerSecond = utils.readValue(
-    chefContract.try_rewardPerSecond(),
-    constants.BIGINT_ZERO
-  );
-  const seniorLlpToken = sdk.Tokens.getOrCreateToken(
-    constants.SENIOR_LLP_ADDRESS
-  );
-  const rewardToken = sdk.Tokens.getOrCreateRewardToken(
-    seniorLlpToken,
-    constants.RewardTokenType.DEPOSIT
-  );
-  const rewardTokenEmission = rewardPerSecond.times(
-    BigInt.fromI32(constants.SECONDS_PER_DAY)
-  );
-
-  pool.setRewardEmissions(
-    constants.RewardTokenType.DEPOSIT,
-    seniorLlpToken,
-    rewardTokenEmission
-  );
+  updateMasterChef(event, event.params.pid, event.params.amount);
 }
 
 // A withdraw or unstaking for the pool specific MasterChef.
 export function handleWithdraw(event: Withdraw): void {
-  const sdk = initializeSDK(event);
-  const pool = getOrCreatePool(sdk);
-  const chefContract = LevelMaster.bind(
-    Address.fromString("0x5aE081b6647aEF897dEc738642089D4BDa93C0e7")
-  );
-  const rewardPerSecond = utils.readValue(
-    chefContract.try_rewardPerSecond(),
-    constants.BIGINT_ZERO
-  );
-  const seniorLlpToken = sdk.Tokens.getOrCreateToken(
-    constants.SENIOR_LLP_ADDRESS
-  );
-  const rewardToken = sdk.Tokens.getOrCreateRewardToken(
-    seniorLlpToken,
-    constants.RewardTokenType.DEPOSIT
-  );
-  const rewardTokenEmission = rewardPerSecond.times(
-    BigInt.fromI32(constants.SECONDS_PER_DAY)
-  );
-
-  pool.setRewardEmissions(
-    constants.RewardTokenType.DEPOSIT,
-    seniorLlpToken,
-    rewardTokenEmission
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount.times(constants.BIGINT_NEGONE)
   );
 }
 
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount.times(constants.BIGINT_NEGONE)
+  );
+}
+
+// Handle the addition of a new pool to the MasterChef. New staking pool.
+export function handleLogPoolAddition(event: LogPoolAddition): void {
+  const masterChefV2Pool = createMasterChefStakingPool(
+    event,
+    constants.MasterChef.MASTERCHEFV2,
+    event.params.pid,
+    event.params.lpToken
+  );
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefV2Pool.poolAllocPoint,
+    event.params.allocPoint,
+    constants.MasterChef.MASTERCHEFV2
+  );
+  masterChefV2Pool.poolAllocPoint = event.params.allocPoint;
+  masterChefV2Pool.save();
+}
+
 // Update the allocation points of the pool.
-export function handleHarvest(event: Harvest): void {
-  const sdk = initializeSDK(event);
-  const pool = getOrCreatePool(sdk);
-  const chefContract = LevelMaster.bind(
-    Address.fromString("0x5aE081b6647aEF897dEc738642089D4BDa93C0e7")
+export function handleLogSetPool(event: LogSetPool): void {
+  const masterChefV2Pool = _MasterChefStakingPool.load(
+    constants.MasterChef.MASTERCHEFV2 + "-" + event.params.pid.toString()
+  )!;
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefV2Pool.poolAllocPoint,
+    event.params.allocPoint,
+    constants.MasterChef.MASTERCHEFV2
   );
-  const rewardPerSecond = utils.readValue(
-    chefContract.try_rewardPerSecond(),
-    constants.BIGINT_ZERO
-  );
-  const seniorLlpToken = sdk.Tokens.getOrCreateToken(
-    constants.SENIOR_LLP_ADDRESS
-  );
-  const rewardToken = sdk.Tokens.getOrCreateRewardToken(
-    seniorLlpToken,
-    constants.RewardTokenType.DEPOSIT
-  );
-  const rewardTokenEmission = rewardPerSecond.times(
-    BigInt.fromI32(constants.SECONDS_PER_DAY)
+  masterChefV2Pool.poolAllocPoint = event.params.allocPoint;
+  masterChefV2Pool.save();
+}
+
+// Update the total emissions rate of rewards for the masterchef contract.
+export function handleUpdateEmissionRate(event: LogRewardPerSecond): void {
+  const masterChefV2Pool = getOrCreateMasterChef(
+    event,
+    constants.MasterChef.MASTERCHEFV2
   );
 
-  pool.setRewardEmissions(
-    constants.RewardTokenType.DEPOSIT,
-    seniorLlpToken,
-    rewardTokenEmission
-  );
+  masterChefV2Pool.rewardTokenRate = event.params.rewardPerSecond;
+  masterChefV2Pool.adjustedRewardTokenRate = event.params.rewardPerSecond;
+
+  masterChefV2Pool.save();
 }

@@ -168,11 +168,11 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0xd152c7f25db7f4b95b7658323c5f33d176818ee4";
+export const PROTOCOL_ID = "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874";
 export const POOL_NAME = "LVLVault";
 export const POOL_SYMBOL = "Vault";
 export const VAULT_ADDRESS = Address.fromString(
-  "0xd152c7f25db7f4b95b7658323c5f33d176818ee4"
+  "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874"
 );
 export const OUTPUT_TOKEN_ADDRESS = Address.fromString(
   "0xb5c42f84ab3f786bca9761240546aa9cec1f8821"
@@ -205,3 +205,12 @@ export enum Side {
   LONG,
   SHORT,
 }
+
+export namespace MasterChef {
+  export const MINICHEF = "MINICHEF";
+  export const MASTERCHEF = "MASTERCHEF";
+  export const MASTERCHEFV2 = "MASTERCHEFV2";
+  export const MASTERCHEFV3 = "MASTERCHEFV3";
+}
+export const INFLATION_INTERVAL = "TIMESTAMP";
+export const STARTING_INFLATION_RATE = BIGINT_ZERO;

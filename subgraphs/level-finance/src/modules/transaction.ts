@@ -52,5 +52,4 @@ export function transaction(
   pool.addTranche(Bytes.fromHexString(trancheAddress.toHexString()));
   const outputTokenSupply = utils.getOutputTokenSupply(pool);
   pool.setOutputTokenSupply(outputTokenSupply);
-  pool.setStakedOutputTokenAmount(outputTokenSupply);
 }

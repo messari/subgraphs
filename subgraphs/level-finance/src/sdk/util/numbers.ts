@@ -72,7 +72,8 @@ export function poolArraySort(
   arr7: Array<BigInt>,
   arr8: Array<BigDecimal>,
   arr9: Array<BigInt>,
-  arr10: Array<BigDecimal>
+  arr10: Array<BigDecimal>,
+  arr11: Array<BigDecimal>
 ): void {
   if (
     ref.length != arr1.length ||
@@ -84,7 +85,8 @@ export function poolArraySort(
     ref.length != arr7.length ||
     ref.length != arr8.length ||
     ref.length != arr9.length ||
-    ref.length != arr10.length
+    ref.length != arr10.length ||
+    ref.length != arr11.length
   ) {
     // cannot sort
     return;
@@ -104,6 +106,7 @@ export function poolArraySort(
       arr8[i].toString(),
       arr9[i].toString(),
       arr10[i].toString(),
+      arr11[i].toString(),
     ];
   }
 
@@ -126,5 +129,6 @@ export function poolArraySort(
     arr8[i] = BigDecimal.fromString(sorter[i][8]);
     arr9[i] = BigInt.fromString(sorter[i][9]);
     arr10[i] = BigDecimal.fromString(sorter[i][10]);
+    arr11[i] = BigDecimal.fromString(sorter[i][11]);
   }
 }
