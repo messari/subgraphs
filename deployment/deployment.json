@@ -461,7 +461,7 @@
       },
       "aave-v3-metis": {
         "network": "metis",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
