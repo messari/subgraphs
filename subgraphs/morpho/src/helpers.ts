@@ -867,7 +867,7 @@ export function getOrCreateMarketHourlySnapshot(
 ): MarketHourlySnapshot {
   const snapshotID = market.id.concat(getHourId(block.timestamp));
   let snapshot = MarketHourlySnapshot.load(snapshotID);
-  
+
   if (!snapshot) {
     snapshot = new MarketHourlySnapshot(snapshotID);
 
