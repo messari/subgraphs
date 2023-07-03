@@ -36,6 +36,7 @@ export function handleMarketCreated(event: MarketCreated): void {
   const usdPrice = priceOracle
     .getUnderlyingPrice(event.params._poolToken)
     .toBigDecimal()
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     .div(exponentToBigDecimal(36 - inputToken.decimals));
   const market = new Market(event.params._poolToken);
   market.protocol = event.address;

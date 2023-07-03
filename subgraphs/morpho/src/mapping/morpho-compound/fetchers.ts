@@ -2,12 +2,12 @@ import {
   exponentToBigInt,
   exponentToBigDecimal,
   MORPHO_COMPOUND_ADDRESS,
-  } from "../../constants";
-  import {
-    getOrInitToken,
-    getOrInitLendingProtocol,
-  } from "../../utils/initializers";
-  import { MorphoPositions } from "../common";
+} from "../../constants";
+import {
+  getOrInitToken,
+  getOrInitLendingProtocol,
+} from "../../utils/initializers";
+import { MorphoPositions } from "../common";
 import { Address } from "@graphprotocol/graph-ts";
 import { CToken } from "../../../generated/Morpho/CToken";
 import { Comptroller } from "../../../generated/templates";
