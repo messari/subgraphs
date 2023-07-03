@@ -482,7 +482,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   let amount = event.params.value;
   const receipt = event.receipt;
   if (!receipt) {
-    log.warning("[handleBorrow]No receipt for tx {}", [
+    log.warning("[handleCollateralTransfer]No receipt for tx {}", [
       event.transaction.hash.toHexString(),
     ]);
   } else if (

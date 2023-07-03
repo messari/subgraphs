@@ -200,6 +200,8 @@ templates:
       abis:
         - name: StableDebtToken
           file: ./abis/aave-v3/StableDebtToken.json
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -219,6 +221,8 @@ templates:
       abis:
         - name: VariableDebtToken
           file: ./abis/aave-v3/VariableDebtToken.json
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:

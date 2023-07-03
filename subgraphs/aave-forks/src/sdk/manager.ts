@@ -38,6 +38,7 @@ import {
   ProtocolType,
   Transaction,
   TransactionType,
+  ZERO_ADDRESS,
 } from "./constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
@@ -728,6 +729,39 @@ export class DataManager {
     return liquidate;
   }
 
+  createTransferEvent(
+    asset: Bytes,
+    sender: Address,
+    receiver: Address,
+    amount: BigInt,
+    amountUSD: BigDecimal,
+    positions: string[]
+  ): Transfer {
+    const transfer = new Transfer(
+      this.event.transaction.hash
+        .concatI32(this.event.logIndex.toI32())
+        .concatI32(Transaction.TRANSFER)
+    );
+    transfer.hash = this.event.transaction.hash;
+    transfer.nonce = this.event.transaction.nonce;
+    transfer.logIndex = this.event.logIndex.toI32();
+    transfer.gasPrice = this.event.transaction.gasPrice;
+    transfer.gasUsed = this.event.receipt ? this.event.receipt!.gasUsed : null;
+    transfer.gasLimit = this.event.transaction.gasLimit;
+    transfer.blockNumber = this.event.block.number;
+    transfer.timestamp = this.event.block.timestamp;
+    transfer.sender = sender;
+    transfer.receiver = receiver;
+    transfer.market = this.market.id;
+    transfer.positions = positions;
+    transfer.asset = asset;
+    transfer.amount = amount;
+    transfer.amountUSD = amountUSD;
+    transfer.save();
+
+    return transfer;
+  }
+
   createTransfer(
     asset: Bytes,
     sender: Address,
@@ -782,30 +816,55 @@ export class DataManager {
       this.market.inputTokenPriceUSD
     );
 
-    const transfer = new Transfer(
-      this.event.transaction.hash
-        .concatI32(this.event.logIndex.toI32())
-        .concatI32(Transaction.TRANSFER)
+    const transfer = this.createTransferEvent(
+      asset,
+      sender,
+      receiver,
+      amount,
+      amountUSD,
+      [receiverPosition.getPositionID()!, positionID!]
     );
-    transfer.hash = this.event.transaction.hash;
-    transfer.nonce = this.event.transaction.nonce;
-    transfer.logIndex = this.event.logIndex.toI32();
-    transfer.gasPrice = this.event.transaction.gasPrice;
-    transfer.gasUsed = this.event.receipt ? this.event.receipt!.gasUsed : null;
-    transfer.gasLimit = this.event.transaction.gasLimit;
-    transfer.blockNumber = this.event.block.number;
-    transfer.timestamp = this.event.block.timestamp;
-    transfer.sender = sender;
-    transfer.receiver = receiver;
-    transfer.market = this.market.id;
-    transfer.positions = [receiverPosition.getPositionID()!, positionID!];
-    transfer.asset = asset;
-    transfer.amount = amount;
-    transfer.amountUSD = amountUSD;
-    transfer.save();
 
     this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
     this.updateUsageData(TransactionType.TRANSFER, sender);
+
+    return transfer;
+  }
+
+  createMintToTreasury(
+    asset: Bytes,
+    treasury: Address,
+    amount: BigInt,
+    amountUSD: BigDecimal,
+    treasuryNewBalance: BigInt,
+    interestType: string | null = null
+  ): Transfer | null {
+    const treasuryAccount = new AccountManager(treasury);
+    const treasuryPosition = new PositionManager(
+      treasuryAccount.getAccount(),
+      this.market,
+      PositionSide.COLLATERAL,
+      interestType
+    );
+    treasuryPosition.addPosition(
+      this.event,
+      asset,
+      this.protocol,
+      treasuryNewBalance,
+      TransactionType.TRANSFER,
+      this.market.inputTokenPriceUSD
+    );
+
+    const transfer = this.createTransferEvent(
+      asset,
+      Address.fromString(ZERO_ADDRESS),
+      treasury,
+      amount,
+      amountUSD,
+      [treasuryPosition.getPositionID()!]
+    );
+
+    this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
 
     return transfer;
   }

@@ -1124,33 +1124,28 @@ export function _handleTransfer(
   // then this transfer is emitted as part of another event
   // ie, a deposit, withdraw, borrow, repay, etc
   // we want to let that handler take care of position updates
-  // and zero addresses mean it is a part of a burn / mint
-  if (
-    to == Address.fromString(ZERO_ADDRESS) ||
-    from == Address.fromString(ZERO_ADDRESS) ||
-    to == asset ||
-    from == asset
-  ) {
+  // and to zero address mean it is a part of a burn
+  if (to == Address.fromString(ZERO_ADDRESS) || to == asset || from == asset) {
     return;
   }
 
-  const tokenContract = ERC20.bind(asset);
-  const senderBalanceResult = tokenContract.try_balanceOf(from);
-  const receiverBalanceResult = tokenContract.try_balanceOf(to);
-  if (senderBalanceResult.reverted) {
+  const aTokenContract = AToken.bind(event.address);
+  const tryTreasuryAddress = aTokenContract.try_RESERVE_TREASURY_ADDRESS();
+  if (tryTreasuryAddress.reverted) {
     log.warning(
-      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
-      [asset.toHexString(), from.toHexString()]
+      "[_handleTransfer] Error getting treasury address on aToken: {}",
+      [event.address.toHexString()]
     );
     return;
   }
-  if (receiverBalanceResult.reverted) {
-    log.warning(
-      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
-      [asset.toHexString(), to.toHexString()]
-    );
-    return;
+  const treasury = tryTreasuryAddress.value;
+
+  let isMintToTreasury = false;
+  if (from == Address.fromString(ZERO_ADDRESS)) {
+    if (to != treasury) return;
+    isMintToTreasury = true;
   }
+
   const tokenManager = new TokenManager(asset, event);
   const assetToken = tokenManager.getToken();
   let interestRateType: string | null;
@@ -1169,16 +1164,47 @@ export function _handleTransfer(
     event,
     protocolData
   );
-  manager.createTransfer(
-    asset,
-    from,
-    to,
-    amount,
-    amountUSD,
-    senderBalanceResult.value,
-    receiverBalanceResult.value,
-    interestRateType
-  );
+
+  const tokenContract = ERC20.bind(asset);
+  const receiverBalanceResult = tokenContract.try_balanceOf(to);
+  if (receiverBalanceResult.reverted) {
+    log.warning(
+      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
+      [asset.toHexString(), to.toHexString()]
+    );
+    return;
+  }
+
+  if (isMintToTreasury) {
+    manager.createMintToTreasury(
+      asset,
+      treasury,
+      amount,
+      amountUSD,
+      receiverBalanceResult.value,
+      interestRateType
+    );
+  } else {
+    const senderBalanceResult = tokenContract.try_balanceOf(from);
+    if (senderBalanceResult.reverted) {
+      log.warning(
+        "[_handleTransfer]token {} balanceOf() call for account {} reverted",
+        [asset.toHexString(), from.toHexString()]
+      );
+      return;
+    }
+
+    manager.createTransfer(
+      asset,
+      from,
+      to,
+      amount,
+      amountUSD,
+      senderBalanceResult.value,
+      receiverBalanceResult.value,
+      interestRateType
+    );
+  }
 }
 
 export function _handleAssetConfigUpdated(
