@@ -8,7 +8,7 @@ dataSources:
     source:
       address: "{{ factory.address }}"
       abi: MorphoCompound
-      startBlock: { { factory.startBlock } }
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
