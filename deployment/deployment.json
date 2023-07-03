@@ -3057,10 +3057,10 @@
       }
     }
   },
-  "morpho": {
+  "morpho-aave-v2": {
     "schema": "lending",
     "base": "morpho",
-    "protocol": "morpho",
+    "protocol": "morpho-aave-v2",
     "project": "morpho",
     "deployments": {
       "morpho-aave-v2-ethereum": {
@@ -3072,7 +3072,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "morpho.template.yaml"
+          "template": "morpho.aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3084,7 +3084,15 @@
             "query-id": "morpho-aave-v2-ethereum"
           }
         }
-      },
+      }
+    }
+  },
+  "morpho-compound": {
+    "schema": "lending",
+    "base": "morpho",
+    "protocol": "morpho-compound",
+    "project": "morpho",
+    "deployments": {
       "morpho-compound-ethereum": {
         "network": "ethereum",
         "status": "prod",
@@ -3094,7 +3102,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "morpho.template.yaml"
+          "template": "morpho.compound.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
