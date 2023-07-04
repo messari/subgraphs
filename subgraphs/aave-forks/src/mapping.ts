@@ -53,6 +53,7 @@ import {
   getInterestRateType,
   getFlashloanPremiumAmount,
   calcuateFlashLoanPremiumToLPUSD,
+  getTreasuryAddress,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -1100,6 +1101,52 @@ export function _handleFlashLoan(
   manager.addSupplyRevenue(premiumUSDToLP, feeToLP);
 }
 
+export function _handleMintedToTreasury(
+  event: ethereum.Event,
+  protocolData: ProtocolData,
+  asset: Address,
+  amount: BigInt
+): void {
+  const market = getMarketFromToken(asset, protocolData);
+  if (!market) {
+    log.warning("[_handleMintedToTreasury] Market for token {} not found", [
+      asset.toHexString(),
+    ]);
+    return;
+  }
+
+  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const amountUSD = tokenManager.getAmountUSD(amount);
+  const treasuryAddress = getTreasuryAddress(market);
+  const treasuryBalance = getCollateralBalance(market, treasuryAddress);
+
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
+
+  log.warning(
+    "[_handleMintedToTreasury] asset: {} market: {} treasury: {} amount: {} usd: {} tBal: {}",
+    [
+      asset.toHexString(),
+      market.id.toHexString(),
+      treasuryAddress.toHexString(),
+      amount.toString(),
+      amountUSD.toString(),
+      treasuryBalance.toString(),
+    ]
+  );
+  manager.createMintToTreasury(
+    asset,
+    treasuryAddress,
+    amount,
+    amountUSD,
+    treasuryBalance
+  );
+}
+
 /////////////////////////
 //// Transfer Events ////
 /////////////////////////
@@ -1124,28 +1171,33 @@ export function _handleTransfer(
   // then this transfer is emitted as part of another event
   // ie, a deposit, withdraw, borrow, repay, etc
   // we want to let that handler take care of position updates
-  // and to zero address mean it is a part of a burn
-  if (to == Address.fromString(ZERO_ADDRESS) || to == asset || from == asset) {
+  // and zero addresses mean it is a part of a burn / mint
+  if (
+    to == Address.fromString(ZERO_ADDRESS) ||
+    from == Address.fromString(ZERO_ADDRESS) ||
+    to == asset ||
+    from == asset
+  ) {
     return;
   }
 
-  const aTokenContract = AToken.bind(event.address);
-  const tryTreasuryAddress = aTokenContract.try_RESERVE_TREASURY_ADDRESS();
-  if (tryTreasuryAddress.reverted) {
+  const tokenContract = ERC20.bind(asset);
+  const senderBalanceResult = tokenContract.try_balanceOf(from);
+  const receiverBalanceResult = tokenContract.try_balanceOf(to);
+  if (senderBalanceResult.reverted) {
     log.warning(
-      "[_handleTransfer] Error getting treasury address on aToken: {}",
-      [event.address.toHexString()]
+      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
+      [asset.toHexString(), from.toHexString()]
     );
     return;
   }
-  const treasury = tryTreasuryAddress.value;
-
-  let isMintToTreasury = false;
-  if (from == Address.fromString(ZERO_ADDRESS)) {
-    if (to != treasury) return;
-    isMintToTreasury = true;
+  if (receiverBalanceResult.reverted) {
+    log.warning(
+      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
+      [asset.toHexString(), to.toHexString()]
+    );
+    return;
   }
-
   const tokenManager = new TokenManager(asset, event);
   const assetToken = tokenManager.getToken();
   let interestRateType: string | null;
@@ -1164,47 +1216,16 @@ export function _handleTransfer(
     event,
     protocolData
   );
-
-  const tokenContract = ERC20.bind(asset);
-  const receiverBalanceResult = tokenContract.try_balanceOf(to);
-  if (receiverBalanceResult.reverted) {
-    log.warning(
-      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
-      [asset.toHexString(), to.toHexString()]
-    );
-    return;
-  }
-
-  if (isMintToTreasury) {
-    manager.createMintToTreasury(
-      asset,
-      treasury,
-      amount,
-      amountUSD,
-      receiverBalanceResult.value,
-      interestRateType
-    );
-  } else {
-    const senderBalanceResult = tokenContract.try_balanceOf(from);
-    if (senderBalanceResult.reverted) {
-      log.warning(
-        "[_handleTransfer]token {} balanceOf() call for account {} reverted",
-        [asset.toHexString(), from.toHexString()]
-      );
-      return;
-    }
-
-    manager.createTransfer(
-      asset,
-      from,
-      to,
-      amount,
-      amountUSD,
-      senderBalanceResult.value,
-      receiverBalanceResult.value,
-      interestRateType
-    );
-  }
+  manager.createTransfer(
+    asset,
+    from,
+    to,
+    amount,
+    amountUSD,
+    senderBalanceResult.value,
+    receiverBalanceResult.value,
+    interestRateType
+  );
 }
 
 export function _handleAssetConfigUpdated(

@@ -44,6 +44,7 @@ import {
   SwapBorrowRateMode,
   Withdraw,
   UserEModeSet,
+  MintedToTreasury,
 } from "../../../generated/LendingPool/LendingPool";
 import {
   _handleAssetConfigUpdated,
@@ -57,6 +58,7 @@ import {
   _handleFlashloanPremiumTotalUpdated,
   _handleLiquidate,
   _handleLiquidationProtocolFeeChanged,
+  _handleMintedToTreasury,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -466,6 +468,15 @@ export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
     newBorrowBalances,
     interestRateType,
     protocolData
+  );
+}
+
+export function handleMintedToTreasury(event: MintedToTreasury): void {
+  _handleMintedToTreasury(
+    event,
+    protocolData,
+    event.params.reserve,
+    event.params.amountMinted
   );
 }
 
