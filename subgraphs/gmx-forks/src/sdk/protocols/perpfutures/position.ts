@@ -1,27 +1,30 @@
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+
+import { Pool } from "./pool";
+import { Account } from "./account";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import * as constants from "../../util/constants";
+import { addToArrayAtIndex } from "../../util/arrays";
+
 import {
   Token,
   PositionSnapshot,
   _PositionCounter,
   Position as PositionSchema,
 } from "../../../../generated/schema";
-import { Pool } from "./pool";
-import { Account } from "./account";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { addToArrayAtIndex } from "../../util/arrays";
 
 /**
  * This file contains the Position class, which is used to
  * make all of the storage changes that occur in the position and
  * its corresponding snapshots.
  *
- * Schema Version:  1.3.2
- * SDK Version:     1.1.5
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class PositionManager {

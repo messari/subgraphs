@@ -5,7 +5,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_NAME = "GMX";
-export const PROTOCOL_SLUG = "GMX";
+export const PROTOCOL_SLUG = "gmx";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -168,7 +168,7 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0x321f653eed006ad1c29d174e17d96351bde22649";
+export const PROTOCOL_ID = "0x9ab2de34a33fb459b538c43f251eb825645e8595";
 export const POOL_NAME = "GMXVault";
 export const POOL_SYMBOL = "Vault";
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
@@ -181,22 +181,22 @@ export const FUNDING_PRECISION = BigDecimal.fromString("1000000");
 export const FUNDING_PRECISION_DECIMALS = 6;
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0x489ee077994b6658eafa855c308275ead8097c4a"
+  "0x9ab2de34a33fb459b538c43f251eb825645e8595"
 );
 
 export const MLP_ADDRESS = Address.fromString(
-  "0x4277f8f2c384827b5273592ff7cebd9f2c1ac258"
+  "0x01234181085565ed162a948b6a5e88758cd7c7b8"
 );
 
 export const MLP_MANAGER_ADDRESSES = [
-  Address.fromString("0x321f653eed006ad1c29d174e17d96351bde22649"), // GlpManager_V1
-  Address.fromString("0x3963ffc9dff443c2a94f21b129d429891e32ec18"), // GlpManager_V2
-];
+  Address.fromString("0xe1ae4d4b06a5fe1fc288f6b4cd72f9f8323b107f"), // GlpManager_V1
+  Address.fromString("0xd152c7f25db7f4b95b7658323c5f33d176818ee4"), // GlpManager_V2
+]
 
 export const MMY_ADDRESS = Address.fromString(
-  "0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a"
+  "0x62edc0692bd897d2295872a9ffcac5425011c661"
 );
 
 export const ESCROWED_MMY_ADDRESS = Address.fromString(
-  "0xf42ae1d54fd613c9bb14810b0588faaa09a426ca"
+  "0xff1489227bbaac61a9209a08929e4c2a526ddd17"
 );
