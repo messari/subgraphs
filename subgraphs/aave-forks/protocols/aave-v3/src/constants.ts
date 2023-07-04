@@ -14,18 +14,18 @@ export const USDC_POS_TOKEN_ADDRESS =
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Aave";
   export const NAME = "Aave v3";
   export const SLUG = "aave-v3";
 }
 
-export namespace TokenType {
-  export const ATOKEN = "ATOKEN";
-  export const INPUTTOKEN = "INPUTTOKEN";
-  export const VTOKEN = "VTOKEN";
-  export const STOKEN = "STOKEN";
-}
-
 export const AAVE_DECIMALS = 8;
+
+export namespace InterestRateMode {
+  export const NONE = 0 as i32;
+  export const STABLE = 1 as i32;
+  export const VARIABLE = 2 as i32;
+}
 
 ////////////////////////////
 ///// Network Specific /////

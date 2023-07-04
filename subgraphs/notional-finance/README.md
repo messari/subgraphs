@@ -206,7 +206,7 @@ Volume in the context of Notional is the aggregate transactions with the liquidi
 
 To simplify, the formula of Notional's Volume (combining lend, borrow, repay and withdraw) is:
 
-> Volumn = $\sum$ value of fCASH transacted
+> Volume = $\sum$ value of fCASH transacted
 
 _Revenue_
 
@@ -276,7 +276,7 @@ In this method, there might be a situation when the same person borrows and repa
 
 However, this might be technically cumbersome to recitify this error. In any case, most lending protocols do not eliminate lendings and borrowing from the same address from their statistics.
 
-# Methodology Implementation Challenges
+## Methodology Implementation Challenges
 
 - Market Balances and Positions: We update market balances and positions to 0 manually when a market is observed to have matured (become inactive). When a market is approaching maturity (see [settlement](https://docs.notional.finance/notional-v2/risk-and-collateralization/settlement#third-party-settlement) details), a user can roll over their position (through individual lend and borrow trades which will be captured through `LendBorrowTrade` event) or a 3p can settle the user balances. In either case, matured market positions should become 0 and positions with rolled-over market will be captured separately.
 
@@ -287,3 +287,14 @@ However, this might be technically cumbersome to recitify this error. In any cas
 - Repay and Deposit, Withdraw and Borrow: Notional team confirmed that these can happen in a single action. However, such actions seem to happen through [BatchActions](https://github.com/notional-finance/contracts-v2/blob/63eb0b46ec37e5fc5447bdde3d951dd90f245741/contracts/external/actions/BatchAction.sol#L78) which should still result in individual LendBorrow trades. Further, I didn't find any occurrences of `repay and deposit` and `withdraw and borrow` in single LendBorrow trade based on logging observations. Hence, I include those conditionals for such events and log.warn any such occurrences for future.
 
 - Negative Input Token Balances: When we observe negative token balances, we set it to 0. This results in totalDepositBalanceUSD and supply side revenue to be 0 as well.
+
+## Data Issues
+
+> Issues as of June 27, 2023. They may be resolved in the future, but for now we are leaving them here for reference.
+
+- Protocol level TVL is 0
+- The pool TVLs don't add up to a number that is reasonable (after cross referencing)
+- `market.totalBorrowBalanceUSD` is negative
+- For context, initial issue was `supplySideRevenue` was negative due to nature of Notional setting fixed interest from DEX market
+  - Attempted to resolve this by tracking open and closing positions and measuring the difference. This lead to negative balances in pools and incorrect TVL.
+  - Recommendation: As the DEX and Lending components are required for accurate data, attempting to build one without the other leads to failed QAs and multiple problems. Subgraph needs to be built to consider both elements.

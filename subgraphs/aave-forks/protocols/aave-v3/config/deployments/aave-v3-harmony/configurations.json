@@ -1,18 +1,22 @@
 {
   "network": "harmony",
-  "PoolAddressesProviderRegistry": {
-    "address": "0x770ef9f4fe897e59daCc474EF11238303F9552b6",
-    "startBlock": 23930102
+  "factory": {
+    "address": "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb",
+    "startBlock": 4365470
   },
-  "RewardsController": {
-    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
-    "startBlock": 24097683
+  "lendingPoolConfigurator": {
+    "address": "0x8145eddDf43f50276641b55bd3AD95944510021E",
+    "startBlock": 4365702
   },
   "LendingPool": {
     "address": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
-    "startBlock": 23930374
+    "startBlock": 4365693
+  },
+  "RewardsController": {
+    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "startBlock": 4467583
   },
   "graftEnabled": false,
   "subgraphId": "",
-  "graftStartBlock": 35918708
+  "graftStartBlock": 4467583
 }

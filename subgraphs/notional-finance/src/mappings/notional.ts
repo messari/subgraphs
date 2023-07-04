@@ -139,10 +139,6 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
           const rate = bigIntToBigDecimal(impliedRate, RATE_PRECISION_DECIMALS);
           interestRate.rate = rate.times(BIGDECIMAL_HUNDRED);
           interestRate.save();
-          // TODO: remove
-          // we don't need this because we aren't changing the
-          // interestRate entity, only updating latest impliedRate
-          // mkt.rates = [interestRate.id];
 
           // set exchange rate for market in event
           const timeToMaturity = bigIntToBigDecimal(

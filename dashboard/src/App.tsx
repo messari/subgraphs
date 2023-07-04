@@ -244,7 +244,10 @@ function App() {
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
           const signalledTokens = sub.currentVersion.subgraphDeployment.signalledTokens;
           const subgraphId = sub.id;
-          decenDepos[name] = { network, deploymentId, subgraphId, signalledTokens };
+          if (!(name in decenDepos)) {
+            decenDepos[name] = [];
+          }
+          decenDepos[name].push({ network, deploymentId, subgraphId, signalledTokens });
         } catch (err) {
           return;
         }

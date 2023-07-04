@@ -96,17 +96,17 @@ Note: This refers to RDNT/WETH liquidity pool on SushiSwap and staking the LP to
 
 ### Total Revenue
 
-> Total Revenue = $\sum$ value of interest payments incurred by borrowers (platform fees)
+> Total Revenue = $\sum$ value of interest payments incurred by borrowers (platform fees) + FlashLoan Amount \* Flashloan premium rate (0.9%)
 
 ### Supply Side Revenue
 
-> Supply Side Revenue = 25% \* Total Revenue
+> Supply Side Revenue = 25% \* interest Revenue + FlashLoan Amount \* Flashloan premium rate (0.9%)
 
 Note: 25% of the total revenue goes to lenders who supply assets
 
 ### Protocol Side Revenue
 
-> Protocol Side Revenue = 75% \* Total Revenue
+> Protocol Side Revenue = 75% \* Interest Revenue
 
 Note: 60% of total revenue goes to Radiant dynamic liquidity providers (dLP) who restake LP with RDNT token. The remainder goes to DAO.
 
@@ -147,7 +147,7 @@ Interest rates are determined by utilization rate. Utilization ratio represents 
 ### Rewards for LPs
 
 Liquidity providers who stake their LP tokens in Radiant earn RDNT emissions
-Daily Rewards for Pool2 = $ Stake LP tokens value \* APR
+Daily Rewards for Pool2 = \$ Stake LP tokens value \* APR
 Note: Stakers receive 20% of all RDNT emissions as an incentive for providing liquidity
 
 ### Rewards for Vesting and Locking RDNT

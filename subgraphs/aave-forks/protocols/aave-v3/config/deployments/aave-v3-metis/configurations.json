@@ -1,8 +1,12 @@
 {
   "network": "andromeda",
-  "PoolAddressesProviderRegistry": {
+  "factory": {
     "address": "0x9E7B73ffD9D2026F3ff4212c29E209E09C8A91F5",
     "startBlock": 5445183
+  },
+  "lendingPoolConfigurator": {
+    "address": "0x69FEE8F261E004453BE0800BC9039717528645A6",
+    "startBlock": 5445225
   },
   "RewardsController": {
     "address": "0x30C1b8F0490fa0908863d6Cbd2E36400b4310A6B",

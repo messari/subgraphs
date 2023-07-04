@@ -19,7 +19,7 @@ dataSources:
       startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - LendingProtocol
@@ -39,7 +39,7 @@ dataSources:
       startBlock: {{ lendingPoolConfigurator.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Market
@@ -69,6 +69,14 @@ dataSources:
           handler: handleReservePaused
         - event: ReserveFactorChanged(indexed address,uint256,uint256)
           handler: handleReserveFactorChanged
+        - event: LiquidationProtocolFeeChanged(indexed address,uint256,uint256)
+          handler: handleLiquidationProtocolFeeChanged
+        - event: FlashloanPremiumTotalUpdated(uint128,uint128)
+          handler: handleFlashloanPremiumTotalUpdated
+        - event: FlashloanPremiumToProtocolUpdated(uint128,uint128)
+          handler: handleFlashloanPremiumToProtocolUpdated
+        - event: SiloedBorrowingChanged(indexed address,bool,bool)
+          handler: handleSiloedBorrowingChanged
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPool
@@ -79,7 +87,7 @@ dataSources:
       startBlock: {{ lendingPool.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Market
@@ -110,10 +118,14 @@ dataSources:
       eventHandlers:
         - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleBorrow
+          receipt: true
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
           handler: handleLiquidationCall
         - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
           handler: handleRepay
+          receipt: true
+        - event: SwapBorrowRateMode(indexed address,indexed address,uint8)
+          handler: handleSwapBorrowRateMode          
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
         - event: Supply(indexed address,address,indexed address,uint256,indexed uint16)
@@ -124,6 +136,11 @@ dataSources:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
+        - event: FlashLoan(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
+          handler: handleFlashloan
+        - event: UserEModeSet(indexed address,uint8)
+          handler: handleUserEModeSet
+
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: RewardsController
@@ -134,7 +151,7 @@ dataSources:
       startBlock: {{ RewardsController.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - RewardsController
@@ -163,7 +180,7 @@ templates:
       abi: AToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -174,6 +191,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCollateralTransfer
+          receipt: true
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: StableDebtToken
@@ -182,7 +200,7 @@ templates:
       abi: StableDebtToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -201,7 +219,7 @@ templates:
       abi: VariableDebtToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:

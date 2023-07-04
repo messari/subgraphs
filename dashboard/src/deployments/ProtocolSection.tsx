@@ -579,7 +579,7 @@ function ProtocolSection({
           }
 
           const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(
-            (x) => x.includes(subgraphName) || x.includes(depo?.decentralizedNetworkId),
+            (x) => x.includes(subgraphName + "-" + depo?.chain) || x.includes(depo?.decentralizedNetworkId),
           );
           let decenSubgraphId = decenObject?.subgraph;
           if (decenSubgraphKey) {
@@ -664,7 +664,10 @@ function ProtocolSection({
               onClick={(event) => {
                 if (event.ctrlKey) {
                   if (!validationSupported) {
-                    window.open(`https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`, "_blank");
+                    window.open(
+                      `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview&chain=arbitrum-one`,
+                      "_blank",
+                    );
                     return;
                   }
                   if (!decenObject?.fatalError) {
@@ -674,7 +677,7 @@ function ProtocolSection({
                   }
                 } else {
                   if (!validationSupported) {
-                    window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`;
+                    window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview&chain=arbitrum-one`;
                     return;
                   }
                   if (!decenObject?.fatalError) {
