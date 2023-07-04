@@ -872,7 +872,7 @@ export class DataManager {
     this.market.rewardTokens = rewardTokens;
     this.market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
     this.market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-    this.market.save();
+    this.saveMarket();
   }
 
   // used to update tvl, borrow balance, reserves, etc. in market and protocol
