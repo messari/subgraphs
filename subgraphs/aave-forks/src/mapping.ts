@@ -1126,18 +1126,6 @@ export function _handleMintedToTreasury(
     event,
     protocolData
   );
-
-  log.warning(
-    "[_handleMintedToTreasury] asset: {} market: {} treasury: {} amount: {} usd: {} tBal: {}",
-    [
-      asset.toHexString(),
-      market.id.toHexString(),
-      treasuryAddress.toHexString(),
-      amount.toString(),
-      amountUSD.toString(),
-      treasuryBalance.toString(),
-    ]
-  );
   manager.createMintToTreasury(
     asset,
     treasuryAddress,
