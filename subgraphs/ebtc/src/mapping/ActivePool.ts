@@ -15,8 +15,8 @@ export function handleActivePoolCollBalanceUpdated(
   const manager = getDataManager(event);
   const stEthToken = new TokenManager(STETH_ADDRESS, event);
   manager.updateMarketAndProtocolData(
-    stEthToken.getPriceUSD(), // inputTokenPriceUSD: BigDecimal,
-    event.params._coll // newInputTokenBalance: BigInt,
+    stEthToken.getPriceUSD(), // inputTokenPriceUSD: BigDecimal
+    event.params._coll // newInputTokenBalance: BigInt
   );
 }
 
@@ -31,8 +31,8 @@ export function handleActivePoolEBTCDebtUpdated(
   const market = manager.getMarket();
   const stEthToken = new TokenManager(STETH_ADDRESS, event);
   manager.updateMarketAndProtocolData(
-    stEthToken.getPriceUSD(), // inputTokenPriceUSD: BigDecimal,
-    market.inputTokenBalance, // newInputTokenBalance: BigInt,
-    event.params._EBTCDebt // newVariableBorrowBalance: BigInt | null = null,
+    stEthToken.getPriceUSD(), // inputTokenPriceUSD: BigDecimal
+    market.inputTokenBalance, // newInputTokenBalance: BigInt
+    event.params._EBTCDebt // newVariableBorrowBalance: BigInt | null = null
   );
 }
