@@ -10,108 +10,43 @@ graft:
   block: {{graftStartBlock}} # Block number
 {{/graftEnabled}}
 dataSources:
-  - kind: ethereum
-    name: Router
+  - kind: ethereum/contract
+    name: RootChainManager
     network: {{ network }}
     source:
-      address: "{{ router.address }}"
-      abi: Router
-      startBlock: {{ router.startBlock }}
+      address: "{{rootChainManager.address}}"
+      abi: RootChainManager
+      startBlock: {{ rootChainManager.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - BridgeProtocol
+        - Token 
+        - CrosschainToken 
+        - RewardToken 
+        - Protocol 
+        - UsageMetricsDailySnapshot 
+        - FinancialsDailySnapshot 
+        - UsageMetricsHourlySnapshot 
+        - Pool 
+        - PoolRoute 
+        - PoolDailySnapshot 
+        - PoolHourlySnapshot 
+        - Account 
+        - SupportedToken 
+        - ActiveAccount 
+        - _ActivityHelper 
+        - _ProtocolSnapshotHelper 
+        - _CircularBuffer 
       abis:
-        - name: Bridge
-          file: ./abis/Stargate/Bridge.json
-        - name: LPStaking
-          file: ./abis/Stargate/LPStaking.json
-        - name: LPStakingTime
-          file: ./abis/Stargate/LPStakingTime.json
-        - name: Pool
-          file: ./abis/Stargate/Pool.json
-        - name: Router
-          file: ./abis/Stargate/Router.json
-        - name: Factory
-          file: ./abis/Stargate/Factory.json
-
-        - name: ERC20
-          file: ./abis/Tokens/ERC20.json
-        - name: ERC20SymbolBytes
-          file: ./abis/Tokens/ERC20SymbolBytes.json
-        - name: ERC20NameBytes
-          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ERC20Predicate
+          file: ./abis/Polygon/ERC20Predicate.json
+        - name: RootChainManager
+          file: ./abis/Polygon/RootChainManager.json
+        - name: FxERC20RootTunnel
+          file: ./abis/Polygon/FxErc20RootTunnel.json
         
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurvePool
-          file: ./abis/Prices/Curve/Pool.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # Aave Oracle Contract
-        - name: AaveOracleContract
-          file: ./abis/Prices/AaveOracle.json
-        # SushiSwap Contracts
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-      callHandlers:
-        - function: createPool(uint256,address,uint8,uint8,string,string)
-          handler: handleCreatePool
-        - function: addLiquidity(uint256,uint256,address)
-          handler: handleAddLiquidity
-      file: {{{ file }}}
-  - kind: ethereum
-    name: LPStaking
-    network: {{ network }}
-    source:
-      address: "{{ lpStaking.address }}"
-      abi: {{ lpStaking.abi }}
-      startBlock: {{ lpStaking.startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - BridgeProtocol
-      abis:
-        - name: Bridge
-          file: ./abis/Stargate/Bridge.json
-        - name: LPStaking
-          file: ./abis/Stargate/LPStaking.json
-        - name: LPStakingTime
-          file: ./abis/Stargate/LPStakingTime.json
-        - name: Pool
-          file: ./abis/Stargate/Pool.json
-        - name: Router
-          file: ./abis/Stargate/Router.json
-        - name: Factory
-          file: ./abis/Stargate/Factory.json
-
         - name: ERC20
           file: ./abis/Tokens/ERC20.json
         - name: ERC20SymbolBytes
@@ -152,37 +87,132 @@ dataSources:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleStake
-        - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleUnstake
-      file: {{{ file }}}
+        - event: PredicateRegistered(indexed bytes32,indexed address)
+          handler: handlePredicateRegistered
+        - event: TokenMapped(indexed address,indexed address,indexed bytes32)
+          handler: handlePOSTokenMapped
+      file: ./src/mappings/rootchain-manager.ts
+  
+  - kind: ethereum/contract
+    name: FxERC20Events
+    network: {{ network }}
+    source:
+      abi: FxERC20RootTunnel
+      startBlock: {{ fxERC20RootTunnel.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - CrosschainToken
+        - RewardToken
+        - Protocol
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - FinancialsDailySnapshot
+        - Pool
+        - PoolRoute
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Account
+        - SupportedToken
+        - ActiveAccount
+        - _ActivityHelper
+        - _ProtocolSnapshotHelper
+        - _CircularBuffer
+      abis:
+        - name: ERC20Predicate
+          file: ./abis/Polygon/ERC20Predicate.json
+        - name: RootChainManager
+          file: ./abis/Polygon/RootChainManager.json
+        - name: FxERC20RootTunnel
+          file: ./abis/Polygon/FxErc20RootTunnel.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: FxDepositERC20(indexed address,indexed address,indexed address,uint256)
+          handler: handleFxDepositERC20
+        - event: FxWithdrawERC20(indexed address,indexed address,indexed address,uint256)
+          handler: handleFxWithdrawERC20
+        - event: TokenMappedERC20(indexed address,indexed address)
+          handler: handleTokenMappedERC20
+      file: ./src/mappings/fx-erc20.ts
+
 templates:
-  - name: PoolTemplate
+  - name: Predicate
     kind: ethereum
     network: {{ network }}
     source:
-      abi: Pool
+      abi: ERC20Predicate
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - BridgeProtocol
+        - Token 
+        - CrosschainToken 
+        - RewardToken 
+        - Protocol 
+        - UsageMetricsDailySnapshot 
+        - UsageMetricsHourlySnapshot 
+        - FinancialsDailySnapshot 
+        - Pool 
+        - PoolRoute 
+        - PoolDailySnapshot 
+        - PoolHourlySnapshot 
+        - Account 
+        - SupportedToken 
+        - ActiveAccount 
+        - _ActivityHelper 
+        - _ProtocolSnapshotHelper 
+        - _CircularBuffer 
       abis:
-        - name: Bridge
-          file: ./abis/Stargate/Bridge.json
-        - name: LPStaking
-          file: ./abis/Stargate/LPStaking.json
-        - name: LPStakingTime
-          file: ./abis/Stargate/LPStakingTime.json
-        - name: Pool
-          file: ./abis/Stargate/Pool.json
-        - name: Router
-          file: ./abis/Stargate/Router.json
-        - name: Factory
-          file: ./abis/Stargate/Factory.json
-
+        - name: ERC20Predicate
+          file: ./abis/Polygon/ERC20Predicate.json
+        - name: RootChainManager
+          file: ./abis/Polygon/RootChainManager.json
+        - name: FxERC20RootTunnel
+          file: ./abis/Polygon/FxErc20RootTunnel.json
+        
         - name: ERC20
           file: ./abis/Tokens/ERC20.json
         - name: ERC20SymbolBytes
@@ -223,17 +253,9 @@ templates:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: Swap(uint16,uint256,address,uint256,uint256,uint256,uint256,uint256)
-          handler: handleSwapOut
-        - event: RedeemLocal(address,uint256,uint256,uint16,uint256,bytes)
-          handler: handleRedeemLocal
-        - event: InstantRedeemLocal(address,uint256,uint256,address)
-          handler: handleInstantRedeemLocal
-        - event: RedeemRemote(uint16,uint256,address,uint256,uint256)
-          handler: handleRedeemRemote
-        - event: RedeemLocalCallback(address,uint256,uint256)
-          handler: handleRedeemLocalCallback
+        - event: LockedERC20(indexed address,indexed address,indexed address,uint256)
+          handler: handleERC20Lock
       callHandlers:
-        - function: swapRemote(uint16,uint256,address,(uint256,uint256,uint256,uint256,uint256,uint256))
-          handler: handleSwapIn
-      file: {{{ file }}}
+        - function: exitTokens(address,address,bytes)
+          handler: handleExitTokens
+      file: ./src/mappings/predicate.ts

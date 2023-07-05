@@ -23,6 +23,7 @@ import { Versions } from "../versions";
 import { ERC20 } from "../../generated/FxERC20Events/ERC20";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import { ETH_ADDRESS } from "../sdk/util/constants";
 
 export const conf = new BridgeConfig(
   NetworkConfigs.getFactoryAddress(),
@@ -47,6 +48,14 @@ export class Pricer implements TokenPricer {
 
 export class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
+    if (address.toHexString() == ETH_ADDRESS) {
+      return {
+        name: "ETH",
+        symbol: "ETH",
+        decimals: 18,
+      };
+    }
+
     const wrappedERC20 = ERC20.bind(address);
     const name_call = wrappedERC20.try_name();
     const symbol_call = wrappedERC20.try_symbol();
@@ -58,8 +67,8 @@ export class TokenInit implements TokenInitializer {
       ]);
 
       return {
-        name: "unknown",
-        symbol: "unknown",
+        name: "invalid",
+        symbol: "invalid",
         decimals: 18,
       };
     }
@@ -78,6 +87,9 @@ export function handleTokenMappedERC20(event: TokenMappedERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const rootToken = sdk.Tokens.getOrCreateToken(event.params.rootToken);
+  if (rootToken.name == "invalid") {
+    return;
+  }
 
   if (!pool.isInitialized) {
     pool.initialize(
@@ -110,6 +122,9 @@ export function handleFxDepositERC20(event: FxDepositERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const token = sdk.Tokens.getOrCreateToken(event.params.rootToken);
+  if (token.name == "invalid") {
+    return;
+  }
 
   if (!pool.isInitialized) {
     pool.initialize(
@@ -166,6 +181,9 @@ export function handleFxWithdrawERC20(event: FxWithdrawERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(event.params.rootToken);
+  if (token.name == "invalid") {
+    return;
+  }
 
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, BridgePoolType.BURN_MINT, token);

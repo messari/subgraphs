@@ -9,6 +9,11 @@ import {
 
 import { Token } from "../../generated/schema";
 import {
+  ExitedEther,
+  LockedEther,
+} from "../../generated/FxERC20Events/EtherPredicate";
+
+import {
   ExitTokensCall,
   LockedERC20,
 } from "../../generated/FxERC20Events/ERC20Predicate";
@@ -30,17 +35,21 @@ import { ERC20 } from "../../generated/FxERC20Events/ERC20";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 import { conf, Pricer, TokenInit } from "./fx-erc20";
+import { ETH_ADDRESS } from "../sdk/util/constants";
 
-export function handleERC20Lock(event: LockedERC20): void {
+export function handleEtherLock(event: LockedEther): void {
   // poolAddress == RootToken Address
-  const poolAddr = event.params.rootToken;
+  const poolAddr = Address.fromString(ETH_ADDRESS);
   const amount = event.params.amount;
   const crosschainID = BigInt.fromI32(137);
 
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
-  const token = sdk.Tokens.getOrCreateToken(event.params.rootToken);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  const token = sdk.Tokens.getOrCreateToken(poolAddr);
+  if (token.name == "unknown") {
+    return;
+  }
 
   if (!pool.isInitialized) {
     pool.initialize(
@@ -55,18 +64,68 @@ export function handleERC20Lock(event: LockedERC20): void {
     Address.fromString(conf.getID())
   );
 
-  const crosschainTokenAddr_call = rootChainManger.try_rootToChildToken(
-    event.params.rootToken
-  );
+  const crosschainTokenAddr_call =
+    rootChainManger.try_rootToChildToken(poolAddr);
 
   if (crosschainTokenAddr_call.reverted) {
     log.warning(
       "[handleSwapIn] No crosschainToken for network: {} poolID: {} token: {}",
-      [
-        crosschainID.toString(),
-        poolAddr.toHexString(),
-        event.params.rootToken.toHexString(),
-      ]
+      [crosschainID.toString(), poolAddr.toHexString(), poolAddr.toHexString()]
+    );
+
+    return;
+  }
+
+  const crosschainTokenAddr = crosschainTokenAddr_call.value;
+
+  const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
+    crosschainID,
+    crosschainTokenAddr,
+    CrosschainTokenType.WRAPPED,
+    Address.fromBytes(token.id)
+  );
+
+  pool.addDestinationToken(crosschainToken);
+  const route = pool.getDestinationTokenRoute(crosschainToken);
+
+  const account = sdk.Accounts.loadAccount(event.params.depositor);
+  account.transferOut(pool, route!, event.params.depositReceiver, amount);
+}
+
+export function handleERC20Lock(event: LockedERC20): void {
+  // poolAddress == RootToken Address
+  const poolAddr = event.params.rootToken;
+  const amount = event.params.amount;
+  const crosschainID = BigInt.fromI32(137);
+
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  const token = sdk.Tokens.getOrCreateToken(poolAddr);
+  if (token.name == "unknown") {
+    return;
+  }
+
+  if (!pool.isInitialized) {
+    pool.initialize(
+      token.name,
+      token.symbol,
+      BridgePoolType.LOCK_RELEASE,
+      token
+    );
+  }
+
+  const rootChainManger = RootChainManager.bind(
+    Address.fromString(conf.getID())
+  );
+
+  const crosschainTokenAddr_call =
+    rootChainManger.try_rootToChildToken(poolAddr);
+
+  if (crosschainTokenAddr_call.reverted) {
+    log.warning(
+      "[handleSwapIn] No crosschainToken for network: {} poolID: {} token: {}",
+      [crosschainID.toString(), poolAddr.toHexString(), poolAddr.toHexString()]
     );
 
     return;

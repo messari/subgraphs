@@ -40,6 +40,8 @@ dataSources:
         - _ProtocolSnapshotHelper 
         - _CircularBuffer 
       abis:
+        - name: EtherPredicate
+          file: ./abis/Polygon/EtherPredicate.json
         - name: ERC20Predicate
           file: ./abis/Polygon/ERC20Predicate.json
         - name: RootChainManager
@@ -122,6 +124,8 @@ dataSources:
         - _ProtocolSnapshotHelper
         - _CircularBuffer
       abis:
+        - name: EtherPredicate
+          file: ./abis/Polygon/EtherPredicate.json
         - name: ERC20Predicate
           file: ./abis/Polygon/ERC20Predicate.json
         - name: RootChainManager
@@ -206,6 +210,8 @@ templates:
         - _ProtocolSnapshotHelper 
         - _CircularBuffer 
       abis:
+        - name: EtherPredicate
+          file: ./abis/Polygon/EtherPredicate.json
         - name: ERC20Predicate
           file: ./abis/Polygon/ERC20Predicate.json
         - name: RootChainManager

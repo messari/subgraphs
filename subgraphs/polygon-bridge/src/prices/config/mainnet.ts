@@ -118,6 +118,9 @@ export const IGNORELIST: Address[] = [
   Address.fromString("0xd9016a907dc0ecfa3ca425ab20b6b785b42f2373"),
   Address.fromString("0x03042482d64577a7bdb282260e2ea4c8a89c064b"),
   Address.fromString("0xbca3c97837a39099ec3082df97e28ce91be14472"),
+  Address.fromString("0x9783b81438c24848f85848f8df31845097341771"),
+  Address.fromString("0x4e08f03079c5cd3083ea331ec61bcc87538b7665"),
+  Address.fromString("0x09617F6fD6cF8A71278ec86e23bBab29C04353a7"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////

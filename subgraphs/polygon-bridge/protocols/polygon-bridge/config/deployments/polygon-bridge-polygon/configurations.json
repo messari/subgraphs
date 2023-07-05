@@ -2,9 +2,12 @@
   "deployment": "STARGATE_POLYGON",
   "network": "matic",
   "file": "./src/mappings/handlers.ts",
-  "router": {
-    "address": "0x45A01E4e04F14f7A4a6702c74187c5F6222033cd",
-    "startBlock": 26032409
+  "childChainManager": {
+    "address": "0xa40fc0782bee28dd2cf8cb4ac2ecdb05c537f1b5",
+    "startBlock": 10735437
+  },
+  "fxERC20ChildTunnel": {
+    "startBlock": 10735445
   },
   "graftEnabled": false,
   "subgraphId": "",
