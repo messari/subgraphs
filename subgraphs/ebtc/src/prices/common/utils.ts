@@ -17,7 +17,7 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 import { Configurations } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-import { ERC20 } from "../../../generated/PriceFeed/ERC20";
+import { _ERC20 } from "../../../generated/PriceFeed/_ERC20";
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 export function isNullAddress(tokenAddr: Address): boolean {
@@ -32,14 +32,14 @@ export function readValue<T>(
 }
 
 export function getTokenName(tokenAddr: Address): string {
-  const tokenContract = ERC20.bind(tokenAddr);
+  const tokenContract = _ERC20.bind(tokenAddr);
   const name = readValue<string>(tokenContract.try_name(), "");
 
   return name;
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const tokenContract = ERC20.bind(tokenAddr);
+  const tokenContract = _ERC20.bind(tokenAddr);
 
   const decimals = readValue<BigInt>(
     tokenContract.try_decimals(),
@@ -50,7 +50,7 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
 }
 
 export function getTokenSupply(tokenAddr: Address): BigInt {
-  const tokenContract = ERC20.bind(tokenAddr);
+  const tokenContract = _ERC20.bind(tokenAddr);
 
   const totalSupply = readValue<BigInt>(
     tokenContract.try_totalSupply(),
