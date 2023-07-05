@@ -22,6 +22,8 @@ dataSources:
       eventHandlers:
         - event: ActivePoolAddressChanged(address)
           handler: handleSystemDeployed
+        - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
+          handler: handleCdpUpdated
   - name: ActivePool
     kind: ethereum/contract
     network: "{{ network.slug }}"
