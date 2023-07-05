@@ -104,6 +104,8 @@ dataSources:
           file: ./abis/Prices/Curve/Pool.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
+        - name: UniswapV3
+          file: ./abis/Prices/Uniswap/UniswapV3.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
@@ -162,6 +164,8 @@ dataSources:
           file: ./abis/L2_Optimism_Messenger.json
         - name: L2_Xdai_Messenger
           file: ./abis/L2_Xdai_Messenger.json
+        - name: UniswapV3
+          file: ./abis/Prices/Uniswap/UniswapV3.json
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json

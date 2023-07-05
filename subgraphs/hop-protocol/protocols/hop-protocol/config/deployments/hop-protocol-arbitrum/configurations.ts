@@ -43,6 +43,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return ["ETH", "ETH", "18", ArbitrumBridge.ETH];
     } else if (tokenAddress == RewardTokens.GNO) {
       return ["GNO", "Gnosis Token", "18", ZERO_ADDRESS];
+    } else if (tokenAddress == RewardTokens.rETH_ARB) {
+      return ["rETH", "Rocket Pool Ethereum", "18", ZERO_ADDRESS];
     } else if (tokenAddress == RewardTokens.HOP) {
       return ["HOP", "HOP Token", "18", ZERO_ADDRESS];
     } else {

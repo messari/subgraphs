@@ -8,6 +8,7 @@ import * as UniswapForksRouter from "./routers/UniswapForksRouter";
 import * as UniswapV2 from "./routers/UniswapV2";
 import * as CurveCalculations from "./calculations/CalculationsCurve";
 import * as SushiCalculations from "./calculations/CalculationsSushiswap";
+import { UniswapV3 } from "../../generated/Bridge/UniswapV3";
 
 import { CustomPriceType } from "./common/types";
 import {
@@ -20,16 +21,43 @@ import {
 import {
   ArbitrumHtoken,
   ArbitrumToken,
+  BIGDECIMAL_ONE,
   OptimismHtoken,
   OptimismToken,
+  PRECISION,
   PolygonHtoken,
   PolygonToken,
   RewardTokens,
   XdaiHtoken,
   XdaiToken,
+  exponentToBigInt,
   priceTokens,
+  safeDiv,
 } from "../sdk/util/constants";
 import { UniswapPair } from "../../generated/Bridge/UniswapPair";
+
+const Q192 = BigInt.fromString(
+  "6277101735386680763835789423207666416102355444464034512896"
+);
+
+export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt): BigDecimal[] {
+  const num = sqrtPriceX96.times(sqrtPriceX96);
+
+  log.warning("FUNCTION FOUND", []);
+
+  const denom = Q192;
+  const price1 = num
+    .times(PRECISION)
+    .div(denom)
+    .times(exponentToBigInt(18))
+    .div(exponentToBigInt(18))
+    .toBigDecimal()
+    .div(PRECISION.toBigDecimal());
+
+  const price0 = safeDiv(BIGDECIMAL_ONE, price1);
+
+  return [price0, price1];
+}
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
@@ -60,6 +88,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     tokenAddr = Address.fromString(ArbitrumToken.ETH);
   }
 
+  if (tokenAddr.toHexString() == ArbitrumHtoken.rETH) {
+    tokenAddr = Address.fromString(ArbitrumToken.rETH);
+  }
+
   if (priceTokens.includes(tokenAddr.toHexString())) {
     return CustomPriceType.initialize(
       constants.BIGDECIMAL_USD_PRICE,
@@ -67,6 +99,49 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     );
   }
 
+  if (
+    tokenAddr.toHexString() == OptimismToken.rETH ||
+    tokenAddr.toHexString() == RewardTokens.rETH_OP ||
+    tokenAddr.toHexString() == OptimismHtoken.rETH
+  ) {
+    const uniSwapPair = UniswapV3.bind(
+      Address.fromString("0xaefc1edaede6adadcdf3bb344577d45a80b19582")
+    );
+
+    let price: BigDecimal;
+    const reserve = uniSwapPair.try_slot0();
+    if (!reserve.reverted) {
+      log.warning("[UniswapV3] tokenAddress: {}, SQRT: {}", [
+        tokenAddr.toHexString(),
+        reserve.value.value1.toString(),
+      ]);
+
+      price = sqrtPriceX96ToTokenPrices(reserve.value.value0)[0];
+
+      log.warning(
+        "[UniswapV3] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}",
+        [
+          tokenAddr.toHexString(),
+          reserve.value.value1.toString(),
+          reserve.value.value0.toString(),
+          price.toString(),
+        ]
+      );
+
+      const tokenPrice = getUsdPricePerToken(
+        Address.fromString(OptimismToken.ETH)
+      );
+
+      if (!tokenPrice.reverted) {
+        tokenPrice.usdPrice.times(price);
+
+        const val = tokenPrice.usdPrice.times(price);
+        let x: CustomPriceType;
+        x = CustomPriceType.initialize(val);
+        return x;
+      }
+    }
+  }
   if (tokenAddr.toHexString() == XdaiToken.MATIC) {
     const uniSwapPair = UniswapPair.bind(
       Address.fromString("0x70cd033af4dc9763700d348e402dfeddb86e09e1")
@@ -192,7 +267,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 
     let price: BigInt;
 
-    let reserve = uniSwapPair.try_getReserves();
+    const reserve = uniSwapPair.try_getReserves();
     if (!reserve.reverted) {
       price = reserve.value.value1.div(reserve.value.value0);
       log.warning(
@@ -229,7 +304,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 
   return new CustomPriceType();
 }
-
 export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal

@@ -84,6 +84,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return ["HOP", "HOP Token", "18", ZERO_ADDRESS];
     } else if (tokenAddress == RewardTokens.OP) {
       return ["OP", "Optimism Token", "18", ZERO_ADDRESS];
+    } else if (tokenAddress == RewardTokens.rETH_OP) {
+      return ["rETH", "Rocket Pool Ethereum", "18", ZERO_ADDRESS];
     } else {
       log.critical("Token not found", []);
       return [];

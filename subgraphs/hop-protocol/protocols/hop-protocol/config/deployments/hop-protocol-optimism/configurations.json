@@ -4,8 +4,8 @@
   "subgraphName": "hop-optimism",
   "deployment": "HOP_PROTOCOL_OPTIMISM",
   "graftEnabled": true,
-  "subgraphId": "QmWMKnNmmPB5BEG2cb31eJvSuMPfn7zj6ARiEJV7rKtF5w",
-  "graftStartBlock": 27410327,
+  "subgraphId": "QmbABvGqvHNgvUgU5jCK1fvhe3dAyifu8qoW8BVJ62PXBz",
+  "graftStartBlock": 106100000,
 
   "amms": [
     {

@@ -233,6 +233,28 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
+export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
+  let bd = BigDecimal.fromString("1");
+  for (let i = BIGINT_ZERO; i.lt(decimals as BigInt); i = i.plus(BIGINT_ONE)) {
+    bd = bd.times(BigDecimal.fromString("10"));
+  }
+  return bd;
+}
+
+export function exponentToBigInt(n: i32): BigInt {
+  return BigInt.fromI32(10).pow(n as u8);
+}
+export const PRECISION = BigInt.fromString("100000000000000000");
+
+// return 0 if denominator is 0 in division
+export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
+  if (amount1.equals(BIGDECIMAL_ZERO)) {
+    return BIGDECIMAL_ZERO;
+  } else {
+    return amount0.div(amount1);
+  }
+}
+
 export const FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 export const TRADING_FEE = BigDecimal.fromString("3");
 export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5");
@@ -516,10 +538,12 @@ export namespace PolygonRewardToken {
 export const priceTokens = [
   OptimismToken.USDC,
   OptimismToken.USDT,
+  OptimismToken.sUSD,
   OptimismToken.DAI,
   OptimismHtoken.USDT,
   OptimismHtoken.USDC,
   OptimismHtoken.DAI,
+  OptimismHtoken.sUSD,
 
   XdaiToken.USDC,
   XdaiHtoken.USDC,
@@ -585,8 +609,10 @@ export namespace RewardTokens {
   export const HOP = "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC".toLowerCase();
   export const OP = "0x4200000000000000000000000000000000000042".toLowerCase();
   export const GNO = "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb".toLowerCase();
-  export const rETH =
-    "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb".toLowerCase();
+  export const rETH_OP =
+    "0xC81D1F0EB955B0c020E5d5b264E1FF72c14d1401".toLowerCase();
+  export const rETH_ARB =
+    "0xB766039cc6DB368759C1E56B79AFfE831d0Cc507".toLowerCase();
 }
 export const GNO_REWARDS = [
   XdaiRewardToken.DAI_A,
@@ -630,4 +656,4 @@ export const OP_REWARDS = [
   OptimismRewardToken.SNX_B,
   OptimismRewardToken.sUSD_B,
 ];
-export const RPL_REWARDS = [OptimismRewardToken.rETH];
+export const RPL_REWARDS = [OptimismRewardToken.rETH, ArbitrumRewardToken.rETH];
