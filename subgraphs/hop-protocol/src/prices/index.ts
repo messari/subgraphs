@@ -142,6 +142,51 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       }
     }
   }
+
+  if (
+    tokenAddr.toHexString() == ArbitrumHtoken.rETH ||
+    tokenAddr.toHexString() == RewardTokens.rETH_ARB ||
+    tokenAddr.toHexString() == ArbitrumToken.rETH
+  ) {
+    const uniSwapPair = UniswapV3.bind(
+      Address.fromString("0x09ba302a3f5ad2bf8853266e271b005a5b3716fe")
+    );
+
+    let price: BigDecimal;
+    const reserve = uniSwapPair.try_slot0();
+    if (!reserve.reverted) {
+      log.warning("[UniswapV3] tokenAddress: {}, SQRT: {}", [
+        tokenAddr.toHexString(),
+        reserve.value.value1.toString(),
+      ]);
+
+      price = sqrtPriceX96ToTokenPrices(reserve.value.value0)[0];
+
+      log.warning(
+        "[UniswapV3] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}",
+        [
+          tokenAddr.toHexString(),
+          reserve.value.value1.toString(),
+          reserve.value.value0.toString(),
+          price.toString(),
+        ]
+      );
+
+      const tokenPrice = getUsdPricePerToken(
+        Address.fromString(OptimismToken.ETH)
+      );
+
+      if (!tokenPrice.reverted) {
+        tokenPrice.usdPrice.times(price);
+
+        const val = tokenPrice.usdPrice.times(price);
+        let x: CustomPriceType;
+        x = CustomPriceType.initialize(val);
+        return x;
+      }
+    }
+  }
+
   if (tokenAddr.toHexString() == XdaiToken.MATIC) {
     const uniSwapPair = UniswapPair.bind(
       Address.fromString("0x70cd033af4dc9763700d348e402dfeddb86e09e1")

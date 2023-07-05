@@ -4,11 +4,7 @@
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/hop-protocol/config/templates/hop-protocol.template.yaml > subgraph.yaml",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
-    "do": "messari b hop-protocol-optimism -d -r itsjerryokolo -l",
-    "da": "messari b hop-protocol-arbitrum -d -r itsjerryokolo -l",
-    "bo": "messari b hop-protocol-optimism -l",
-    "ba": "messari b hop-protocol-arbitrum -l"
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.49.0",

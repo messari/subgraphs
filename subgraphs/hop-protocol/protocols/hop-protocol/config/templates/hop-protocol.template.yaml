@@ -43,6 +43,8 @@ dataSources:
           file: ./abis/Prices/Curve/Pool.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
+        - name: UniswapV3
+          file: ./abis/Prices/Uniswap/UniswapV3.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
@@ -102,6 +104,8 @@ dataSources:
           file: ./abis/Prices/Curve/Registry.json
         - name: CurvePool
           file: ./abis/Prices/Curve/Pool.json
+        - name: UniswapV3
+          file: ./abis/Prices/Uniswap/UniswapV3.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: UniswapV3
@@ -169,6 +173,8 @@ dataSources:
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
+        - name: UniswapV3
+          file: ./abis/Prices/Uniswap/UniswapV3.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
@@ -226,6 +232,8 @@ dataSources:
       abis:
         - name: L2_Reward
           file: ./abis/L2_Reward.json
+        - name: UniswapV3
+          file: ./abis/Prices/Uniswap/UniswapV3.json
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
