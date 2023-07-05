@@ -1,0 +1,72 @@
+{
+  protocols {
+    borrowerPermissionType
+    collateralizationType
+    cumulativeProtocolSideRevenueUSD
+    cumulativeSupplySideRevenueUSD
+    cumulativeTotalRevenueUSD
+    cumulativeUniqueUsers
+    id
+    lenderPermissionType
+    lendingType
+    methodologyVersion
+    name
+    network
+    poolCreatorPermissionType
+    protocol
+    protocolControlledValueUSD
+    riskType
+    schemaVersion
+    slug
+    subgraphVersion
+    totalPoolCount
+    totalValueLockedUSD
+    type
+  }
+  tokens {
+    decimals
+    id
+    lastPriceBlockNumber
+    lastPriceUSD
+    name
+    symbol
+    type
+  }
+  accounts {
+    borrowCount
+    closedPositionCount
+    depositCount
+    flashloanCount
+    id
+    liquidateCount
+    liquidationCount
+    openPositionCount
+    positionCount
+    receivedCount
+    repayCount
+    rewardsClaimedUSD
+    transferredCount
+    withdrawCount
+  }
+  positions {
+    balance
+    blockNumberClosed
+    blockNumberOpened
+    borrowCount
+    depositCount
+    hashClosed
+    hashOpened
+    id
+    isCollateral
+    isIsolated
+    liquidationCount
+    receivedCount
+    repayCount
+    side
+    timestampClosed
+    timestampOpened
+    transferredCount
+    type
+    withdrawCount
+  }
+}
