@@ -66,6 +66,8 @@ dataSources:
         ############## Price Oracle ###############
         ###########################################
         # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes

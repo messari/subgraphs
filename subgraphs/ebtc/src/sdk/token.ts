@@ -16,8 +16,8 @@ import {
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version:  3.0.1
- * SDK Version:     1.0.2
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.4
  * Author(s):
  *  - @dmelotik
  */
@@ -158,7 +158,7 @@ export class TokenManager {
     const decimalResult = contract.try_decimals();
     if (!decimalResult.reverted) {
       const decimalValue = decimalResult.value;
-      return decimalValue.toI32();
+      return decimalValue;
     }
 
     // try with the static definition
