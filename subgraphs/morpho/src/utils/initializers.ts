@@ -130,6 +130,7 @@ export const getMarket = (marketAddress: Bytes): Market => {
   if (!market) {
     // The event "MarketCreated" creates directly the market entity
     log.critical("Market not found: {}", [marketAddress.toHexString()]);
+
     return new Market(marketAddress);
   }
   return market;

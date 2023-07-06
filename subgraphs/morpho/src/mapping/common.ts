@@ -18,6 +18,7 @@ import {
 } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
   EventType,
   exponentToBigDecimal,
   exponentToBigInt,
@@ -39,7 +40,11 @@ import {
   updateProtocolPosition,
   updateSnapshots,
 } from "../helpers";
-import { getMarket, getOrInitToken } from "../utils/initializers";
+import {
+  getMarket,
+  getOrInitMarketList,
+  getOrInitToken,
+} from "../utils/initializers";
 
 export class MorphoPositions {
   constructor(
@@ -832,25 +837,16 @@ export function _handleReserveUpdate(
   updateProtocolPosition(params.protocol, market, morphoPositions);
 
   // Update the total supply and borrow frequently by using pool updates
-  const totalDepositBalanceUSD = market
+  const marketDepositBalanceUSD = market
     ._totalSupplyOnPool!.plus(market._totalSupplyInP2P!)
     .times(market.inputTokenPriceUSD);
-  params.protocol.totalDepositBalanceUSD =
-    params.protocol.totalDepositBalanceUSD
-      .minus(market.totalDepositBalanceUSD)
-      .plus(totalDepositBalanceUSD);
-  market.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  market.totalDepositBalanceUSD = marketDepositBalanceUSD;
 
-  const totalBorrowBalanceUSD = market
+  const marketBorrowBalanceUSD = market
     ._totalBorrowOnPool!.plus(market._totalBorrowInP2P!)
     .times(market.inputTokenPriceUSD);
-  params.protocol.totalBorrowBalanceUSD = params.protocol.totalBorrowBalanceUSD
-    .minus(market.totalBorrowBalanceUSD)
-    .plus(totalBorrowBalanceUSD);
-  market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  params.protocol.totalValueLockedUSD = params.protocol.totalDepositBalanceUSD;
+  market.totalBorrowBalanceUSD = marketBorrowBalanceUSD;
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  params.protocol.save();
   // Update pool indexes
   market._reserveSupplyIndex = params.reserveSupplyIndex;
   market._reserveBorrowIndex = params.reserveBorrowIndex;
@@ -887,8 +883,31 @@ export function _handleReserveUpdate(
   ];
 
   updateP2PRates(market);
-
   market.save();
+
+  // update protocol TVL, DepositBalanceUSD, and BorrowBalanceUSD
+  const marketList = getOrInitMarketList(Address.fromBytes(params.protocol.id));
+  let totalValueLockedUSD = BIGDECIMAL_ZERO;
+  let _totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < marketList.markets.length; i++) {
+    const market = Market.load(marketList.markets[i]);
+    if (!market) {
+      log.critical("Market not found for marketID: {}", [
+        marketList.markets[i].toHexString(),
+      ]);
+      return;
+    }
+    totalValueLockedUSD = totalValueLockedUSD.plus(market.totalValueLockedUSD);
+    _totalBorrowBalanceUSD = _totalBorrowBalanceUSD.plus(
+      market.totalBorrowBalanceUSD
+    );
+  }
+
+  params.protocol.totalValueLockedUSD = totalValueLockedUSD;
+  params.protocol.totalBorrowBalanceUSD = _totalBorrowBalanceUSD;
+  params.protocol.totalDepositBalanceUSD = totalValueLockedUSD;
+  params.protocol.save();
+
   return;
 }
 
