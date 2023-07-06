@@ -4,7 +4,7 @@ import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Factory/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Factory/ERC20NameBytes";
-import { INT_EIGHTEEN, INT_NINE, INT_SIXTEEN } from "./constants";
+import { INT_EIGHTEEN, INT_NINE, INT_SIX, INT_SIXTEEN } from "./constants";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
@@ -112,7 +112,7 @@ class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    let staticDefinitions = new Array<StaticTokenDefinition>(6);
+    let staticDefinitions = new Array<StaticTokenDefinition>(INT_SIX);
 
     // Add DGD
     let tokenDGD = new StaticTokenDefinition(
