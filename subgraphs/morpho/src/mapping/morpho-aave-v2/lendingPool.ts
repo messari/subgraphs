@@ -1,10 +1,7 @@
-import {
-  fetchAssetPrice,
-  getAaveProtocol,
-} from "./fetchers";
-import { Address } from "@graphprotocol/graph-ts";
 import { _handleReserveUpdate } from "../common";
+import { Address } from "@graphprotocol/graph-ts";
 import { AaveMath } from "../../utils/maths/aaveMath";
+import { fetchAssetPrice, getAaveProtocol } from "./fetchers";
 import { UnderlyingTokenMapping } from "../../../generated/schema";
 import { getMarket, getOrInitToken } from "../../utils/initializers";
 import { MORPHO_AAVE_V2_ADDRESS, ReserveUpdateParams } from "../../constants";
