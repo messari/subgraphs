@@ -1,6 +1,11 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
-import { LiquidityPool, _PoolPricingHelper } from "../../../generated/schema";
-import { Swap } from "../../../generated/templates/Pair/Pair";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
+
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -13,9 +18,15 @@ import {
 import { getOrCreateToken } from "../../common/getters";
 import { exponentToBigDecimal, safeDiv } from "../../common/utils/numbers";
 
+import { LiquidityPool, _PoolPricingHelper } from "../../../generated/schema";
+
 export function updatePoolPriceFromSwap(
   pool: LiquidityPool,
-  event: Swap
+  amount0In: BigInt,
+  amount0Out: BigInt,
+  amount1In: BigInt,
+  amount1Out: BigInt,
+  event: ethereum.Event
 ): void {
   const helper = _PoolPricingHelper.load(event.address.toHex())!;
 
@@ -33,35 +44,29 @@ export function updatePoolPriceFromSwap(
   const token0IsBase = helper.baseTokenIndex == 0 ? true : false;
 
   let token = token1;
-  let amountBaseIn = event.params.amount0In.toBigDecimal();
-  let amountBaseOut = event.params.amount0Out.toBigDecimal();
-  let amountTokenIn = event.params.amount1In.toBigDecimal();
-  let amountTokenOut = event.params.amount1Out.toBigDecimal();
+  let amountBaseIn = amount0In.toBigDecimal();
+  let amountBaseOut = amount0Out.toBigDecimal();
+  let amountTokenIn = amount1In.toBigDecimal();
+  let amountTokenOut = amount1Out.toBigDecimal();
 
   if (!token0IsBase) {
     token = token0;
-    amountBaseIn = event.params.amount1In.toBigDecimal();
-    amountBaseOut = event.params.amount1Out.toBigDecimal();
-    amountTokenIn = event.params.amount0In.toBigDecimal();
-    amountTokenOut = event.params.amount0Out.toBigDecimal();
+    amountBaseIn = amount1In.toBigDecimal();
+    amountBaseOut = amount1Out.toBigDecimal();
+    amountTokenIn = amount0In.toBigDecimal();
+    amountTokenOut = amount0Out.toBigDecimal();
   }
 
   if (event.block.number <= token.lastPriceBlockNumber!) {
     return;
   }
 
-  if (
-    event.params.amount0In > BIGINT_ZERO &&
-    event.params.amount1Out > BIGINT_ZERO
-  ) {
+  if (amount0In > BIGINT_ZERO && amount1Out > BIGINT_ZERO) {
     // Swap is from token0 to token1
     helper.priceTokenInBase = token0IsBase
       ? amountBaseIn.div(amountTokenOut) //  Base In -> Token Out swap
       : amountBaseOut.div(amountTokenIn); //  Token In -> Base Out swap
-  } else if (
-    event.params.amount1In > BIGINT_ZERO &&
-    event.params.amount0Out > BIGINT_ZERO
-  ) {
+  } else if (amount1In > BIGINT_ZERO && amount0Out > BIGINT_ZERO) {
     // Swap is from token1 to token0
     helper.priceTokenInBase = token0IsBase
       ? amountBaseOut.div(amountTokenIn) // Token In -> Base Out swap

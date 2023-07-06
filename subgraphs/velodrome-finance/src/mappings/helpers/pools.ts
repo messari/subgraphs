@@ -5,16 +5,14 @@ import {
   Bytes,
   ethereum,
 } from "@graphprotocol/graph-ts";
-import { PairFactory } from "../../../generated/PairFactory/PairFactory";
+
 import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
-  FACTORY_ADDRESS,
   FEE_CHECK_INTERVAL_BLOCKS,
 } from "../../common/constants";
 import {
-  getOrCreateDex,
+  getLiquidityPool,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
@@ -22,7 +20,8 @@ import {
 } from "../../common/getters";
 import { applyDecimals, safeDiv } from "../../common/utils/numbers";
 import { createPoolFees } from "./entities";
-import { LiquidityPool } from "../../../generated/schema";
+
+import { DexAmmProtocol, LiquidityPool } from "../../../generated/schema";
 
 //  Update token balances, which also
 export function updateTokenBalances(
@@ -30,20 +29,25 @@ export function updateTokenBalances(
   balance0: BigInt,
   balance1: BigInt
 ): void {
+  const totalBalance = balance0.plus(balance1);
+
   pool.inputTokenBalances = [balance0, balance1];
+  pool.inputTokenWeights = [
+    balance0.toBigDecimal().div(totalBalance.toBigDecimal()),
+    balance1.toBigDecimal().div(totalBalance.toBigDecimal()),
+  ];
   pool.save();
 }
 
 // Updates TVL and output token price
 export function updatePoolValue(
-  poolAddress: Address,
+  protocol: DexAmmProtocol,
   pool: LiquidityPool,
   block: ethereum.Block
 ): void {
-  const protocol = getOrCreateDex();
   const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
   const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
-  const lpToken = getOrCreateToken(poolAddress);
+  const lpToken = getOrCreateToken(Address.fromString(pool.id));
 
   const reserve0USD = applyDecimals(
     pool.inputTokenBalances[0],
@@ -75,12 +79,12 @@ export function updatePoolValue(
 }
 
 export function updatePoolVolume(
+  protocol: DexAmmProtocol,
   pool: LiquidityPool,
   amount0: BigInt,
   amount1: BigInt,
   event: ethereum.Event
 ): void {
-  const protocol = getOrCreateDex();
   const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
   const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
@@ -123,7 +127,10 @@ export function updatePoolVolume(
   protocol.cumulativeVolumeUSD =
     protocol.cumulativeVolumeUSD.plus(amountTotalUSD);
 
-  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    protocol,
+    event
+  );
   financialsDailySnapshot.dailyVolumeUSD =
     financialsDailySnapshot.dailyVolumeUSD.plus(amountTotalUSD);
   financialsDailySnapshot.cumulativeVolumeUSD =
@@ -132,7 +139,6 @@ export function updatePoolVolume(
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
   const poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
-    event.address,
     pool,
     event.block
   );
@@ -152,7 +158,6 @@ export function updatePoolVolume(
   poolDailySnapshot.timestamp = event.block.timestamp;
 
   const poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
-    event.address,
     pool,
     event.block
   );
@@ -179,11 +184,12 @@ export function updatePoolVolume(
 }
 
 export function updateAllPoolFees(
+  protocol: DexAmmProtocol,
+  stableFee: BigDecimal,
+  volatileFee: BigDecimal,
   block: ethereum.Block,
   forceUpdate: boolean = false
 ): void {
-  const protocol = getOrCreateDex();
-
   const blocksSinceLastChecked = block.number.minus(
     protocol._lastFeeCheckBlockNumber
   );
@@ -191,16 +197,6 @@ export function updateAllPoolFees(
   if (!forceUpdate && blocksSinceLastChecked < FEE_CHECK_INTERVAL_BLOCKS) {
     return;
   }
-
-  const factoryContract = PairFactory.bind(Address.fromString(FACTORY_ADDRESS));
-  const stableFee = factoryContract
-    .getFee(true)
-    .toBigDecimal()
-    .div(BIGDECIMAL_HUNDRED);
-  const volatileFee = factoryContract
-    .getFee(false)
-    .toBigDecimal()
-    .div(BIGDECIMAL_HUNDRED);
 
   const stableFeeChanged = stableFee != protocol._stableFee;
   const volatileFeeChanged = volatileFee != protocol._volatileFee;
@@ -228,6 +224,10 @@ export function updatePoolFeesForList(
   fee: BigDecimal
 ): void {
   for (let i = 0; i < poolList.length; i++) {
+    const pool = getLiquidityPool(Address.fromBytes(poolList[i]));
+    if (!pool) return;
+
+    if (pool._customFeeApplied) continue;
     createPoolFees(Address.fromBytes(poolList[i]), fee);
   }
 }

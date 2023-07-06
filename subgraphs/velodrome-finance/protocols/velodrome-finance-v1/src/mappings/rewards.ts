@@ -1,4 +1,18 @@
 import { Address } from "@graphprotocol/graph-ts";
+
+import { updatePoolMetrics } from "../../../../src/common/metrics";
+import {
+  createGauge,
+  killGauge,
+  updateRewards,
+  updateStaked,
+} from "../../../../src/mappings/helpers/rewards";
+import {
+  getLiquidityPool,
+  getLiquidityGauge,
+} from "../../../../src/common/getters";
+import { VELO_ADDRESS } from "../common/constants";
+
 import {
   Deposit,
   DistributeReward,
@@ -6,28 +20,14 @@ import {
   GaugeKilled,
   GaugeRevived,
   Withdraw,
-} from "../../generated/Voter/Voter";
-import { updatePoolMetrics } from "../common/metrics";
-import { createLiquidityGauge } from "./helpers/entities";
-import {
-  createGauge,
-  killGauge,
-  updateRewards,
-  updateStaked,
-} from "./helpers/rewards";
-import { getLiquidityPool, getLiquidityGauge } from "../common/getters";
+} from "../../../../generated/Voter/Voter";
 
 export function handleGaugeCreated(event: GaugeCreated): void {
   const pool = getLiquidityPool(event.params.pool);
   if (!pool) return;
 
-  const gauge = createLiquidityGauge(
-    event.params.gauge,
-    Address.fromString(pool.id)
-  );
-
-  createGauge(pool);
-  updatePoolMetrics(Address.fromString(gauge.pool), pool, event.block);
+  createGauge(pool, event.params.gauge, VELO_ADDRESS);
+  updatePoolMetrics(pool, event.block);
 }
 
 export function handleGaugeKilled(event: GaugeKilled): void {
@@ -38,7 +38,7 @@ export function handleGaugeKilled(event: GaugeKilled): void {
   if (!pool) return;
 
   killGauge(pool, gauge);
-  updatePoolMetrics(Address.fromString(gauge.pool), pool, event.block);
+  updatePoolMetrics(pool, event.block);
 }
 
 export function handleGaugeRevived(event: GaugeRevived): void {
@@ -58,7 +58,7 @@ export function handleDeposit(event: Deposit): void {
   if (!pool) return;
 
   updateStaked(pool, event.params.amount, true);
-  updatePoolMetrics(Address.fromString(gauge.pool), pool, event.block);
+  updatePoolMetrics(pool, event.block);
 }
 
 // Withdraws of LP tokens from gauges
@@ -70,7 +70,7 @@ export function handleWithdraw(event: Withdraw): void {
   if (!pool) return;
 
   updateStaked(pool, event.params.amount, false);
-  updatePoolMetrics(Address.fromString(gauge.pool), pool, event.block);
+  updatePoolMetrics(pool, event.block);
 }
 
 export function handleDistributeReward(event: DistributeReward): void {
@@ -81,5 +81,5 @@ export function handleDistributeReward(event: DistributeReward): void {
   if (!pool) return;
 
   updateRewards(pool, event.params.amount);
-  updatePoolMetrics(Address.fromString(gauge.pool), pool, event.block);
+  updatePoolMetrics(pool, event.block);
 }

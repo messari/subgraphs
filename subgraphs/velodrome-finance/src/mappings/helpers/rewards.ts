@@ -1,21 +1,28 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
+
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_SEVEN,
+  BIGINT_ZERO,
+} from "../../common/constants";
+import { getOrCreateRewardToken, getOrCreateToken } from "../../common/getters";
+import { applyDecimals } from "../../common/utils/numbers";
+import { createLiquidityGauge } from "./entities";
+
 import {
   LiquidityPool,
   RewardToken,
   _LiquidityGauge,
 } from "../../../generated/schema";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_SEVEN,
-  BIGINT_ZERO,
-  VELO_ADDRESS,
-} from "../../common/constants";
-import { getOrCreateRewardToken, getOrCreateToken } from "../../common/getters";
-import { applyDecimals } from "../../common/utils/numbers";
 
-export function createGauge(pool: LiquidityPool): void {
-  getOrCreateToken(Address.fromString(VELO_ADDRESS));
-  const rewardToken = getOrCreateRewardToken(Address.fromString(VELO_ADDRESS));
+export function createGauge(
+  pool: LiquidityPool,
+  gaugeAddress: Address,
+  veloAddress: string
+): void {
+  createLiquidityGauge(gaugeAddress, Address.fromString(pool.id));
+  getOrCreateToken(Address.fromString(veloAddress));
+  const rewardToken = getOrCreateRewardToken(Address.fromString(veloAddress));
   pool.rewardTokens = [rewardToken.id];
   pool.save();
 }

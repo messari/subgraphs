@@ -145,6 +145,9 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_NINE = 9 as i32;
+export const INT_SIXTEEN = 16 as i32;
+export const INT_EIGHTEEN = 18 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -179,7 +182,5 @@ export const USDC_ADDRESS = "0x7f5c764cbc14f9669b88837ca1490cca17c31607";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const FACTORY_ADDRESS = "0x25cbddb98b35ab1ff77413456b31ec81a6b6b746";
-export const VELO_ADDRESS = "0x3c8b650257cfb5f272f799f5e2b4e65093a11a05";
 export const FEE_CHECK_INTERVAL_BLOCKS = BigInt.fromI32(900); // ~ 1 block every 2 seconds on optimism. 900 blocks ~ 30 mins.
 export const MINIMUM_LIQUIDITY_USD = BIGDECIMAL_THOUSAND;
