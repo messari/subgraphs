@@ -13,18 +13,18 @@ import {
 import { getCompoundProtocol } from "./fetchers";
 import { Market } from "../../../generated/schema";
 import { CToken } from "../../../generated/Morpho/CToken";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
+import { updateProtocolAfterNewMarket } from "../../helpers";
 import { Comptroller } from "../../../generated/Morpho/Comptroller";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
+import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
 import { getOrInitMarketList, getOrInitToken } from "../../utils/initializers";
 
 export function handleMarketCreated(event: MarketCreated): void {
   // Sync protocol creation since MarketCreated is the first event emitted
-  CTokenTemplate.create(event.params._poolToken);
   const protocol = getCompoundProtocol(event.address);
-  protocol.totalPoolCount = protocol.totalPoolCount + 1;
-  protocol.save();
+  CTokenTemplate.create(event.params._poolToken);
+
   const morpho = MorphoCompound.bind(event.address);
   const cToken = CToken.bind(event.params._poolToken);
   const comptroller = Comptroller.bind(morpho.comptroller());
@@ -38,6 +38,7 @@ export function handleMarketCreated(event: MarketCreated): void {
     .toBigDecimal()
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     .div(exponentToBigDecimal(36 - inputToken.decimals));
+
   const market = new Market(event.params._poolToken);
   market.protocol = event.address;
   market.name = `Morpho ${cToken.name()}`;
@@ -184,4 +185,6 @@ export function handleMarketCreated(event: MarketCreated): void {
   list.markets = markets.concat([market.id]);
 
   list.save();
+
+  updateProtocolAfterNewMarket(market.id, protocol.id);
 }

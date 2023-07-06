@@ -2,6 +2,7 @@ import {
   log,
   Bytes,
   BigInt,
+  Address,
   ethereum,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
@@ -36,15 +37,18 @@ import {
   BIGDECIMAL_HUNDRED,
   exponentToBigDecimal,
 } from "./constants";
-import { getMarket, getOrInitToken } from "./utils/initializers";
-import { IMaths } from "./utils/maths/maths.interface";
+import {
+  getMarket,
+  getOrInitToken,
+  getOrInitLendingProtocol,
+} from "./utils/initializers";
+import { IMaths } from "./utils/maths/mathsInterface";
 import {
   computeGrowthFactors,
   computeP2PBorrowRate,
   computeP2PIndex,
   computeP2PSupplyRate,
 } from "./utils/interestRatesModels";
-import { MorphoPositions } from "./mapping/common";
 
 function getDay(timestamp: BigInt): BigInt {
   return timestamp.div(BigInt.fromI32(SECONDS_PER_DAY));
@@ -183,22 +187,25 @@ export function getOrCreateFinancialDailySnapshots(
     financialMetrics.dailyTransferUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyFlashloanUSD = BIGDECIMAL_ZERO;
 
-    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
 
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD;
 
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD =
+      protocol.cumulativeProtocolSideRevenueUSD;
 
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD;
 
-    financialMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+    financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+    financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+    financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+    financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
 
     financialMetrics.blockNumber = block.number;
     financialMetrics.timestamp = block.timestamp;
@@ -214,21 +221,6 @@ export function updateFinancials(
   block: ethereum.Block
 ): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(protocol, block);
-
-  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
-
-  financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
-  financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-  financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
-  financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
-  financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
 
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;
@@ -1003,9 +995,7 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
  */
 export function updateProtocolPosition(
   protocol: LendingProtocol,
-  market: Market,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _morphoPositions: MorphoPositions
+  market: Market
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
@@ -1060,10 +1050,6 @@ export function updateProtocolPosition(
     .plus(newMarketBorrowInP2P)
     .times(market.inputTokenPriceUSD);
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD
-    .minus(market.totalDepositBalanceUSD)
-    .plus(newMarketSupplyUSD);
-
   protocol.totalDepositBalanceUSD = protocol.totalValueLockedUSD;
   protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD
     .minus(market.totalBorrowBalanceUSD)
@@ -1088,6 +1074,8 @@ export function updateProtocolPosition(
 
   market._totalBorrowInP2P = newMarketBorrowInP2P;
   market.save();
+
+  updateProtocolTotalValueLockedUSD(protocol.id);
 }
 
 function computeProportionIdle(market: Market): BigInt {
@@ -1199,3 +1187,40 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
 
 export const getEventId = (hash: Bytes, logIndex: BigInt): Bytes =>
   hash.concat(Bytes.fromI32(logIndex.toI32()));
+
+export function updateProtocolTotalValueLockedUSD(
+  protocolAddress: Bytes
+): void {
+  const protocol = getOrInitLendingProtocol(
+    Address.fromBytes(protocolAddress)
+  ).protocol;
+
+  const marketIds = protocol._marketIds;
+  let totalValueLockedUSD = BIGDECIMAL_ZERO;
+
+  for (let marketIdx = 0; marketIdx < marketIds.length; marketIdx++) {
+    const pool = getMarket(Bytes.fromHexString(marketIds[marketIdx]));
+
+    if (!pool) continue;
+    totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+  }
+
+  protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.save();
+}
+
+export function updateProtocolAfterNewMarket(
+  poolAddress: Bytes,
+  protocolAddress: Bytes
+): void {
+  const protocol = getOrInitLendingProtocol(
+    Address.fromBytes(protocolAddress)
+  ).protocol;
+
+  const marketIds = protocol._marketIds;
+  marketIds.push(poolAddress.toHexString());
+  protocol._marketIds = marketIds;
+
+  protocol.totalPoolCount += 1;
+  protocol.save();
+}

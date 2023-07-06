@@ -1,11 +1,10 @@
 import {
   fetchAssetPrice,
   getAaveProtocol,
-  fetchMorphoPositionsAaveV2,
 } from "./fetchers";
 import { Address } from "@graphprotocol/graph-ts";
 import { _handleReserveUpdate } from "../common";
-import { AaveMath } from "../../utils/maths/AaveMath";
+import { AaveMath } from "../../utils/maths/aaveMath";
 import { UnderlyingTokenMapping } from "../../../generated/schema";
 import { getMarket, getOrInitToken } from "../../utils/initializers";
 import { MORPHO_AAVE_V2_ADDRESS, ReserveUpdateParams } from "../../constants";
@@ -42,6 +41,5 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.variableBorrowRate
   );
 
-  const morphoPositions = fetchMorphoPositionsAaveV2(market);
-  _handleReserveUpdate(params, morphoPositions, market, new AaveMath());
+  _handleReserveUpdate(params, market, new AaveMath());
 }

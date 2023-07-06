@@ -1,6 +1,6 @@
 import { minBN } from "../constants";
-import PercentMath from "./maths/PercentMath";
-import { IMaths } from "./maths/maths.interface";
+import PercentMath from "./maths/percentMath";
+import { IMaths } from "./maths/mathsInterface";
 import { BigInt } from "@graphprotocol/graph-ts";
 
 export class GrowthFactors {

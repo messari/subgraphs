@@ -38,7 +38,7 @@ import {
   updateProtocolPosition,
   updateRevenueSnapshots,
 } from "../helpers";
-import { IMaths } from "../utils/maths/maths.interface";
+import { IMaths } from "../utils/maths/mathsInterface";
 import { getMarket, getOrInitToken } from "../utils/initializers";
 
 export class MorphoPositions {
@@ -57,7 +57,6 @@ export class MorphoPositions {
 export function _handleSupplied(
   event: ethereum.Event,
   protocol: LendingProtocol,
-  morphoPositions: MorphoPositions,
   market: Market,
   accountID: Address,
   amount: BigInt,
@@ -170,13 +169,12 @@ export function _handleSupplied(
     EventType.DEPOSIT,
     event.block
   );
-  updateProtocolPosition(protocol, market, morphoPositions);
+  updateProtocolPosition(protocol, market);
 }
 
 export function _handleWithdrawn(
   event: ethereum.Event,
   protocol: LendingProtocol,
-  morphoPositions: MorphoPositions,
   market: Market,
   accountID: Address,
   amount: BigInt,
@@ -289,7 +287,7 @@ export function _handleWithdrawn(
     EventType.WITHDRAW,
     event.block
   );
-  updateProtocolPosition(protocol, market, morphoPositions);
+  updateProtocolPosition(protocol, market);
 }
 
 export function _handleLiquidated(
@@ -427,7 +425,6 @@ export function _handleLiquidated(
 export function _handleBorrowed(
   event: ethereum.Event,
   protocol: LendingProtocol,
-  morphoPositions: MorphoPositions,
   market: Market,
   accountID: Address,
   amount: BigInt,
@@ -541,13 +538,12 @@ export function _handleBorrowed(
     EventType.BORROW,
     event.block
   );
-  updateProtocolPosition(protocol, market, morphoPositions);
+  updateProtocolPosition(protocol, market);
 }
 
 export function _handleP2PIndexesUpdated(
   event: ethereum.Event,
   protocol: LendingProtocol,
-  morphoPositions: MorphoPositions,
   market: Market,
   poolSupplyIndex: BigInt,
   p2pSupplyIndex: BigInt,
@@ -677,7 +673,7 @@ export function _handleP2PIndexesUpdated(
   market.save();
   protocol.save();
 
-  updateProtocolPosition(protocol, market, morphoPositions);
+  updateProtocolPosition(protocol, market);
 
   // update revenue in market snapshots
   updateRevenueSnapshots(
@@ -692,7 +688,6 @@ export function _handleP2PIndexesUpdated(
 export function _handleRepaid(
   event: ethereum.Event,
   protocol: LendingProtocol,
-  morphoPositions: MorphoPositions,
   market: Market,
   accountID: Address,
   amount: BigInt,
@@ -803,12 +798,11 @@ export function _handleRepaid(
     EventType.REPAY,
     event.block
   );
-  updateProtocolPosition(protocol, market, morphoPositions);
+  updateProtocolPosition(protocol, market);
 }
 
 export function _handleReserveUpdate(
   params: ReserveUpdateParams,
-  morphoPositions: MorphoPositions,
   market: Market,
   __MATHS__: IMaths
 ): void {
@@ -868,7 +862,7 @@ export function _handleReserveUpdate(
   ];
 
   updateP2PRates(market, __MATHS__);
-  updateProtocolPosition(params.protocol, market, morphoPositions);
+  updateProtocolPosition(params.protocol, market);
 
   market.save();
   return;

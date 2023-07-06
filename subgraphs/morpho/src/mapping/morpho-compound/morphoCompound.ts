@@ -48,6 +48,7 @@ import {
   _handleBorrowerPositionUpdated,
   _handleSupplierPositionUpdated,
 } from "../common";
+import { getCompoundProtocol } from "./fetchers";
 import { updateFinancials } from "../../helpers";
 import { CToken } from "../../../generated/Morpho/CToken";
 import { LendingProtocol, Market } from "../../../generated/schema";
@@ -55,7 +56,6 @@ import { Comptroller } from "../../../generated/Morpho/Comptroller";
 import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { getMarket, getOrCreateRewardToken } from "../../utils/initializers";
-import { fetchMorphoPositionsCompound, getCompoundProtocol } from "./fetchers";
 
 export { handleMarketCreated } from "./handleMarketCreated";
 
@@ -66,7 +66,6 @@ export function handleP2PIndexesUpdated(event: P2PIndexesUpdated): void {
   _handleP2PIndexesUpdated(
     event,
     protocol,
-    fetchMorphoPositionsCompound(market),
     market,
     event.params._poolSupplyIndex,
     event.params._p2pSupplyIndex,
@@ -84,7 +83,6 @@ export function handleBorrowed(event: Borrowed): void {
   _handleBorrowed(
     event,
     protocol,
-    fetchMorphoPositionsCompound(market),
     market,
     event.params._borrower,
     event.params._amount,
@@ -158,7 +156,6 @@ export function handleRepaid(event: Repaid): void {
   _handleRepaid(
     event,
     getCompoundProtocol(event.address),
-    fetchMorphoPositionsCompound(market),
     market,
     event.params._onBehalf,
     event.params._amount,
@@ -173,7 +170,6 @@ export function handleSupplied(event: Supplied): void {
   _handleSupplied(
     event,
     getCompoundProtocol(event.address),
-    fetchMorphoPositionsCompound(market),
     market,
     event.params._supplier,
     event.params._amount,
@@ -203,7 +199,6 @@ export function handleWithdrawn(event: Withdrawn): void {
   _handleWithdrawn(
     event,
     getCompoundProtocol(event.address),
-    fetchMorphoPositionsCompound(market),
     market,
     event.params._supplier,
     event.params._amount,

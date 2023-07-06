@@ -37,12 +37,12 @@ import {
   DefaultMaxGasForMatchingSet,
   IsLiquidateCollateralPausedSet,
 } from "../../../generated/Morpho/MorphoAaveV2";
+import { getAaveProtocol } from "./fetchers";
 import { BASE_UNITS } from "../../constants";
-import { updateFinancials, updateP2PRates } from "../../helpers";
 import { BigInt } from "@graphprotocol/graph-ts";
 import { getMarket } from "../../utils/initializers";
-import { AaveMath } from "../../utils/maths/AaveMath";
-import { fetchMorphoPositionsAaveV2, getAaveProtocol } from "./fetchers";
+import { AaveMath } from "../../utils/maths/aaveMath";
+import { updateFinancials, updateP2PRates } from "../../helpers";
 
 export { handleMarketCreated } from "./handleMarketCreated";
 
@@ -53,7 +53,6 @@ export function handleBorrowed(event: Borrowed): void {
   _handleBorrowed(
     event,
     protocol,
-    fetchMorphoPositionsAaveV2(market),
     market,
     event.params._borrower,
     event.params._amount,
@@ -107,7 +106,6 @@ export function handleSupplied(event: Supplied): void {
   _handleSupplied(
     event,
     getAaveProtocol(event.address),
-    fetchMorphoPositionsAaveV2(market),
     market,
     event.params._onBehalf,
     event.params._amount,
@@ -159,7 +157,6 @@ export function handleP2PIndexesUpdated(event: P2PIndexesUpdated): void {
   _handleP2PIndexesUpdated(
     event,
     protocol,
-    fetchMorphoPositionsAaveV2(market),
     market,
     event.params._poolSupplyIndex,
     event.params._p2pSupplyIndex,
@@ -194,7 +191,6 @@ export function handleWithdrawn(event: Withdrawn): void {
   _handleWithdrawn(
     event,
     protocol,
-    fetchMorphoPositionsAaveV2(market),
     market,
     event.params._supplier,
     event.params._amount,
@@ -211,7 +207,6 @@ export function handleRepaid(event: Repaid): void {
   _handleRepaid(
     event,
     protocol,
-    fetchMorphoPositionsAaveV2(market),
     market,
     event.params._onBehalf,
     event.params._amount,

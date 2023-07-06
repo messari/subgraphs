@@ -6,6 +6,7 @@ import { getAaveProtocol } from "./fetchers";
 import { BASE_UNITS, WAD } from "../../constants";
 import { ERC20 } from "../../../generated/Morpho/ERC20";
 import { AToken } from "../../../generated/Morpho/AToken";
+import { updateProtocolAfterNewMarket } from "../../helpers";
 import { LendingPool } from "../../../generated/Morpho/LendingPool";
 import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
 import { Market, UnderlyingTokenMapping } from "../../../generated/schema";
@@ -17,8 +18,6 @@ import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingP
 export function handleMarketCreated(event: MarketCreated): void {
   // Sync protocol creation since MarketCreated is the first event emitted
   const protocol = getAaveProtocol(event.address);
-  protocol.totalPoolCount = protocol.totalPoolCount + 1;
-  protocol.save();
 
   const aToken = AToken.bind(event.params._poolToken);
   const underlying = ERC20.bind(aToken.UNDERLYING_ASSET_ADDRESS());
@@ -201,4 +200,6 @@ export function handleMarketCreated(event: MarketCreated): void {
   list.markets = markets.concat([market.id]);
 
   list.save();
+
+  updateProtocolAfterNewMarket(market.id, protocol.id);
 }

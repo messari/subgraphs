@@ -557,6 +557,7 @@ type LendingProtocol implements Protocol @entity {
   _defaultMaxIterationsWithdraw: BigInt
   _defaultMaxIterationsRepay: BigInt
 
+  _marketIds: [String!]!
 }
 
 # helper entity to iterate through all markets
