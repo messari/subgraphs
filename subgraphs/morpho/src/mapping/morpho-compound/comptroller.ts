@@ -1,5 +1,5 @@
-import { Address } from "@graphprotocol/graph-ts";
-import { Market } from "../../../generated/schema";
+import { Address, log } from "@graphprotocol/graph-ts";
+import { Market, _MarketList } from "../../../generated/schema";
 import { CompoundOracle } from "../../../generated/templates";
 import {
   NewBorrowCap,
@@ -24,13 +24,17 @@ export function handleNewBorrowCap(event: NewBorrowCap): void {
 }
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
-  const protocol = getCompoundProtocol(MORPHO_COMPOUND_ADDRESS);
   const closeFactor = event.params.newCloseFactorMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .minus(BIGDECIMAL_ONE);
-  for (let i = 0; i < protocol.markets.length; i++) {
-    const market = getMarket(protocol.markets[i]);
+  const marketList = _MarketList.load(MORPHO_COMPOUND_ADDRESS);
+  if (!marketList) {
+    log.error("[handleNewCloseFactor] Market list not found", []);
+    return;
+  }
+  for (let i = 0; i < marketList.markets.length; i++) {
+    const market = getMarket(marketList.markets[i]);
     market.liquidationPenalty = closeFactor;
     market.save();
   }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { TransferSingle } from "../../generated/UniqueIdentity/UniqueIdentity";
 import { createTransactionFromEvent } from "../entities/helpers";

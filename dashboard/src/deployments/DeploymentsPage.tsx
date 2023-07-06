@@ -113,27 +113,32 @@ function DeploymentsPage({
   let decentralizedDepoQuery: any = "";
 
   if (Object.keys(decentralizedDeployments)?.length) {
-    Object.keys(decentralizedDeployments).forEach((x) => {
-      const protocolObj = Object.keys(protocolsToQuery).find((pro) => pro.includes(x));
+    Object.keys(decentralizedDeployments).forEach((key) => {
+      const protocolObj = Object.keys(protocolsToQuery).find((pro) => pro.includes(key));
       if (protocolObj) {
-        let networkStr = decentralizedDeployments[x]?.network;
-        if (networkStr === "mainnet") {
-          networkStr = "ethereum";
-        }
-        if (networkStr === "matic") {
-          networkStr = "polygon";
-        }
-        let subgraphIdToMap = { id: "", signal: 0 };
-        if (decentralizedDeployments[x]?.signalledTokens > 0) {
-          depoIdToSubgraphName[decentralizedDeployments[x]?.deploymentId] =
-            (protocolsToQuery[protocolObj]?.protocol || protocolObj) + "-" + networkStr;
-          depoIds.push(decentralizedDeployments[x]?.deploymentId);
-          subgraphIdToMap = {
-            id: decentralizedDeployments[x]?.subgraphId,
-            signal: decentralizedDeployments[x]?.signalledTokens,
-          };
-        }
-        decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
+        decentralizedDeployments[key].forEach((item: any) => {
+          if (item.signalledTokens > 0) {
+            let networkStr = item.network;
+            if (networkStr === "mainnet") {
+              networkStr = "ethereum";
+            }
+            if (networkStr === "matic") {
+              networkStr = "polygon";
+            }
+            if (networkStr === "arbitrum-one") {
+              networkStr = "arbitrum";
+            }
+            let subgraphIdToMap = { id: "", signal: 0 };
+            depoIdToSubgraphName[item.deploymentId] =
+              (protocolsToQuery[protocolObj]?.protocol || protocolObj) + "-" + networkStr;
+            depoIds.push(item.deploymentId);
+            subgraphIdToMap = {
+              id: item.subgraphId,
+              signal: item.signalledTokens,
+            };
+            decenDeposToSubgraphIds[key + "-" + networkStr] = subgraphIdToMap;
+          }
+        });
       }
     });
 

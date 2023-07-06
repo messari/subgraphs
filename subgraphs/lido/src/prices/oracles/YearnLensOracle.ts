@@ -1,23 +1,44 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { CustomPriceType, OracleContract } from "../common/types";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/Lido/YearnLensContract";
 
-export function getYearnLensContract(network: string): YearnLensContract {
-  return YearnLensContract.bind(Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)));
+export function getYearnLensContract(
+  contract: OracleContract,
+  block: ethereum.Block | null = null
+): YearnLensContract | null {
+  if (
+    (block && contract.startBlock.gt(block.number)) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return YearnLensContract.bind(contract.address);
 }
 
-export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string): CustomPriceType {
-  const yearnLensContract = getYearnLensContract(network);
+export function getTokenPriceUSDC(
+  tokenAddr: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
+  const config = utils.getConfig();
 
-  if (!yearnLensContract) {
+  if (!config || config.yearnLensBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
 
-  let tokenPrice: BigDecimal = utils
-    .readValue<BigInt>(yearnLensContract.try_getPriceUsdcRecommended(tokenAddr), constants.BIGINT_ZERO)
+  const yearnLensContract = getYearnLensContract(config.yearnLens(), block);
+  if (!yearnLensContract) return new CustomPriceType();
+
+  const tokenPrice: BigDecimal = utils
+    .readValue<BigInt>(
+      yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
+      constants.BIGINT_ZERO
+    )
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
+  return CustomPriceType.initialize(
+    tokenPrice,
+    constants.DEFAULT_USDC_DECIMALS,
+    constants.OracleType.YEARN_LENS_ORACLE
+  );
 }

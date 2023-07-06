@@ -52,9 +52,10 @@ import { PositionManager } from "./position";
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.3
+ * SDK Version:     1.0.5
  * Author(s):
  *  - @dmelotik
+ *  - @dhruv-chauhan
  */
 
 export class ProtocolData {
@@ -88,6 +89,7 @@ export class DataManager {
   private inputToken!: TokenManager;
   private oracle!: Oracle;
   private snapshots!: SnapshotManager;
+  private newMarket: boolean = false;
 
   constructor(
     marketID: Bytes,
@@ -150,6 +152,8 @@ export class DataManager {
       _market.lendingPositionCount = INT_ZERO;
       _market.borrowingPositionCount = INT_ZERO;
       _market.save();
+
+      this.newMarket = true;
 
       // add to market list
       this.getOrAddMarketToList(marketID);
@@ -225,6 +229,10 @@ export class DataManager {
 
   getMarket(): Market {
     return this.market;
+  }
+
+  isNewMarket(): boolean {
+    return this.newMarket;
   }
 
   saveMarket(): void {
@@ -370,7 +378,8 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
-    interestType: string | null = null
+    interestType: string | null = null,
+    principal: BigInt | null = null
   ): Deposit {
     const depositor = new AccountManager(account);
     if (depositor.isNewUser()) {
@@ -389,7 +398,8 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.DEPOSIT,
-      this.market.inputTokenPriceUSD
+      this.market.inputTokenPriceUSD,
+      principal
     );
 
     const deposit = new Deposit(
@@ -425,7 +435,8 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
-    interestType: string | null = null
+    interestType: string | null = null,
+    principal: BigInt | null = null
   ): Withdraw | null {
     const withdrawer = new AccountManager(account);
     if (withdrawer.isNewUser()) {
@@ -443,7 +454,8 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.WITHDRAW,
-      this.market.inputTokenPriceUSD
+      this.market.inputTokenPriceUSD,
+      principal
     );
     const positionID = position.getPositionID();
     if (!positionID) {
@@ -488,7 +500,8 @@ export class DataManager {
     amountUSD: BigDecimal,
     newBalance: BigInt,
     tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
-    interestType: string | null = null
+    interestType: string | null = null,
+    principal: BigInt | null = null
   ): Borrow {
     const borrower = new AccountManager(account);
     if (borrower.isNewUser()) {
@@ -507,7 +520,8 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.BORROW,
-      tokenPriceUSD
+      tokenPriceUSD,
+      principal
     );
 
     const borrow = new Borrow(
@@ -544,7 +558,8 @@ export class DataManager {
     amountUSD: BigDecimal,
     newBalance: BigInt,
     tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
-    interestType: string | null = null
+    interestType: string | null = null,
+    principal: BigInt | null = null
   ): Repay | null {
     const repayer = new AccountManager(account);
     if (repayer.isNewUser()) {
@@ -562,7 +577,8 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.REPAY,
-      tokenPriceUSD
+      tokenPriceUSD,
+      principal
     );
     const positionID = position.getPositionID();
     if (!positionID) {
@@ -822,16 +838,16 @@ export class DataManager {
       const index = rewardData.rewardToken.id.localeCompare(rewardTokens[i]);
       if (index < 0) {
         // insert rewardData at index i
-        rewardTokens = insert(rewardTokens, i, rewardData.rewardToken.id);
+        rewardTokens = insert(rewardTokens, rewardData.rewardToken.id, i);
         rewardTokenEmissionsAmount = insert(
           rewardTokenEmissionsAmount,
-          i,
-          rewardData.rewardTokenEmissionsAmount
+          rewardData.rewardTokenEmissionsAmount,
+          i
         );
         rewardTokenEmissionsUSD = insert(
           rewardTokenEmissionsUSD,
-          i,
-          rewardData.rewardTokenEmissionsUSD
+          rewardData.rewardTokenEmissionsUSD,
+          i
         );
         break;
       } else if (index == 0) {
@@ -1193,40 +1209,33 @@ export class DataManager {
     if (details.sources.length == 0) {
       details.sources = [associatedSource];
       details.amountsUSD = [amountUSD];
-      details.save();
-      return; // initial add is manually done
-    }
+    } else {
+      let sources = details.sources;
+      let amountsUSD = details.amountsUSD;
 
-    let sources = details.sources;
-    let amountsUSD = details.amountsUSD;
+      // upsert source and amount
+      if (sources.includes(associatedSource)) {
+        const idx = sources.indexOf(associatedSource);
+        amountsUSD[idx] = amountsUSD[idx].plus(amountUSD);
 
-    // insert in alphabetical order
-    for (let i = 0; i < sources.length; i++) {
-      const index = associatedSource.localeCompare(sources[i]);
-      if (index < 0) {
-        // insert associatedSource at index i
-        sources = insert(sources, i, associatedSource);
-        amountsUSD = insert(
-          details.amountsUSD,
-          i,
-          amountsUSD[i].plus(amountUSD)
-        );
-        break;
-      } else if (index == 0) {
-        // update associatedSource at index i
-        sources[i] = associatedSource;
-        amountsUSD[i] = amountsUSD[i].plus(amountUSD);
-        break;
+        details.sources = sources;
+        details.amountsUSD = amountsUSD;
       } else {
-        if (i == sources.length - 1) {
-          sources.push(associatedSource);
-          amountsUSD.push(amountUSD);
-          break;
+        sources = insert(sources, associatedSource);
+        amountsUSD = insert(amountsUSD, amountUSD);
+
+        // sort amounts by sources
+        const sourcesSorted = sources.sort();
+        let amountsUSDSorted: BigDecimal[] = [];
+        for (let i = 0; i < sourcesSorted.length; i++) {
+          const idx = sources.indexOf(sourcesSorted[i]);
+          amountsUSDSorted = insert(amountsUSDSorted, amountsUSD[idx]);
         }
+
+        details.sources = sourcesSorted;
+        details.amountsUSD = amountsUSDSorted;
       }
     }
-    details.sources = sources;
-    details.amountsUSD = amountsUSD;
     details.save();
   }
 

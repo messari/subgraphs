@@ -19,7 +19,7 @@ import {
   InterestRate,
   RewardToken,
   User,
-  _PoolToken,
+  _PoolTokenStore,
   _PositionCounter,
   Position,
 } from "../../generated/schema";
@@ -57,10 +57,10 @@ import { Versions } from "../versions";
 export function getOrCreatePoolToken(
   tokenId: string,
   marketId: string | null = null
-): _PoolToken {
-  let poolToken = _PoolToken.load(tokenId);
+): _PoolTokenStore {
+  let poolToken = _PoolTokenStore.load(tokenId);
   if (!poolToken) {
-    poolToken = new _PoolToken(tokenId);
+    poolToken = new _PoolTokenStore(tokenId);
     poolToken.market = marketId!;
     poolToken.save();
   }
