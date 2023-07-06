@@ -268,6 +268,7 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeOutflowVolumeUSD;
 
+    snapshot.inputTokens = this.pool.inputTokens;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
     snapshot.outputTokenSupply = this.pool.outputTokenSupply;
@@ -523,6 +524,7 @@ export class PoolSnapshot {
         previousSnapshot.cumulativePositionCount
       : snapshot.cumulativePositionCount;
 
+    snapshot.inputTokens = this.pool.inputTokens;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
     snapshot.outputTokenSupply = this.pool.outputTokenSupply;

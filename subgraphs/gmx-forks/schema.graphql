@@ -1107,6 +1107,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   " Outflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming outof protocol from trade. "
   cumulativeOutflowVolumeUSD: BigDecimal!
 
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -1293,6 +1296,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
 
   " Outflow historical trade notional volume occurred in this pool, in USD "
   cumulativeOutflowVolumeUSD: BigDecimal!
+
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
