@@ -213,7 +213,7 @@ function App() {
   }>({});
 
   const clientDecentralizedEndpoint = useMemo(
-    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
+    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum"),
     [],
   );
 
@@ -230,7 +230,7 @@ function App() {
       const decenDepos: { [x: string]: any } = {};
       const subgraphsOnDecenAcct = [
         ...decentralized.graphAccounts[0].subgraphs,
-        ...decentralized.graphAccounts[1].subgraphs,
+        // ...decentralized.graphAccounts[1].subgraphs,
       ];
       subgraphsOnDecenAcct.forEach((sub: { [x: string]: any }) => {
         try {
@@ -244,7 +244,10 @@ function App() {
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
           const signalledTokens = sub.currentVersion.subgraphDeployment.signalledTokens;
           const subgraphId = sub.id;
-          decenDepos[name] = { network, deploymentId, subgraphId, signalledTokens };
+          if (!(name in decenDepos)) {
+            decenDepos[name] = [];
+          }
+          decenDepos[name].push({ network, deploymentId, subgraphId, signalledTokens });
         } catch (err) {
           return;
         }

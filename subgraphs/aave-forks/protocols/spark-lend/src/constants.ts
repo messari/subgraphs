@@ -6,11 +6,12 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Spark Lend";
   export const NAME = "Spark Lend";
   export const SLUG = "spark-lend";
 }
 
-export namespace TokenType {
+export namespace IavsTokenType {
   export const ATOKEN = "ATOKEN";
   export const INPUTTOKEN = "INPUTTOKEN";
   export const VTOKEN = "VTOKEN";
@@ -18,6 +19,12 @@ export namespace TokenType {
 }
 
 export const AAVE_DECIMALS = 8;
+
+export namespace InterestRateMode {
+  export const NONE = 0 as i32;
+  export const STABLE = 1 as i32;
+  export const VARIABLE = 2 as i32;
+}
 
 ////////////////////////////
 ///// Network Specific /////

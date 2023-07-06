@@ -1,16 +1,20 @@
 {
   "network": "fantom",
-  "PoolAddressesProviderRegistry": {
-    "address": "0x770ef9f4fe897e59daCc474EF11238303F9552b6",
-    "startBlock": 33131990
+  "factory": {
+    "address": "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb",
+    "startBlock": 33135283
   },
-  "RewardsController": {
-    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
-    "startBlock": 33496901
+  "lendingPoolConfigurator": {
+    "address": "0x8145eddDf43f50276641b55bd3AD95944510021E",
+    "startBlock": 33142229
   },
   "LendingPool": {
     "address": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
     "startBlock": 33142113
+  },
+  "RewardsController": {
+    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "startBlock": 33496901
   },
   "graftEnabled": false,
   "subgraphId": "",

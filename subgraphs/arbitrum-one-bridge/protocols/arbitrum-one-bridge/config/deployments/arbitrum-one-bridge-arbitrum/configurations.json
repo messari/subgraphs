@@ -42,6 +42,12 @@
       "address": "0x6D2457a4ad276000A615295f7A80F79E48CcD318",
       "startBlock": 5864786,
       "handlerSuffix": "3pGateway"
+    },
+    {
+      "name": "ArbGateway",
+      "address": "0xCaD7828a19b363A2B44717AFB1786B5196974D8E",
+      "startBlock": 70397931,
+      "handlerSuffix": "3pGateway"
     }
   ]
 }

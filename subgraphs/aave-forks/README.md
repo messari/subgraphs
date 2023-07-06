@@ -30,3 +30,4 @@ When a transaction occurs in the `lendingPool` the following events are emitted 
 - Aave V2 Contract Addresses: [https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts](https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts)
 - Aave V2 Permissioned Contract Addresses: [https://aave-arc.gitbook.io/docs/deployed-contracts/arc](https://aave-arc.gitbook.io/docs/deployed-contracts/arc)
 - Gesit Contract Addresses: [https://docs.geist.finance/useful-info/deployments-addresses](https://docs.geist.finance/useful-info/deployments-addresses)
+- Aave V3 Metis Subgraph GraphQL Endpoint: https://andromeda.thegraph.metis.io/subgraphs/name/messari/aave-v3-metis

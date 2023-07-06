@@ -1,6 +1,13 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
+  FLASHLOAN_PREMIUM_TOTAL,
   getNetworkSpecificConstant,
   Protocol,
   UWU_DECIMALS,
@@ -20,23 +27,25 @@ import {
 import {
   Borrow,
   Deposit,
+  FlashLoan,
   LiquidationCall,
   Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Swap,
   Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
 import {
-  ProtocolData,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleFlashLoan,
   _handleLiquidate,
   _handlePaused,
   _handlePriceOracleUpdated,
@@ -48,48 +57,72 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleSwapBorrowRateMode,
   _handleTransfer,
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  getOrCreateLendingProtocol,
-  getOrCreateRewardToken,
-  getOrCreateToken,
-} from "../../../src/helpers";
-import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  exponentToBigDecimal,
-  PositionSide,
-  readValue,
-  RewardTokenType,
+  InterestRateMode,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import { Market } from "../../../generated/schema";
+import { _DefaultOracle } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { SushiSwapLP } from "../../../generated/LendingPool/SushiSwapLP";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
+import {
+  DataManager,
+  ProtocolData,
+  RewardData,
+} from "../../../src/sdk/manager";
+import {
+  LendingType,
+  PermissionType,
+  CollateralizationType,
+  RiskType,
+  PositionSide,
+  RewardTokenType,
+  InterestRateType,
+} from "../../../src/sdk/constants";
+import {
+  exponentToBigDecimal,
+  getBorrowBalances,
+  getMarketFromToken,
+  getOrCreateFlashloanPremium,
+  readValue,
+} from "../../../src/helpers";
+import { TokenManager } from "../../../src/sdk/token";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
   return new ProtocolData(
-    constants.protocolAddress.toHexString(),
+    constants.protocolAddress,
+    Protocol.PROTOCOL,
     Protocol.NAME,
     Protocol.SLUG,
-    constants.network
+    constants.network,
+    LendingType.POOLED,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.ADMIN,
+    CollateralizationType.OVER_COLLATERALIZED,
+    RiskType.GLOBAL
   );
 }
+
+const protocolData = getProtocolData();
 
 ///////////////////////////////////////////////
 ///// LendingPoolAddressProvider Handlers /////
 ///////////////////////////////////////////////
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  _handlePriceOracleUpdated(event.params.newAddress, getProtocolData());
+  _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
 //////////////////////////////////////
@@ -105,7 +138,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event.params.asset,
     event.params.aToken,
     event.params.variableDebtToken,
-    getProtocolData(),
+    protocolData,
     event.params.stableDebtToken
   );
 }
@@ -118,35 +151,35 @@ export function handleCollateralConfigurationChanged(
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
     event.params.ltv,
-    getProtocolData()
+    protocolData
   );
 }
 
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
-  _handleBorrowingEnabledOnReserve(event.params.asset, getProtocolData());
+  _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
-  _handleBorrowingDisabledOnReserve(event.params.asset, getProtocolData());
+  _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
-  _handleReserveActivated(event.params.asset, getProtocolData());
+  _handleReserveActivated(event.params.asset, protocolData);
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  _handleReserveDeactivated(event.params.asset, getProtocolData());
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   _handleReserveFactorChanged(
     event.params.asset,
     event.params.factor,
-    getProtocolData()
+    protocolData
   );
 }
 
@@ -155,37 +188,23 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  const protocolData = getProtocolData();
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // update rewards if there is an incentive controller
-  const market = Market.load(event.params.reserve.toHexString());
+  const market = getMarketFromToken(event.params.reserve, protocolData);
   if (!market) {
     log.warning("[handleReserveDataUpdated] Market not found", [
       event.params.reserve.toHexString(),
     ]);
     return;
   }
-
-  // update rewards
-  market.rewardTokens = [
-    getOrCreateRewardToken(
-      Address.fromString(UWU_TOKEN_ADDRESS),
-      RewardTokenType.BORROW
-    ).id,
-    getOrCreateRewardToken(
-      Address.fromString(UWU_TOKEN_ADDRESS),
-      RewardTokenType.DEPOSIT
-    ).id,
-  ];
-  market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-  market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-  market.save();
-  updateRewards(market);
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
 
   const assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol._priceOracle)
+    Address.fromBytes(market.inputToken),
+    manager.getOracleAddress()
   );
 
   _handleReserveDataUpdated(
@@ -198,6 +217,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.reserve,
     assetPriceUSD
   );
+  updateRewards(manager, event);
 }
 
 export function handleReserveUsedAsCollateralEnabled(
@@ -207,7 +227,7 @@ export function handleReserveUsedAsCollateralEnabled(
   _handleReserveUsedAsCollateralEnabled(
     event.params.reserve,
     event.params.user,
-    getProtocolData()
+    protocolData
   );
 }
 
@@ -218,18 +238,18 @@ export function handleReserveUsedAsCollateralDisabled(
   _handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
     event.params.user,
-    getProtocolData()
+    protocolData
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handlePaused(event: Paused): void {
-  _handlePaused(getProtocolData());
+  _handlePaused(protocolData);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
-  _handleUnpaused(getProtocolData());
+  _handleUnpaused(protocolData);
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -237,7 +257,7 @@ export function handleDeposit(event: Deposit): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.onBehalfOf
   );
 }
@@ -247,7 +267,7 @@ export function handleWithdraw(event: Withdraw): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.to
   );
 }
@@ -257,7 +277,7 @@ export function handleBorrow(event: Borrow): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.onBehalfOf
   );
 }
@@ -267,7 +287,7 @@ export function handleRepay(event: Repay): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.user
   );
 }
@@ -277,11 +297,68 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event,
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
-    getProtocolData(),
+    protocolData,
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
     event.params.debtToCover
+  );
+}
+
+export function handleFlashloan(event: FlashLoan): void {
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+  flashloanPremium.premiumRateTotal = FLASHLOAN_PREMIUM_TOTAL;
+  flashloanPremium.save();
+
+  _handleFlashLoan(
+    event.params.asset,
+    event.params.amount,
+    event.params.initiator,
+    protocolData,
+    event,
+    event.params.premium,
+    flashloanPremium
+  );
+}
+
+export function handleSwapBorrowRateMode(event: Swap): void {
+  const interestRateMode = event.params.rateMode.toI32();
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      interestRateMode
+    )
+  ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
+    return;
+  }
+
+  const interestRateType =
+    interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
+    event,
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 
@@ -292,30 +369,33 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
-    PositionSide.LENDER,
+    protocolData,
+    PositionSide.COLLATERAL,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
 export function handleVariableTransfer(event: VariableTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
+    protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
 export function handleStableTransfer(event: StableTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
+    protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
@@ -323,91 +403,109 @@ export function handleStableTransfer(event: StableTransfer): void {
 ///// Helpers /////
 ///////////////////
 
-function updateRewards(market: Market): void {
+function updateRewards(manager: DataManager, event: ethereum.Event): void {
+  const market = manager.getMarket();
   // Get UWU rewards for the given pool
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
   const tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
-    const rewardEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-    const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-
-    const incentiveControllerContract = ChefIncentivesController.bind(
-      tryIncentiveController.value
+    log.warning(
+      "[updateRewards]aToken {} getIncentivesController() call reverted",
+      [market.outputToken!.toHexString()]
     );
-    const tryDepPoolInfo = incentiveControllerContract.try_poolInfo(
-      Address.fromString(market.outputToken!)
-    );
-    const tryBorPoolInfo = incentiveControllerContract.try_poolInfo(
-      Address.fromString(market._vToken!)
-    );
-    const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
-    const tryRewardsPerSecond =
-      incentiveControllerContract.try_rewardsPerSecond();
+    return;
+  }
 
-    // calculate rewards per pool
-    // Rewards/sec/poolSide = rewardsPerSecond * poolAllocPoints / totalAllocPoints
+  const rewardEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+  const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
-    if (
-      !tryBorPoolInfo.reverted &&
-      !tryAllocPoints.reverted &&
-      !tryRewardsPerSecond.reverted
-    ) {
-      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
-      const poolAllocPoints = tryBorPoolInfo.value.value1;
+  const incentiveControllerContract = ChefIncentivesController.bind(
+    tryIncentiveController.value
+  );
+  const tryDepPoolInfo = incentiveControllerContract.try_poolInfo(
+    Address.fromBytes(market.outputToken!)
+  );
+  const tryBorPoolInfo = incentiveControllerContract.try_poolInfo(
+    Address.fromBytes(market._vToken!)
+  );
+  const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
+  const tryRewardsPerSecond =
+    incentiveControllerContract.try_rewardsPerSecond();
 
-      const borRewardsPerDay = tryRewardsPerSecond.value
-        .times(BigInt.fromI32(SECONDS_PER_DAY))
-        .toBigDecimal()
-        .div(exponentToBigDecimal(uwuToken.decimals))
-        .times(
-          poolAllocPoints
-            .toBigDecimal()
-            .div(tryAllocPoints.value.toBigDecimal())
-        );
-      const borRewardsPerDayBI = BigInt.fromString(
-        borRewardsPerDay
-          .times(exponentToBigDecimal(uwuToken.decimals))
-          .truncate(0)
-          .toString()
+  const tokenManager = new TokenManager(
+    Address.fromString(UWU_TOKEN_ADDRESS),
+    event
+  );
+  const uwuToken = tokenManager.getToken();
+  const rewardTokenBorrow = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.VARIABLE_BORROW
+  );
+  const rewardTokenDeposit = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.DEPOSIT
+  );
+  const uwuPriceUSD = getUwuPriceUSD();
+  tokenManager.updatePrice(uwuPriceUSD);
+
+  // calculate rewards per pool
+  // Rewards/sec/poolSide = rewardsPerSecond * poolAllocPoints / totalAllocPoints
+  if (
+    !tryBorPoolInfo.reverted &&
+    !tryAllocPoints.reverted &&
+    !tryRewardsPerSecond.reverted
+  ) {
+    const poolAllocPoints = tryBorPoolInfo.value.value1;
+
+    const borRewardsPerDay = tryRewardsPerSecond.value
+      .times(BigInt.fromI32(SECONDS_PER_DAY))
+      .toBigDecimal()
+      .div(exponentToBigDecimal(uwuToken.decimals))
+      .times(
+        poolAllocPoints.toBigDecimal().div(tryAllocPoints.value.toBigDecimal())
       );
+    const borRewardsPerDayBI = BigInt.fromString(
+      borRewardsPerDay
+        .times(exponentToBigDecimal(uwuToken.decimals))
+        .truncate(0)
+        .toString()
+    );
 
-      const uwuPriceUSD = getUwuPriceUSD();
-      rewardEmissionsAmount[0] = borRewardsPerDayBI;
-      rewardEmissionsUSD[0] = borRewardsPerDay.times(uwuPriceUSD);
-    }
+    const rewardDataBorrow = new RewardData(
+      rewardTokenBorrow,
+      borRewardsPerDayBI,
+      borRewardsPerDay.times(uwuPriceUSD)
+    );
+    manager.updateRewards(rewardDataBorrow);
+  }
 
-    if (
-      !tryDepPoolInfo.reverted &&
-      !tryAllocPoints.reverted &&
-      !tryRewardsPerSecond.reverted
-    ) {
-      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
-      const poolAllocPoints = tryDepPoolInfo.value.value1;
+  if (
+    !tryDepPoolInfo.reverted &&
+    !tryAllocPoints.reverted &&
+    !tryRewardsPerSecond.reverted
+  ) {
+    const poolAllocPoints = tryDepPoolInfo.value.value1;
 
-      const depRewardsPerDay = tryRewardsPerSecond.value
-        .times(BigInt.fromI32(SECONDS_PER_DAY))
-        .toBigDecimal()
-        .div(exponentToBigDecimal(uwuToken.decimals))
-        .times(
-          poolAllocPoints
-            .toBigDecimal()
-            .div(tryAllocPoints.value.toBigDecimal())
-        );
-      const depRewardsPerDayBI = BigInt.fromString(
-        depRewardsPerDay
-          .times(exponentToBigDecimal(uwuToken.decimals))
-          .truncate(0)
-          .toString()
+    const depRewardsPerDay = tryRewardsPerSecond.value
+      .times(BigInt.fromI32(SECONDS_PER_DAY))
+      .toBigDecimal()
+      .div(exponentToBigDecimal(uwuToken.decimals))
+      .times(
+        poolAllocPoints.toBigDecimal().div(tryAllocPoints.value.toBigDecimal())
       );
+    const depRewardsPerDayBI = BigInt.fromString(
+      depRewardsPerDay
+        .times(exponentToBigDecimal(uwuToken.decimals))
+        .truncate(0)
+        .toString()
+    );
 
-      const uwuPriceUSD = getUwuPriceUSD();
-      rewardEmissionsAmount[1] = depRewardsPerDayBI;
-      rewardEmissionsUSD[1] = depRewardsPerDay.times(uwuPriceUSD);
-    }
-
-    market.rewardTokenEmissionsAmount = rewardEmissionsAmount;
-    market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-    market.save();
+    rewardEmissionsAmount[1] = depRewardsPerDayBI;
+    rewardEmissionsUSD[1] = depRewardsPerDay.times(uwuPriceUSD);
+    const rewardDataDeposit = new RewardData(
+      rewardTokenDeposit,
+      depRewardsPerDayBI,
+      depRewardsPerDay.times(uwuPriceUSD)
+    );
+    manager.updateRewards(rewardDataDeposit);
   }
 }
 
@@ -458,10 +556,16 @@ function getUwuPriceUSD(): BigDecimal {
   }
 
   // get WETH price in USD
-  const protocol = getOrCreateLendingProtocol(getProtocolData());
+  const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  if (!defaultOracle || !defaultOracle.oracle) {
+    log.warning("[getUwuPriceUSD]defaultOracle.oracle for {} is not set", [
+      protocolData.protocolID.toHexString(),
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
   const wethPriceUSD = getAssetPriceInUSDC(
     Address.fromString(WETH_TOKEN_ADDRESS),
-    Address.fromString(protocol._priceOracle)
+    Address.fromBytes(defaultOracle.oracle)
   );
 
   const uwuPriceUSD = wethPriceUSD.div(

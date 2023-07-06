@@ -1,0 +1,33 @@
+{
+  "network": "avalanche",
+  "protocolName": "GMX",
+  "protocolSlug": "gmx",
+  "protocolId": "0x9ab2de34a33fb459b538c43f251eb825645e8595",
+  "poolName": "GMXVault",
+  "poolSymbol": "Vault",
+  "protocolSideRevenuePercent": "0.15",
+  "stakeSideRevenuePercent": "0.3",
+  "priceCachingBlocks": 7000,
+  "mlpAddress": "0x01234181085565ed162a948b6a5e88758cd7c7b8",
+  "mmyAddress": "0x62edc0692bd897d2295872a9ffcac5425011c661",
+  "esMMYAddress": "0xff1489227bbaac61a9209a08929e4c2a526ddd17",
+  "VaultAddr": "0x9ab2de34a33fb459b538c43f251eb825645e8595",
+  "VaultStartBlock": 8231150,
+  "FeeGlpRewardDistributorAddr": "0x1de098faf30bd74f22753c28db17a2560d4f5554",
+  "FeeGlpRewardDistributorStartBlock": 8353442,
+  "EsgmxGlpRewardDistributorAddr": "0xdd593cf40734199afc9207ebe9fff23da4bf7720",
+  "EsgmxGlpRewardDistributorStartBlock": 8353460,
+  "deployment": "GMX_AVALANCHE",
+  "glpManagers": [
+    {
+      "name": "GlpManager_V1",
+      "address": "0xe1ae4d4b06a5fe1fc288f6b4cd72f9f8323b107f",
+      "startBlock": 8231150
+    },
+    {
+      "name": "GlpManager_V2",
+      "address": "0xd152c7f25db7f4b95b7658323c5f33d176818ee4",
+      "startBlock": 22742389
+    }
+  ]
+}

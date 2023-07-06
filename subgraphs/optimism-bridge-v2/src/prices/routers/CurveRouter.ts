@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { getUsdPricePerToken } from "..";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
@@ -90,10 +91,13 @@ export function getCurvePriceUsdc(
       constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
     );
 
+  const liquidity = getLpTokenLiquidityUsdc(lpAddress, block);
+
   return CustomPriceType.initialize(
     priceUsdc,
     decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8,
-    constants.OracleType.CURVE_ROUTER
+    constants.OracleType.CURVE_ROUTER,
+    liquidity.usdPrice
   );
 }
 
@@ -321,6 +325,44 @@ export function getPriceUsdc(
   return CustomPriceType.initialize(
     price.usdPrice.times(virtualPrice),
     constants.DEFAULT_DECIMALS.toI32() as u8,
+    constants.OracleType.CURVE_ROUTER
+  );
+}
+
+function getLpTokenLiquidityUsdc(
+  lpAddress: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
+  const poolAddress = getPoolFromLpToken(lpAddress, block);
+  const poolContract = CurvePoolContract.bind(poolAddress);
+
+  let liquidity = constants.BIGDECIMAL_ZERO;
+  for (let i = 0; i < 8; i++) {
+    const coin = utils.readValue<Address>(
+      poolContract.try_coins(BigInt.fromI32(i)),
+      constants.NULL.TYPE_ADDRESS
+    );
+    if (coin.equals(constants.NULL.TYPE_ADDRESS) || coin.equals(lpAddress))
+      continue;
+
+    const decimals = utils.getTokenDecimals(coin);
+    const balance = utils.readValue<BigInt>(
+      poolContract.try_balances(BigInt.fromI32(i as i32)),
+      constants.BIGINT_ZERO
+    );
+
+    const price = getPriceUsdcRecommended(coin, block);
+    liquidity = liquidity.plus(
+      balance
+        .div(constants.BIGINT_TEN.pow(decimals.toI32() as u8))
+        .toBigDecimal()
+        .times(price.usdPrice)
+    );
+  }
+
+  return CustomPriceType.initialize(
+    liquidity,
+    constants.DEFAULT_USDC_DECIMALS,
     constants.OracleType.CURVE_ROUTER
   );
 }

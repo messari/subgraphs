@@ -44,6 +44,8 @@ dataSources:
       abis:
         - name: MiniChefV2
           file: ./abis/pangolin/MiniChefV2.json
+        - name: Factory
+          file: ./abis/pangolin/Factory.json
         - name: TokenABI
           file: ./abis/pangolin/ERC20.json
       eventHandlers:

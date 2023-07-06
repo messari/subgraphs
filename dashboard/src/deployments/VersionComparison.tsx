@@ -105,7 +105,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
           let decentralizedFetch = null;
           if (depo?.["services"]?.["decentralized-network"]) {
             let decenEndpoint =
-              "https://gateway.thegraph.com/api/" +
+              "https://gateway-arbitrum.network.thegraph.com/api/" +
               process.env.REACT_APP_GRAPH_API_KEY +
               "/subgraphs/id/" +
               depo?.["services"]?.["decentralized-network"]?.["query-id"];

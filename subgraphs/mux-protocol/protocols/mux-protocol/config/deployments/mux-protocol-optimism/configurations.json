@@ -1,0 +1,9 @@
+{
+  "network": "optimism",
+  "pool": {
+    "address": "0xc6bd76fa1e9e789345e003b361e4a0037dfb7260",
+    "startBlock": "56067441"
+  },
+  "isArbitrum": false,
+  "deployment": "MUX_OPTIMISM"
+}

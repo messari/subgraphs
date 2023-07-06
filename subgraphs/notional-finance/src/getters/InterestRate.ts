@@ -11,7 +11,7 @@ export function getOrCreateInterestRate(marketId: string): InterestRate {
   if (!interestRate) {
     interestRate = new InterestRate("BORROWER-" + "FIXED-" + marketId);
     interestRate.side = InterestRateSide.BORROWER;
-    interestRate.type = InterestRateType.STABLE;
+    interestRate.type = InterestRateType.FIXED;
     interestRate.rate = BIGDECIMAL_ONE;
     interestRate.save();
   }

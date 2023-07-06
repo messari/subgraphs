@@ -46,9 +46,9 @@ function ProtocolInfo({
     if (versionParam === "pending") {
       link += "?version=pending";
     }
-  } else if (subgraphToQueryURL.includes("https://gateway.thegraph.com")) {
+  } else if (subgraphToQueryURL.includes("https://gateway-arbitrum.network.thegraph.com")) {
     const subId = subgraphToQueryURL.split("id/")[1];
-    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview`;
+    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview&chain=arbitrum-one`;
   } else {
     link = subgraphToQueryURL;
   }
@@ -153,7 +153,9 @@ function ProtocolInfo({
             <span>{protocolSchemaData?.name} - </span>
             <Typography variant="body1" component="span">
               {protocolSchemaData?.network}
-              {subgraphToQueryURL.includes("https://gateway.thegraph.com") ? " (DECENTRALIZED NETWORK)" : ""}
+              {subgraphToQueryURL.includes("https://gateway-arbitrum.network.thegraph.com")
+                ? " (DECENTRALIZED NETWORK)"
+                : ""}
             </Typography>
           </Typography>
         </Link>

@@ -1,6 +1,9 @@
 {
   "deployment": "ARBITRUM_ONE_MAINNET",
   "network": "mainnet",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0,
   "file": "./src/handlers/ethereum/transfers.ts",
   "L1Bridge": [
     {
@@ -45,6 +48,13 @@
       "address": "0x6142f1C8bBF02E6A6bd074E8d564c9A5420a0676",
       "abi": "TokenGateway",
       "startBlock": 14199457,
+      "handlerSuffix": "3pGateway"
+    },
+    {
+      "name": "ArbGateway",
+      "address": "0xbbcE8aA77782F13D4202a230d978F361B011dB27",
+      "abi": "TokenGateway",
+      "startBlock": 16840302,
       "handlerSuffix": "3pGateway"
     }
   ]
