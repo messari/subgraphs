@@ -39,6 +39,7 @@ import {
  * SDK Version:     1.0.5
  * Author(s):
  *  - @dmelotik
+ *  - @dhruv-chauhan
  */
 
 export class SnapshotManager {

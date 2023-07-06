@@ -17,9 +17,10 @@ import {
  * use in mappings and get info about the token.
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.4
+ * SDK Version:     1.0.5
  * Author(s):
  *  - @dmelotik
+ *  - @dhruv-chauhan
  */
 
 export class TokenManager {
