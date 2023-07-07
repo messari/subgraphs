@@ -44,7 +44,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.from = transaction.from.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
-    withdrawTransaction.logIndex = transaction.index.toI32();
+    withdrawTransaction.logIndex = 0;
 
     withdrawTransaction.asset = assetId;
     withdrawTransaction.amount = amount;

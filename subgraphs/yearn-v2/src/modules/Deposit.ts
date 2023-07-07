@@ -44,7 +44,7 @@ export function createDepositTransaction(
     depositTransaction.from = transaction.from.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
-    depositTransaction.logIndex = transaction.index.toI32();
+    depositTransaction.logIndex = 0;
 
     depositTransaction.asset = assetId;
     depositTransaction.amount = amount;
