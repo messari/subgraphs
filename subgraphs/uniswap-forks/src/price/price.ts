@@ -116,7 +116,7 @@ export function findUSDPricePerToken(
             poolAmounts.inputTokenBalances[priceTokenIndex]
           ).times(whitelistToken.lastPriceUSD! as BigDecimal);
 
-          if (isValidTVL(pool, token, whitelistToken.lastPriceUSD!)) {
+          if (isValidTVL(pool, token, newPrice)) {
             priceSoFar = newPrice;
           }
         }

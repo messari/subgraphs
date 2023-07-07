@@ -49,7 +49,7 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(18);
+export const USDC_TOKEN_DECIMALS = constants.BIGINT_EIGHTEEN;
 
 export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
 

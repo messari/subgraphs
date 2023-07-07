@@ -1,26 +1,36 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/RouterV6/CalculationsCurve";
+import { CustomPriceType, OracleContract } from "../common/types";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/Router-0/CalculationsCurve";
 
 export function getCalculationsCurveContract(
-  network: string
-): CalculationsCurveContract {
-  return CalculationsCurveContract.bind(
-    constants.CURVE_CALCULATIONS_ADDRESS_MAP.get(network)!
-  );
+  contract: OracleContract,
+  block: ethereum.Block | null = null
+): CalculationsCurveContract | null {
+  if (
+    (block && contract.startBlock.gt(block.number)) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return CalculationsCurveContract.bind(contract.address);
 }
 
-export function getTokenPriceFromCalculationCurve(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
-  network: string
+  block: ethereum.Block | null = null
 ): CustomPriceType {
-  const calculationCurveContract = getCalculationsCurveContract(network);
+  const config = utils.getConfig();
 
-  if (!calculationCurveContract) {
+  if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
+
+  const calculationCurveContract = getCalculationsCurveContract(
+    config.curveCalculations(),
+    block
+  );
+  if (!calculationCurveContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
@@ -31,6 +41,7 @@ export function getTokenPriceFromCalculationCurve(
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.DEFAULT_USDC_DECIMALS,
+    constants.OracleType.CURVE_CALCULATIONS
   );
 }

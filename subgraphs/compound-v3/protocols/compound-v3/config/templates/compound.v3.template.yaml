@@ -79,6 +79,10 @@ templates:
           file: ./abis/Comet.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
         - name: CometRewards
           file: ./abis/CometRewards.json
         - name: Chainlink

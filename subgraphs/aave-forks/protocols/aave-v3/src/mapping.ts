@@ -3,22 +3,18 @@ import {
   BigDecimal,
   BigInt,
   dataSource,
-  DataSourceContext,
   log,
-  ethereum,
   Bytes,
+  crypto,
+  ByteArray,
+  ethereum,
 } from "@graphprotocol/graph-ts";
-import {
-  PriceOracleUpdated,
-  ProxyCreated,
-} from "../../../generated/templates/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
+import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
-  POOL_ADDRESSES_PROVIDER_ID_KEY,
+  InterestRateMode,
   Protocol,
-  PROTOCOL_ID_KEY,
-  TokenType,
   USDC_POS_TOKEN_ADDRESS,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
@@ -30,9 +26,14 @@ import {
   ReserveFrozen,
   ReserveInitialized,
   ReservePaused,
-} from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
+  LiquidationProtocolFeeChanged,
+  FlashloanPremiumTotalUpdated,
+  FlashloanPremiumToProtocolUpdated,
+  SiloedBorrowingChanged,
+} from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
+  FlashLoan,
   LendingPool as LendingPoolContract,
   LiquidationCall,
   Repay,
@@ -40,16 +41,22 @@ import {
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
   Supply,
+  SwapBorrowRateMode,
   Withdraw,
-} from "../../../generated/templates/LendingPool/LendingPool";
+  UserEModeSet,
+} from "../../../generated/LendingPool/LendingPool";
 import {
-  ProtocolData,
+  _handleAssetConfigUpdated,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleFlashLoan,
+  _handleFlashloanPremiumToProtocolUpdated,
+  _handleFlashloanPremiumTotalUpdated,
   _handleLiquidate,
+  _handleLiquidationProtocolFeeChanged,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -59,153 +66,102 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleSwapBorrowRateMode,
   _handleTransfer,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  getOrCreateLendingProtocol,
-  getOrCreateMarket,
-  getOrCreateToken,
-} from "../../../src/helpers";
-import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  Network,
+  INT_FOUR,
+} from "../../../src/constants";
+import {
+  getMarketFromToken,
+  readValue,
   equalsIgnoreCase,
   exponentToBigDecimal,
-  InterestRateType,
-  INT_TWO,
-  Network,
-  PositionSide,
-  readValue,
-  RewardTokenType,
-  SECONDS_PER_DAY,
-} from "../../../src/constants";
-import { Market, RewardToken, Token } from "../../../generated/schema";
-import {
-  AddressesProviderRegistered,
-  PoolAddressesProviderRegistry,
-} from "../../../generated/PoolAddressesProviderRegistry/PoolAddressesProviderRegistry";
+  getOrCreateFlashloanPremium,
+  getBorrowBalances,
+} from "../../../src/helpers";
+import { Market, _DefaultOracle } from "../../../generated/schema";
 import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
-import {
-  LendingPool as LendingPoolTemplate,
-  LendingPoolAddressesProvider,
-  LendingPoolConfigurator,
-} from "../../../generated/templates";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 import { AaveOracle } from "../../../generated/LendingPool/AaveOracle";
+import { DataManager, ProtocolData } from "../../../src/sdk/manager";
+import {
+  CollateralizationType,
+  INT_152,
+  INT_SIXTY_FOUR,
+  INT_TEN,
+  INT_THIRTY_TWO,
+  InterestRateType,
+  LendingType,
+  PermissionType,
+  PositionSide,
+  RiskType,
+} from "../../../src/sdk/constants";
+import { AccountManager } from "../../../src/sdk/account";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
   return new ProtocolData(
-    constants.protocolAddress.toHexString(),
+    constants.protocolAddress,
+    Protocol.PROTOCOL,
     Protocol.NAME,
     Protocol.SLUG,
-    constants.network
+    constants.network,
+    LendingType.POOLED,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.ADMIN,
+    CollateralizationType.OVER_COLLATERALIZED,
+    RiskType.GLOBAL
   );
 }
 
 const protocolData = getProtocolData();
 
-// PoolAddressesProviderRegistry
-export function handleAddressesProviderRegistered(
-  event: AddressesProviderRegistered
-): void {
-  const poolAddressesProviderRegistry = PoolAddressesProviderRegistry.bind(
-    event.address
-  );
-  if (poolAddressesProviderRegistry.getAddressesProvidersList().length > 1) {
-    // TODO: add support for additional pools, when it becomes necessary
-    log.error("Additional pool address providers not supported", []);
-    return;
-  }
-
-  const context = new DataSourceContext();
-  context.setString(PROTOCOL_ID_KEY, dataSource.address().toHexString());
-  LendingPoolAddressesProvider.createWithContext(
-    event.params.addressesProvider,
-    context
-  );
-}
-
 ///////////////////////////////////////////////
 ///// PoolAddressProvider Handlers /////
 ///////////////////////////////////////////////r
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  _handlePriceOracleUpdated(event.params.newAddress, protocolData);
-}
-
-export function handleProxyCreated(event: ProxyCreated): void {
-  const context = dataSource.context();
-  context.setString(
-    POOL_ADDRESSES_PROVIDER_ID_KEY,
-    event.address.toHexString()
-  );
-  const id = event.params.id.toString();
-  if ("POOL" == id) {
-    LendingPoolTemplate.createWithContext(event.params.proxyAddress, context);
-  } else if ("POOL_CONFIGURATOR" == id) {
-    LendingPoolConfigurator.createWithContext(
-      event.params.proxyAddress,
-      context
-    );
-  }
+  _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
 ///////////////////////////////////////////////
 ///// RewardController Handlers /////
 ///////////////////////////////////////////////
 export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
-  const assetAddress = event.params.asset.toHexString();
-  const assetToken = Token.load(assetAddress);
-  if (!assetToken || !assetToken._market || !assetToken._type) {
-    log.error(
-      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._type is null",
-      [assetAddress]
+  // it is not clear which market.oracle should be used,
+  // use the protocol-wide defaultOracle
+  const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+  if (!defaultOracle || !defaultOracle.oracle) {
+    log.warning(
+      "[handleAssetConfigUpdated]_DefaultOracle for {} not set; rewardTokenPriceUSD set to default 0.0",
+      [protocolData.protocolID.toHexString()]
     );
-    return;
-  }
-
-  const marketId = Address.fromString(assetToken._market!);
-  const market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.error("[handleAssetConfigUpdated]Market {} not found", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
-
-  // There can be more than one reward tokens for a side,
-  // e.g. one reward token for variable borrowing
-  // and another for stable borrowing
-  let rewardTokenType: string;
-  let interestRateType: string;
-  if (assetToken._type! == TokenType.ATOKEN) {
-    rewardTokenType = RewardTokenType.DEPOSIT;
-    interestRateType = InterestRateType.VARIABLE;
-  } else if (assetToken._type! == TokenType.STOKEN) {
-    rewardTokenType = RewardTokenType.BORROW;
-    interestRateType = InterestRateType.STABLE;
-  } else if (assetToken._type! == TokenType.VTOKEN) {
-    rewardTokenType = RewardTokenType.BORROW;
-    interestRateType = InterestRateType.VARIABLE;
   } else {
-    log.error("Failed to update rewards, could not find asset: {}", [
-      assetAddress,
-    ]);
-    return;
+    rewardTokenPriceUSD = getAssetPriceInUSDC(
+      event.params.reward,
+      Address.fromBytes(defaultOracle.oracle),
+      event.block.number
+    );
   }
 
-  const rewardToken = getOrCreateRewardToken(
+  _handleAssetConfigUpdated(
+    event,
+    event.params.asset,
     event.params.reward,
-    rewardTokenType,
-    interestRateType,
-    event.params.newDistributionEnd
+    rewardTokenPriceUSD,
+    event.params.newEmission,
+    event.params.newDistributionEnd,
+    protocolData
   );
-
-  updateMarketRewards(event, market, rewardToken, event.params.newEmission);
 }
 
 ///////////////////////////////////////////////
@@ -217,52 +173,19 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
   _handleReserveInitialized(
     event,
-    event.params.aToken, // marketID & input Token (underlying asset)
-    event.params.aToken,
+    event.params.asset, //input Token/underlying asset
+    event.params.aToken, //output Token
     event.params.variableDebtToken,
     protocolData,
     event.params.stableDebtToken
   );
-
-  const assetToken = getOrCreateToken(event.params.asset);
-  const market = getOrCreateMarket(event.params.aToken, protocolData);
-  market.inputToken = assetToken.id;
-  market.save();
-
-  // map tokens to market
-  assetToken._market = market.id;
-  assetToken._type = TokenType.INPUTTOKEN;
-  assetToken.save();
-
-  const aToken = getOrCreateToken(event.params.aToken);
-  aToken._market = market.id;
-  aToken._type = TokenType.ATOKEN;
-  aToken.save();
-
-  const vToken = getOrCreateToken(event.params.variableDebtToken);
-  vToken._market = market.id;
-  vToken._type = TokenType.VTOKEN;
-  vToken.save();
-
-  const sToken = getOrCreateToken(event.params.stableDebtToken);
-  sToken._market = market.id;
-  sToken._type = TokenType.STOKEN;
-  sToken.save();
 }
 
 export function handleCollateralConfigurationChanged(
   event: CollateralConfigurationChanged
 ): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
-    return;
-  }
   _handleCollateralConfigurationChanged(
-    marketId,
+    event.params.asset,
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
     event.params.ltv,
@@ -271,91 +194,88 @@ export function handleCollateralConfigurationChanged(
 }
 
 export function handleReserveActive(event: ReserveActive): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
-    return;
-  }
-  _handleReserveActivated(marketId, protocolData);
+  _handleReserveActivated(event.params.asset, protocolData);
 }
 
 export function handleReserveBorrowing(event: ReserveBorrowing): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error("[handleReserveBorrowing]Failed to find market for asset {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
   if (event.params.enabled) {
-    _handleBorrowingEnabledOnReserve(marketId, protocolData);
+    _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
   } else {
-    _handleBorrowingDisabledOnReserve(marketId, protocolData);
+    _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
   }
 }
 
 export function handleReserveFrozen(event: ReserveFrozen): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error("[handleReserveFrozen]Failed to find market for asset {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
-  _handleReserveDeactivated(marketId, protocolData);
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReservePaused(event: ReservePaused): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error("[handleReservePaused]Failed to find market for asset {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
-  _handleReserveDeactivated(marketId, protocolData);
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error(
-      "[handleReserveFactorChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
-    return;
-  }
   _handleReserveFactorChanged(
-    marketId,
+    event.params.asset,
     event.params.newReserveFactor,
     protocolData
   );
+}
+
+export function handleLiquidationProtocolFeeChanged(
+  event: LiquidationProtocolFeeChanged
+): void {
+  _handleLiquidationProtocolFeeChanged(
+    event.params.asset,
+    event.params.newFee,
+    protocolData
+  );
+}
+
+export function handleFlashloanPremiumTotalUpdated(
+  event: FlashloanPremiumTotalUpdated
+): void {
+  // rate is in 1/10000 (bps)
+  const rate = event.params.newFlashloanPremiumTotal
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  _handleFlashloanPremiumTotalUpdated(rate, protocolData);
+}
+
+export function handleFlashloanPremiumToProtocolUpdated(
+  event: FlashloanPremiumToProtocolUpdated
+): void {
+  // rate is in 1/10000 (bps)
+  const rate = event.params.newFlashloanPremiumToProtocol
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  _handleFlashloanPremiumToProtocolUpdated(rate, protocolData);
 }
 
 /////////////////////////////////
 ///// Lending Pool Handlers /////
 /////////////////////////////////
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId || !Market.load(marketId.toHexString())) {
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
     log.warning("[handleReserveDataUpdated]Market not found for reserve {}", [
       event.params.reserve.toHexString(),
     ]);
     return;
   }
 
-  const market = Market.load(marketId.toHexString())!;
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
+
   const assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol._priceOracle),
+    Address.fromBytes(market.inputToken),
+    manager.getOracleAddress(),
     event.block.number
   );
 
-  // TODO: better to pass market and protocol
   _handleReserveDataUpdated(
     event,
     event.params.liquidityRate,
@@ -363,7 +283,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
     protocolData,
-    marketId,
+    event.params.reserve,
     assetPriceUSD
   );
 }
@@ -371,17 +291,9 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error(
-      "[handleReserveUsedAsCollateralEnabled]Failed to find market for asset {}",
-      [event.params.reserve.toHexString()]
-    );
-    return;
-  }
   // This Event handler enables a reserve/market to be used as collateral
   _handleReserveUsedAsCollateralEnabled(
-    marketId,
+    event.params.reserve,
     event.params.user,
     protocolData
   );
@@ -390,119 +302,170 @@ export function handleReserveUsedAsCollateralEnabled(
 export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error(
-      "[handleReserveUsedAsCollateralDisabled]Failed to find market for asset {}",
-      [event.params.reserve.toHexString()]
-    );
-    return;
-  }
   // This Event handler disables a reserve/market being used as collateral
   _handleReserveUsedAsCollateralDisabled(
-    marketId,
+    event.params.reserve,
     event.params.user,
     protocolData
   );
 }
 
 export function handleDeposit(event: Supply): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleDeposit]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
   _handleDeposit(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.onBehalfOf
   );
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleWithdraw]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
   _handleWithdraw(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.user
   );
 }
 
 export function handleBorrow(event: Borrow): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
+  // determine whether the borrow position is in isolated mode
+  // borrow in isolated mode will have an IsolationModeTotalDebtUpdated event emitted
+  // before the Borrow event
+  // https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/protocol/libraries/logic/BorrowLogic.sol#L139
+  let isIsolated = false;
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.warning(
+      "[handleBorrow]No receipt for tx {}; cannot set isIsolated flag",
+      [event.transaction.hash.toHexString()]
+    );
+  } else {
+    isIsolated = getIsIsolatedFlag(event);
+  }
+
+  let interestRateType: InterestRateType | null = null;
+  if (event.params.interestRateMode === InterestRateMode.STABLE) {
+    interestRateType = InterestRateType.STABLE;
+  } else if (event.params.interestRateMode === InterestRateMode.VARIABLE) {
+    interestRateType = InterestRateType.VARIABLE;
+  }
+
+  _handleBorrow(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    protocolData,
+    event.params.onBehalfOf,
+    interestRateType,
+    isIsolated
+  );
+  // decode reserve factor from contract storage
+  // as there may be no ReserveFactorChanged event emitted
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
     log.error("[handleBorrow]Failed to find market for asset {}", [
       event.params.reserve.toHexString(),
     ]);
     return;
   }
-
-  setReserveFactor(marketId, event.address, event.params.reserve);
-
-  _handleBorrow(
-    event,
-    event.params.amount,
-    marketId,
-    protocolData,
-    event.params.onBehalfOf
-  );
+  storeReserveFactor(market, event.address, event.params.reserve);
 }
 
 export function handleRepay(event: Repay): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleRepay]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
   _handleRepay(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.user
   );
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
-  const collateralMarketId = getMarketIdFromToken(event.params.collateralAsset);
-  if (!collateralMarketId) {
+  const collateralMarket = getMarketFromToken(
+    event.params.collateralAsset,
+    protocolData
+  );
+  if (!collateralMarket) {
     log.error("[handleLiquidationCall]Failed to find market for asset {}", [
       event.params.collateralAsset.toHexString(),
     ]);
     return;
   }
 
-  const debtMarketId = getMarketIdFromToken(event.params.debtAsset);
-  if (!debtMarketId) {
-    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
-      event.params.debtAsset.toHexString(),
-    ]);
-    return;
+  if (!collateralMarket._liquidationProtocolFee) {
+    storeLiquidationProtocolFee(
+      collateralMarket,
+      event.address,
+      event.params.collateralAsset
+    );
   }
 
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
-    collateralMarketId,
+    event.params.collateralAsset,
     protocolData,
     event.params.liquidator,
     event.params.user,
-    debtMarketId,
+    event.params.debtAsset,
     event.params.debtToCover
+  );
+}
+
+export function handleFlashloan(event: FlashLoan): void {
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+
+  _handleFlashLoan(
+    event.params.asset,
+    event.params.amount,
+    event.params.initiator,
+    protocolData,
+    event,
+    event.params.premium,
+    flashloanPremium
+  );
+}
+
+export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
+  const interestRateMode = event.params.interestRateMode;
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      interestRateMode
+    )
+  ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
+    return;
+  }
+  const interestRateType =
+    event.params.interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
+    event,
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 
@@ -511,12 +474,33 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 /////////////////////////
 
 export function handleCollateralTransfer(event: CollateralTransfer): void {
+  // determine the transfer amount because different versions of the AToken contract
+  // pass discounted and undiscounted amount to Transfer() and BalanceTransfer() event
+  // here we get the higher of the two amount and use it as the transfer amount
+  // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
+  // logIndex 18 and 21
+  let amount = event.params.value;
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.warning("[handleBorrow]No receipt for tx {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+  } else if (
+    ![event.params.from, event.params.to].includes(Address.zero()) &&
+    ![event.params.from, event.params.to].includes(event.address)
+  ) {
+    // only try to find BalanceTransfer amount for non-burn/mint event
+    const btAmount = getBalanceTransferAmount(event);
+    amount = btAmount.gt(amount) ? btAmount : amount;
+  }
+
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
-    event.params.from
+    event.params.from,
+    amount
   );
 }
 
@@ -526,7 +510,8 @@ export function handleVariableTransfer(event: VariableTransfer): void {
     protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
@@ -536,8 +521,29 @@ export function handleStableTransfer(event: StableTransfer): void {
     protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
+}
+
+export function handleSiloedBorrowingChanged(
+  event: SiloedBorrowingChanged
+): void {
+  const market = getMarketFromToken(event.params.asset, protocolData);
+  if (!market) {
+    log.error("[handleSiloedBorrowingChanged]market not found for token {}", [
+      event.params.asset.toHexString(),
+    ]);
+    return;
+  }
+  market._siloedBorrowing = event.params.newState;
+  market.save();
+}
+
+export function handleUserEModeSet(event: UserEModeSet): void {
+  const account = new AccountManager(event.params.user).getAccount();
+  account._eMode = true;
+  account.save();
 }
 
 ///////////////////
@@ -551,7 +557,7 @@ function getAssetPriceInUSDC(
   const oracle = AaveOracle.bind(priceOracle);
   const priceDecimals = readValue<BigInt>(
     oracle.try_BASE_CURRENCY_UNIT(),
-    BigInt.fromI32(10).pow(AAVE_DECIMALS as u8)
+    BigInt.fromI32(INT_TEN).pow(AAVE_DECIMALS as u8)
   ).toBigDecimal();
 
   const oracleResult = readValue<BigInt>(
@@ -610,7 +616,8 @@ function getAssetPriceFallback(
     // we will override the price at this block to $1.55615781978
     // this price is derived using the following method on that block using historical contract calls
     // The contract calls return 634291527055835 / 407601027988722 = our new price
-    if (blockNumber.equals(BigInt.fromI32(15783457))) {
+    const MISPRICE_BLOCK_NUMBER = 15783457;
+    if (blockNumber.equals(BigInt.fromI32(MISPRICE_BLOCK_NUMBER))) {
       return BigDecimal.fromString("1.55615781978");
     }
 
@@ -629,195 +636,162 @@ function getAssetPriceFallback(
   return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
 }
 
-function getMarketIdFromToken(token: Address): Address | null {
-  const tokenAddress = token.toHexString();
-  const tokenEntity = Token.load(tokenAddress);
-  if (!tokenEntity || !tokenEntity._market) {
-    log.error(
-      "[getMarketIdFromToken]token {} not exist or token._market = null",
-      [tokenAddress]
-    );
-    return null;
-  }
-  const marketId = Address.fromString(tokenEntity._market!);
-  return marketId;
-}
-
-function getOrCreateRewardToken(
-  tokenAddress: Address,
-  rewardTokenType: string,
-  interestRateType: string,
-  distributionEnd: BigInt
-): RewardToken {
-  const token = getOrCreateToken(tokenAddress);
-  // deposit-variable-0x123, borrow-stable-0x123, borrow-variable-0x123
-  const id = `${rewardTokenType}-${interestRateType}-${token.id}`;
-
-  let rewardToken = RewardToken.load(id);
-  if (!rewardToken) {
-    rewardToken = new RewardToken(id);
-    rewardToken.token = token.id;
-    rewardToken.type = rewardTokenType;
-  }
-  rewardToken._distributionEnd = distributionEnd;
-  rewardToken.save();
-
-  return rewardToken;
-}
-
-export function updateMarketRewards(
-  event: ethereum.Event,
+function storeReserveFactor(
   market: Market,
-  rewardToken: RewardToken,
-  emissionRate: BigInt
-): void {
-  let rewardTokens = market.rewardTokens;
-  let rewardTokenEmissions = market.rewardTokenEmissionsAmount;
-  let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-
-  if (rewardTokens == null) {
-    rewardTokens = [];
-    rewardTokenEmissions = [];
-    rewardTokenEmissionsUSD = [];
-  }
-
-  let rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
-  if (rewardTokenIndex == -1) {
-    rewardTokenIndex = rewardTokens.push(rewardToken.id) - 1;
-    rewardTokenEmissions!.push(BIGINT_ZERO);
-    rewardTokenEmissionsUSD!.push(BIGDECIMAL_ZERO);
-  }
-  rewardTokenEmissions![rewardTokenIndex] = emissionRate.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
-  );
-  market.rewardTokens = rewardTokens;
-  market.rewardTokenEmissionsAmount = rewardTokenEmissions;
-  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-  market.save();
-
-  sortRewardTokens(market);
-  updateMarketRewardEmissions(market, event);
-}
-
-function updateMarketRewardEmissions(
-  market: Market,
-  event: ethereum.Event
-): void {
-  if (market.rewardTokens == null) {
-    return;
-  }
-
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  const rewardTokens = market.rewardTokens!;
-  const rewardEmissions = market.rewardTokenEmissionsAmount!;
-  const rewardEmissionsUSD = market.rewardTokenEmissionsUSD!;
-  for (let i = 0; i < rewardTokens.length; i++) {
-    const rewardToken = RewardToken.load(rewardTokens[i])!;
-    if (event.block.timestamp.gt(rewardToken._distributionEnd!)) {
-      rewardEmissions[i] = BIGINT_ZERO;
-      rewardEmissionsUSD[i] = BIGDECIMAL_ZERO;
-    } else {
-      const token = Token.load(rewardToken.token)!;
-      let rewardTokenPriceUSD = token.lastPriceUSD;
-      rewardTokenPriceUSD = getAssetPriceInUSDC(
-        Address.fromString(token.id),
-        Address.fromString(protocol._priceOracle),
-        event.block.number
-      );
-
-      rewardEmissionsUSD[i] = rewardEmissions[i]
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(rewardTokenPriceUSD);
-    }
-  }
-  market.rewardTokenEmissionsAmount = rewardEmissions;
-  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-  market.save();
-}
-
-function sortRewardTokens(market: Market): void {
-  if (market.rewardTokens!.length <= 1) {
-    return;
-  }
-
-  const tokens = market.rewardTokens;
-  const emissions = market.rewardTokenEmissionsAmount;
-  const emissionsUSD = market.rewardTokenEmissionsUSD;
-  multiArraySort(tokens!, emissions!, emissionsUSD!);
-
-  market.rewardTokens = tokens;
-  market.rewardTokenEmissionsAmount = emissions;
-  market.rewardTokenEmissionsUSD = emissionsUSD;
-  market.save();
-}
-
-function multiArraySort(
-  ref: Array<string>,
-  arr1: Array<BigInt>,
-  arr2: Array<BigDecimal>
-): void {
-  if (ref.length != arr1.length || ref.length != arr2.length) {
-    // cannot sort
-    return;
-  }
-
-  const sorter: Array<Array<string>> = [];
-  for (let i = 0; i < ref.length; i++) {
-    sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
-  }
-
-  sorter.sort(function (a: Array<string>, b: Array<string>): i32 {
-    if (a[0] < b[0]) {
-      return -1;
-    }
-    return 1;
-  });
-
-  for (let i = 0; i < sorter.length; i++) {
-    ref[i] = sorter[i][0];
-    arr1[i] = BigInt.fromString(sorter[i][1]);
-    arr2[i] = BigDecimal.fromString(sorter[i][2]);
-  }
-}
-
-function setReserveFactor(
-  marketId: Address,
   poolAddress: Address,
   reserve: Address
 ): void {
-  // Set reserveFactor if not set, as setReserveFactor may be never called
-  const market = getOrCreateMarket(marketId, protocolData);
-  if (market._reserveFactor.equals(BIGDECIMAL_ZERO)) {
-    // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
-    // for how to decode configuration data to get reserve factor
-    const reserveFactorMask =
-      "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
-    const reserveFactorStartBitPosition = 64 as u8;
-
-    const maskArray = new Uint8Array(32);
-    maskArray.set(Bytes.fromHexString(reserveFactorMask));
-    // BITWISE NOT
-    for (let i = 0; i < maskArray.length; i++) {
-      maskArray[i] = ~maskArray[i];
-    }
-    // reverse for little endian
-    const reserveFactorMaskBigInt = BigInt.fromUnsignedBytes(
-      Bytes.fromUint8Array(maskArray.reverse())
-    );
-
-    const pool = LendingPoolContract.bind(poolAddress);
-    const poolConfigData = pool.getConfiguration(reserve).data;
-    const reserveFactor = poolConfigData
-      .bitAnd(reserveFactorMaskBigInt)
-      .rightShift(reserveFactorStartBitPosition);
-
-    log.info("[setReserveFactor]reserveFactor set to {}", [
-      reserveFactor.toString(),
-    ]);
-    market._reserveFactor = reserveFactor
-      .toBigDecimal()
-      .div(exponentToBigDecimal(INT_TWO));
-    market.save();
+  // Set reserveFactor if not set, as setReserveFactor() may be never called
+  // and no ReserveFactorChanged event is emitted
+  if (market.reserveFactor || market.reserveFactor!.gt(BIGDECIMAL_ZERO)) {
+    // we should only need to do this when market.reserveFactor is not set or equal to 0.0
+    // changing reserveFactor config should emit ReserveFactorChanged event and handled
+    // by handleReserveFactorChanged
+    return;
   }
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
+  // for how to decode configuration data to get reserve factor
+  const reserveFactorMask =
+    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
+  const reserveFactorStartBitPosition = INT_SIXTY_FOUR as u8;
+
+  const pool = LendingPoolContract.bind(poolAddress);
+  const poolConfigData = pool.getConfiguration(reserve).data;
+  const reserveFactor = decodeConfig(
+    poolConfigData,
+    reserveFactorMask,
+    reserveFactorStartBitPosition
+  )
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR)); // reserveFactor in bps, 1/10000
+
+  log.info("[setReserveFactor]reserveFactor set to {}", [
+    reserveFactor.toString(),
+  ]);
+  market.reserveFactor = reserveFactor;
+  market.save();
+}
+
+function storeLiquidationProtocolFee(
+  market: Market,
+  poolAddress: Address,
+  reserve: Address
+): void {
+  // Store LiquidationProtocolFee if not set, as setLiquidationProtocolFee() may be never called
+  // and no LiquidationProtocolFeeChanged event is emitted
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
+  // for how to decode configuration data to get _liquidationProtocolFee
+  const liquidationProtocolFeeMask =
+    "0xFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+  const reserveFactorStartBitPosition = INT_152 as u8;
+
+  const pool = LendingPoolContract.bind(poolAddress);
+  const poolConfigData = pool.getConfiguration(reserve).data;
+  const liquidationProtocolFee = decodeConfig(
+    poolConfigData,
+    liquidationProtocolFeeMask,
+    reserveFactorStartBitPosition
+  )
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+
+  log.info("[storeLiquidationProtocolFee]market {} liquidationProtocolFee={}", [
+    market.id.toHexString(),
+    liquidationProtocolFee.toString(),
+  ]);
+  market._liquidationProtocolFee = liquidationProtocolFee;
+  market.save();
+}
+
+function decodeConfig(
+  storedData: BigInt,
+  maskStr: string,
+  startBitPosition: u8
+): BigInt {
+  // aave-v3 stores configuration in packed bits (ReserveConfiguration.sol)
+  // decoding them by applying a bit_not mask and right shift by startBitPosition
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
+  // for how to decode configuration data to get _liquidationProtocolFee
+
+  const maskArray = new Uint8Array(INT_THIRTY_TWO);
+  maskArray.set(Bytes.fromHexString(maskStr));
+  // BITWISE NOT
+  for (let i = 0; i < maskArray.length; i++) {
+    maskArray[i] = ~maskArray[i];
+  }
+  // reverse for little endian
+  const configMaskBigInt = BigInt.fromUnsignedBytes(
+    Bytes.fromUint8Array(maskArray.reverse())
+  );
+
+  const config = storedData
+    .bitAnd(configMaskBigInt)
+    .rightShift(startBitPosition);
+
+  return config;
+}
+
+function getIsIsolatedFlag(event: ethereum.Event): boolean {
+  let isIsolated = false;
+  const ISOLATE_MODE = "IsolationModeTotalDebtUpdated(address,uint256)";
+  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(ISOLATE_MODE));
+  const logs = event.receipt!.logs;
+  //IsolationModeTotalDebtUpdated emitted before Borrow's event.logIndex
+  // e.g. https://etherscan.io/tx/0x4b038b26555d4b6c057cd612057b39e6482a7c60eb44058ee61d299332efdf29#eventlog
+  const eventLogIndex = event.logIndex;
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.gt(eventLogIndex)) {
+      // no IsolationModeTotalDebtUpdated log before Borrow
+      break;
+    }
+    // topics[0] - signature
+    const logSignature = thisLog.topics[0];
+    if (thisLog.address == event.address && logSignature == eventSignature) {
+      log.info(
+        "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
+        [event.transaction.hash.toHexString()]
+      );
+      isIsolated = true;
+      break;
+    }
+  }
+  return isIsolated;
+}
+
+function getBalanceTransferAmount(event: ethereum.Event): BigInt {
+  let btAmount = BIGINT_ZERO;
+  const BALANCE_TRANSFER =
+    "BalanceTransfer(address, address, uint256, uint256)";
+  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(BALANCE_TRANSFER));
+  const logs = event.receipt!.logs;
+  // BalanceTransfer emitted after Transfer's event.logIndex
+  // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
+  const eventLogIndex = event.logIndex;
+  log.info(
+    "[getBalanceTransferAmount]tx {}-{},logs.length={},event.logIndex={}",
+    [
+      event.transaction.hash.toHexString(),
+      event.logIndex.toString(),
+      logs.length.toString(),
+      eventLogIndex.toString(),
+    ]
+  );
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.le(eventLogIndex)) {
+      // skip event with logIndex < event.logIndex
+      continue;
+    }
+    // topics[0] - signature
+    const logSignature = thisLog.topics[0];
+    if (thisLog.address == event.address && logSignature == eventSignature) {
+      const UINT256_UINT256 = "(uint256,uint256)";
+      const decoded = ethereum.decode(UINT256_UINT256, thisLog.data)!.toTuple();
+      btAmount = decoded[0].toBigInt();
+
+      break;
+    }
+  }
+  return btAmount;
 }

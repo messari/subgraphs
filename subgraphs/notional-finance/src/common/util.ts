@@ -25,7 +25,7 @@ export function getTokenFromCurrency(
   } else if (currencyId == "4") {
     tokenAddress = cWBTC_ADDRESS;
   } else {
-    log.error(" -- New currency found: {}", [currencyId.toString()]);
+    log.warning(" -- New currency found: {}", [currencyId.toString()]);
   }
 
   const token = getOrCreateToken(
@@ -34,4 +34,23 @@ export function getTokenFromCurrency(
   );
 
   return token;
+}
+
+export function getNameFromCurrency(currencyId: string): string {
+  // default if no currencyID is recognized
+  let currencyName = "UNKNOWN";
+
+  if (currencyId == "1") {
+    currencyName = "ETH";
+  } else if (currencyId == "2") {
+    currencyName = "DAI";
+  } else if (currencyId == "3") {
+    currencyName = "USDC";
+  } else if (currencyId == "4") {
+    currencyName = "WBTC";
+  } else {
+    log.warning(" -- New currency found: {}", [currencyId.toString()]);
+  }
+
+  return currencyName;
 }

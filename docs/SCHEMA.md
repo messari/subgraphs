@@ -2,6 +2,8 @@
 
 All subgraphs follow a set of standardized schemas. This standardization brings some important benefits:
 
+> As a note, schemas will follow [semver](https://semver.org/) strictly. Whereas subgraph versions versioning can be more flexible. Read more details [here](./CONTRIBUTING.md#how-to-name-your-pr).
+
 **It makes it extremely easy for people to consume the subgraph data.**
 
 - Every protocol has slightly different terminology and definition, making it difficult for people to make sense of their data.

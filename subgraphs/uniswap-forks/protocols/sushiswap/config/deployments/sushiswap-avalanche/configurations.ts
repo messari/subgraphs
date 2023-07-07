@@ -116,7 +116,9 @@ export class SushiswapAvalancheConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x0da67235dd5787d67955420c84ca1cecd4e5bb3b", // wMEMO
+    ];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;

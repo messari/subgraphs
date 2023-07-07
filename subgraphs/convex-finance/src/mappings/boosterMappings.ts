@@ -10,7 +10,6 @@ import {
 import {
   SetFeesCall,
   AddPoolCall,
-  EarmarkRewardsCall,
   Deposited as DepositedEvent,
   Withdrawn as WithdrawnEvent,
 } from "../../generated/Booster/Booster";
@@ -28,7 +27,7 @@ export function handleAddPool(call: AddPoolCall): void {
   protocol._poolCount = protocol._poolCount.plus(constants.BIGINT_ONE);
   protocol.save();
 
-  const vault = getOrCreateVault(poolId, call.block);
+  getOrCreateVault(poolId, call.block);
 }
 
 export function handleDeposited(event: DepositedEvent): void {
@@ -37,7 +36,13 @@ export function handleDeposited(event: DepositedEvent): void {
 
   const vault = getOrCreateVault(poolId, event.block);
   if (vault) {
-    Deposit(vault, depositAmount, event.transaction, event.block);
+    Deposit(
+      vault,
+      depositAmount,
+      event.params.user,
+      event.transaction,
+      event.block
+    );
   }
 
   updateFinancials(event.block);
@@ -52,15 +57,19 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
   const vault = getOrCreateVault(poolId, event.block);
 
   if (vault) {
-    withdraw(vault, withdrawAmount, event.transaction, event.block);
+    withdraw(
+      vault,
+      withdrawAmount,
+      event.params.user,
+      event.transaction,
+      event.block
+    );
   }
 
   updateFinancials(event.block);
   updateUsageMetrics(event.block, event.transaction.from);
   updateVaultSnapshots(poolId, event.block);
 }
-
-export function handleEarmarkRewards(call: EarmarkRewardsCall): void {}
 
 export function handleSetFees(call: SetFeesCall): void {
   const lockFees = call.inputs._lockFees;

@@ -1,0 +1,9 @@
+{
+  "network": "arbitrum-one",
+  "pool": {
+    "address": "0x3e0199792ce69dc29a0a36146bfa68bd7c8d6633",
+    "startBlock": "11242780"
+  },
+  "isArbitrum": true,
+  "deployment": "MUX_ARBITRUM"
+}

@@ -16,10 +16,11 @@ import {
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version:  3.0.1
- * SDK Version:     1.0.2
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.5
  * Author(s):
  *  - @dmelotik
+ *  - @dhruv-chauhan
  */
 
 export class TokenManager {

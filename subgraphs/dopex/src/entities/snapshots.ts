@@ -49,12 +49,12 @@ export function takeSnapshots(
     protocol._lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
 
   if (protocolSnapshotDayID != dayID && protocolSnapshotDayID != INT_ZERO) {
-    takeFinancialDailySnapshot(protocol, protocolSnapshotDayID);
-    takeUsageMetricsDailySnapshot(protocol, protocolSnapshotDayID);
+    takeFinancialDailySnapshot(event, protocol, protocolSnapshotDayID);
+    takeUsageMetricsDailySnapshot(event, protocol, protocolSnapshotDayID);
     updateProtocolSnapshotDayID(protocolSnapshotDayID);
   }
   if (protocolSnapshotHourID != hourID && protocolSnapshotHourID != INT_ZERO) {
-    takeUsageMetricsHourlySnapshot(protocol, protocolSnapshotHourID);
+    takeUsageMetricsHourlySnapshot(event, protocol, protocolSnapshotHourID);
   }
 
   const pool = getOrCreateLiquidityPool(event, poolAddress);
@@ -63,16 +63,17 @@ export function takeSnapshots(
   const poolSnapshotHourID =
     pool._lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
   if (poolSnapshotDayID != dayID && poolSnapshotDayID != INT_ZERO) {
-    takeLiquidityPoolDailySnapshot(pool, poolSnapshotDayID);
+    takeLiquidityPoolDailySnapshot(event, pool, poolSnapshotDayID);
     updatePoolSnapshotDayID(pool, poolSnapshotDayID);
   }
   if (poolSnapshotHourID != hourID && poolSnapshotHourID != INT_ZERO) {
-    takeLiquidityPoolHourlySnapshot(pool, poolSnapshotHourID);
+    takeLiquidityPoolHourlySnapshot(event, pool, poolSnapshotHourID);
     updatePoolSnapshotHourID(pool, poolSnapshotHourID);
   }
 }
 
 export function takeLiquidityPoolDailySnapshot(
+  event: ethereum.Event,
   pool: LiquidityPool,
   day: i32
 ): void {
@@ -186,6 +187,7 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.days = day;
   poolMetrics.protocol = pool.protocol;
   poolMetrics.pool = pool.id;
+  poolMetrics.timestamp = event.block.timestamp;
 
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
@@ -355,6 +357,7 @@ export function takeLiquidityPoolDailySnapshot(
 }
 
 export function takeLiquidityPoolHourlySnapshot(
+  event: ethereum.Event,
   pool: LiquidityPool,
   hour: i32
 ): void {
@@ -444,6 +447,7 @@ export function takeLiquidityPoolHourlySnapshot(
   poolMetrics.hours = hour;
   poolMetrics.protocol = pool.protocol;
   poolMetrics.pool = pool.id;
+  poolMetrics.timestamp = event.block.timestamp;
 
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.openInterestUSD = pool.openInterestUSD;
@@ -567,6 +571,7 @@ export function takeLiquidityPoolHourlySnapshot(
 }
 
 export function takeFinancialDailySnapshot(
+  event: ethereum.Event,
   protocol: DerivOptProtocol,
   day: i32
 ): void {
@@ -647,6 +652,8 @@ export function takeFinancialDailySnapshot(
 
   financialMetrics.days = day;
   financialMetrics.protocol = protocol.id;
+  financialMetrics.timestamp = event.block.timestamp;
+
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
   financialMetrics.dailyVolumeUSD = protocol.cumulativeVolumeUSD.minus(
@@ -742,6 +749,7 @@ export function takeFinancialDailySnapshot(
 }
 
 export function takeUsageMetricsDailySnapshot(
+  event: ethereum.Event,
   protocol: DerivOptProtocol,
   day: i32
 ): void {
@@ -754,6 +762,7 @@ export function takeUsageMetricsDailySnapshot(
   const usageMetrics = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
   usageMetrics.days = day;
   usageMetrics.protocol = protocol.id;
+  usageMetrics.timestamp = event.block.timestamp;
 
   const tempUsageMetrics = _TempUsageMetricsDailySnapshot.load(id);
   if (tempUsageMetrics) {
@@ -786,6 +795,7 @@ export function takeUsageMetricsDailySnapshot(
 }
 
 export function takeUsageMetricsHourlySnapshot(
+  event: ethereum.Event,
   protocol: DerivOptProtocol,
   hour: i32
 ): void {
@@ -798,6 +808,7 @@ export function takeUsageMetricsHourlySnapshot(
   const usageMetrics = new UsageMetricsHourlySnapshot(id);
   usageMetrics.hours = hour;
   usageMetrics.protocol = protocol.id;
+  usageMetrics.timestamp = event.block.timestamp;
 
   const tempUsageMetrics = _TempUsageMetricsHourlySnapshot.load(id);
   if (tempUsageMetrics) {

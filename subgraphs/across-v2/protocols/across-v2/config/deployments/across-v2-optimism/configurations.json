@@ -1,0 +1,23 @@
+{
+  "deployment": "ACROSS_V2_OPTIMISM",
+  "SpokePool": [
+    {
+      "chain": "Optimism",
+      "network": "optimism",
+      "address": "0xa420b2d1c0841415a695b81e5b867bcd07dff8c9",
+      "startBlock": 8747136,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,uint256,uint256,uint64,uint64,uint64,uint32,address,indexed address,indexed address,address,bool)",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,uint256,uint64,indexed uint32,uint32,indexed address,address,indexed address)",
+      "name": "SpokePool1"
+    },
+    {
+      "chain": "Optimism",
+      "network": "optimism",
+      "address": "0x6f26Bf09B1C792e3228e5467807a900A503c0281",
+      "startBlock": 93903076,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,indexed uint256,uint256,int64,int64,indexed uint32,address,address,indexed address,address,bytes,(address,bytes,int64,bool,int256))",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,indexed uint256,int64,indexed uint32,uint32,address,address,indexed address,bytes)",
+      "name": "SpokePool2"
+    }
+  ]
+}

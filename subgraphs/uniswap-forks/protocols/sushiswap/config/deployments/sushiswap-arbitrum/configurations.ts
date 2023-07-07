@@ -109,7 +109,13 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x3010eadefaba5756226c0543ab4ea1f975018c65", // HonorWorld
+      "0x5204ca6252643b1cfc6bbac05698c45e70f2cb1c", // Pi Network
+      "0x15e32be99b3af4b7517639b3ac608c93f73e42de", // Bluefin APP
+      "0xf5520364a2e2ff1cb2e007df7cbe01c8b2cd7e0d", // ReadON
+      "0x014a029338d7953e0df6dc5ea351ade9743c98ed", // Sushiswap AI Card Render
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

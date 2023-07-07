@@ -92,7 +92,7 @@ enum _OrderFulfillmentMethod {
     MATCH_ADVANCED_ORDERS 
 }
 
-type Marketplace @entity {
+type Marketplace @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
@@ -136,7 +136,7 @@ type Marketplace @entity {
   cumulativeUniqueTraders: Int!
 }
 
-type Collection @entity {
+type Collection @entity @regularPolling {
   " Contract address. "
   id: ID!
 
@@ -181,7 +181,7 @@ type Collection @entity {
 }
 
 " Trades exist such as a combination of taker/order and bid/ask. "
-type Trade @entity {
+type Trade @entity @transaction {
   " { Transaction hash }-{ Log index }-{ (optional) ID within bundle } "
   id: ID!
 
@@ -222,7 +222,7 @@ type Trade @entity {
   seller: String!
 }
 
-type MarketplaceDailySnapshot @entity {
+type MarketplaceDailySnapshot @entity @dailySnapshot {
   " { Contract address }-{# of days since Unix epoch time} "
   id: ID!
 
@@ -266,7 +266,7 @@ type MarketplaceDailySnapshot @entity {
   dailyTradedItemCount: Int!
 }
 
-type CollectionDailySnapshot @entity {
+type CollectionDailySnapshot @entity @dailySnapshot {
   " { Contract address }-{# of days since epoch unix time } "
   id: ID!
 
