@@ -34,6 +34,13 @@
     }
   ],
 
+  "hardcodedMetaPools": [
+    {
+      "name": "Curve.fi fUSDT/DAI/USDC",
+      "address": "0x92d5ebf3593a92888c25c0abef126583d4b5312e"
+    }
+  ],
+
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": ""

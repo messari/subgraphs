@@ -492,6 +492,10 @@ export function getOrCreateLiquidityPool(
     pool._registryAddress = constants.NULL.TYPE_STRING;
     pool._gaugeAddress = constants.NULL.TYPE_STRING;
     pool._isMetapool = false;
+
+    if (constants.HARDCODED_METAPOOLS.includes(poolAddress))
+      pool._isMetapool = true;
+
     pool.save();
 
     PoolTemplate.create(poolAddress);

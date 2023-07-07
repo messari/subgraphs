@@ -65,4 +65,6 @@ export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x1be5d71f2da660bfdee8012ddc58d024448a0a59"), // iearn USDT
   Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
   Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
+  Address.fromString("0xaa91cdd7abb47f821cf07a2d38cc8668deaf1bdc"), // 2jpy-2-f
+  Address.fromString("0x8343091f2499fd4b6174a46d067a920a3b851ff9"), // jJPY
 ];

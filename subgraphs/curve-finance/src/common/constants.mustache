@@ -155,6 +155,12 @@ export const POOL_REGISTRIES: Address[] = [
 {{/poolRegistry}}
 ]
 
+export const HARDCODED_METAPOOLS: Address[] = [
+{{#hardcodedMetaPools}}
+  Address.fromString("{{address}}"), // {{name}}
+{{/hardcodedMetaPools}}
+]
+
 export const HARDCODED_BASEPOOLS_LP_TOKEN: Address[] = [
 {{#basePoolsLpToken}}
   Address.fromString("{{address}}"), // {{name}}
