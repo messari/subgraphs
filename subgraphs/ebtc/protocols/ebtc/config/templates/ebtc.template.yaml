@@ -19,11 +19,11 @@ dataSources:
       abis:
         - name: CdpManager
           file: ./abis/CdpManager.json
-        - name: ERC20
-          file: ./abis/ERC20.json
       eventHandlers:
         - event: ActivePoolAddressChanged(address)
           handler: handleSystemDeployed
+        - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
+          handler: handleCdpUpdated
   - name: ActivePool
     kind: ethereum/contract
     network: "{{ network.slug }}"
@@ -40,12 +40,6 @@ dataSources:
       abis:
         - name: ActivePool
           file: ./abis/ActivePool.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
         - event: ActivePoolCollBalanceUpdated(uint256)
           handler: handleActivePoolCollBalanceUpdated
@@ -73,7 +67,13 @@ dataSources:
         ###########################################
         # ERC20
         - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
         # Curve Contracts
         - name: CurvePool
           file: ./abis/Prices/Curve/Pool.json

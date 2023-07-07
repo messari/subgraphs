@@ -18,6 +18,7 @@ import {
   exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
+  PositionSide,
   SECONDS_PER_DAY,
   TransactionType,
 } from "./util/constants";
@@ -28,8 +29,8 @@ import { TokenManager } from "./token";
  * This file contains the PositionManager class, which is used to
  * make changes to a given position.
  *
- * Schema Version:  3.0.1
- * SDK Version:     1.0.2
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.4
  * Author(s):
  *  - @dmelotik
  */
@@ -80,15 +81,15 @@ export class PositionManager {
 
   setCollateral(isCollateral: boolean): void {
     if (this.position) {
-      this.position.isCollateral = isCollateral;
-      this.position.save();
+      this.position!.isCollateral = isCollateral;
+      this.position!.save();
     }
   }
 
   setIsolation(isIsolated: boolean): void {
     if (this.position) {
-      this.position.isIsolated = isIsolated;
-      this.position.save();
+      this.position!.isIsolated = isIsolated;
+      this.position!.save();
     }
   }
 
@@ -98,7 +99,8 @@ export class PositionManager {
     protocol: LendingProtocol,
     newBalance: BigInt,
     transactionType: string,
-    priceUSD: BigDecimal
+    priceUSD: BigDecimal,
+    principal: BigInt | null = null
   ): void {
     let positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -117,6 +119,7 @@ export class PositionManager {
       // update existing position
       position = position!;
       position.balance = newBalance;
+      if (principal) position.principal = principal;
       if (transactionType == TransactionType.DEPOSIT) {
         position.depositCount += INT_ONE;
       } else if (transactionType == TransactionType.BORROW) {
@@ -146,6 +149,7 @@ export class PositionManager {
       position.type = this.interestType;
     }
     position.balance = newBalance;
+    if (principal) position.principal = principal;
     position.depositCount = INT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.borrowCount = INT_ZERO;
@@ -207,7 +211,8 @@ export class PositionManager {
     protocol: LendingProtocol,
     newBalance: BigInt,
     transactionType: string,
-    priceUSD: BigDecimal
+    priceUSD: BigDecimal,
+    principal: BigInt | null = null
   ): void {
     const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -226,6 +231,7 @@ export class PositionManager {
     }
 
     position.balance = newBalance;
+    if (principal) position.principal = principal;
 
     if (transactionType == TransactionType.WITHDRAW) {
       position.withdrawCount += INT_ONE;
@@ -303,6 +309,20 @@ export class PositionManager {
       .times(priceUSD);
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
+
+    if (this.position!.principal) snapshot.principal = this.position!.principal;
+    if (
+      this.market.borrowIndex &&
+      this.position!.side == PositionSide.BORROWER
+    ) {
+      snapshot.index = this.market.borrowIndex;
+    } else if (
+      this.market.supplyIndex &&
+      this.position!.side == PositionSide.COLLATERAL
+    ) {
+      snapshot.index = this.market.supplyIndex;
+    }
+
     snapshot.save();
   }
 

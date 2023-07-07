@@ -1,6 +1,6 @@
-import { ERC20 } from "../../generated/ActivePool/ERC20";
-import { ERC20SymbolBytes } from "../../generated/ActivePool/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/ActivePool/ERC20NameBytes";
+import { ERC20 } from "../../generated/PriceFeed/ERC20";
+import { ERC20SymbolBytes } from "../../generated/PriceFeed/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/PriceFeed/ERC20NameBytes";
 import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
 import {
@@ -16,8 +16,8 @@ import {
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version:  3.0.1
- * SDK Version:     1.0.2
+ * Schema Version:  3.1.0
+ * SDK Version:     1.0.4
  * Author(s):
  *  - @dmelotik
  */
@@ -158,7 +158,7 @@ export class TokenManager {
     const decimalResult = contract.try_decimals();
     if (!decimalResult.reverted) {
       const decimalValue = decimalResult.value;
-      return decimalValue.toI32();
+      return decimalValue;
     }
 
     // try with the static definition

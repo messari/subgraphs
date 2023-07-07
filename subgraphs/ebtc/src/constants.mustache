@@ -1,4 +1,4 @@
-import { BigDecimal, Bytes } from "@graphprotocol/graph-ts";
+import { BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_HUNDRED,
@@ -8,7 +8,7 @@ import {
   PermissionType,
   RiskType,
 } from "./sdk/util/constants";
-import { ProtocolData } from "./sdk/manager";
+import { DataManager, ProtocolData } from "./sdk/manager";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -49,7 +49,7 @@ export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 
 ///////
 
-export const PROTOCOL = "Liquity";
+export const PROTOCOL = "BadgerDAO";
 export const PROTOCOL_NAME = "eBTC Protocol";
 export const PROTOCOL_SLUG = "ebtc";
 export const PROTOCOL_NETWORK = {{ network.object }};
@@ -73,5 +73,14 @@ export function getProtocolData(): ProtocolData {
     POOL_CREATOR_PERMISSION_TYPE,
     COLATERALIZATION_TYPE,
     RISK_TYPE
+  );
+}
+
+export function getDataManager(event: ethereum.Event): DataManager {
+  return new DataManager(
+    ACTIVE_POOL, // marketID: Bytes
+    STETH_ADDRESS, // inputToken: Bytes
+    event, // event: ethereum.Event
+    getProtocolData() // protocolData: ProtocolData
   );
 }
