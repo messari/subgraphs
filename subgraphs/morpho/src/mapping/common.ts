@@ -37,6 +37,7 @@ import {
   createInterestRate,
   updateProtocolPosition,
   updateRevenueSnapshots,
+  updateProtocolTotalValueLockedUSD,
 } from "../helpers";
 import { IMaths } from "../utils/maths/mathsInterface";
 import { getMarket, getOrInitToken } from "../utils/initializers";
@@ -823,7 +824,6 @@ export function _handleReserveUpdate(
     .minus(market.totalBorrowBalanceUSD)
     .plus(totalBorrowBalanceUSD);
   market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  params.protocol.totalValueLockedUSD = params.protocol.totalDepositBalanceUSD;
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   params.protocol.save();
   // Update pool indexes
@@ -863,6 +863,7 @@ export function _handleReserveUpdate(
 
   updateP2PRates(market, __MATHS__);
   updateProtocolPosition(params.protocol, market);
+  updateProtocolTotalValueLockedUSD(params.protocol.id);
 
   market.save();
   return;
