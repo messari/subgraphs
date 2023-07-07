@@ -45,6 +45,25 @@ dataSources:
           handler: handleActivePoolCollBalanceUpdated
         - event: ActivePoolEBTCDebtUpdated(uint256)
           handler: handleActivePoolEBTCDebtUpdated
+  - name: BorrowerOperations
+    kind: ethereum/contract
+    network: "{{ network.slug }}"
+    source:
+      abi: BorrowerOperations
+      address: "{{ borrowerOperations.address }}"
+      startBlock: {{ borrowerOperations.startBlock }}
+    mapping:
+      file: ./src/mapping/BorrowerOperations.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      entities: []
+      abis:
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+      eventHandlers:
+        - event: CdpCreated(indexed bytes32,indexed address,indexed address,uint256)
+          handler: handleCdpCreated
   - name: PriceFeed
     kind: ethereum/contract
     network: "{{ network.slug }}"
