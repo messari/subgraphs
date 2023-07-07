@@ -1,9 +1,10 @@
+import { ethereum } from "@graphprotocol/graph-ts";
+
 import { PoolManager } from "./pool";
+import { PositionManager } from "./position";
 import { Perpetual } from "./protocol";
 import { AccountManager } from "./account";
-import { PositionManager } from "./position";
 import * as constants from "../../util/constants";
-import { ethereum } from "@graphprotocol/graph-ts";
 import { CustomEventType } from "../../util/events";
 import { TokenInitializer, TokenManager } from "./tokens";
 import { ProtocolConfigurer, TokenPricer } from "../config";

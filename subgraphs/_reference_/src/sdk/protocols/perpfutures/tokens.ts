@@ -10,8 +10,8 @@ import { Token, RewardToken } from "../../../../generated/schema";
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version:  1.3.2
- * SDK Version:     1.1.5
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
