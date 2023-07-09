@@ -20,7 +20,7 @@ import {
   _LiquidityPoolAmount,
 } from "../../../../generated/schema";
 import { Pair as PairTemplate } from "../../../../generated/templates";
-import { getTrackedVolumeUSD } from "../../../../src/price/price";
+import { getTrackedVolumeUSD } from "../price";
 import {
   BIGDECIMAL_FIFTY_PERCENT,
   BIGDECIMAL_ZERO,

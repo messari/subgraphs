@@ -17,7 +17,7 @@ import {
   _TokenWhitelist,
   _Transfer,
 } from "../../../../generated/schema";
-import { findUSDPricePerToken } from "../../../../src/price/price";
+import { findUSDPricePerToken } from "../price";
 import { Versions } from "../../../../src/versions";
 import {
   BIGDECIMAL_ZERO,

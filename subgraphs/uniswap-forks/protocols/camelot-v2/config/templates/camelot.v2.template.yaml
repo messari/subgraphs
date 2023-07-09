@@ -28,6 +28,8 @@ dataSources:
           file: ./abis/camelot-v2/Factory.json
         - name: TokenABI
           file: ./abis/camelot-v2/ERC20.json
+        - name: Pair
+          file: ./abis/camelot-v2/Pair.json
       eventHandlers:
         - event: OwnerFeeShareUpdated(uint256,uint256)
           handler: handleOwnerFeeShareUpdated
@@ -55,6 +57,8 @@ dataSources:
           file: ./abis/camelot-v2/GrailTokenV2.json
         - name: TokenABI
           file: ./abis/camelot-v2/ERC20.json
+        - name: Pair
+          file: ./abis/camelot-v2/Pair.json
       eventHandlers:
         - event: PoolAdded(indexed address,uint256)
           handler: handlePoolAdded

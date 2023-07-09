@@ -149,6 +149,9 @@ export class CamelotV2Configurations implements Configurations {
       "0x0f3074c55478a5c46c8af963b669ca663c2435e8",
       "0xc6488b0fccde76176bf4808067c243909ab91020",
       "0xee1d570036f96afbf43b1e711a19165bb35a5593",
+      "0x37ca2cc40487dba094b6670be524b79aade4fafb",
+      "0x5180dce8f532f40d84363737858e2c5fd0c8ab39",
+      "0xeadb108688435deb62cae64cb393ed2c23ffd814",
     ];
   }
   getUntrackedTokens(): string[] {
@@ -199,6 +202,8 @@ export class CamelotV2Configurations implements Configurations {
       "0xc971b8a0dd289be391c8a21b6f5df49c9962b848",
       "0x3fbb75df858e5b0164b27e294678fc78d0097d54",
       "0x3fa8d66caa837681d71a05a2c032b1c3f52e84e1",
+      "0x78414be33e8269976e5a86b2389297da1bca0e08",
+      "0x033f193b3fceb22a440e89a2867e8fee181594d9",
     ];
   }
   getBrokenERC20Tokens(): string[] {
