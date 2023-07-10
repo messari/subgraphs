@@ -12,7 +12,7 @@ import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { ActiveAccount, Vault as VaultStore } from "../../generated/schema";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
+  getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateYieldAggregator();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);

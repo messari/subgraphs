@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-checksum-addresses */
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 // The network names corresponding to the Network enum in the schema.
