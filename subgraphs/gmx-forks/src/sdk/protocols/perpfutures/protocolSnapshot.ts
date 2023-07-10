@@ -1,3 +1,10 @@
+import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+
+import { TransactionType } from "./enums";
+import { AccountWasActive } from "./account";
+import * as constants from "../../util/constants";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
 import {
   _ActivityHelper,
   FinancialsDailySnapshot,
@@ -5,22 +12,18 @@ import {
   UsageMetricsHourlySnapshot,
   DerivPerpProtocol as PerpetualSchema,
 } from "../../../../generated/schema";
-import { TransactionType } from "./enums";
-import { AccountWasActive } from "./account";
-import * as constants from "../../util/constants";
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
  * This file contains the ProtocolSnapshot, which is used to
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  1.3.2
- * SDK Version:     1.1.5
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class ProtocolSnapshot {
@@ -107,6 +110,10 @@ export class ProtocolSnapshot {
 
   private takeSnapshots(): void {
     if (!this.protocol._lastUpdateTimestamp) {
+      log.error(
+        "[isInitialized] cannot create snapshots, protocol: {} not initialized",
+        [this.protocol.id.toHexString()]
+      );
       return;
     }
 

@@ -225,9 +225,15 @@ export function BDChangeDecimals(
 // insert value into arr at index
 export function insert<Type>(
   arr: Array<Type>,
-  index: i32,
-  value: Type
+  value: Type,
+  index: i32 = -1
 ): Array<Type> {
+  if (arr.length == 0) {
+    return [value];
+  }
+  if (index == -1 || index > arr.length) {
+    index = arr.length;
+  }
   const result: Type[] = [];
   for (let i = 0; i < index; i++) {
     result.push(arr[i]);
