@@ -168,7 +168,7 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0x65DCb38637b526305Be55F14B24a4Ab2bD177780";
+export const PROTOCOL_ID = "0x65dcb38637b526305be55f14b24a4ab2bd177780";
 export const POOL_NAME = "MMYVault";
 export const POOL_SYMBOL = "Vault";
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
@@ -181,21 +181,21 @@ export const FUNDING_PRECISION = BigDecimal.fromString("1000000");
 export const FUNDING_PRECISION_DECIMALS = 6;
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b"
+  "0x304951d7172bcada54ccac1e4674862b3d5b3d5b"
 );
 
 export const MLP_ADDRESS = Address.fromString(
-  "0x41cD8CaFc24A771031B9eB9C57cFC94D86045eB6"
+  "0x41cd8cafc24a771031b9eb9c57cfc94d86045eb6"
 );
 
 export const MLP_MANAGER_ADDRESSES = [
-  Address.fromString("0x65DCb38637b526305Be55F14B24a4Ab2bD177780"), // GlpManager_V1
+  Address.fromString("0x65dcb38637b526305be55f14b24a4ab2bd177780"), // GlpManager_V1
 ];
 
 export const MMY_ADDRESS = Address.fromString(
-  "0xA6D7D0e650aa40FFa42d845A354c12c2bc0aB15f"
+  "0xa6d7d0e650aa40ffa42d845a354c12c2bc0ab15f"
 );
 
 export const ESCROWED_MMY_ADDRESS = Address.fromString(
-  "0x68d1CA32Aee9a73534429D8376743Bf222ff1870"
+  "0x68d1ca32aee9a73534429d8376743bf222ff1870"
 );
