@@ -77,6 +77,8 @@ export const DEFAULT_MANAGEMENT_FEE = BigInt.fromI32(200);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(2000);
 export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
 
+export const INT_EIGHTEEN = 18 as i32;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);

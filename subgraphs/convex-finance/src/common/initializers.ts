@@ -68,7 +68,10 @@ export function getOrCreateToken(address: Address): Token {
 
     token.name = utils.readValue<string>(contract.try_name(), "");
     token.symbol = utils.readValue<string>(contract.try_symbol(), "");
-    token.decimals = utils.readValue<i32>(contract.try_decimals(), 18);
+    token.decimals = utils.readValue<i32>(
+      contract.try_decimals(),
+      constants.INT_EIGHTEEN
+    );
 
     token.save();
   }
@@ -94,7 +97,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  const id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
   if (!usageMetrics) {
@@ -122,7 +125,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -256,7 +259,7 @@ export function getOrCreateVaultsHourlySnapshots(
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  const id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
   let financialMetrics = FinancialsDailySnapshot.load(id);
 
   if (!financialMetrics) {
@@ -364,7 +367,7 @@ export function getOrCreateVault(
       .enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE)
       .concat(constants.CONVEX_BOOSTER_ADDRESS.toHexString());
 
-    let performanceFee = getTotalFees();
+    const performanceFee = getTotalFees();
     utils.createFeeType(
       performanceFeeId,
       constants.VaultFeeType.PERFORMANCE_FEE,

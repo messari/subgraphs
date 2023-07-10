@@ -33,7 +33,7 @@ export function createWithdrawTransaction(
   amount: BigInt,
   amountUSD: BigDecimal
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -84,8 +84,8 @@ export function _Withdraw(
     const collateralMap = stableMasterContract.collateralMap(
       constants.POOL_MANAGER_ADDRESS
     );
-    let sanRate = collateralMap.value5;
-    let slpDataSlippage = collateralMap.value7.slippage;
+    const sanRate = collateralMap.value5;
+    const slpDataSlippage = collateralMap.value7.slippage;
 
     // StableMasterFront: (amount * (BASE_PARAMS - col.slpData.slippage) * col.sanRate) / (BASE_TOKENS * BASE_PARAMS)
     withdrawAmount = sharesBurnt
@@ -100,10 +100,10 @@ export function _Withdraw(
       .div(vault.outputTokenSupply!);
   }
 
-  let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+  const inputToken = Token.load(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken!.decimals as u8
   ).toBigDecimal();
 
@@ -128,7 +128,7 @@ export function _Withdraw(
     .div(inputTokenDecimals)
     .minus(protocolSideWithdrawalAmount);
 
-  let withdrawAmountUSD = supplySideWithdrawalAmount
+  const withdrawAmountUSD = supplySideWithdrawalAmount
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 

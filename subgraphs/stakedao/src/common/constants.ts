@@ -63,6 +63,8 @@ export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
 export const BASE_PARAMS = BigInt.fromString("1000000000");
 export const BASE_TOKENS = BigInt.fromString("1000000000000000000");
 
+export const INT_TEN = 10 as i32;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);

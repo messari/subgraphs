@@ -61,9 +61,9 @@ export function handleSetVault(call: SetVaultCall): void {
     inputTokenAddress
   );
 
-  let protocol = getOrCreateYieldAggregator();
+  const protocol = getOrCreateYieldAggregator();
 
-  let vaultIds = protocol._vaultIds;
+  const vaultIds = protocol._vaultIds;
   vaultIds.push(vaultAddress.toHexString());
 
   protocol._vaultIds = vaultIds;
@@ -82,7 +82,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   const inputTokenAddress = call.inputs._token;
   const newStrategyAddress = call.inputs._strategy;
 
-  let controller = ControllerContract.bind(controllerAddress);
+  const controller = ControllerContract.bind(controllerAddress);
   const vaultAddress = utils.readValue<Address>(
     controller.try_vaults(inputTokenAddress),
     constants.ZERO_ADDRESS
