@@ -17,7 +17,7 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Prices";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";

@@ -58,14 +58,8 @@ export function updateVaultSnapshots(
 ): void {
   let vault = getOrCreateVault(vaultAddress, block);
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress.toHexString(),
-    block
-  );
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress.toHexString(),
-    block
-  );
+  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vault, block);
+  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vault, block);
 
   vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
     vault.cumulativeSupplySideRevenueUSD;

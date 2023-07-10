@@ -56,15 +56,11 @@ export function updateVaultSnapshots(
   poolId: BigInt,
   block: ethereum.Block
 ): void {
-  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
-    .concat("-")
-    .concat(poolId.toString());
-
   let vault = getOrCreateVault(poolId, block);
   if (!vault) return;
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vaultId, block);
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vaultId, block);
+  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vault, block);
+  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vault, block);
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;

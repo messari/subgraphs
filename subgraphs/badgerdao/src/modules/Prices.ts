@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
+import { getPriceUsdcRecommended } from "../prices/routers/CurveRouter";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 
 export function getPricePerShare(vaultAddress: Address): BigDecimal {

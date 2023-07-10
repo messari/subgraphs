@@ -1,6 +1,6 @@
 {
   "name": "belt",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
@@ -10,10 +10,8 @@
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.31.0",
-    "@graphprotocol/graph-ts": "0.27.0"
-  },
-  "devDependencies": {
-    "matchstick-as": "^0.4.2"
+    "@graphprotocol/graph-cli": "^0.51.1",
+    "@graphprotocol/graph-ts": "^0.31.0",
+    "prettier": "^3.0.0"
   }
 }

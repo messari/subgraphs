@@ -37,6 +37,7 @@ export function handleSetVault(call: SetVaultCall): void {
   const inputToken = getOrCreateToken(inputTokenAddress);
   vault.inputToken = inputToken.id;
   vault.inputTokenBalance = constants.BIGINT_ZERO;
+  vault.depositLimit = constants.BIGINT_ZERO;
 
   const outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
@@ -57,10 +58,10 @@ export function handleSetVault(call: SetVaultCall): void {
   );
 
   let protocol = getOrCreateYieldAggregator();
-  
+
   let vaultIds = protocol._vaultIds;
-  vaultIds.push(vaultAddress.toHexString())
-  
+  vaultIds.push(vaultAddress.toHexString());
+
   protocol._vaultIds = vaultIds;
   protocol.totalPoolCount += 1;
   protocol.save();

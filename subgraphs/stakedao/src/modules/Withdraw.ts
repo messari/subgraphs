@@ -21,8 +21,8 @@ import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Price";
 import { Vault as VaultContract } from "../../generated/Controller/Vault";
-import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
-import { StableMaster as StableMasterContract } from "../../generated/controller/StableMaster";
+import { Strategy as StrategyContract } from "../../generated/Controller/Strategy";
+import { StableMaster as StableMasterContract } from "../../generated/Controller/StableMaster";
 
 export function createWithdrawTransaction(
   to: Address,
@@ -93,7 +93,6 @@ export function _Withdraw(
       .times(sanRate)
       .div(constants.BASE_TOKENS.times(constants.BASE_PARAMS));
   } else {
-    
     // calculate withdraw amount as per the withdraw function in vault
     // contract address
     withdrawAmount = vault.inputTokenBalance
@@ -204,9 +203,8 @@ export function updateFinancialsAfterWithdrawal(
   const protocol = getOrCreateYieldAggregator();
 
   // TotalRevenueUSD Metrics
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  financialMetrics.dailyTotalRevenueUSD =
+    financialMetrics.dailyTotalRevenueUSD.plus(protocolSideRevenueUSD);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
     protocolSideRevenueUSD
   );
@@ -214,12 +212,10 @@ export function updateFinancialsAfterWithdrawal(
     protocol.cumulativeTotalRevenueUSD;
 
   // ProtocolSideRevenueUSD Metrics
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  financialMetrics.dailyProtocolSideRevenueUSD =
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
   financialMetrics.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD;
 

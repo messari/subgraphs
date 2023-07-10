@@ -13,7 +13,7 @@ import * as constants from "../common/constants";
 import { Vault as VaultStore } from "../../generated/schema";
 import { log, BigInt, Address } from "@graphprotocol/graph-ts";
 import { getOrCreateRewardToken } from "../common/initializers";
-import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
+import { Strategy as StrategyContract } from "../../generated/Controller/Strategy";
 
 export function handleAddReward(call: AddRewardCall): void {
   const gaugeAddress = call.to;
