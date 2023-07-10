@@ -37,7 +37,6 @@ export function handleSetVault(call: SetVaultCall): void {
   const inputToken = getOrCreateToken(inputTokenAddress);
   vault.inputToken = inputToken.id;
   vault.inputTokenBalance = constants.BIGINT_ZERO;
-  vault.depositLimit = constants.BIGINT_ZERO;
 
   const outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
@@ -47,6 +46,11 @@ export function handleSetVault(call: SetVaultCall): void {
 
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;
+
+  vault.depositLimit = constants.BIGINT_ZERO;
+  vault.fees = [];
+  vault._rewardTokensIds = [];
+  vault._strategy = constants.ZERO_ADDRESS_STRING;
 
   VaultTemplate.create(vaultAddress);
   vault.save();

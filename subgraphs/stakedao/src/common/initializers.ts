@@ -44,7 +44,16 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.slug = constants.Protocol.SLUG;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.Protocol.TYPE;
+
+    //////// Quantitative Data ////////
+    protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
+
+    protocol._vaultIds = [];
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
