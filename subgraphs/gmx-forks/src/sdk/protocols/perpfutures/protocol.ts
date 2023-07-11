@@ -4,6 +4,7 @@ import {
   dataSource,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+
 import { SDK } from ".";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
@@ -11,17 +12,19 @@ import { CustomEventType } from "../../util/events";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { PositionType, TransactionType } from "./enums";
 import { ProtocolConfigurer, TokenPricer } from "../config";
+
 import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/schema";
 
 /**
  * This file contains the Perpetual class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  1.3.2
- * SDK Version:     1.1.5
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 /**
@@ -127,6 +130,7 @@ export class Perpetual {
     protocol.schemaVersion = versions.getSchemaVersion();
     protocol.subgraphVersion = versions.getSubgraphVersion();
     protocol.methodologyVersion = versions.getMethodologyVersion();
+
     const proto = new Perpetual(protocol, pricer, event);
 
     protocol._lastUpdateTimestamp = event.block.timestamp;

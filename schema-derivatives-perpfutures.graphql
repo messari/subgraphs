@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Perpetual Futures
-# Version: 1.3.2
+# Version: 1.3.3
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -1104,6 +1104,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) @dailySnapshot {
   " Outflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming outof protocol from trade. "
   cumulativeOutflowVolumeUSD: BigDecimal!
 
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -1290,6 +1293,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) @hourlySnapshot {
 
   " Outflow historical trade notional volume occurred in this pool, in USD "
   cumulativeOutflowVolumeUSD: BigDecimal!
+
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -1807,7 +1813,7 @@ enum PositionSide {
 
 # A position is defined as who has what position in the protocol and distribution of longs and shorts at a positional level
 type Position @entity @regularPolling {
-  " { Account address }-{ Pool address }-{ Position Side }-{ Counter } "
+  " { Account address }-{ Pool address }-{ Asset }-{ Position Side }-{ Counter } "
   id: Bytes!
 
   " Account that owns this position "
@@ -1963,9 +1969,9 @@ type _ActivityHelper @entity {
 
 # Helper entity for getting positions
 type _PositionCounter @entity {
-  " { Account address }-{ Pool address }-{ Position Side } "
+  " { Account address }-{ Pool address }-{ Asset }-{ Position Side } "
   id: Bytes!
 
-  " Next count "
-  nextCount: Int!
+  " Unique Positions "
+  uniquePositions: [Bytes!]!
 }

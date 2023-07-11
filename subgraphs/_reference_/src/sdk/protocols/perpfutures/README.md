@@ -1,6 +1,6 @@
-# Perpetual SDK `1.1.5`
+# Perpetual SDK `1.1.6`
 
-The perpetual SDK follows the `1.3.2` Derivatives Perpetual Futures schema.
+The perpetual SDK follows the `1.3.3` Derivatives Perpetual Futures schema.
 
 ## Setup
 
