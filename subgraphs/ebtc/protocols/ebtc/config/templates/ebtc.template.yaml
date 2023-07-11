@@ -20,8 +20,6 @@ dataSources:
         - name: CdpManager
           file: ./abis/CdpManager.json
       eventHandlers:
-        - event: ActivePoolAddressChanged(address)
-          handler: handleSystemDeployed
         - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
           handler: handleCdpUpdated
   - name: ActivePool
@@ -41,6 +39,8 @@ dataSources:
         - name: ActivePool
           file: ./abis/ActivePool.json
       eventHandlers:
+        - event: ActivePoolAddressChanged(address)
+          handler: handleSystemDeployed
         - event: ActivePoolCollBalanceUpdated(uint256)
           handler: handleActivePoolCollBalanceUpdated
         - event: ActivePoolEBTCDebtUpdated(uint256)
