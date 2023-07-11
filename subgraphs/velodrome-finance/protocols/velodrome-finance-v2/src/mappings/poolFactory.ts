@@ -8,7 +8,12 @@ import {
   getLiquidityPool,
   getOrCreateDex,
 } from "../../../../src/common/getters";
-import { FACTORY_ADDRESS, HARDCODED_POOLS } from "../common/constants";
+import {
+  FACTORY_ADDRESS,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+  HARDCODED_POOLS,
+} from "../common/constants";
 import { BIGDECIMAL_HUNDRED } from "../../../../src/common/constants";
 import { updateAllPoolFees } from "../../../../src/mappings/helpers/pools";
 
@@ -20,7 +25,11 @@ import {
 import { Pool as PoolTemplate } from "../../../../generated/templates";
 
 export function handlePoolCreated(event: PoolCreated): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
 
   PoolTemplate.create(event.params.pool);
   createLiquidityPool(

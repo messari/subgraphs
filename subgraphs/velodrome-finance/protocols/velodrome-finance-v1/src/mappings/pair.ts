@@ -34,7 +34,11 @@ import {
   updatePoolVolume,
   updateTokenBalances,
 } from "../../../../src/mappings/helpers/pools";
-import { FACTORY_ADDRESS } from "../common/constants";
+import {
+  FACTORY_ADDRESS,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../common/constants";
 
 import { PairFactory } from "../../../../generated/Factory/PairFactory";
 import {
@@ -47,7 +51,11 @@ import {
 } from "../../../../generated/templates/Pair/Pair";
 
 export function handleMint(event: Mint): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
   createDeposit(
@@ -65,7 +73,11 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleBurn(event: Burn): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 
@@ -89,7 +101,11 @@ export function handleBurn(event: Burn): void {
 }
 
 export function handleSwap(event: Swap): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 
@@ -138,7 +154,11 @@ export function handleSwap(event: Swap): void {
 }
 
 export function handleFees(event: Fees): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 

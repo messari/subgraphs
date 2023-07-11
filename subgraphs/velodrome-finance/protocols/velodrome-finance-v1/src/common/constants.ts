@@ -1,7 +1,12 @@
 import { TypedMap } from "@graphprotocol/graph-ts";
 
+/* FACTORY_ADDRESS is used as the protocol.id;
+ignoring lint rule here so grafting on older deployment does not create multiple protocol entities */
+
 /* eslint-disable-next-line rulesdir/no-checksum-addresses */
 export const FACTORY_ADDRESS = "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746";
+export const PROTOCOL_NAME = "Velodrome Finance V1";
+export const PROTOCOL_SLUG = "velodrome-finance-v1";
 export const VELO_ADDRESS = "0x3c8b650257cfb5f272f799f5e2b4e65093a11a05";
 
 const OPTIMISM_POOLS = new TypedMap<string, string>();

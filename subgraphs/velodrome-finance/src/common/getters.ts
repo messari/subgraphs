@@ -10,8 +10,6 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
   RewardTokenType,
-  PROTOCOL_NAME,
-  PROTOCOL_SLUG,
   USDC_ADDRESS,
   BIGDECIMAL_ONE,
 } from "../common/constants";
@@ -262,13 +260,17 @@ export function getOrCreateFinancialsDailySnapshot(
 ///// DexAmm Specific /////
 ///////////////////////////
 
-export function getOrCreateDex(protocolId: string): DexAmmProtocol {
+export function getOrCreateDex(
+  protocolId: string,
+  protocolName: string,
+  protocolSlug: string
+): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(protocolId);
 
   if (!protocol) {
     protocol = new DexAmmProtocol(protocolId);
-    protocol.name = PROTOCOL_NAME;
-    protocol.slug = PROTOCOL_SLUG;
+    protocol.name = protocolName;
+    protocol.slug = protocolSlug;
     protocol.network = Network.OPTIMISM; // Need to change this
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;

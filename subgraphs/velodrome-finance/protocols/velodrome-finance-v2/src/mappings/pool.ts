@@ -34,7 +34,11 @@ import {
   handleTransferMint,
   handleTransferToPoolBurn,
 } from "../../../../src/common/handlers";
-import { FACTORY_ADDRESS } from "../common/constants";
+import {
+  FACTORY_ADDRESS,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../common/constants";
 
 import { PoolFactory } from "../../../../generated/Factory/PoolFactory";
 import {
@@ -47,7 +51,11 @@ import {
 } from "../../../../generated/templates/Pool/Pool";
 
 export function handleMint(event: Mint): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 
@@ -66,7 +74,11 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleBurn(event: Burn): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 
@@ -90,7 +102,11 @@ export function handleBurn(event: Burn): void {
 }
 
 export function handleSwap(event: Swap): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 
@@ -129,16 +145,16 @@ export function handleSwap(event: Swap): void {
     .getFee(Address.fromString(pool.id), pool._stable)
     .toBigDecimal()
     .div(BIGDECIMAL_HUNDRED);
-  createPoolFees(
-    Address.fromString(pool.id),
-    fee
-    // LiquidityPoolFeeType.DYNAMIC_TRADING_FEE
-  );
+  createPoolFees(Address.fromString(pool.id), fee);
   updatePoolMetrics(pool, event.block); // Syncs daily/hourly metrics with pool
 }
 
 export function handleFees(event: Fees): void {
-  const protocol = getOrCreateDex(FACTORY_ADDRESS);
+  const protocol = getOrCreateDex(
+    FACTORY_ADDRESS,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG
+  );
   const pool = getLiquidityPool(event.address);
   if (!pool) return;
 

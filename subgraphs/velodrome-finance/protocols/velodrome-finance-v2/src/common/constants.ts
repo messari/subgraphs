@@ -1,6 +1,8 @@
 import { TypedMap } from "@graphprotocol/graph-ts";
 
 export const FACTORY_ADDRESS = "0xf1046053aa5682b4f9a81b5481394da16be5ff5a";
+export const PROTOCOL_NAME = "Velodrome Finance V2";
+export const PROTOCOL_SLUG = "velodrome-finance-v2";
 export const VELO_ADDRESS = "0x9560e827af36c94d2ac33a39bce1fe78631088db";
 
 const OPTIMISM_POOLS = new TypedMap<string, string>();

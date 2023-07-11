@@ -1,12 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-////////////////////
-///// Versions /////
-////////////////////
-
-export const PROTOCOL_NAME = "Velodrome Finance";
-export const PROTOCOL_SLUG = "velodrome-finance";
-
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////
