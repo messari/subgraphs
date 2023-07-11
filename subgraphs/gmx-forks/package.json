@@ -2,7 +2,8 @@
   "name": "gmx-forks",
   "license": "UNLICENSED",
   "scripts": {
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json src/common/constants.mustache > src/common/constants.ts"
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json src/common/constants.mustache > src/common/constants.ts",
+    "deploy": "graph deploy --product hosted-service shashwats22/mummy-finance-arbitrum"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.51.1",
