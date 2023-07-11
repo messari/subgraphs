@@ -140,7 +140,8 @@ dataSources:
           handler: handleFlashloan
         - event: UserEModeSet(indexed address,uint8)
           handler: handleUserEModeSet
-
+        - event: MintedToTreasury(indexed address,uint256)
+          handler: handleMintedToTreasury
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: RewardsController
