@@ -739,7 +739,7 @@ export class DataManager {
     receiverNewBalance: BigInt,
     interestType: string | null = null
   ): Transfer | null {
-    let positions: string[] = [];
+    const positions: string[] = [];
     if (sender != Address.fromString(ZERO_ADDRESS)) {
       const transferrer = new AccountManager(sender);
       if (transferrer.isNewUser()) {
