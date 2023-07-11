@@ -1,66 +1,9 @@
-import { Address, log } from "@graphprotocol/graph-ts";
-import {
-  ActivePool,
-  CdpManagerAddressChanged,
-} from "../../generated/ActivePool/ActivePool";
 import { CdpUpdated } from "../../generated/CdpManager/CdpManager";
 import { AccountManager } from "../sdk/account";
 import { PositionManager } from "../sdk/position";
 import { TokenManager } from "../sdk/token";
-import {
-  OracleSource,
-  PositionSide,
-  TransactionType,
-} from "../sdk/util/constants";
-import {
-  ACTIVE_POOL,
-  EBTC_ADDRESS,
-  LIQUIDATION_FEE_PERCENT,
-  MAXIMUM_LTV,
-  PRICE_FEED,
-  getProtocolData,
-  getDataManager,
-  STETH_ADDRESS,
-} from "../constants";
-
-/**
- * On deployment of the pool, initialise and populate the market,
- * lendingProtocol and oracle entities.
- * @param event An event emitted by the constructor of the ActivePool proving
- * it was deployed successfully.
- */
-export function handleSystemDeployed(event: CdpManagerAddressChanged): void {
-  const activePool = ActivePool.bind(event.address);
-  if (activePool._address != ACTIVE_POOL) {
-    // quick check to make sure our configurations.json is correct
-    log.error(
-      "deployed ActivePool address {} does not match expected address",
-      [event.address.toHexString()]
-    );
-    return;
-  }
-
-  const dataManager = getDataManager(event);
-
-  // update market with ebtc specifics
-  const market = dataManager.getMarket();
-  market.canBorrowFrom = true;
-  market.maximumLTV = MAXIMUM_LTV;
-  market.liquidationThreshold = MAXIMUM_LTV;
-  market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
-  market.borrowedToken = EBTC_ADDRESS;
-  market.save();
-
-  const lendingProtocol = dataManager.getOrCreateLendingProtocol(
-    getProtocolData() // data: ProtocolData
-  );
-
-  const oracle = dataManager.getOrCreateOracle(
-    Address.fromBytes(PRICE_FEED), // oracleAddress: Address
-    false, // isUSD: boolean
-    OracleSource.CHAINLINK // source?: string
-  );
-}
+import { PositionSide, TransactionType } from "../sdk/util/constants";
+import { getProtocolData, getDataManager, STETH_ADDRESS } from "../constants";
 
 /**
  * Make necessary adjustments to the system when a CDP changes.

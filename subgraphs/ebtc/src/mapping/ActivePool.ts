@@ -1,13 +1,63 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
+  ActivePool,
   ActivePoolCollBalanceUpdated,
   ActivePoolEBTCDebtUpdated,
+  CdpManagerAddressChanged,
   FlashLoanSuccess,
 } from "../../generated/ActivePool/ActivePool";
-import { getDataManager, STETH_ADDRESS } from "../constants";
+import {
+  ACTIVE_POOL,
+  EBTC_ADDRESS,
+  LIQUIDATION_FEE_PERCENT,
+  MAXIMUM_LTV,
+  PRICE_FEED,
+  STETH_ADDRESS,
+  getDataManager,
+  getProtocolData,
+} from "../constants";
 import { TokenManager } from "../sdk/token";
 import { getUsdPrice } from "../prices";
-import { BIGINT_TEN_TO_EIGHTEENTH } from "../sdk/util/constants";
+import { BIGINT_TEN_TO_EIGHTEENTH, OracleSource } from "../sdk/util/constants";
+
+/**
+ * On deployment of the pool, initialise and populate the market,
+ * lendingProtocol and oracle entities.
+ * @param event An event emitted by the constructor of the ActivePool proving
+ * it was deployed successfully.
+ */
+export function handleSystemDeployed(event: CdpManagerAddressChanged): void {
+  const activePool = ActivePool.bind(event.address);
+  if (activePool._address != ACTIVE_POOL) {
+    // quick check to make sure our configurations.json is correct
+    log.error(
+      "deployed ActivePool address {} does not match expected address",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+
+  const dataManager = getDataManager(event);
+
+  // update market with ebtc specifics
+  const market = dataManager.getMarket();
+  market.canBorrowFrom = true;
+  market.maximumLTV = MAXIMUM_LTV;
+  market.liquidationThreshold = MAXIMUM_LTV;
+  market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
+  market.borrowedToken = EBTC_ADDRESS;
+  market.save();
+
+  const lendingProtocol = dataManager.getOrCreateLendingProtocol(
+    getProtocolData() // data: ProtocolData
+  );
+
+  const oracle = dataManager.getOrCreateOracle(
+    Address.fromBytes(PRICE_FEED), // oracleAddress: Address
+    false, // isUSD: boolean
+    OracleSource.CHAINLINK // source?: string
+  );
+}
 
 /**
  * Total stETH collateral was updated
