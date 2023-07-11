@@ -7,8 +7,10 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import {
+  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
+  BIGINT_TEN,
   FEE_CHECK_INTERVAL_BLOCKS,
 } from "../../common/constants";
 import {
@@ -23,19 +25,46 @@ import { createPoolFees } from "./entities";
 
 import { DexAmmProtocol, LiquidityPool } from "../../../generated/schema";
 
-//  Update token balances, which also
+function getPoolTokenWeights(
+  totalValueLockedUSD: BigDecimal,
+  inputTokens: string[],
+  inputTokenBalances: BigInt[]
+): BigDecimal[] {
+  const inputTokenWeights: BigDecimal[] = [];
+  for (let idx = 0; idx < inputTokens.length; idx++) {
+    if (totalValueLockedUSD == BIGDECIMAL_ZERO) {
+      inputTokenWeights.push(BIGDECIMAL_ZERO);
+      continue;
+    }
+
+    const balance = inputTokenBalances[idx];
+    const inputToken = getOrCreateToken(Address.fromString(inputTokens[idx]));
+
+    const balanceUSD = balance
+      .divDecimal(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
+      .times(inputToken.lastPriceUSD!);
+    const weight = balanceUSD
+      .div(totalValueLockedUSD)
+      .times(BIGDECIMAL_HUNDRED);
+
+    inputTokenWeights.push(weight);
+  }
+
+  return inputTokenWeights;
+}
+
+//  Update token balances, which also updates token weights
 export function updateTokenBalances(
   pool: LiquidityPool,
   balance0: BigInt,
   balance1: BigInt
 ): void {
-  const totalBalance = balance0.plus(balance1);
-
   pool.inputTokenBalances = [balance0, balance1];
-  pool.inputTokenWeights = [
-    balance0.toBigDecimal().div(totalBalance.toBigDecimal()),
-    balance1.toBigDecimal().div(totalBalance.toBigDecimal()),
-  ];
+  pool.inputTokenWeights = getPoolTokenWeights(
+    pool.totalValueLockedUSD,
+    pool.inputTokens,
+    pool.inputTokenBalances
+  );
   pool.save();
 }
 
