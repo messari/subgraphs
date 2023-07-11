@@ -1126,11 +1126,13 @@ export function _handleMintedToTreasury(
     event,
     protocolData
   );
-  manager.createMintToTreasury(
+  manager.createTransfer(
     asset,
+    Address.fromString(ZERO_ADDRESS),
     treasuryAddress,
     amount,
     amountUSD,
+    BIGINT_ZERO,
     treasuryBalance
   );
 }

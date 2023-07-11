@@ -729,14 +729,67 @@ export class DataManager {
     return liquidate;
   }
 
-  createTransferEvent(
+  createTransfer(
     asset: Bytes,
     sender: Address,
     receiver: Address,
     amount: BigInt,
     amountUSD: BigDecimal,
-    positions: string[]
-  ): Transfer {
+    senderNewBalance: BigInt,
+    receiverNewBalance: BigInt,
+    interestType: string | null = null
+  ): Transfer | null {
+    let positions: string[] = [];
+    if (sender != Address.fromString(ZERO_ADDRESS)) {
+      const transferrer = new AccountManager(sender);
+      if (transferrer.isNewUser()) {
+        this.protocol.cumulativeUniqueUsers += INT_ONE;
+        this.protocol.save();
+      }
+      const transferrerPosition = new PositionManager(
+        transferrer.getAccount(),
+        this.market,
+        PositionSide.COLLATERAL,
+        interestType
+      );
+      transferrerPosition.subtractPosition(
+        this.event,
+        this.protocol,
+        senderNewBalance,
+        TransactionType.TRANSFER,
+        this.market.inputTokenPriceUSD
+      );
+      const positionID = transferrerPosition.getPositionID();
+      if (!positionID) {
+        log.error(
+          "[createTransfer] positionID is null for market: {} account: {}",
+          [this.market.id.toHexString(), receiver.toHexString()]
+        );
+        return null;
+      }
+      positions.push(positionID!);
+
+      this.updateUsageData(TransactionType.TRANSFER, sender);
+    }
+
+    const recieverAccount = new AccountManager(receiver);
+    // receivers are not considered users since they are not spending gas for the transaction
+    const receiverPosition = new PositionManager(
+      recieverAccount.getAccount(),
+      this.market,
+      PositionSide.COLLATERAL,
+      interestType
+    );
+    receiverPosition.addPosition(
+      this.event,
+      asset,
+      this.protocol,
+      receiverNewBalance,
+      TransactionType.TRANSFER,
+      this.market.inputTokenPriceUSD
+    );
+    positions.push(receiverPosition.getPositionID()!);
+
     const transfer = new Transfer(
       this.event.transaction.hash
         .concatI32(this.event.logIndex.toI32())
@@ -758,111 +811,6 @@ export class DataManager {
     transfer.amount = amount;
     transfer.amountUSD = amountUSD;
     transfer.save();
-
-    return transfer;
-  }
-
-  createTransfer(
-    asset: Bytes,
-    sender: Address,
-    receiver: Address,
-    amount: BigInt,
-    amountUSD: BigDecimal,
-    senderNewBalance: BigInt,
-    receiverNewBalance: BigInt,
-    interestType: string | null = null
-  ): Transfer | null {
-    const transferrer = new AccountManager(sender);
-    if (transferrer.isNewUser()) {
-      this.protocol.cumulativeUniqueUsers += INT_ONE;
-      this.protocol.save();
-    }
-    const transferrerPosition = new PositionManager(
-      transferrer.getAccount(),
-      this.market,
-      PositionSide.COLLATERAL,
-      interestType
-    );
-    transferrerPosition.subtractPosition(
-      this.event,
-      this.protocol,
-      senderNewBalance,
-      TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD
-    );
-    const positionID = transferrerPosition.getPositionID();
-    if (!positionID) {
-      log.error(
-        "[createTransfer] positionID is null for market: {} account: {}",
-        [this.market.id.toHexString(), receiver.toHexString()]
-      );
-      return null;
-    }
-
-    const recieverAccount = new AccountManager(receiver);
-    // receivers are not considered users since they are not spending gas for the transaction
-    const receiverPosition = new PositionManager(
-      recieverAccount.getAccount(),
-      this.market,
-      PositionSide.COLLATERAL,
-      interestType
-    );
-    receiverPosition.addPosition(
-      this.event,
-      asset,
-      this.protocol,
-      receiverNewBalance,
-      TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD
-    );
-
-    const transfer = this.createTransferEvent(
-      asset,
-      sender,
-      receiver,
-      amount,
-      amountUSD,
-      [receiverPosition.getPositionID()!, positionID!]
-    );
-
-    this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
-    this.updateUsageData(TransactionType.TRANSFER, sender);
-
-    return transfer;
-  }
-
-  createMintToTreasury(
-    asset: Bytes,
-    treasury: Address,
-    amount: BigInt,
-    amountUSD: BigDecimal,
-    treasuryNewBalance: BigInt,
-    interestType: string | null = null
-  ): Transfer | null {
-    const treasuryAccount = new AccountManager(treasury);
-    const treasuryPosition = new PositionManager(
-      treasuryAccount.getAccount(),
-      this.market,
-      PositionSide.COLLATERAL,
-      interestType
-    );
-    treasuryPosition.addPosition(
-      this.event,
-      asset,
-      this.protocol,
-      treasuryNewBalance,
-      TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD
-    );
-
-    const transfer = this.createTransferEvent(
-      asset,
-      Address.fromString(ZERO_ADDRESS),
-      treasury,
-      amount,
-      amountUSD,
-      [treasuryPosition.getPositionID()!]
-    );
 
     this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
 
