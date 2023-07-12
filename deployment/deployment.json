@@ -459,28 +459,6 @@
           }
         }
       },
-      "aave-v3-metis": {
-        "network": "metis",
-        "status": "dev",
-        "versions": {
-          "schema": "3.0.1",
-          "subgraph": "2.0.1",
-          "methodology": "1.1.0"
-        },
-        "files": {
-          "template": "aave.v3.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "aave-v3-metis",
-            "query-id": "aave-v3-metis"
-          }
-        }
-      },
       "aave-v3-ethereum": {
         "network": "ethereum",
         "status": "prod",
@@ -498,7 +476,7 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "aave-v3-ethereum",
+            "slug": "aave-v3-etehereum",
             "query-id": "aave-v3-ethereum"
           },
           "decentralized-network": {
@@ -3774,8 +3752,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "nftx-v3-uniswap-goerli",
-            "query-id": "nftx-v3-uniswap-goerli"
+            "slug": "nftx-v3-uniswap-goerli-v2",
+            "query-id": "nftx-v3-uniswap-goerli-v2"
           }
         }
       }
