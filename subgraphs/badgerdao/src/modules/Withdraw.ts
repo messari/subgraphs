@@ -1,5 +1,4 @@
 import {
-  Token,
   Vault as VaultStore,
   Withdraw as WithdrawTransaction,
 } from "../../generated/schema";
@@ -12,12 +11,12 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateVault,
+  getOrCreateToken,
   getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Prices";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
@@ -97,18 +96,17 @@ export function Withdraw(
     ? constants.BIGINT_ZERO
     : sharesBurnt.times(vault.inputTokenBalance).div(vault.outputTokenSupply!);
 
-  const inputToken = Token.load(vault.inputToken);
-  const inputTokenAddress = Address.fromString(vault.inputToken);
-  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputToken = getOrCreateToken(
+    Address.fromString(vault.inputToken),
+    block
+  );
   const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken!.decimals as u8
-  );
+  ).toBigDecimal();
 
   const withdrawAmountUSD = withdrawAmount
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(inputTokenDecimals)
+    .times(inputToken.lastPriceUSD!);
 
   const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
@@ -122,14 +120,13 @@ export function Withdraw(
   );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(inputTokenDecimals)
+    .times(inputToken.lastPriceUSD!);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
-    inputTokenDecimals
+    inputTokenDecimals,
+    block
   );
 
   vault.save();
