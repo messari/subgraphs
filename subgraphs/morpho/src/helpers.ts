@@ -1050,12 +1050,6 @@ export function updateProtocolPosition(
     .plus(newMarketBorrowInP2P)
     .times(market.inputTokenPriceUSD);
 
-  protocol.totalDepositBalanceUSD = protocol.totalValueLockedUSD;
-  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD
-    .minus(market.totalBorrowBalanceUSD)
-    .plus(newMarketBorrowUSD);
-  protocol.save();
-
   market.variableBorrowedTokenBalance = newMarketBorrowInP2P_BI.plus(
     newMarketBorrowOnPool_BI
   );
@@ -1074,8 +1068,6 @@ export function updateProtocolPosition(
 
   market._totalBorrowInP2P = newMarketBorrowInP2P;
   market.save();
-
-  updateProtocolTotalValueLockedUSD(protocol.id);
 }
 
 function computeProportionIdle(market: Market): BigInt {
@@ -1170,6 +1162,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
       .div(exponentToBigDecimal(market._indexesOffset))
       .times(BIGDECIMAL_HUNDRED)
   );
+  market.save();
 
   if (!market.rates) return;
   const rates = market.rates as string[];
@@ -1183,12 +1176,13 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     p2pBorrowRate.id,
     borrowRateId,
   ];
+  market.save();
 }
 
 export const getEventId = (hash: Bytes, logIndex: BigInt): Bytes =>
   hash.concat(Bytes.fromI32(logIndex.toI32()));
 
-export function updateProtocolTotalValueLockedUSD(
+export function updateProtocolValues(
   protocolAddress: Bytes
 ): void {
   const protocol = getOrInitLendingProtocol(
@@ -1197,15 +1191,25 @@ export function updateProtocolTotalValueLockedUSD(
 
   const marketIds = protocol._marketIds;
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
 
   for (let marketIdx = 0; marketIdx < marketIds.length; marketIdx++) {
     const pool = getMarket(Bytes.fromHexString(marketIds[marketIdx]));
-
     if (!pool) continue;
+
     totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      pool.totalDepositBalanceUSD
+    );
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      pool.totalBorrowBalanceUSD
+    );
   }
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   protocol.save();
 }
 

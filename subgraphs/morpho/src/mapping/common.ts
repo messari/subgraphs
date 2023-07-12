@@ -37,7 +37,7 @@ import {
   createInterestRate,
   updateProtocolPosition,
   updateRevenueSnapshots,
-  updateProtocolTotalValueLockedUSD,
+  updateProtocolValues,
 } from "../helpers";
 import { IMaths } from "../utils/maths/mathsInterface";
 import { getMarket, getOrInitToken } from "../utils/initializers";
@@ -161,7 +161,9 @@ export function _handleSupplied(
     true
   );
 
-  // udpate market daily / hourly snapshots / financialSnapshots
+  updateProtocolPosition(protocol, market);
+
+  // update market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
     market,
@@ -170,7 +172,7 @@ export function _handleSupplied(
     EventType.DEPOSIT,
     event.block
   );
-  updateProtocolPosition(protocol, market);
+  updateProtocolValues(protocol.id);
 }
 
 export function _handleWithdrawn(
@@ -279,7 +281,9 @@ export function _handleWithdrawn(
     true
   );
 
-  // udpate market daily / hourly snapshots / financialSnapshots
+  updateProtocolPosition(protocol, market);
+
+  // update market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
     market,
@@ -288,7 +292,7 @@ export function _handleWithdrawn(
     EventType.WITHDRAW,
     event.block
   );
-  updateProtocolPosition(protocol, market);
+  updateProtocolValues(protocol.id);
 }
 
 export function _handleLiquidated(
@@ -412,7 +416,7 @@ export function _handleLiquidated(
     false
   );
 
-  // udpate market daily / hourly snapshots / financialSnapshots
+  // update market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
     market,
@@ -530,7 +534,8 @@ export function _handleBorrowed(
     true
   );
 
-  // udpate market daily / hourly snapshots / financialSnapshots
+  updateProtocolPosition(protocol, market);
+  // update market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
     market,
@@ -539,7 +544,7 @@ export function _handleBorrowed(
     EventType.BORROW,
     event.block
   );
-  updateProtocolPosition(protocol, market);
+  updateProtocolValues(protocol.id);
 }
 
 export function _handleP2PIndexesUpdated(
@@ -674,8 +679,6 @@ export function _handleP2PIndexesUpdated(
   market.save();
   protocol.save();
 
-  updateProtocolPosition(protocol, market);
-
   // update revenue in market snapshots
   updateRevenueSnapshots(
     market,
@@ -684,6 +687,9 @@ export function _handleP2PIndexesUpdated(
     protocolSideRevenueDeltaUSD,
     event.block
   );
+
+  updateProtocolPosition(protocol, market);
+  updateProtocolValues(protocol.id);
 }
 
 export function _handleRepaid(
@@ -790,7 +796,8 @@ export function _handleRepaid(
     true
   );
 
-  // udpate market daily / hourly snapshots / financialSnapshots
+  updateProtocolPosition(protocol, market);
+  // update market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
     market,
@@ -799,7 +806,8 @@ export function _handleRepaid(
     EventType.REPAY,
     event.block
   );
-  updateProtocolPosition(protocol, market);
+
+  updateProtocolValues(protocol.id);
 }
 
 export function _handleReserveUpdate(
@@ -811,21 +819,13 @@ export function _handleReserveUpdate(
   const totalDepositBalanceUSD = market
     ._totalSupplyOnPool!.plus(market._totalSupplyInP2P!)
     .times(market.inputTokenPriceUSD);
-  params.protocol.totalDepositBalanceUSD =
-    params.protocol.totalDepositBalanceUSD
-      .minus(market.totalDepositBalanceUSD)
-      .plus(totalDepositBalanceUSD);
   market.totalDepositBalanceUSD = totalDepositBalanceUSD;
 
   const totalBorrowBalanceUSD = market
     ._totalBorrowOnPool!.plus(market._totalBorrowInP2P!)
     .times(market.inputTokenPriceUSD);
-  params.protocol.totalBorrowBalanceUSD = params.protocol.totalBorrowBalanceUSD
-    .minus(market.totalBorrowBalanceUSD)
-    .plus(totalBorrowBalanceUSD);
   market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  params.protocol.save();
   // Update pool indexes
   market._reserveSupplyIndex = params.reserveSupplyIndex;
   market._reserveBorrowIndex = params.reserveBorrowIndex;
@@ -860,12 +860,12 @@ export function _handleReserveUpdate(
     poolBorrowRate.id, // p2p rates are updated right after
     poolBorrowRate.id,
   ];
+  market.save();
 
   updateP2PRates(market, __MATHS__);
   updateProtocolPosition(params.protocol, market);
-  updateProtocolTotalValueLockedUSD(params.protocol.id);
+  updateProtocolValues(params.protocol.id);
 
-  market.save();
   return;
 }
 

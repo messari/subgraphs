@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: Bytes!
 
