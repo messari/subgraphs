@@ -134,7 +134,7 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
 
-  position.liquidity = position.liquidity.plus(event.params.liquidity);
+  position.liquidity = position.liquidity.minus(event.params.liquidity);
   position.liquidityUSD = safeDivBigDecimal(
     position.liquidity.toBigDecimal(),
     pool.totalLiquidity.toBigDecimal()

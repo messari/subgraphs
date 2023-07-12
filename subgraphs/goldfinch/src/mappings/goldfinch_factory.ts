@@ -3,11 +3,15 @@ import {
   RoleGranted,
   PoolCreated,
   GoldfinchFactory,
+  CallableLoanCreated,
 } from "../../generated/GoldfinchFactory/GoldfinchFactory";
 import { MigratedTranchedPool as MigratedTranchedPoolContract } from "../../generated/GoldfinchFactory/MigratedTranchedPool";
 import { GoldfinchConfig } from "../../generated/GoldfinchConfig/GoldfinchConfig";
 import { getOrInitTranchedPool } from "../entities/tranched_pool";
-import { TranchedPool as TranchedPoolTemplate } from "../../generated/templates";
+import {
+  TranchedPool as TranchedPoolTemplate,
+  CallableLoan as CallableLoanTemplate,
+} from "../../generated/templates";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { Account } from "../../generated/schema";
 import {
@@ -23,6 +27,7 @@ import {
   getOrCreateAccount,
   getOrCreateToken,
 } from "../common/getters";
+import { initCallableLoan } from "./callable_loan/helpers";
 
 export function handleRoleGranted(event: RoleGranted): void {
   // Init GoldfinchConfig and SeniorPool template when GoldfinchFactory grants OWNER_ROLE (initialize())
@@ -73,14 +78,25 @@ export function handlePoolCreated(event: PoolCreated): void {
     protocol.cumulativeUniqueUsers += INT_ONE;
     protocol.cumulativeUniqueBorrowers += INT_ONE;
   }
+
   protocol.totalPoolCount += INT_ONE;
   protocol.save();
 
-  //TranchedPoolTemplate.create(poolAddress);
-
-  //
   TranchedPoolTemplate.create(event.params.pool);
+
   getOrInitTranchedPool(event.params.pool, event.block.timestamp);
+}
+
+export function handleCallableLoanCreated(event: CallableLoanCreated): void {
+  CallableLoanTemplate.create(event.params.loan);
+  const callableLoan = initCallableLoan(event.params.loan, event.block);
+  callableLoan.save();
+
+  const protocol = getOrCreateProtocol();
+  const marketIDs = protocol._marketIDs ? protocol._marketIDs! : [];
+  marketIDs.push(event.params.loan.toHexString());
+  protocol._marketIDs = marketIDs;
+  protocol.save();
 }
 
 function isMigratedTranchedPool(event: PoolCreated): bool {

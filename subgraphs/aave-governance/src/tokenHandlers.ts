@@ -8,6 +8,7 @@ import {
   getOrCreateTokenDailySnapshot,
   getOrCreateTokenHolder,
   toDecimal,
+  isNewDelegate,
 } from "./handlers";
 import { DelegationType } from "./constants";
 
@@ -56,6 +57,14 @@ export function _handleDelegatedPowerChanged(
 ): void {
   if (delegationType == DelegationType.VOTING_POWER) {
     const governance = getGovernance();
+    if (isNewDelegate(delegateAddress)) {
+      if (!isStakedToken) {
+        governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
+      } else {
+        governance.totalStakedTokenDelegates =
+          governance.totalStakedTokenDelegates.plus(BIGINT_ONE);
+      }
+    }
     const delegate = getOrCreateDelegate(delegateAddress);
 
     let previousBalance: BigInt;

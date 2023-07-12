@@ -53,6 +53,11 @@ import {
   Network,
   BIGINT_MINUS_ONE,
   TokenType,
+  POOL_PREFIX,
+  INT_TWENTY_SIX,
+  UINT256,
+  ADDRESS,
+  TRANSFER,
 } from "./sdk/util/constants";
 import { Pool } from "./sdk/protocols/bridge/pool";
 import { isValidEVMAddress } from "./sdk/util/strings";
@@ -173,7 +178,7 @@ export function onCreatePool(
 ): void {
   if (aux1 && aux2) {
     const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
-    pool.initialize(`Axelar Bridge: ${token.name}`, token.name, aux1, token);
+    pool.initialize(`${POOL_PREFIX} ${token.name}`, token.name, aux1, token);
   }
 }
 
@@ -245,10 +250,10 @@ export function handleContractCallWithToken(
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
 
-  const dstStr = event.params.destinationContractAddress;
-  const dstAccount = isValidEVMAddress(dstStr)
-    ? Address.fromString(dstStr)
-    : Bytes.fromUTF8(dstStr);
+  const dstAccountStr = event.params.destinationContractAddress;
+  const dstAccount = isValidEVMAddress(dstAccountStr)
+    ? Address.fromString(dstAccountStr)
+    : Bytes.fromUTF8(dstAccountStr);
 
   const bridgePoolType =
     tokenSymbol.tokenType == TokenType.EXTERNAL
@@ -283,9 +288,10 @@ export function handleContractCall(event: ContractCall): void {
   const dstChainId = networkToChainID(
     event.params.destinationChain.toUpperCase()
   );
-  const dstAccount = Address.fromString(
-    event.params.destinationContractAddress
-  );
+  const dstAccountStr = event.params.destinationContractAddress;
+  const dstAccount = isValidEVMAddress(dstAccountStr)
+    ? Address.fromString(dstAccountStr)
+    : Bytes.fromUTF8(dstAccountStr);
 
   const customEvent = _createCustomEvent(event)!;
   _handleMessageOut(
@@ -377,10 +383,7 @@ export function handleCommandExecuted(event: Executed): void {
     ]);
     return;
   }
-
-  const transferSignature = crypto.keccak256(
-    ByteArray.fromUTF8("Transfer(address,address,uint256)")
-  );
+  const transferSignature = crypto.keccak256(ByteArray.fromUTF8(TRANSFER));
 
   const commandId = event.params.commandId;
   let command = _Command.load(commandId);
@@ -402,6 +405,7 @@ export function handleCommandExecuted(event: Executed): void {
     // topics[0] - signature
     // topics[1] - from address
     // topics[2] - to address
+
     const logSignature = thisLog.topics[0];
     if (
       transferLogIndex.equals(thisLog.logIndex) &&
@@ -409,14 +413,12 @@ export function handleCommandExecuted(event: Executed): void {
     ) {
       const tokenAddress = thisLog.address;
       const fromAddress = ethereum
-        .decode("address", thisLog.topics[1])!
+        .decode(ADDRESS, thisLog.topics[1])!
         .toAddress();
       const toAddress = ethereum
-        .decode("address", thisLog.topics[2])!
+        .decode(ADDRESS, thisLog.topics[2])!
         .toAddress();
-      const transferAmount = ethereum
-        .decode("uint256", thisLog.data)!
-        .toBigInt();
+      const transferAmount = ethereum.decode(UINT256, thisLog.data)!.toBigInt();
 
       // burnToken: transfer to 0x or address(this)
       if (toAddress.equals(Address.zero()) || toAddress.equals(event.address)) {
@@ -793,7 +795,7 @@ export function bytes32ToAddress(bytes: Bytes): Address {
 
 export function bytes32ToAddressHexString(bytes: Bytes): string {
   //take the last 40 hexstring: 0x + 32 bytes/64 hex characters
-  return `0x${bytes.toHexString().slice(26).toLowerCase()}`;
+  return `0x${bytes.toHexString().slice(INT_TWENTY_SIX).toLowerCase()}`;
 }
 
 export function getTxId(

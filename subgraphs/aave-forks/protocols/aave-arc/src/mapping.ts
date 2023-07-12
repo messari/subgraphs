@@ -3,10 +3,12 @@ import {
   BigDecimal,
   BigInt,
   dataSource,
+  ethereum,
   log,
 } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
+  FLASHLOAN_PREMIUM_TOTAL,
   getNetworkSpecificConstant,
   Protocol,
   USDC_TOKEN_ADDRESS,
@@ -23,23 +25,25 @@ import {
 import {
   Borrow,
   Deposit,
+  FlashLoan,
   LiquidationCall,
   Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Swap,
   Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
 import {
-  ProtocolData,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleFlashLoan,
   _handleLiquidate,
   _handlePaused,
   _handlePriceOracleUpdated,
@@ -51,50 +55,74 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleSwapBorrowRateMode,
   _handleTransfer,
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  getOrCreateLendingProtocol,
-  getOrCreateRewardToken,
-  getOrCreateToken,
+  equalsIgnoreCase,
+  exponentToBigDecimal,
+  getBorrowBalances,
+  getMarketFromToken,
+  getOrCreateFlashloanPremium,
+  readValue,
 } from "../../../src/helpers";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  equalsIgnoreCase,
-  exponentToBigDecimal,
+  InterestRateMode,
   Network,
-  PositionSide,
-  readValue,
-  RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import { Market } from "../../../generated/schema";
+import { Token, _DefaultOracle } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
+import {
+  DataManager,
+  ProtocolData,
+  RewardData,
+} from "../../../src/sdk/manager";
+import {
+  CollateralizationType,
+  PermissionType,
+  RiskType,
+  LendingType,
+  InterestRateType,
+  PositionSide,
+  RewardTokenType,
+} from "../../../src/sdk/constants";
+import { TokenManager } from "../../../src/sdk/token";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
   return new ProtocolData(
-    constants.protocolAddress.toHexString(),
+    constants.protocolAddress,
+    Protocol.PROTOCOL,
     Protocol.NAME,
     Protocol.SLUG,
-    constants.network
+    constants.network,
+    LendingType.POOLED,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.ADMIN,
+    CollateralizationType.OVER_COLLATERALIZED,
+    RiskType.GLOBAL
   );
 }
+
+const protocolData = getProtocolData();
 
 ///////////////////////////////////////////////
 ///// LendingPoolAddressProvider Handlers /////
 ///////////////////////////////////////////////
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  _handlePriceOracleUpdated(event.params.newAddress, getProtocolData());
+  _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
 //////////////////////////////////////
@@ -110,7 +138,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event.params.asset,
     event.params.aToken,
     event.params.variableDebtToken,
-    getProtocolData(),
+    protocolData,
     event.params.stableDebtToken
   );
 }
@@ -123,35 +151,35 @@ export function handleCollateralConfigurationChanged(
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
     event.params.ltv,
-    getProtocolData()
+    protocolData
   );
 }
 
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
-  _handleBorrowingEnabledOnReserve(event.params.asset, getProtocolData());
+  _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
-  _handleBorrowingDisabledOnReserve(event.params.asset, getProtocolData());
+  _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
-  _handleReserveActivated(event.params.asset, getProtocolData());
+  _handleReserveActivated(event.params.asset, protocolData);
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  _handleReserveDeactivated(event.params.asset, getProtocolData());
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   _handleReserveFactorChanged(
     event.params.asset,
     event.params.factor,
-    getProtocolData()
+    protocolData
   );
 }
 
@@ -160,115 +188,25 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  const protocolData = getProtocolData();
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // update rewards if there is an incentive controller
-  const market = Market.load(event.params.reserve.toHexString());
+  const market = getMarketFromToken(event.params.reserve, protocolData);
   if (!market) {
-    log.warning("[handleReserveDataUpdated] Market not found", [
+    log.warning("[handleReserveDataUpdated] Market not found for reserve {}", [
       event.params.reserve.toHexString(),
     ]);
     return;
   }
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
 
-  //
-  // Reward rate (rewards/second) in a market comes from try_assets(to)
-  // Supply side the to address is the aToken
-  // Borrow side the to address is the variableDebtToken
-
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  const tryIncentiveController = aTokenContract.try_getIncentivesController();
-  if (!tryIncentiveController.reverted) {
-    const incentiveControllerContract = AaveIncentivesController.bind(
-      tryIncentiveController.value
-    );
-    const tryBorrowRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market._vToken!)
-    );
-    const trySupplyRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.outputToken!)
-    );
-    const tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
-
-    if (!tryRewardAsset.reverted) {
-      // get reward tokens
-      const borrowRewardToken = getOrCreateRewardToken(
-        tryRewardAsset.value,
-        RewardTokenType.BORROW
-      );
-      const depositRewardToken = getOrCreateRewardToken(
-        tryRewardAsset.value,
-        RewardTokenType.DEPOSIT
-      );
-
-      // always ordered [borrow, deposit/supply]
-      const rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
-      const rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
-      const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-      const rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
-
-      // get reward token price
-      // get price of reward token (if stkAAVE it is tied to the price of AAVE)
-      let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
-      if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-        // get staked token if possible to grab price of staked token
-        const stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
-        const tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
-        if (!tryStakedToken.reverted) {
-          rewardTokenPriceUSD = getAssetPriceInUSDC(
-            tryStakedToken.value,
-            Address.fromString(protocol._priceOracle)
-          );
-        }
-      }
-
-      // if reward token price was not found then use old method
-      if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
-        rewardTokenPriceUSD = getAssetPriceInUSDC(
-          tryRewardAsset.value,
-          Address.fromString(protocol._priceOracle)
-        );
-      }
-
-      // we check borrow first since it will show up first in graphql ordering
-      // see explanation in docs/Mapping.md#Array Sorting When Querying
-      if (!tryBorrowRewards.reverted) {
-        // update borrow rewards
-        const borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        rewardEmissions[0] = borrowRewardsPerDay;
-        const borrowRewardsPerDayUSD = borrowRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
-        rewardEmissionsUSD[0] = borrowRewardsPerDayUSD;
-      }
-
-      if (!trySupplyRewards.reverted) {
-        // update deposit rewards
-        const supplyRewardsPerDay = trySupplyRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        rewardEmissions[1] = supplyRewardsPerDay;
-        const supplyRewardsPerDayUSD = supplyRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
-        rewardEmissionsUSD[1] = supplyRewardsPerDayUSD;
-      }
-
-      market.rewardTokens = rewardTokens;
-      market.rewardTokenEmissionsAmount = rewardEmissions;
-      market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-      market.save();
-    }
-  }
+  updateRewards(manager, event);
 
   const assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol._priceOracle)
+    Address.fromBytes(market.inputToken),
+    manager.getOracleAddress()
   );
 
   _handleReserveDataUpdated(
@@ -290,7 +228,7 @@ export function handleReserveUsedAsCollateralEnabled(
   _handleReserveUsedAsCollateralEnabled(
     event.params.reserve,
     event.params.user,
-    getProtocolData()
+    protocolData
   );
 }
 
@@ -301,18 +239,18 @@ export function handleReserveUsedAsCollateralDisabled(
   _handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
     event.params.user,
-    getProtocolData()
+    protocolData
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handlePaused(event: Paused): void {
-  _handlePaused(getProtocolData());
+  _handlePaused(protocolData);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
-  _handleUnpaused(getProtocolData());
+  _handleUnpaused(protocolData);
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -320,7 +258,7 @@ export function handleDeposit(event: Deposit): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.onBehalfOf
   );
 }
@@ -330,7 +268,7 @@ export function handleWithdraw(event: Withdraw): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.to
   );
 }
@@ -340,7 +278,7 @@ export function handleBorrow(event: Borrow): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.onBehalfOf
   );
 }
@@ -350,7 +288,7 @@ export function handleRepay(event: Repay): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.user
   );
 }
@@ -360,11 +298,68 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event,
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
-    getProtocolData(),
+    protocolData,
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
     event.params.debtToCover
+  );
+}
+
+export function handleFlashloan(event: FlashLoan): void {
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+  flashloanPremium.premiumRateTotal = FLASHLOAN_PREMIUM_TOTAL;
+  flashloanPremium.save();
+
+  _handleFlashLoan(
+    event.params.asset,
+    event.params.amount,
+    event.params.initiator,
+    protocolData,
+    event,
+    event.params.premium,
+    flashloanPremium
+  );
+}
+
+export function handleSwapBorrowRateMode(event: Swap): void {
+  const interestRateMode = event.params.rateMode.toI32();
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      interestRateMode
+    )
+  ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
+    return;
+  }
+
+  const interestRateType =
+    interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
+    event,
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 
@@ -375,30 +370,33 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
-    PositionSide.LENDER,
+    protocolData,
+    PositionSide.COLLATERAL,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
 export function handleVariableTransfer(event: VariableTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
+    protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
 export function handleStableTransfer(event: StableTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
+    protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
@@ -443,8 +441,129 @@ function getAssetPriceInUSDC(
   }
 
   // last resort, should not be touched
-  const inputToken = getOrCreateToken(tokenAddress);
+  const inputToken = Token.load(tokenAddress);
+  if (!inputToken) {
+    log.warning(
+      "[getAssetPriceInUSDC]token {} not found in Token entity; return BIGDECIMAL_ZERO",
+      [tokenAddress.toHexString()]
+    );
+    return BIGDECIMAL_ZERO;
+  }
   return oracleResult
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
+}
+
+function updateRewards(manager: DataManager, event: ethereum.Event): void {
+  // Reward rate (rewards/second) in a market comes from try_assets(to)
+  // Supply side the to address is the aToken
+  // Borrow side the to address is the variableDebtToken
+  const market = manager.getMarket();
+  const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
+  const tryIncentiveController = aTokenContract.try_getIncentivesController();
+  if (!tryIncentiveController.reverted) {
+    log.warning(
+      "[updateRewards]getIncentivesController() call for aToken {} is reverted",
+      [market.outputToken!.toHexString()]
+    );
+    return;
+  }
+  const incentiveControllerContract = AaveIncentivesController.bind(
+    tryIncentiveController.value
+  );
+  const tryBorrowRewards = incentiveControllerContract.try_assets(
+    Address.fromBytes(market._vToken!)
+  );
+  const trySupplyRewards = incentiveControllerContract.try_assets(
+    Address.fromBytes(market.outputToken!)
+  );
+  const tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
+
+  if (tryRewardAsset.reverted) {
+    log.warning(
+      "[updateRewards]REWARD_TOKEN() call for AaveIncentivesController contract {} is reverted",
+      [tryIncentiveController.value.toHexString()]
+    );
+    return;
+  }
+
+  // create reward tokens
+  const tokenManager = new TokenManager(tryRewardAsset.value, event);
+  const rewardToken = tokenManager.getToken();
+  const borrowRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.VARIABLE_BORROW
+  );
+  const depositRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.DEPOSIT
+  );
+
+  const rewardDecimals = rewardToken.decimals;
+  const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  // get reward token price
+  // get price of reward token (if stkAAVE it is tied to the price of AAVE)
+  let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+  if (
+    equalsIgnoreCase(dataSource.network(), Network.MAINNET) &&
+    defaultOracle &&
+    defaultOracle.oracle
+  ) {
+    // get staked token if possible to grab price of staked token
+    const stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
+    const tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
+    if (!tryStakedToken.reverted) {
+      rewardTokenPriceUSD = getAssetPriceInUSDC(
+        tryStakedToken.value,
+        Address.fromBytes(defaultOracle.oracle)
+      );
+    }
+  }
+
+  // if reward token price was not found then use old method
+  if (
+    rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO) &&
+    defaultOracle &&
+    defaultOracle.oracle
+  ) {
+    rewardTokenPriceUSD = getAssetPriceInUSDC(
+      tryRewardAsset.value,
+      Address.fromBytes(defaultOracle.oracle)
+    );
+  }
+
+  // we check borrow first since it will show up first in graphql ordering
+  // see explanation in docs/Mapping.md#Array Sorting When Querying
+  if (!tryBorrowRewards.reverted) {
+    // update borrow rewards
+    const borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    const borrowRewardsPerDayUSD = borrowRewardsPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(rewardTokenPriceUSD);
+
+    const borrowRewardData = new RewardData(
+      borrowRewardToken,
+      borrowRewardsPerDay,
+      borrowRewardsPerDayUSD
+    );
+    manager.updateRewards(borrowRewardData);
+  }
+
+  if (!trySupplyRewards.reverted) {
+    // update deposit rewards
+    const supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    const supplyRewardsPerDayUSD = supplyRewardsPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(rewardTokenPriceUSD);
+    const depositRewardData = new RewardData(
+      depositRewardToken,
+      supplyRewardsPerDay,
+      supplyRewardsPerDayUSD
+    );
+    manager.updateRewards(depositRewardData);
+  }
 }

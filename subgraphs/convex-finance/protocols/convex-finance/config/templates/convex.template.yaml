@@ -1,6 +1,13 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graft}}
+features:
+  - grafting
+graft:
+  base: {{base}}
+  block: {{block}}
+{{/graft}}
 dataSources:
   - kind: ethereum
     name: Booster
@@ -79,8 +86,6 @@ dataSources:
       callHandlers:
         - function: addPool(address,address,uint256)
           handler: handleAddPool
-        - function: earmarkRewards(uint256)
-          handler: handleEarmarkRewards
         - function: setFees(uint256,uint256,uint256,uint256)
           handler: handleSetFees
       file: ./src/mappings/boosterMappings.ts

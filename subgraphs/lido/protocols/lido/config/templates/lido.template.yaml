@@ -1,6 +1,13 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: Lido
@@ -42,15 +49,21 @@ dataSources:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -61,20 +74,13 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Submitted(indexed address,uint256,address)
           handler: handleSubmit
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+        - event: ETHDistributed(indexed uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleETHDistributed
       file: ./src/mappings/Lido.ts
   - kind: ethereum
     name: LidoOracle
@@ -116,15 +122,21 @@ dataSources:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -135,15 +147,6 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: PostTotalShares(uint256,uint256,uint256,uint256)
           handler: handlePostTotalShares

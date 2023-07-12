@@ -79,6 +79,9 @@ dataSources:
           handler: handleBorrow
         - event: Repay(indexed address,indexed address,indexed address,uint256)
           handler: handleRepay
+          receipt: true
+        - event: Swap(indexed address,indexed address,uint256)
+          handler: handleSwapBorrowRateMode          
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool,address)
           handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
@@ -91,6 +94,8 @@ dataSources:
           handler: handlePaused
         - event: Unpaused()
           handler: handleUnpaused
+        - event: FlashLoan(indexed address,indexed address,indexed address,uint256,uint256,uint16)
+          handler: handleFlashloan          
       file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
@@ -151,7 +156,7 @@ templates:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
+        - event: BalanceTransfer(indexed address,indexed address,uint256,uint256)
           handler: handleCollateralTransfer
       file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract

@@ -19,11 +19,12 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * This file contains the Perpetual class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.1
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 /**
@@ -130,10 +131,12 @@ export class Perpetual {
     protocol.subgraphVersion = versions.getSubgraphVersion();
     protocol.methodologyVersion = versions.getMethodologyVersion();
 
+    const proto = new Perpetual(protocol, pricer, event);
+
     protocol._lastUpdateTimestamp = event.block.timestamp;
     protocol.save();
 
-    return new Perpetual(protocol, pricer, event);
+    return proto;
   }
 
   /**

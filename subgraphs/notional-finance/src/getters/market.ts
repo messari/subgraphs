@@ -9,12 +9,11 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
-  SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../common/constants";
-import { getTokenFromCurrency } from "../common/util";
+import { getNameFromCurrency, getTokenFromCurrency } from "../common/util";
 import { getOrCreateLendingProtocol } from "./protocol";
-import { getOrCreateInterestRate } from "./InterestRate";
+import { getOrCreateInterestRate } from "./interestRate";
 
 export function getOrCreateMarket(
   event: ethereum.Event,
@@ -28,11 +27,12 @@ export function getOrCreateMarket(
     protocol.save();
 
     const currencyId = marketId.split("-")[0];
+    const maturity = marketId.split("-")[1];
 
     // market metadata
     market = new Market(marketId);
     market.protocol = protocol.id;
-    market.name = marketId;
+    market.name = getNameFromCurrency(currencyId) + "-" + maturity;
 
     // market properties
     market.isActive = true;
@@ -80,6 +80,9 @@ export function getOrCreateMarket(
     market.lendingPositionCount = INT_ZERO;
     market.borrowingPositionCount = INT_ZERO;
 
+    // helper for rev calc
+    market._prevDailyId = "";
+
     market.save();
   }
 
@@ -88,9 +91,9 @@ export function getOrCreateMarket(
 
 export function getOrCreateMarketDailySnapshot(
   event: ethereum.Event,
+  dailyId: i64,
   marketId: string
 ): MarketDailySnapshot {
-  const dailyId = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const id = "daily-" + marketId + "-" + dailyId.toString();
 
   const protocol = getOrCreateLendingProtocol();
@@ -132,6 +135,7 @@ export function getOrCreateMarketDailySnapshot(
     marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
     marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     marketMetrics.save();
   }
 

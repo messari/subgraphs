@@ -33,10 +33,11 @@ import {
  *  - Making a position
  *  - Making position snapshots
  *
- * Schema Version:  1.2.0
- * SDK Version:     1.0.0
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
  * Author(s):
  *  - @harsh9200
+ *  - @dhruv-chauhan
  */
 
 class LoadAccountResponse {

@@ -11,7 +11,7 @@ import { ComboBoxInput } from "./ComboBoxInput";
  * @returns
  */
 const isAddress = (input: string) => {
-  return (input.startsWith("0x") && input.length === 42) || input.includes('.near');
+  return (input.startsWith("0x") && input.length === 42) || input.includes(".near");
 };
 
 interface PoolDropDownProps {

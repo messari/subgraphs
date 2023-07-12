@@ -1,0 +1,246 @@
+{
+  "deployment": "MULTICHAIN_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "bridgeConfig": [
+    {
+      "name": "BridgeV2-0",
+      "address": "0xfe77d71baf7a6cdabbd63a2ad1e0adb68ca64c06",
+      "abi": "anyToken",
+      "startBlock": 8557056
+    },
+    {
+      "name": "BridgeV2-1",
+      "address": "0x3c1bb39bb696b443a1d80bb2b3a3d950ba9dee87",
+      "abi": "anyToken",
+      "startBlock": 4981590
+    },
+    {
+      "name": "BridgeV2-2",
+      "address": "0x47536f17f4ff30e64a96a7555826b8f9e66ec468",
+      "abi": "anyToken",
+      "startBlock": 4981727
+    },
+    {
+      "name": "BridgeV2-3",
+      "address": "0x03e8d118a1864c7dc53bf91e007ab7d91f5a06fa",
+      "abi": "anyToken",
+      "startBlock": 7654622
+    },
+    {
+      "name": "BridgeV2-4",
+      "address": "0xf1b9c667a53a800b48b55b14f7612d2638607288",
+      "abi": "anyToken",
+      "startBlock": 7358269
+    },
+    {
+      "name": "BridgeV2-5",
+      "address": "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454",
+      "abi": "anyToken",
+      "startBlock": 1101290
+    },
+    {
+      "name": "BridgeV2-6",
+      "address": "0x937e077abaea52d3abf879c9b9d3f2ebd15baa21",
+      "abi": "anyToken",
+      "startBlock": 5862041
+    },
+    {
+      "name": "BridgeV2-7",
+      "address": "0x0ebd9537a25f56713e34c45b38f421a1e7191469",
+      "abi": "anyToken",
+      "startBlock": 3450605
+    },
+    {
+      "name": "BridgeV2-8",
+      "address": "0xfb98b335551a418cd0737375a2ea0ded62ea213b",
+      "abi": "anyToken",
+      "startBlock": 6161073
+    },
+    {
+      "name": "BridgeV2-9",
+      "address": "0x5fc17416925789e0852fbfcd81c490ca4abc51f9",
+      "abi": "anyToken",
+      "startBlock": 3999978
+    },
+    {
+      "name": "BridgeV2-10",
+      "address": "0xa9cad0165c155f3998b0001b3ef30bca0aa6b591",
+      "abi": "anyToken",
+      "startBlock": 7052696
+    },
+    {
+      "name": "BridgeV2-11",
+      "address": "0xe6cdd3a275c976bca5d3de4f96c7514b899f0434",
+      "abi": "anyToken",
+      "startBlock": 4000039
+    },
+    {
+      "name": "BridgeV2-12",
+      "address": "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+      "abi": "anyToken",
+      "startBlock": 1179721
+    },
+    {
+      "name": "BridgeV2-13",
+      "address": "0x264c1383ea520f73dd837f915ef3a732e204a493",
+      "abi": "anyToken",
+      "startBlock": 2369613
+    },
+    {
+      "name": "BridgeV2-14",
+      "address": "0xcaf870dad882b00f4b20d714bbf7fceada5e4195",
+      "abi": "anyToken",
+      "startBlock": 5365376
+    },
+    {
+      "name": "BridgeV2-15",
+      "address": "0x09211dc67f9fe98fb7bbb91be0ef05f4a12fa2b2",
+      "abi": "anyToken",
+      "startBlock": 6164994
+    },
+    {
+      "name": "BridgeV2-16",
+      "address": "0xe82f4cb6026b2005900ce77896bac82c49420f78",
+      "abi": "anyToken",
+      "startBlock": 8855056
+    },
+    {
+      "name": "BridgeV2-17",
+      "address": "0x65c9d9d080714cda7b5d58989dc27f897f165179",
+      "abi": "anyToken",
+      "startBlock": 9984544
+    },
+    {
+      "name": "BridgeV2-18",
+      "address": "0x68f7a9e795c7074f2d0e698101d5c3fea7aa0acb",
+      "abi": "anyToken",
+      "startBlock": 10683199
+    },
+    {
+      "name": "BridgeV2-19",
+      "address": "0xd9a807e9d2f61b0098b4c3f79b2dfb9bc2e181ae",
+      "abi": "anyToken",
+      "startBlock": 10984093
+    },
+    {
+      "name": "BridgeV2-20",
+      "address": "0x237917e8a998b37759c8ee2faa529d60c66c2927",
+      "abi": "anyToken",
+      "startBlock": 12259746
+    },
+    {
+      "name": "BridgeV2-21",
+      "address": "0xcaf5191fc480f43e4df80106c7695eca56e48b18",
+      "abi": "anyToken",
+      "startBlock": 6457688
+    },
+    {
+      "name": "BridgeV2-22",
+      "address": "0xe6b9d092223f39013656702a40dbe6b7decc5746",
+      "abi": "anyToken",
+      "startBlock": 8556956
+    },
+    {
+      "name": "BridgeV2-23",
+      "address": "0xd4d026322c88c2d49942a75dff920fcfbc5614c1",
+      "abi": "anyToken",
+      "startBlock": 7052990
+    },
+    {
+      "name": "BridgeV2-24",
+      "address": "0xdc42728b0ea910349ed3c6e1c9dc06b5fb591f98",
+      "abi": "anyToken",
+      "startBlock": 1101319
+    },
+    {
+      "name": "BridgeV2-25",
+      "address": "0x921f99719eb6c01b4b8f0ba7973a7c24891e740a",
+      "abi": "anyToken",
+      "startBlock": 8557009
+    },
+    {
+      "name": "BridgeV2-26",
+      "address": "0x993163cad35162fb579d7b64e6695cb076ef5064",
+      "abi": "anyToken",
+      "startBlock": 5572783
+    },
+    {
+      "name": "BridgeV2-27",
+      "address": "0x3d8f74620857dd8ed6d0da02ceb13fd0ed8ba678",
+      "abi": "anyToken",
+      "startBlock": 7358042
+    },
+    {
+      "name": "BridgeV2-28",
+      "address": "0x340fe1d898eccaad394e2ba0fc1f93d27c7b717a",
+      "abi": "anyToken",
+      "startBlock": 4981525
+    },
+    {
+      "name": "BridgeV2-29",
+      "address": "0x2cf51e73c3516f3d86e9c0b4de0971dbf0766fd4",
+      "abi": "anyToken",
+      "startBlock": 6457845
+    },
+    {
+      "name": "BridgeV2-30",
+      "address": "0x3ff1af9e583d3790ec51e1407c9e94d8d1133dc3",
+      "abi": "anyToken",
+      "startBlock": 15838932
+    }
+  ],
+  "routerConfig": [
+    {
+      "name": "Router-0",
+      "address": "0x833f307ac507d47309fd8cdd1f835bef8d702a93",
+      "abi": "Router",
+      "startBlock": 10161444
+    },
+    {
+      "name": "Router-1",
+      "address": "0xb0731d50c681c45856bfc3f7539d5f61d4be81d8",
+      "abi": "Router",
+      "startBlock": 3397229
+    },
+    {
+      "name": "Router-2",
+      "address": "0x9b17baadf0f21f03e35249e0e59723f34994f806",
+      "abi": "Router",
+      "startBlock": 6209348
+    },
+    {
+      "name": "Router-3",
+      "address": "0x05f024c6f5a94990d32191d6f36211e3ee33504e",
+      "abi": "Router",
+      "startBlock": 15116665
+    },
+    {
+      "name": "Router-4",
+      "address": "0xe5cf1558a1470cb5c166c2e8651ed0f3c5fb8f42",
+      "abi": "Router",
+      "startBlock": 2795954
+    },
+    {
+      "name": "Router-5",
+      "address": "0x34324e1598bf02ccd3dea93f4e332b5507097473",
+      "abi": "Router",
+      "startBlock": 14513607
+    },
+    {
+      "name": "Router-6",
+      "address": "0x9366790d807f1fb7dd08c36ec0e8b8acbbc1354d",
+      "abi": "Router",
+      "startBlock": 22093870
+    },
+    {
+      "name": "Router-7",
+      "address": "0xd86eEE98E7D6726A1701f004f747e5Ce3E48e87c",
+      "abi": "Router",
+      "startBlock": 23357922
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

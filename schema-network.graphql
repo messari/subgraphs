@@ -45,7 +45,7 @@ enum DataType {
 }
 
 # Stores statistical analytics for given metrics
-type Stat @entity {
+type Stat @entity @regularPolling {
   " { id of the snapshot this belongs to } - { DataType } "
   id: Bytes!
 
@@ -84,7 +84,7 @@ type Stat @entity {
 #### Network Metadata ####
 ##########################
 
-type Network @entity {
+type Network @entity @regularPolling {
   " Name of the network being indexed "
   id: ID!
 
@@ -145,7 +145,7 @@ type Network @entity {
 #### Blockchain Timeseries ####
 ###############################
 
-type DailySnapshot @entity {
+type DailySnapshot @entity @dailySnapshot {
   " { number of days since UNIX epoch time } "
   id: Bytes!
 
@@ -227,7 +227,7 @@ type DailySnapshot @entity {
   dailyGasPrice: Stat
 }
 
-type HourlySnapshot @entity {
+type HourlySnapshot @entity @hourlySnapshot {
   " { number of hours since UNIX epoch time } "
   id: Bytes!
 
@@ -313,7 +313,7 @@ type HourlySnapshot @entity {
 #### Block-level Data ####
 ##########################
 
-type Block @entity(immutable: true) {
+type Block @entity(immutable: true) @regularPolling {
   " { block number } "
   id: Bytes!
 
@@ -361,7 +361,7 @@ type Block @entity(immutable: true) {
 }
 
 # This is the node that found the next block (e.g. miner or validator)
-type Author @entity {
+type Author @entity @regularPolling {
   " Address of the author "
   id: Bytes!
 

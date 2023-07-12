@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { negativeFieldList, nonStrictlyIncrementalFieldList } from "../constants";
 
-const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -35,7 +35,10 @@ const messagesByLevel = (
         }
         issuesMsg = `All values in ${issuesArray[x].fieldName} are 0 (or null). ${factors}Verify that this data is being mapped correctly.`;
       }
-      if (issuesArray[x].type === "CUMULATIVE" && !nonStrictlyIncrementalFieldList?.includes(issuesArray[x].fieldName)) {
+      if (
+        issuesArray[x].type === "CUMULATIVE" &&
+        !nonStrictlyIncrementalFieldList?.includes(issuesArray[x].fieldName)
+      ) {
         issuesMsg = `
           ${issuesArray[x].fieldName} cumulative value dropped on snapshot id ${issuesArray[x].message}. Cumulative values should always increase.`;
       }
@@ -69,8 +72,9 @@ const messagesByLevel = (
         if (issuesArray[x]?.message?.split("///")[1] === "-1") {
           endStr = `is empty`;
         }
-        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${issuesArray[x].fieldName?.split("///")[1]
-          }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
+        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${
+          issuesArray[x].fieldName?.split("///")[1]
+        }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
       }
       if (issuesArray[x].type === "NEG" && !negativeFieldList?.includes(issuesArray[x].fieldName)) {
         const msgObj = JSON.parse(issuesArray[x].message);

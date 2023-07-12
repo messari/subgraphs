@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { log } from "@graphprotocol/graph-ts"
 import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
