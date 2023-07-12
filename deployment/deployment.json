@@ -459,6 +459,28 @@
           }
         }
       },
+      "aave-v3-metis": {
+        "network": "metis",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.1",
+          "subgraph": "2.0.1",
+          "methodology": "1.1.0"
+        },
+        "files": {
+          "template": "aave.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-metis",
+            "query-id": "aave-v3-metis"
+          }
+        }
+      },
       "aave-v3-ethereum": {
         "network": "ethereum",
         "status": "prod",
