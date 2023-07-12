@@ -20,8 +20,37 @@ dataSources:
         - name: CdpManager
           file: ./abis/CdpManager.json
       eventHandlers:
+        # - event: ActivePoolAddressChanged(address)
+        # - event: AuthorityUpdated(indexed address,indexed address)
+        # - event: BaseRateUpdated(uint256)
+        # - event: BetaSet(uint256)
+        # - event: BorrowerOperationsAddressChanged(address)
+        # - event: CdpFeeSplitApplied(bytes32,uint256,uint256,uint256,uint256)
+        # - event: CdpIndexUpdated(bytes32,uint256)
+        # - event: CdpLiquidated(indexed bytes32,indexed address,uint256,uint256,uint8)
+        # - event: CdpPartiallyLiquidated(indexed bytes32,indexed address,uint256,uint256,uint8)
+        # - event: CdpSnapshotsUpdated(bytes32,uint256)
         - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
           handler: handleCdpUpdated
+        # - event: CollSurplusPoolAddressChanged(address)
+        # - event: CollateralAddressChanged(address)
+        # - event: CollateralFeePerUnitUpdated(uint256,uint256,uint256)
+        # - event: CollateralGlobalIndexUpdated(uint256,uint256,uint256)
+        # - event: CollateralIndexUpdateIntervalUpdated(uint256,uint256)
+        # - event: EBTCTokenAddressChanged(address)
+        # - event: FeeRecipientAddressChanged(address)
+        # - event: LTermsUpdated(uint256)
+        # - event: LastFeeOpTimeUpdated(uint256)
+        # - event: Liquidation(uint256,uint256,uint256)
+        # - event: LiquidationLibraryAddressChanged(address)
+        # - event: MinuteDecayFactorSet(uint256)
+        # - event: PriceFeedAddressChanged(address)
+        # - event: Redemption(uint256,uint256,uint256,uint256)
+        # - event: RedemptionFeeFloorSet(uint256)
+        # - event: SortedCdpsAddressChanged(address)
+        # - event: StakingRewardSplitSet(uint256)
+        # - event: SystemSnapshotsUpdated(uint256,uint256)
+        # - event: TotalStakesUpdated(uint256)
   - name: ActivePool
     kind: ethereum/contract
     network: "{{ network.slug }}"

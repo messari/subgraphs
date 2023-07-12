@@ -33,4 +33,14 @@ export function handleCdpUpdated(event: CdpUpdated): void {
     positionManager.setCollateral(true);
     positionManager.setIsolation(true);
   }
+
+  // createLiquidate(
+  //     asset: Bytes
+  //     liquidator: Address
+  //     liquidatee: Address
+  //     amount: BigInt
+  //     amountUSD: BigDecimal
+  //     profitUSD: BigDecimal
+  //     newBalance: BigInt // repaid token balance for liquidatee
+  // )
 }
