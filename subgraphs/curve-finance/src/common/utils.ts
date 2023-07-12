@@ -380,9 +380,7 @@ export function getPoolTokenWeights(
     const inputToken = getOrCreateTokenFromString(inputTokens[idx], block);
 
     const balanceUSD = balance
-      .divDecimal(
-        exponentToBigDecimal(inputToken.decimals as u8)
-      )
+      .divDecimal(exponentToBigDecimal(inputToken.decimals as u8))
       .times(inputToken.lastPriceUSD!);
     const weight = balanceUSD
       .div(totalValueLockedUSD)
