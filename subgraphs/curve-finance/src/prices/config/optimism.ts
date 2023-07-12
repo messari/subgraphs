@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable rulesdir/no-string-literals */
 
 import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Configurations, ContractInfo, TokenInfo } from "../common/types";

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable rulesdir/no-string-literals */
 
 import { getUsdPricePerToken } from "..";
 import * as utils from "../common/utils";
@@ -90,9 +89,7 @@ export function getCurvePriceUsdc(
   );
   const priceUsdc = virtualPrice
     .times(basePrice.usdPrice)
-    .times(
-      constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
-    );
+    .times(utils.exponentToBigDecimal(decimalsAdjustment.toI32() as u8));
 
   return CustomPriceType.initialize(
     priceUsdc,
@@ -204,11 +201,7 @@ export function cryptoPoolLpPriceUsdc(
 
   const totalValueUsdc = cryptoPoolLpTotalValueUsdc(lpAddress, block);
   const priceUsdc = totalValueUsdc
-    .times(
-      constants.BIGINT_TEN.pow(
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      ).toBigDecimal()
-    )
+    .times(utils.exponentToBigDecimal(constants.DEFAULT_DECIMALS.toI32() as u8))
     .div(totalSupply.toBigDecimal());
 
   return CustomPriceType.initialize(
@@ -265,7 +258,7 @@ export function cryptoPoolTokenAmountUsdc(
   const tokenPrice = getPriceUsdcRecommended(tokenAddress, block);
   const tokenValueUsdc = tokenBalance
     .times(tokenPrice.usdPrice)
-    .div(constants.BIGINT_TEN.pow(tokenDecimals.toI32() as u8).toBigDecimal());
+    .div(utils.exponentToBigDecimal(tokenDecimals.toI32() as u8));
 
   return tokenValueUsdc;
 }

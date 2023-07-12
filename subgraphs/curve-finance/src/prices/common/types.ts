@@ -1,3 +1,4 @@
+import * as utils from "./utils";
 import * as constants from "./constants";
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
@@ -118,7 +119,7 @@ export class CustomPriceType {
   }
   get usdPrice(): BigDecimal {
     return changetype<Wrapped<BigDecimal>>(this._usdPrice).inner.div(
-      constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal()
+      utils.exponentToBigDecimal(this.decimals as u8)
     );
   }
   get decimals(): i32 {

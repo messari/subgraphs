@@ -101,10 +101,7 @@ export function Deposit(
       block
     );
 
-    const inputTokenDecimals = constants.BIGINT_TEN.pow(
-      inputToken.decimals as u8
-    ).toBigDecimal();
-
+    const inputTokenDecimals = utils.exponentToBigDecimal(inputToken.decimals);
     inputTokenAmounts.push(depositedCoinAmounts[idx]);
     depositAmountUSD = depositAmountUSD.plus(
       depositedCoinAmounts[idx]

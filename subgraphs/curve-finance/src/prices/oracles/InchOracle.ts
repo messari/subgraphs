@@ -39,7 +39,7 @@ export function getTokenPriceUSDC(
 
     return CustomPriceType.initialize(
       tokenPrice.times(
-        constants.BIGINT_TEN.pow(srcTokenDecimals.toI32() as u8).toBigDecimal()
+        utils.exponentToBigDecimal(srcTokenDecimals.toI32() as u8)
       ),
       (dstToken.decimals + constants.DEFAULT_DECIMALS.toI32()) as u8,
       constants.OracleType.INCH_ORACLE

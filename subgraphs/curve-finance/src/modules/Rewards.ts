@@ -160,9 +160,7 @@ export function updateControllerRewards(
       constants.BIGINT_ZERO
     )
     .divDecimal(
-      constants.BIGINT_TEN.pow(
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      ).toBigDecimal()
+      utils.exponentToBigDecimal(constants.DEFAULT_DECIMALS.toI32() as u8)
     );
 
   if (
@@ -273,7 +271,7 @@ export function updateRewardTokenEmissions(
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+    .divDecimal(utils.exponentToBigDecimal(token.decimals as u8))
     .times(token.lastPriceUSD!);
 
   pool.rewardTokens = rewardTokens;

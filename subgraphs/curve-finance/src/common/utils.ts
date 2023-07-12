@@ -25,8 +25,15 @@ export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
 }
 
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bigDecimal = BigDecimal.fromString("1");
+  for (let i = 0; i < decimals; i++) {
+    bigDecimal = bigDecimal.times(BigDecimal.fromString("10"));
+  }
+  return bigDecimal;
+}
+
 export function equalsIgnoreCase(a: string, b: string): boolean {
-  // eslint-disable-next-line rulesdir/no-string-literals
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
 
@@ -38,7 +45,7 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
     constants.DEFAULT_DECIMALS
   );
 
-  return constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal();
+  return exponentToBigDecimal(decimals.toI32() as u8);
 }
 
 export function getOrCreateTokenFromString(
@@ -342,9 +349,7 @@ export function getPoolTVLUsingInputTokens(
     const inputToken = getOrCreateTokenFromString(inputTokens[idx], block);
 
     const balanceUSD = balance
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
+      .divDecimal(exponentToBigDecimal(inputToken.decimals as u8))
       .times(inputToken.lastPriceUSD!);
 
     totalValueLockedUSD = totalValueLockedUSD.plus(balanceUSD);
@@ -376,7 +381,7 @@ export function getPoolTokenWeights(
 
     const balanceUSD = balance
       .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+        exponentToBigDecimal(inputToken.decimals as u8)
       )
       .times(inputToken.lastPriceUSD!);
     const weight = balanceUSD
@@ -501,9 +506,7 @@ export function getPoolTVL(
     );
 
   const totalValueLockedUSD = outputTokenBalance
-    .divDecimal(
-      constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(exponentToBigDecimal(outputToken.decimals as u8))
     .times(outputToken.lastPriceUSD!);
 
   return totalValueLockedUSD;
@@ -522,9 +525,7 @@ export function getPoolTVLExcludingBasePoolLpToken(
     if (inputToken.isBasePoolLpToken) continue;
 
     const balanceUSD = balance
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
+      .divDecimal(exponentToBigDecimal(inputToken.decimals as u8))
       .times(inputToken.lastPriceUSD!);
 
     totalValueLockedUSD = totalValueLockedUSD.plus(balanceUSD);

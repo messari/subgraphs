@@ -132,16 +132,12 @@ export function Swap(
 
   const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
   const amountInUSD = amountIn
-    .divDecimal(
-      constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(utils.exponentToBigDecimal(tokenInStore.decimals as u8))
     .times(tokenInStore.lastPriceUSD!);
 
   const tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block);
   const amountOutUSD = amountOut
-    .divDecimal(
-      constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(utils.exponentToBigDecimal(tokenOutStore.decimals as u8))
     .times(tokenOutStore.lastPriceUSD!);
 
   createSwapTransaction(

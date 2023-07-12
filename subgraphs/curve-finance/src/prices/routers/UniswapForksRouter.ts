@@ -1,5 +1,3 @@
-/* eslint-disable rulesdir/no-string-literals */
-
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
@@ -150,7 +148,7 @@ export function getLpTokenPriceUsdc(
   }
 
   const pricePerLpTokenUsdc = totalLiquidity.usdPrice
-    .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
+    .times(utils.exponentToBigDecimal(pairDecimals as u8))
     .div(totalSupply.toBigDecimal());
 
   return CustomPriceType.initialize(
@@ -205,13 +203,11 @@ export function getLpTokenTotalLiquidityUsdc(
     reserve1.notEqual(constants.BIGINT_ZERO)
   ) {
     const liquidity0 = reserve0
-      .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
-      .toBigDecimal()
+      .divDecimal(utils.exponentToBigDecimal(token0Decimals.toI32() as u8))
       .times(token0Price.usdPrice);
 
     const liquidity1 = reserve1
-      .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
-      .toBigDecimal()
+      .divDecimal(utils.exponentToBigDecimal(token1Decimals.toI32() as u8))
       .times(token1Price.usdPrice);
 
     const totalLiquidity = liquidity0.plus(liquidity1);

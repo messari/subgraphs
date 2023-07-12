@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable rulesdir/no-string-literals */
 
 import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Configurations, ContractInfo, TokenInfo } from "../common/types";
@@ -111,6 +110,7 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x04b727c7e246ca70d496ecf52e6b6280f3c8077d"), // Curve.fi Factory USD Metapool: apeUSDFRAXBP
   Address.fromString("0x3175df0976dfa876431c2e9ee6bc45b65d3473cc"), // Curve.fi FRAX/USDC
   Address.fromString("0xbcb91e689114b9cc865ad7871845c95241df4105"), // Curve.fi Factory USD Metapool: PWRD Metapool
+  // commented out as they were depegged 
   // Address.fromString("0x26ea744e5b887e5205727f55dfbe8685e3b21951"), // iearn USDC
   // Address.fromString("0xc2cb1040220768554cf699b0d863a3cd4324ce32"), // iearn DAI
   // Address.fromString("0x04bc0ab673d88ae9dbc9da2380cb6b79c4bca9ae"), // iearn BUSD

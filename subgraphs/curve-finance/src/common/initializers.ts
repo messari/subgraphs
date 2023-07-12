@@ -403,7 +403,6 @@ export function getOrCreateLiquidityGauge(
 
     if (poolAddress) {
       const context = new DataSourceContext();
-      // eslint-disable-next-line rulesdir/no-string-literals
       context.setString("poolAddress", poolAddress.toHexString());
 
       LiquidityGaugeTemplate.createWithContext(gaugeAddress, context);
