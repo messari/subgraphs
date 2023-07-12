@@ -172,6 +172,8 @@ export function handleTransferSent(event: TransferSent): void {
       event.params.chainId.toString(),
     ]
   );
+  if (event.params.chainId.toString() == "42170") return;
+
   if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
     const inputTokenOne = NetworkConfigs.getTokenAddressFromBridgeAddress(
       event.address.toHexString()

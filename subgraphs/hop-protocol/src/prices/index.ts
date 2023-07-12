@@ -173,7 +173,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       );
 
       const tokenPrice = getUsdPricePerToken(
-        Address.fromString(OptimismToken.ETH)
+        Address.fromString(ArbitrumToken.ETH)
       );
 
       if (!tokenPrice.reverted) {

@@ -4,8 +4,8 @@
   "subgraphName": "hop-arbitrum",
   "deployment": "HOP_PROTOCOL_ARBITRUM",
   "graftEnabled": true,
-  "subgraphId": "Qma4PsSJcrAvfkFWGB5bMjAvH78SFu71NyouXyrDb8gDkF",
-  "graftStartBlock": 44968854,
+  "subgraphId": "QmZPWQnqauCZGv99um7EaVgcc9wvcvPmQ29hi2NQWyErtY",
+  "graftStartBlock": 110239390,
   "amms": [
     {
       "dataSourceName": "HopL2Amm",

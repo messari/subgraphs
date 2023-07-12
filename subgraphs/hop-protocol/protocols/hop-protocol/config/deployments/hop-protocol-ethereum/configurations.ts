@@ -57,6 +57,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return ["HOP-ETH", "hETH/ETH"];
     } else if (this.getRethPools().includes(poolAddress)) {
       return ["HOP-rETH", "hrETH/ETH"];
+    } else if (this.getsUSDPools().includes(poolAddress)) {
+      return ["HOP-sUSD", "hsUSD/sUSD"];
     } else {
       log.critical("Pool not found", []);
       return [];
@@ -90,7 +92,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.DAI) return ArbitrumAmm.DAI;
     else if (bridgeAddress == MainnetBridge.USDT) return ArbitrumAmm.USDT;
     else if (bridgeAddress == MainnetBridge.ETH) return ArbitrumAmm.ETH;
-    else if (bridgeAddress == MainnetBridge.ETH) return ArbitrumAmm.rETH;
+    else if (bridgeAddress == MainnetBridge.rETH) return ArbitrumAmm.rETH;
     else {
       log.critical("Token not found", []);
 
@@ -129,6 +131,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.USDT) return OptimismAmm.USDT;
     else if (bridgeAddress == MainnetBridge.ETH) return OptimismAmm.ETH;
     else if (bridgeAddress == MainnetBridge.SNX) return OptimismAmm.SNX;
+    else if (bridgeAddress == MainnetBridge.sUSD) return OptimismAmm.sUSD;
+    else if (bridgeAddress == MainnetBridge.rETH) return OptimismAmm.rETH;
     else {
       log.critical("Optimism Pool not found", []);
 
@@ -226,14 +230,14 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     return [ArbitrumAmm.rETH, OptimismAmm.rETH];
   }
   getRethTokens(): string[] {
-    return [OptimismToken.rETH, ArbitrumToken.rETH];
+    return [MainnetToken.rETH, OptimismToken.rETH, ArbitrumToken.rETH];
   }
 
   getsUSDPools(): string[] {
     return [OptimismAmm.sUSD];
   }
   getsUSDTokens(): string[] {
-    return [OptimismToken.sUSD];
+    return [MainnetToken.sUSD, OptimismToken.sUSD];
   }
 
   getMaticPools(): string[] {
