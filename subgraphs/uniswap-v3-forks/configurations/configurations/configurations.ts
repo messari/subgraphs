@@ -57,6 +57,7 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.NFTX_V3_ARBITRUM: {
       return new NftxV3ArbitrumConfigurations();
+    }
     case Deploy.SUSHISWAP_V3_ETHEREUM: {
       return new SushiswapV3EthereumConfigurations();
     }
