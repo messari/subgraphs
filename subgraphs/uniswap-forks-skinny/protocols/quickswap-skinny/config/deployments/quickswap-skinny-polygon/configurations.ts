@@ -1,7 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-
 import {
-  FeeSwitch,
   Network,
   PROTOCOL_SCHEMA_VERSION,
 } from "../../../../../src/common/constants";
