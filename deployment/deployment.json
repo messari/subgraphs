@@ -3855,13 +3855,13 @@
       }
     }
   },
-  "pancakeswap-v3-skinny": {
+  "pancakeswap-v3-swaps": {
     "schema": "dex-amm",
-    "base": "uniswap-v3-forks-skinny",
-    "protocol": "pancakeswap-v3-skinny",
+    "base": "uniswap-v3-forks-swaps",
+    "protocol": "pancakeswap-v3-swaps",
     "project": "pancakeswap",
     "deployments": {
-      "pancakeswap-v3-skinny-bsc": {
+      "pancakeswap-v3-swaps-bsc": {
         "network": "bsc",
         "status": "prod",
         "versions": {
@@ -3870,7 +3870,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "pancakeswap.v3.skinny.template.yaml"
+          "template": "pancakeswap.v3.swaps.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3878,12 +3878,12 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "pancakeswap-v3-skinny-bsc",
-            "query-id": "pancakeswap-v3-skinny-bsc"
+            "slug": "pancakeswap-v3-swaps-bsc",
+            "query-id": "pancakeswap-v3-swaps-bsc"
           }
         }
       },
-      "pancakeswap-v3-skinny-ethereum": {
+      "pancakeswap-v3-swaps-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -3892,7 +3892,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "pancakeswap.v3.skinny.template.yaml"
+          "template": "pancakeswap.v3.swaps.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3900,8 +3900,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "pancakeswap-v3-skinny-ethereum",
-            "query-id": "pancakeswap-v3-skinny-ethereum"
+            "slug": "pancakeswap-v3-swaps-ethereum",
+            "query-id": "pancakeswap-v3-swaps-ethereum"
           }
         }
       }
@@ -4593,13 +4593,13 @@
       }
     }
   },
-  "quickswap-skinny": {
+  "quickswap-swaps": {
     "schema": "dex-amm",
-    "base": "uniswap-forks-skinny",
-    "protocol": "quickswap-skinny",
+    "base": "uniswap-forks-swaps",
+    "protocol": "quickswap-swaps",
     "project": "quickswap",
     "deployments": {
-      "quickswap-skinny-polygon": {
+      "quickswap-swaps-polygon": {
         "network": "polygon",
         "status": "dev",
         "versions": {
@@ -4608,7 +4608,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "quickswap.skinny.template.yaml"
+          "template": "quickswap.swaps.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4616,8 +4616,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "quickswap-skinny-polygon",
-            "query-id": "quickswap-skinny-polygon"
+            "slug": "quickswap-swaps-polygon",
+            "query-id": "quickswap-swaps-polygon"
           }
         }
       }
@@ -5129,13 +5129,13 @@
       }
     }
   },
-  "uniswap-v2-skinny": {
+  "uniswap-v2-swaps": {
     "schema": "dex-amm",
-    "base": "uniswap-forks-skinny",
-    "protocol": "uniswap-v2-skinny",
+    "base": "uniswap-forks-swaps",
+    "protocol": "uniswap-v2-swaps",
     "project": "uniswap",
     "deployments": {
-      "uniswap-v2-skinny-ethereum": {
+      "uniswap-v2-swaps-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -5144,7 +5144,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v2.skinny.template.yaml"
+          "template": "uniswap.v2.swaps.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -5152,8 +5152,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "uniswap-v2-skinny-ethereum",
-            "query-id": "uniswap-v2-skinny-ethereum"
+            "slug": "uniswap-v2-swaps-ethereum",
+            "query-id": "uniswap-v2-swaps-ethereum"
           }
         }
       }
