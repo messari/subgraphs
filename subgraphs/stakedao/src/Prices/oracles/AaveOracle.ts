@@ -2,19 +2,19 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/templates/Vault/YearnLensContract";
+import { AaveOracleContract } from "../../../generated/templates/Vault/AaveOracleContract";
 
-export function getYearnLensContract(
+export function getAaveOracleContract(
   contract: OracleContract,
   block: ethereum.Block
-): YearnLensContract | null {
+): AaveOracleContract | null {
   if (
     contract.startBlock.lt(block.number) ||
     utils.isNullAddress(contract.address)
   )
     return null;
 
-  return YearnLensContract.bind(contract.address);
+  return AaveOracleContract.bind(contract.address);
 }
 
 export function getTokenPriceUSDC(
@@ -23,22 +23,22 @@ export function getTokenPriceUSDC(
 ): CustomPriceType {
   const config = utils.getConfig();
 
-  if (!config || config.yearnLensBlacklist().includes(tokenAddr))
+  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const yearnLensContract = getYearnLensContract(config.yearnLens(), block);
-  if (!yearnLensContract) return new CustomPriceType();
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle(), block);
+  if (!aaveOracleContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
+      aaveOracleContract.try_getAssetPrice(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS,
-    "YearnLensOracle"
+    constants.AAVE_ORACLE_DECIMALS,
+    "AaveOracle"
   );
 }

@@ -1,42 +1,51 @@
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { CustomPriceType, OracleContract } from "../common/types";
 import { ChainLinkContract } from "../../../generated/templates/Vault/ChainLinkContract";
 
-export function getChainLinkContract(network: string): ChainLinkContract {
-  return ChainLinkContract.bind(
-    constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network)
-  );
+export function getChainLinkContract(
+  contract: OracleContract,
+  block: ethereum.Block
+): ChainLinkContract | null {
+  if (
+    contract.startBlock.lt(block.number) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return ChainLinkContract.bind(contract.address);
 }
 
-export function getTokenPriceFromChainLink(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
-  network: string
+  block: ethereum.Block
 ): CustomPriceType {
-  const chainLinkContract = getChainLinkContract(network);
+  const config = utils.getConfig();
+  if (!config) return new CustomPriceType();
 
-  if (!chainLinkContract) {
-    return new CustomPriceType();
-  }
+  const chainLinkContract = getChainLinkContract(config.chainLink(), block);
+  if (!chainLinkContract) return new CustomPriceType();
 
-  let result = chainLinkContract.try_latestRoundData(
+  const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
     constants.CHAIN_LINK_USD_ADDRESS
   );
 
   if (!result.reverted) {
-    let decimals = chainLinkContract.try_decimals(
+    const decimals = chainLinkContract.try_decimals(
       tokenAddr,
       constants.CHAIN_LINK_USD_ADDRESS
     );
 
     if (decimals.reverted) {
-      new CustomPriceType();
+      return new CustomPriceType();
     }
 
     return CustomPriceType.initialize(
       result.value.value1.toBigDecimal(),
-      decimals.value
+      decimals.value,
+      "ChainlinkFeed"
     );
   }
 

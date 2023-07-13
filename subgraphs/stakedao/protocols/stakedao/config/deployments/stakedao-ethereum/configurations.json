@@ -1,1 +1,67 @@
-{}
+{
+  "network": "mainnet",
+  "controllerV1": "0x29D3782825432255041Db2EAfCB7174f5273f08A",
+  "controllerV1StartBlock": 11692633,
+
+  "controllerV2": "0x408179Cd13C805Ca4EdED1e3D2718bC7302116AE",
+  "controllerV2StartBlock": 12722464,
+
+  "liquidityLockers": [
+    {
+      "name": "curveStrategy",
+      "address": "0x20F1d4Fed24073a9b9d388AfA2735Ac91f079ED6",
+      "startBlock": "14831393"
+    },
+    {
+      "name": "angleStrategy",
+      "address": "0x22635427C72e8b0028FeAE1B5e1957508d9D7CAF",
+      "startBlock": "14742353"
+    },
+    {
+      "name": "balancerStrategy",
+      "address": "0x873b031Ea6E4236E44d933Aae5a66AF6d4DA419d",
+      "startBlock": "14975141"
+    },
+    {
+      "name": "fraxStrategy",
+      "address": "0xf285Dec3217E779353350443fC276c07D05917c3",
+      "startBlock": "15390294"
+    }
+  ],
+  "depositors": [
+    {
+      "name": "crvDepositor",
+      "address": "0xc1e3Ca8A3921719bE0aE3690A0e036feB4f69191",
+      "startBlock": "14570972"
+    },
+    {
+      "name": "angleDepositor",
+      "address": "0x8A97e8B3389D431182aC67c0DF7D46FF8DCE7121",
+      "startBlock": "14209711"
+    },
+    {
+      "name": "fxsDepositor",
+      "address": "0xFaF3740167B866b571465B063c6B3A71Ba9b6285",
+      "startBlock": "14209708"
+    },
+    {
+      "name": "balancerDepositor",
+      "address": "0x3e0d44542972859de3CAdaF856B1a4FD351B4D2E",
+      "startBlock": "14848997"
+    },
+    {
+      "name": "apwineDepositor",
+      "address": "0xFe928ca6a9C0cdf658a26A374b7373B9D6CefBCf",
+      "startBlock": "15402143"
+    },
+    {
+      "name": "blackpoolDepositor",
+      "address": "0x219f7496fbD30e1F21A20613F9372d608A279993",
+      "startBlock": "15458687"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}
