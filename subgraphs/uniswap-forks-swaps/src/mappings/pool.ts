@@ -1,6 +1,6 @@
 import { createSwap } from "../common/creators";
 
-import { Swap, Sync } from "../../generated/templates/Pair/Pair";
+import { Swap } from "../../generated/templates/Pair/Pair";
 
 export function handleSwap(event: Swap): void {
   createSwap(
