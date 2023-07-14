@@ -739,37 +739,31 @@ export class DataManager {
     receiverNewBalance: BigInt,
     interestType: string | null = null
   ): Transfer | null {
-    const positions: string[] = [];
-    if (sender != Address.fromString(ZERO_ADDRESS)) {
-      const transferrer = new AccountManager(sender);
-      if (transferrer.isNewUser()) {
-        this.protocol.cumulativeUniqueUsers += INT_ONE;
-        this.protocol.save();
-      }
-      const transferrerPosition = new PositionManager(
-        transferrer.getAccount(),
-        this.market,
-        PositionSide.COLLATERAL,
-        interestType
+    const transferrer = new AccountManager(sender);
+    if (transferrer.isNewUser()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+    const transferrerPosition = new PositionManager(
+      transferrer.getAccount(),
+      this.market,
+      PositionSide.COLLATERAL,
+      interestType
+    );
+    transferrerPosition.subtractPosition(
+      this.event,
+      this.protocol,
+      senderNewBalance,
+      TransactionType.TRANSFER,
+      this.market.inputTokenPriceUSD
+    );
+    const positionID = transferrerPosition.getPositionID();
+    if (!positionID) {
+      log.error(
+        "[createTransfer] positionID is null for market: {} account: {}",
+        [this.market.id.toHexString(), receiver.toHexString()]
       );
-      transferrerPosition.subtractPosition(
-        this.event,
-        this.protocol,
-        senderNewBalance,
-        TransactionType.TRANSFER,
-        this.market.inputTokenPriceUSD
-      );
-      const positionID = transferrerPosition.getPositionID();
-      if (!positionID) {
-        log.error(
-          "[createTransfer] positionID is null for market: {} account: {}",
-          [this.market.id.toHexString(), receiver.toHexString()]
-        );
-        return null;
-      }
-      positions.push(positionID!);
-
-      this.updateUsageData(TransactionType.TRANSFER, sender);
+      return null;
     }
 
     const recieverAccount = new AccountManager(receiver);
@@ -788,7 +782,6 @@ export class DataManager {
       TransactionType.TRANSFER,
       this.market.inputTokenPriceUSD
     );
-    positions.push(receiverPosition.getPositionID()!);
 
     const transfer = new Transfer(
       this.event.transaction.hash
@@ -806,13 +799,14 @@ export class DataManager {
     transfer.sender = sender;
     transfer.receiver = receiver;
     transfer.market = this.market.id;
-    transfer.positions = positions;
+    transfer.positions = [receiverPosition.getPositionID()!, positionID!];
     transfer.asset = asset;
     transfer.amount = amount;
     transfer.amountUSD = amountUSD;
     transfer.save();
 
     this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
+    this.updateUsageData(TransactionType.TRANSFER, sender);
 
     return transfer;
   }
