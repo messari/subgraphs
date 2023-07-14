@@ -1,9 +1,9 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { CdpUpdated } from "../../generated/BorrowerOperations/BorrowerOperations";
 import { FlashLoanSuccess } from "../../generated/ActivePool/ActivePool";
-import { getUsdPrice } from "../prices";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { BIGINT_TEN_TO_EIGHTEENTH, BIGINT_ZERO } from "../sdk/util/constants";
-import { getDataManager, STETH_ADDRESS } from "../constants";
+import { EBTC_ADDRESS, getDataManager, STETH_ADDRESS } from "../constants";
 
 /**
  * Create withdrawals, deposits, borrows, and repays when a CDP is updated.
@@ -25,7 +25,8 @@ export function handleCdpUpdated(event: CdpUpdated): void {
       ), // amountUSD: BigDecimal
       event.params._debt // newBalance: BigInt
     );
-  } else {
+  }
+  if (deltaColl < BIGINT_ZERO) {
     dataManager.createWithdraw(
       STETH_ADDRESS, // asset: Bytes
       event.params._borrower, // account: Bytes
@@ -41,44 +42,33 @@ export function handleCdpUpdated(event: CdpUpdated): void {
 
   const deltaDebt = event.params._debt.minus(event.params._oldDebt);
   if (deltaDebt > BIGINT_ZERO) {
-    // createBorrow(
-    //     asset: Bytes
-    //     account: Bytes
-    //     amount: BigInt
-    //     amountUSD: BigDecimal
-    //     newBalance: BigInt
-    //     tokenPriceUSD: BigDecimal // used for different borrow token in CDP
-    // )
-  } else {
-    // createRepay(
-    //     asset: Bytes
-    //     account: Bytes
-    //     amount: BigInt
-    //     amountUSD: BigDecimal
-    //     newBalance: BigInt
-    //     tokenPriceUSD: BigDecimal // used for different borrow token in CDP
-    // )
+    dataManager.createBorrow(
+      EBTC_ADDRESS, // asset: Bytes
+      event.params._borrower, // account: Bytes
+      deltaDebt, // amount: BigInt
+      getUsdPrice(
+        Address.fromBytes(EBTC_ADDRESS),
+        deltaColl.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal(),
+        event.block
+      ), // amountUSD: BigDecimal
+      event.params._debt, // newBalance: BigInt
+      getUsdPricePerToken(Address.fromBytes(EBTC_ADDRESS)).usdPrice // tokenPriceUSD: BigDecimal // used for different borrow token in CDP
+    );
   }
-
-  // createLiquidate(
-  //     asset: Bytes
-  //     liquidator: Address
-  //     liquidatee: Address
-  //     amount: BigInt
-  //     amountUSD: BigDecimal
-  //     profitUSD: BigDecimal
-  //     newBalance: BigInt // repaid token balance for liquidatee
-  // )
-
-  // createTransfer(
-  //     asset: Bytes
-  //     sender: Address
-  //     receiver: Address
-  //     amount: BigInt
-  //     amountUSD: BigDecimal
-  //     senderNewBalance: BigInt
-  //     receiverNewBalance: BigInt
-  // )
+  if (deltaDebt < BIGINT_ZERO) {
+    dataManager.createRepay(
+      EBTC_ADDRESS, // asset: Bytes
+      event.params._borrower, // account: Bytes
+      deltaDebt, // amount: BigInt
+      getUsdPrice(
+        Address.fromBytes(EBTC_ADDRESS),
+        deltaColl.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal(),
+        event.block
+      ), // amountUSD: BigDecimal
+      event.params._coll, // newBalance: BigInt
+      getUsdPricePerToken(Address.fromBytes(EBTC_ADDRESS)).usdPrice // tokenPriceUSD: BigDecimal // used for different borrow token in CDP
+    );
+  }
 }
 
 /**
