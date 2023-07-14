@@ -115,4 +115,19 @@
     type
     withdrawCount
   }
+  flashloans {
+    amount
+    amountUSD
+    blockNumber
+    feeAmount
+    feeAmountUSD
+    gasLimit
+    gasPrice
+    gasUsed
+    hash
+    id
+    logIndex
+    nonce
+    timestamp
+  }
 }
