@@ -3863,7 +3863,7 @@
     "deployments": {
       "pancakeswap-v3-swap-bsc": {
         "network": "bsc",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "4.0.0",
           "subgraph": "1.0.0",
@@ -3885,7 +3885,7 @@
       },
       "pancakeswap-v3-swap-ethereum": {
         "network": "ethereum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "4.0.0",
           "subgraph": "1.0.0",
