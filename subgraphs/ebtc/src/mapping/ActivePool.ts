@@ -1,9 +1,63 @@
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
+  ActivePool,
   ActivePoolCollBalanceUpdated,
   ActivePoolEBTCDebtUpdated,
+  CdpManagerAddressChanged,
+  FlashLoanSuccess,
 } from "../../generated/ActivePool/ActivePool";
-import { getDataManager, STETH_ADDRESS } from "../constants";
+import {
+  ACTIVE_POOL,
+  EBTC_ADDRESS,
+  LIQUIDATION_FEE_PERCENT,
+  MAXIMUM_LTV,
+  PRICE_FEED,
+  STETH_ADDRESS,
+  getDataManager,
+  getProtocolData,
+} from "../constants";
 import { TokenManager } from "../sdk/token";
+import { getUsdPrice } from "../prices";
+import { BIGINT_TEN_TO_EIGHTEENTH, OracleSource } from "../sdk/util/constants";
+
+/**
+ * On deployment of the pool, initialise and populate the market,
+ * lendingProtocol and oracle entities.
+ * @param event An event emitted by the constructor of the ActivePool proving
+ * it was deployed successfully.
+ */
+export function handleSystemDeployed(event: CdpManagerAddressChanged): void {
+  const activePool = ActivePool.bind(event.address);
+  if (activePool._address != ACTIVE_POOL) {
+    // quick check to make sure our configurations.json is correct
+    log.error(
+      "deployed ActivePool address {} does not match expected address",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+
+  const dataManager = getDataManager(event);
+
+  // update market with ebtc specifics
+  const market = dataManager.getMarket();
+  market.canBorrowFrom = true;
+  market.maximumLTV = MAXIMUM_LTV;
+  market.liquidationThreshold = MAXIMUM_LTV;
+  market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
+  market.borrowedToken = EBTC_ADDRESS;
+  market.save();
+
+  const lendingProtocol = dataManager.getOrCreateLendingProtocol(
+    getProtocolData() // data: ProtocolData
+  );
+
+  const oracle = dataManager.getOrCreateOracle(
+    Address.fromBytes(PRICE_FEED), // oracleAddress: Address
+    false, // isUSD: boolean
+    OracleSource.CHAINLINK // source?: string
+  );
+}
 
 /**
  * Total stETH collateral was updated
@@ -35,4 +89,24 @@ export function handleActivePoolEBTCDebtUpdated(
     market.inputTokenBalance, // newInputTokenBalance: BigInt
     event.params._EBTCDebt // newVariableBorrowBalance: BigInt | null = null
   );
+}
+
+/**
+ * Create a flashloan object and handle its fee when a flashloan is successful.
+ * @param event FlashLoanSuccess The event emitted by BorrowerOperations when
+ * a flashloan is successful.
+ */
+export function handleFlashLoanSuccess(event: FlashLoanSuccess): void {
+  const dataManager = getDataManager(event);
+  const flashloan = dataManager.createFlashloan(
+    Address.fromBytes(STETH_ADDRESS), // asset: Address
+    event.params._receiver, // account: Address
+    event.params._amount, // amount: BigInt
+    getUsdPrice(
+      Address.fromBytes(STETH_ADDRESS),
+      event.params._amount.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal(),
+      event.block
+    ) // amountUSD: BigDecimal
+  );
+  // TODO: handle fee (event.params._fee)
 }

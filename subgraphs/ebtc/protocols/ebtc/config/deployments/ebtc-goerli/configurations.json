@@ -29,7 +29,8 @@
   },
   "borrowerOperations": {
     "address": "0x11d823a74104A4E9D2E49672BAa6Ab9B5d321D06",
-    "verification": "https://goerli.etherscan.io/address/0x11d823a74104A4E9D2E49672BAa6Ab9B5d321D06#code"
+    "verification": "https://goerli.etherscan.io/address/0x11d823a74104A4E9D2E49672BAa6Ab9B5d321D06#code",
+    "startBlock": 9129638
   },
   "eBTCToken": {
     "address": "0x5F9Da4b8B81AB38649Aa5d2043eD58C313Bf4139",

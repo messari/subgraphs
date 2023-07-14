@@ -24,6 +24,18 @@ graph auth --product hosted-service ***
 messari b -l -s hosted-service ebtc -r badger-finance -d
 ```
 
+```
+graph init --product=hosted-service --protocol=ethereum --from-contract=0x7Cbde961F8aDB94c8A7660Abe1f3e647dbB8513f --network=goerli --index-events --start-block=9129595 --contract-name=CdpManager badger-finance/ebtc-goerli-scaffold
+
+cd ebtc-goerli-scaffold
+
+***change graph-cli and graph-ts version to "*" in package.json***
+
+yarn
+
+yarn codegen && yarn build && yarn deploy
+```
+
 **NOTE: Omit the `-d` for a dry run without deployment**
 
 ### Test GQL Queries
