@@ -41,7 +41,8 @@ dataSources:
         # - event: FeeRecipientAddressChanged(address)
         # - event: LTermsUpdated(uint256)
         # - event: LastFeeOpTimeUpdated(uint256)
-        # - event: Liquidation(uint256,uint256,uint256)
+        - event: Liquidation(uint256,uint256,uint256)
+          handler: handleLiquidation
         # - event: LiquidationLibraryAddressChanged(address)
         # - event: MinuteDecayFactorSet(uint256)
         # - event: PriceFeedAddressChanged(address)
