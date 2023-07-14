@@ -1,5 +1,8 @@
-import { CdpUpdated, Liquidation } from "../../generated/CdpManager/CdpManager";
-import { BIGINT_ZERO } from "../sdk/util/constants";
+import {
+  CdpLiquidated,
+  CdpUpdated,
+} from "../../generated/CdpManager/CdpManager";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../sdk/util/constants";
 import { getDataManager, STETH_ADDRESS } from "../constants";
 import { Address } from "@graphprotocol/graph-ts";
 import { getUsdPrice } from "../prices";
@@ -17,27 +20,22 @@ export function handleCdpUpdated(event: CdpUpdated): void {
  * @param event Liquidation The event emitted by the CdpManager when a CDP is
  * liquidated.
  */
-export function handleLiquidation(event: Liquidation): void {
-  // TODO: event is missing the following data points:
-  // - liquidator
-  // - liquidatee
-  // - newBalance
+export function handleCdpLiquidated(event: CdpLiquidated): void {
   const dataManager = getDataManager(event);
   dataManager.createLiquidate(
     STETH_ADDRESS, // asset: Bytes
+    // TODO: liquidator address missing in event
     new Address(0), // liquidator: Address
-    new Address(0), // liquidatee: Address
-    event.params._liquidatedColl, // amount: BigInt
+    Address.fromBytes(event.params._borrower), // liquidatee: Address
+    event.params._coll, // amount: BigInt
     getUsdPrice(
       Address.fromBytes(STETH_ADDRESS),
-      event.params._liquidatedColl.toBigDecimal(),
+      event.params._coll.toBigDecimal(),
       event.block
     ), // amountUSD: BigDecimal
-    getUsdPrice(
-      Address.fromBytes(STETH_ADDRESS),
-      event.params._liqReward.toBigDecimal(),
-      event.block
-    ), // profitUSD: BigDecimal
+    // TODO: what is profit?
+    getUsdPrice(Address.fromBytes(STETH_ADDRESS), BIGDECIMAL_ZERO, event.block), // profitUSD: BigDecimal
+    // TODO: add logic for partial liquidations
     BIGINT_ZERO // newBalance: BigInt // repaid token balance for liquidatee
   );
 }

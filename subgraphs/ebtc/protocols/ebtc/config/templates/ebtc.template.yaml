@@ -65,7 +65,8 @@ dataSources:
         # - event: BorrowerOperationsAddressChanged(address)
         # - event: CdpFeeSplitApplied(bytes32,uint256,uint256,uint256,uint256)
         # - event: CdpIndexUpdated(bytes32,uint256)
-        # - event: CdpLiquidated(indexed bytes32,indexed address,uint256,uint256,uint8)
+        - event: CdpLiquidated(indexed bytes32,indexed address,uint256,uint256,uint8)
+          handler: handleCdpLiquidated
         # - event: CdpPartiallyLiquidated(indexed bytes32,indexed address,uint256,uint256,uint8)
         # - event: CdpSnapshotsUpdated(bytes32,uint256)
         - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
@@ -79,8 +80,7 @@ dataSources:
         # - event: FeeRecipientAddressChanged(address)
         # - event: LTermsUpdated(uint256)
         # - event: LastFeeOpTimeUpdated(uint256)
-        - event: Liquidation(uint256,uint256,uint256)
-          handler: handleLiquidation
+        # - event: Liquidation(uint256,uint256,uint256)
         # - event: LiquidationLibraryAddressChanged(address)
         # - event: MinuteDecayFactorSet(uint256)
         # - event: PriceFeedAddressChanged(address)
