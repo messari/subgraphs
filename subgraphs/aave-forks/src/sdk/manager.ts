@@ -38,7 +38,6 @@ import {
   ProtocolType,
   Transaction,
   TransactionType,
-  ZERO_ADDRESS,
 } from "./constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
