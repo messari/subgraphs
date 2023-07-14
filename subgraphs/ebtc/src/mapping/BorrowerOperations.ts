@@ -40,6 +40,8 @@ export function handleCdpUpdated(event: CdpUpdated): void {
     );
   }
 
+  // TODO: ebtc price can be determined as below (via price lib), but it might
+  // be better to not take market price but use theoretical price instead.
   const deltaDebt = event.params._debt.minus(event.params._oldDebt);
   if (deltaDebt > BIGINT_ZERO) {
     dataManager.createBorrow(
