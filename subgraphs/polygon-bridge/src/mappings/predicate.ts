@@ -8,46 +8,51 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import { Token } from "../../generated/schema";
-import {
-  ExitedEther,
-  LockedEther,
-} from "../../generated/FxERC20Events/EtherPredicate";
 
 import {
   ExitTokensCall,
-  LockedERC20,
+  LockTokensCall,
 } from "../../generated/FxERC20Events/ERC20Predicate";
 import { NetworkConfigs } from "../../configurations/configure";
 
-import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { SDK } from "../sdk/protocols/bridge";
-import { TokenPricer } from "../sdk/protocols/config";
-import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import {
-  BridgePermissionType,
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
-import { getUsdPricePerToken, getUsdPrice } from "../prices";
-import { Versions } from "../versions";
-import { ERC20 } from "../../generated/FxERC20Events/ERC20";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
-import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import { UNKNOWN_TOKEN_VALUE } from "../prices/common/constants";
 import { conf, Pricer, TokenInit } from "./fx-erc20";
-import { ETH_ADDRESS } from "../sdk/util/constants";
 
-export function handleEtherLock(event: LockedEther): void {
+export function handleLockTokens(call: LockTokensCall): void {
   // poolAddress == RootToken Address
-  const poolAddr = Address.fromString(ETH_ADDRESS);
-  const amount = event.params.amount;
+  const poolAddr = call.inputs.rootToken;
+  const depositData = call.inputs.depositData;
+
+  const decoded = ethereum.decode("uint256", depositData);
+
+  if (!decoded) {
+    log.critical("[DECODE ERROR] {} {}", [
+      call.transaction.hash.toHexString(),
+      depositData.toHexString(),
+    ]);
+    return;
+  }
+
+  const amount = decoded.toBigInt();
+  log.info("[DECODE SUCCESS] txhash = {}, depositData = {} amount = {}", [
+    call.transaction.hash.toHexString(),
+    depositData.toHexString(),
+    amount.toString(),
+  ]);
+
   const crosschainID = BigInt.fromI32(137);
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
-  const token = sdk.Tokens.getOrCreateToken(poolAddr);
-  if (token.name == "unknown") {
+  const token = sdk.Tokens.getOrCreateToken(call.inputs.rootToken);
+  if (token.name == UNKNOWN_TOKEN_VALUE) {
     return;
   }
 
@@ -64,87 +69,36 @@ export function handleEtherLock(event: LockedEther): void {
     Address.fromString(conf.getID())
   );
 
-  const crosschainTokenAddr_call =
-    rootChainManger.try_rootToChildToken(poolAddr);
+  const crosschainTokenAddr_call = rootChainManger.try_rootToChildToken(
+    call.inputs.rootToken
+  );
 
   if (crosschainTokenAddr_call.reverted) {
     log.warning(
       "[handleSwapIn] No crosschainToken for network: {} poolID: {} token: {}",
-      [crosschainID.toString(), poolAddr.toHexString(), poolAddr.toHexString()]
+      [
+        crosschainID.toString(),
+        poolAddr.toHexString(),
+        call.inputs.rootToken.toHexString(),
+      ]
     );
 
     return;
   }
-
   const crosschainTokenAddr = crosschainTokenAddr_call.value;
 
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     crosschainID,
     crosschainTokenAddr,
-    CrosschainTokenType.WRAPPED,
+    CrosschainTokenType.CANONICAL,
     Address.fromBytes(token.id)
   );
 
   pool.addDestinationToken(crosschainToken);
   const route = pool.getDestinationTokenRoute(crosschainToken);
 
-  const account = sdk.Accounts.loadAccount(event.params.depositor);
-  account.transferOut(pool, route!, event.params.depositReceiver, amount);
-}
-
-export function handleERC20Lock(event: LockedERC20): void {
-  // poolAddress == RootToken Address
-  const poolAddr = event.params.rootToken;
-  const amount = event.params.amount;
-  const crosschainID = BigInt.fromI32(137);
-
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
-
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
-  const token = sdk.Tokens.getOrCreateToken(poolAddr);
-  if (token.name == "unknown") {
-    return;
-  }
-
-  if (!pool.isInitialized) {
-    pool.initialize(
-      token.name,
-      token.symbol,
-      BridgePoolType.LOCK_RELEASE,
-      token
-    );
-  }
-
-  const rootChainManger = RootChainManager.bind(
-    Address.fromString(conf.getID())
-  );
-
-  const crosschainTokenAddr_call =
-    rootChainManger.try_rootToChildToken(poolAddr);
-
-  if (crosschainTokenAddr_call.reverted) {
-    log.warning(
-      "[handleSwapIn] No crosschainToken for network: {} poolID: {} token: {}",
-      [crosschainID.toString(), poolAddr.toHexString(), poolAddr.toHexString()]
-    );
-
-    return;
-  }
-
-  const crosschainTokenAddr = crosschainTokenAddr_call.value;
-
-  const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
-    crosschainID,
-    crosschainTokenAddr,
-    CrosschainTokenType.WRAPPED,
-    Address.fromBytes(token.id)
-  );
-
-  pool.addDestinationToken(crosschainToken);
-  const route = pool.getDestinationTokenRoute(crosschainToken);
-
-  const account = sdk.Accounts.loadAccount(event.params.depositor);
-  account.transferOut(pool, route!, event.params.depositReceiver, amount);
+  const account = sdk.Accounts.loadAccount(call.inputs.depositor);
+  account.transferOut(pool, route!, call.inputs.depositReceiver, amount);
 }
 
 export function handleExitTokens(call: ExitTokensCall): void {
@@ -184,6 +138,9 @@ export function handleExitTokens(call: ExitTokensCall): void {
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(call.inputs.rootToken);
+  if (token.name == UNKNOWN_TOKEN_VALUE) {
+    return;
+  }
 
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, BridgePoolType.BURN_MINT, token);

@@ -22,7 +22,10 @@ import { getUsdPricePerToken, getUsdPrice } from "../prices";
 import { Versions } from "../versions";
 import { ERC20 } from "../../generated/FxERC20Events/ERC20";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
-import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import {
+  BIGDECIMAL_ZERO,
+  UNKNOWN_TOKEN_VALUE,
+} from "../prices/common/constants";
 import { ETH_ADDRESS } from "../sdk/util/constants";
 
 export const conf = new BridgeConfig(
@@ -48,7 +51,7 @@ export class Pricer implements TokenPricer {
 
 export class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
-    if (address.toHexString() == ETH_ADDRESS) {
+    if (Address.fromString(ETH_ADDRESS).equals(address)) {
       return {
         name: "ETH",
         symbol: "ETH",
@@ -67,8 +70,8 @@ export class TokenInit implements TokenInitializer {
       ]);
 
       return {
-        name: "invalid",
-        symbol: "invalid",
+        name: UNKNOWN_TOKEN_VALUE,
+        symbol: UNKNOWN_TOKEN_VALUE,
         decimals: 18,
       };
     }
@@ -87,7 +90,7 @@ export function handleTokenMappedERC20(event: TokenMappedERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const rootToken = sdk.Tokens.getOrCreateToken(event.params.rootToken);
-  if (rootToken.name == "invalid") {
+  if (rootToken.name == UNKNOWN_TOKEN_VALUE) {
     return;
   }
 
@@ -122,7 +125,7 @@ export function handleFxDepositERC20(event: FxDepositERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const token = sdk.Tokens.getOrCreateToken(event.params.rootToken);
-  if (token.name == "invalid") {
+  if (token.name == UNKNOWN_TOKEN_VALUE) {
     return;
   }
 
@@ -181,7 +184,7 @@ export function handleFxWithdrawERC20(event: FxWithdrawERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(event.params.rootToken);
-  if (token.name == "invalid") {
+  if (token.name == UNKNOWN_TOKEN_VALUE) {
     return;
   }
 

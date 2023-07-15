@@ -258,10 +258,9 @@ templates:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-      eventHandlers:
-        - event: LockedERC20(indexed address,indexed address,indexed address,uint256)
-          handler: handleERC20Lock
       callHandlers:
+        - function: lockTokens(address,address,address,bytes)
+          handler: handleLockTokens
         - function: exitTokens(address,address,bytes)
           handler: handleExitTokens
       file: ./src/mappings/predicate.ts

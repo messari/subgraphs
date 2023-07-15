@@ -10,6 +10,7 @@ import {
 } from "../sdk/protocols/bridge/enums";
 import { conf, Pricer, TokenInit } from "./fx-erc20";
 import { Predicate as PredicateTemplate } from "../../generated/templates";
+import { UNKNOWN_TOKEN_VALUE } from "../prices/common/constants";
 
 export function handlePredicateRegistered(event: PredicateRegistered): void {
   log.debug(
@@ -30,6 +31,10 @@ export function handlePOSTokenMapped(event: TokenMapped): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const rootToken = sdk.Tokens.getOrCreateToken(event.params.rootToken);
+
+  if (rootToken.name == UNKNOWN_TOKEN_VALUE) {
+    return;
+  }
 
   if (!pool.isInitialized) {
     pool.initialize(
