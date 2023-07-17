@@ -212,6 +212,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event,
     event.params.liquidityRate,
     event.params.liquidityIndex,
+    event.params.variableBorrowIndex,
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
     protocolData,

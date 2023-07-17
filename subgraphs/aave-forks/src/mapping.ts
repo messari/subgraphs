@@ -461,6 +461,7 @@ export function _handleReserveDataUpdated(
   event: ethereum.Event,
   liquidityRate: BigInt, // deposit rate in ray
   liquidityIndex: BigInt,
+  variableBorrowIndex: BigInt,
   variableBorrowRate: BigInt,
   stableBorrowRate: BigInt,
   protocolData: ProtocolData,
@@ -549,15 +550,17 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
-  if (!market._liquidityIndex) {
-    market._liquidityIndex = BIGINT_ONE_RAY;
+  let currSupplyIndex = market.supplyIndex;
+  if (!currSupplyIndex) {
+    manager.updateSupplyIndex(BIGINT_ONE_RAY);
+    currSupplyIndex = BIGINT_ONE_RAY;
   }
   const liquidityIndexDiff = liquidityIndex
-    .minus(market._liquidityIndex!)
+    .minus(currSupplyIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
-  market._liquidityIndex = liquidityIndex; // must update to current liquidity index
-  market.save();
+  manager.updateSupplyIndex(liquidityIndex); // must update to current liquidity index
+  manager.updateBorrowIndex(variableBorrowIndex);
 
   const newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
@@ -672,7 +675,7 @@ export function _handleReserveDataUpdated(
       ) {
         emission = BIGINT_ZERO;
       }
-      const emissionUSD = rewardTokenManager.getAmountUSD(emission);
+      const emissionUSD = rewardTokenManager._getAmountUSD(emission);
       const rewardData = new RewardData(rewardToken, emission, emissionUSD);
       manager.updateRewards(rewardData);
     }
@@ -700,7 +703,7 @@ export function _handleDeposit(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const amountUSD = tokenManager._getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createDeposit(
     asset,
@@ -769,7 +772,7 @@ export function _handleWithdraw(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const amountUSD = tokenManager._getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createWithdraw(
     asset,
@@ -803,7 +806,7 @@ export function _handleBorrow(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const amountUSD = tokenManager._getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   manager.createBorrow(
@@ -839,7 +842,7 @@ export function _handleRepay(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const amountUSD = tokenManager._getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   // use debtToken Transfer event for Burn/Mint to determine interestRateType of the Repay event
@@ -1046,8 +1049,8 @@ export function _handleFlashLoan(
     procotolData
   );
   const tokenManager = new TokenManager(asset, event);
-  const amountUSD = tokenManager.getAmountUSD(amount);
-  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
+  const amountUSD = tokenManager._getAmountUSD(amount);
+  const premiumUSDTotal = tokenManager._getAmountUSD(premiumAmount);
   const flashloan = manager.createFlashloan(asset, account, amount, amountUSD);
   flashloan.feeAmount = premiumAmount;
   flashloan.feeAmountUSD = premiumUSDTotal;
@@ -1199,7 +1202,7 @@ export function _handleTransfer(
     interestRateType = null;
   }
 
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const amountUSD = tokenManager._getAmountUSD(amount);
   const manager = new DataManager(
     market.id,
     market.inputToken,
@@ -1290,7 +1293,7 @@ export function _handleAssetConfigUpdated(
     rewardTokenManager.updatePrice(rewardTokenPriceUSD);
   }
 
-  const emissionUSD = rewardTokenManager.getAmountUSD(emission);
+  const emissionUSD = rewardTokenManager._getAmountUSD(emission);
   const rewardData = new RewardData(rewardToken, emission, emissionUSD);
   manager.updateRewards(rewardData);
 }
