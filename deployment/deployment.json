@@ -7503,7 +7503,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7525,7 +7525,7 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7547,7 +7547,7 @@
         "network": "boba",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7569,7 +7569,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7591,7 +7591,7 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7619,7 +7619,7 @@
     "deployments": {
       "hop-protocol-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7641,7 +7641,7 @@
       },
       "hop-protocol-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7663,7 +7663,7 @@
       },
       "hop-protocol-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7685,7 +7685,7 @@
       },
       "hop-protocol-xdai": {
         "network": "gnosis",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -7707,7 +7707,7 @@
       },
       "hop-protocol-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
