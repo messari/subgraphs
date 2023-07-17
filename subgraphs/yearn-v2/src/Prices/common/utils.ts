@@ -12,7 +12,7 @@ export function readValue<T>(
 export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = PriceOracleERC20.bind(tokenAddr);
 
-  let decimals = readValue<BigInt>(
+  const decimals = readValue<BigInt>(
     token.try_decimals(),
     constants.DEFAULT_DECIMALS
   );

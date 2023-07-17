@@ -20,12 +20,13 @@ export function getTokenPriceFromYearnLens(
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   return CustomPriceType.initialize(tokenPrice, 6);
 }

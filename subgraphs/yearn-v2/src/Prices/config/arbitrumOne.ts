@@ -10,10 +10,10 @@ export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
   "0x26f698491daf32771217abc1356dae48c7230c75"
 );
 export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x445FE580eF8d70FF569aB36e80c647af338db351"
+  "0x445fe580ef8d70ff569ab36e80c647af338db351"
 );
 export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15"
+  "0x0e9fbb167df83ede3240d6a5fa5d40c6c6851e15"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x5EA7E501c9A23F4A76Dc7D33a11D995B13a1dD25"
+  "0x5ea7e501c9a23f4a76dc7d33a11d995b13a1dd25"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
   "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
@@ -77,7 +77,7 @@ WHITELIST_TOKENS.set(
 );
 WHITELIST_TOKENS.set(
   "ETH",
-  Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE")
+  Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 );
 WHITELIST_TOKENS.set(
   "USDT",

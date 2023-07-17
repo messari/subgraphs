@@ -5,7 +5,11 @@ export class RewardType {
   private _totalSharesMinted: BigInt;
   private _totalFee: BigInt;
 
-  constructor(strategistReward: BigInt, totalSharesMinted: BigInt, totalFee: BigInt) {
+  constructor(
+    strategistReward: BigInt,
+    totalSharesMinted: BigInt,
+    totalFee: BigInt
+  ) {
     this._strategistReward = strategistReward;
     this._totalSharesMinted = totalSharesMinted;
     this._totalFee = totalFee;
