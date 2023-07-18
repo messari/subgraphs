@@ -484,6 +484,9 @@ type LiquidityPool @entity @regularPolling {
 
   " Indicates if pool contains stable pair "
   _stable: Boolean!
+
+  " Indicates if custom fee is set for pool "
+  _customFeeApplied: Boolean
 }
 
 #################################
