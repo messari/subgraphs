@@ -324,7 +324,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -350,7 +350,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -376,7 +376,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -398,7 +398,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -420,7 +420,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -442,7 +442,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -464,7 +464,7 @@
         "status": "dev",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -486,7 +486,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -3474,7 +3474,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.0.0"
         },
         "files": {
