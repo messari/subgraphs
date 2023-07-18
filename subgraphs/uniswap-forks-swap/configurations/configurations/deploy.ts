@@ -4,4 +4,5 @@
 export namespace Deploy {
   export const UNISWAP_V2_ETHEREUM = 0;
   export const QUICKSWAP_POLYGON = 1;
+  export const PANCAKESWAP_V2_BSC = 2;
 }
