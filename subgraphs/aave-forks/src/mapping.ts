@@ -53,6 +53,7 @@ import {
   getInterestRateType,
   getFlashloanPremiumAmount,
   calcuateFlashLoanPremiumToLPUSD,
+  getTreasuryAddress,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -1098,6 +1099,42 @@ export function _handleFlashLoan(
   );
 
   manager.addSupplyRevenue(premiumUSDToLP, feeToLP);
+}
+
+export function _handleMintedToTreasury(
+  event: ethereum.Event,
+  protocolData: ProtocolData,
+  asset: Address,
+  amount: BigInt
+): void {
+  const market = getMarketFromToken(asset, protocolData);
+  if (!market) {
+    log.warning("[_handleMintedToTreasury] Market for token {} not found", [
+      asset.toHexString(),
+    ]);
+    return;
+  }
+
+  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const amountUSD = tokenManager.getAmountUSD(amount);
+  const treasuryAddress = getTreasuryAddress(market);
+  const treasuryBalance = getCollateralBalance(market, treasuryAddress);
+
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
+  manager.createTransfer(
+    asset,
+    Address.fromString(ZERO_ADDRESS),
+    treasuryAddress,
+    amount,
+    amountUSD,
+    BIGINT_ZERO,
+    treasuryBalance
+  );
 }
 
 /////////////////////////
