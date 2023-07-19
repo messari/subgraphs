@@ -4,8 +4,8 @@
   "subgraphName": "hop-arbitrum",
   "deployment": "HOP_PROTOCOL_ARBITRUM",
   "graftEnabled": true,
-  "subgraphId": "QmZPWQnqauCZGv99um7EaVgcc9wvcvPmQ29hi2NQWyErtY",
-  "graftStartBlock": 110239390,
+  "subgraphId": "QmRkuASsskvysrucvDViRQHEbycKbk89r26BYfEufe7wgr",
+  "graftStartBlock": 51301700,
   "amms": [
     {
       "dataSourceName": "HopL2Amm",
@@ -36,6 +36,12 @@
       "token": "rETH",
       "address": "0x0Ded0d521AC7B0d312871D18EA4FDE79f03Ee7CA",
       "startBlock": 85020157
+    },
+    {
+      "dataSourceName": "HopL2AmmMAGIC",
+      "token": "MAGIC",
+      "address": "0x50a3a623d00fd8b8a4F3CbC5aa53D0Bc6FA912DD",
+      "startBlock": 99535924
     }
   ],
   "bridges": [
@@ -68,6 +74,13 @@
       "token": "rETH",
       "address": "0xc315239cFb05F1E130E7E28E603CEa4C014c57f0",
       "startBlock": 85020329
+    },
+
+    {
+      "dataSourceName": "HopL2BridgeMAGIC",
+      "token": "MAGIC",
+      "address": "0xEa5abf2C909169823d939de377Ef2Bf897A6CE98",
+      "startBlock": 99536351
     },
     {
       "dataSourceName": "HopL2BridgeHOP",

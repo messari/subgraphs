@@ -136,8 +136,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
         tokenPrice.usdPrice.times(price);
 
         const val = tokenPrice.usdPrice.times(price);
-        let x: CustomPriceType;
-        x = CustomPriceType.initialize(val);
+        const x = CustomPriceType.initialize(val);
         return x;
       }
     }
@@ -180,8 +179,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
         tokenPrice.usdPrice.times(price);
 
         const val = tokenPrice.usdPrice.times(price);
-        let x: CustomPriceType;
-        x = CustomPriceType.initialize(val);
+        const x = CustomPriceType.initialize(val);
         return x;
       }
     }
@@ -207,8 +205,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
           price.toString(),
         ]
       );
-      let x: CustomPriceType;
-      x = CustomPriceType.initialize(price);
+      const x = CustomPriceType.initialize(price);
       return x;
     }
   }
@@ -324,8 +321,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
           price.toString(),
         ]
       );
-      let x: CustomPriceType;
-      x = CustomPriceType.initialize(price.toBigDecimal());
+      const x = CustomPriceType.initialize(price.toBigDecimal());
       if (!x.reverted) {
         return x;
       }

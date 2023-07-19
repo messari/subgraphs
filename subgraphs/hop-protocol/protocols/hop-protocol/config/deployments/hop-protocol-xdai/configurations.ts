@@ -12,6 +12,9 @@ import {
   XdaiRewardToken,
   ZERO_ADDRESS,
   RewardTokens,
+  ArbitrumNovaToken,
+  ArbitrumNovaHtoken,
+  ArbitrumNovaAmm,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
@@ -63,10 +66,31 @@ export class HopProtocolxDaiConfigurations implements Configurations {
       return this.getPolygonCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "1")
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "42170")
+      return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else {
       log.critical("Chain not found", []);
       return "";
     }
+  }
+
+  getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[] {
+    if (tokenAddress == XdaiToken.ETH)
+      return [
+        ArbitrumNovaToken.ETH,
+        ArbitrumNovaHtoken.ETH,
+        "HOP-ETH",
+        "hETH/ETH Nova Pool - ETH",
+        "hETH/ETH Nova Pool - hETH",
+        ArbitrumNovaAmm.ETH,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else {
+      log.critical("Config not found", []);
+    }
+    return [""];
   }
 
   getArbitrumCrossTokenFromTokenAddress(tokenAddress: string): string {
@@ -249,23 +273,23 @@ export class HopProtocolxDaiConfigurations implements Configurations {
   }
 
   getXdaiCrossTokenFromTokenAddress(tokenAddress: string): string {
-    return "";
+    return tokenAddress;
   }
   getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
 
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
-    return "";
+    return chainId || bridgeAddress;
   }
 
   getUsdcPools(): string[] {
@@ -290,7 +314,12 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     return [];
   }
   getEthTokens(): string[] {
-    return [XdaiToken.ETH, XdaiHtoken.ETH];
+    return [
+      XdaiToken.ETH,
+      XdaiHtoken.ETH,
+      ArbitrumNovaToken.ETH,
+      ArbitrumNovaHtoken.ETH,
+    ];
   }
   getSnxPools(): string[] {
     return [];
@@ -316,6 +345,12 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     return [];
   }
   getsUSDTokens(): string[] {
+    return [];
+  }
+  getMagicPools(): string[] {
+    return [];
+  }
+  getMagicTokens(): string[] {
     return [];
   }
 }

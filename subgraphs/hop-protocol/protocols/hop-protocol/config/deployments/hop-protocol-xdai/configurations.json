@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
-  "graftEnabled": false,
-  "subgraphId": "QmQRSVJbJxMA5jHvzGG27qvbaPLPqbn9GGQyDBGGEXqDgG",
-  "graftStartBlock": 24646598,
+  "graftEnabled": true,
+  "subgraphId": "QmWwsHry2hJVEXoUQ5fgW4dKFwktSSVjLUo6Qc1Rc2RFgv",
+  "graftStartBlock": 28902508,
   "amms": [
     {
       "dataSourceName": "HopL2Amm",

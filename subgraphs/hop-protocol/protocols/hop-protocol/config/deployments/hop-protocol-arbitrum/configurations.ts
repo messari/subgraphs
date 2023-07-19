@@ -12,6 +12,9 @@ import {
   ZERO_ADDRESS,
   RewardTokens,
   ArbitrumHtoken,
+  ArbitrumNovaToken,
+  ArbitrumNovaAmm,
+  ArbitrumNovaHtoken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolArbitrumConfigurations implements Configurations {
@@ -39,6 +42,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return ["USDT", "USDT", "6", ArbitrumBridge.USDT];
     } else if (this.getRethTokens().includes(tokenAddress)) {
       return ["rETH", "Rocket Pool Ethereum", "18", ArbitrumBridge.rETH];
+    } else if (this.getMagicTokens().includes(tokenAddress)) {
+      return ["MAGIC", "MAGIC", "18", ArbitrumBridge.MAGIC];
     } else if (this.getEthTokens().includes(tokenAddress)) {
       return ["ETH", "ETH", "18", ArbitrumBridge.ETH];
     } else if (tokenAddress == RewardTokens.GNO) {
@@ -62,6 +67,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return this.getXdaiCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "137")
       return this.getPolygonCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "42170")
+      return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else if (chainId == "1")
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
     else {
@@ -71,7 +78,38 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   }
 
   getArbitrumCrossTokenFromTokenAddress(tokenAddress: string): string {
-    return "";
+    return tokenAddress;
+  }
+
+  getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[] {
+    if (tokenAddress == ArbitrumToken.ETH)
+      return [
+        ArbitrumNovaToken.ETH,
+        ArbitrumNovaHtoken.ETH,
+        "HOP-ETH",
+        "hETH/ETH Nova Pool - ETH",
+        "hETH/ETH Nova Pool - hETH",
+        ArbitrumNovaAmm.ETH,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else if (tokenAddress == ArbitrumToken.MAGIC)
+      return [
+        ArbitrumNovaToken.MAGIC,
+        ArbitrumNovaHtoken.MAGIC,
+        "HOP-MAGIC",
+        "hMAGIC/MAGIC Nova Pool - MAGIC",
+        "hMAGIC/MAGIC Nova Pool - hMAGIC",
+        ArbitrumNovaAmm.MAGIC,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else {
+      log.critical("Config not found", []);
+    }
+    return [""];
   }
 
   getPolygonCrossTokenFromTokenAddress(tokenAddress: string): string {
@@ -84,6 +122,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     }
     return "";
   }
+
   getXdaiCrossTokenFromTokenAddress(tokenAddress: string): string {
     if (tokenAddress == ArbitrumToken.USDC) return XdaiToken.USDC;
     else if (tokenAddress == ArbitrumToken.DAI) return XdaiToken.DAI;
@@ -118,6 +157,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     else if (tokenAddress == ArbitrumToken.USDT) return MainnetToken.USDT;
     else if (tokenAddress == ArbitrumToken.ETH) return MainnetToken.ETH;
     else if (tokenAddress == ArbitrumToken.rETH) return MainnetToken.rETH;
+    else if (tokenAddress == ArbitrumToken.MAGIC) return MainnetToken.MAGIC;
     else {
       log.critical("Token not found", []);
     }
@@ -135,6 +175,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return [ArbitrumToken.ETH, ArbitrumHtoken.ETH];
     } else if (bridgeAddress == ArbitrumBridge.rETH) {
       return [ArbitrumToken.rETH, ArbitrumHtoken.rETH];
+    } else if (bridgeAddress == ArbitrumBridge.MAGIC) {
+      return [ArbitrumToken.MAGIC, ArbitrumHtoken.MAGIC];
     } else {
       log.critical("Token not found", []);
       return [""];
@@ -152,6 +194,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return [ArbitrumToken.ETH, ArbitrumHtoken.ETH];
     else if (poolAddress == ArbitrumAmm.rETH)
       return [ArbitrumToken.rETH, ArbitrumHtoken.rETH];
+    else if (poolAddress == ArbitrumAmm.MAGIC)
+      return [ArbitrumToken.MAGIC, ArbitrumHtoken.MAGIC];
     else {
       log.critical("Token not found", []);
       return [""];
@@ -164,6 +208,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     else if (bridgeAddress == ArbitrumBridge.USDT) return ArbitrumAmm.USDT;
     else if (bridgeAddress == ArbitrumBridge.ETH) return ArbitrumAmm.ETH;
     else if (bridgeAddress == ArbitrumBridge.rETH) return ArbitrumAmm.rETH;
+    else if (bridgeAddress == ArbitrumBridge.MAGIC) return ArbitrumAmm.MAGIC;
     else {
       log.critical("Address not found", []);
       return "";
@@ -181,6 +226,12 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return ["HOP-ETH", "hETH/ETH Pool - ETH", "hETH/ETH Pool - hETH"];
     } else if (poolAddress == ArbitrumAmm.rETH) {
       return ["HOP-rETH", "hrETH/rETH Pool - ETH", "hrETH/rETH Pool - hrETH"];
+    } else if (poolAddress == ArbitrumAmm.MAGIC) {
+      return [
+        "HOP-MAGIC",
+        "hMAGIC/MAGIC Pool - MAGIC",
+        "hMAGIC/MAGIC Pool - hMAGIC",
+      ];
     } else {
       log.critical("Token not found", []);
       return [];
@@ -194,6 +245,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumToken.USDT,
       ArbitrumToken.ETH,
       ArbitrumToken.rETH,
+      ArbitrumHtoken.MAGIC,
     ];
   }
   getPoolsList(): string[] {
@@ -203,6 +255,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumAmm.USDT,
       ArbitrumAmm.ETH,
       ArbitrumAmm.rETH,
+      ArbitrumAmm.MAGIC,
     ];
   }
   getBridgeList(): string[] {
@@ -212,23 +265,24 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       ArbitrumBridge.USDT,
       ArbitrumBridge.ETH,
       ArbitrumBridge.rETH,
+      ArbitrumBridge.MAGIC,
     ];
   }
   getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
 
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getUsdcPools(): string[] {
     return [];
@@ -248,6 +302,9 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   getRethTokens(): string[] {
     return [ArbitrumToken.rETH, ArbitrumHtoken.rETH];
   }
+  getMagicTokens(): string[] {
+    return [ArbitrumToken.MAGIC, ArbitrumHtoken.MAGIC];
+  }
   getRethPools(): string[] {
     return [];
   }
@@ -257,6 +314,10 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   getsUSDTokens(): string[] {
     return [];
   }
+  getMagicPools(): string[] {
+    return [];
+  }
+
   getDaiPools(): string[] {
     return [];
   }

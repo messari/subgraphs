@@ -22,10 +22,13 @@ export interface Configurations {
   getPolygonCrossTokenFromTokenAddress(tokenAddress: string): string;
   getRewardTokenList(): string[];
   getPoolAddressFromRewardTokenAddress(rewardToken: string): string;
+  getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[];
   getUsdcPools(): string[];
   getUsdcTokens(): string[];
   getDaiPools(): string[];
   getDaiTokens(): string[];
+  getMagicTokens(): string[];
+  getMagicPools(): string[];
   getUsdtPools(): string[];
   getUsdtTokens(): string[];
   getEthPools(): string[];

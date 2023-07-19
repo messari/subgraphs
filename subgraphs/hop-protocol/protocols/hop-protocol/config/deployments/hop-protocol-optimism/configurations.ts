@@ -12,6 +12,9 @@ import {
   OptimismRewardToken,
   RewardTokens,
   OptimismHtoken,
+  ArbitrumNovaToken,
+  ArbitrumNovaHtoken,
+  ArbitrumNovaAmm,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolOptimismConfigurations implements Configurations {
@@ -19,19 +22,19 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     return Network.OPTIMISM;
   }
   getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
-    return "";
+    return bridgeAddress || chainId;
   }
 
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
@@ -139,10 +142,28 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     }
     return "";
   }
+  getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[] {
+    if (tokenAddress == OptimismToken.ETH)
+      return [
+        ArbitrumNovaToken.ETH,
+        ArbitrumNovaHtoken.ETH,
+        "HOP-ETH",
+        "hETH/ETH Nova Pool - ETH",
+        "hETH/ETH Nova Pool - hETH",
+        ArbitrumNovaAmm.ETH,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else {
+      log.critical("Config not found", []);
+    }
+    return [""];
+  }
 
   getOptimismCrossTokenFromTokenAddress(tokenAddress: string): string {
     log.critical("CrossToken not found", []);
-    return "";
+    return tokenAddress;
   }
 
   getMainnetCrossTokenFromTokenAddress(tokenAddress: string): string {
@@ -320,7 +341,12 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     return [];
   }
   getEthTokens(): string[] {
-    return [OptimismToken.ETH, OptimismHtoken.ETH];
+    return [
+      OptimismToken.ETH,
+      OptimismHtoken.ETH,
+      ArbitrumNovaToken.ETH,
+      ArbitrumNovaToken.ETH,
+    ];
   }
   getSnxPools(): string[] {
     return [];
@@ -333,6 +359,12 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     return [];
   }
   getMaticTokens(): string[] {
+    return [];
+  }
+  getMagicPools(): string[] {
+    return [];
+  }
+  getMagicTokens(): string[] {
     return [];
   }
 }

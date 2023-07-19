@@ -1,10 +1,10 @@
 {
   "network": "mainnet",
   "isMainnet": true,
-  "graftEnabled": false,
+  "graftEnabled": true,
   "deployment": "HOP_PROTOCOL_ETHEREUM",
-  "subgraphId": "QmUAmXDku6ZgA9pSCK6sJYaci7BcoinWkW1rVKoKvvJMq5",
-  "graftStartBlock": 15678490,
+  "subgraphId": "QmTBvXdRdsUVa257KgnpUTn6qBEYet9KdnNT24CcKv7GV8",
+  "graftStartBlock": 16350930,
   "bridges": [
     {
       "dataSourceName": "Bridge",
@@ -53,6 +53,12 @@
       "token": "sUSD",
       "address": "0x36443fC70E073fe9D50425f82a3eE19feF697d62",
       "startBlock": 15678491
+    },
+    {
+      "dataSourceName": "HopL1BridgeMAGIC",
+      "token": "MAGIC",
+      "address": "0xf074540eb83c86211F305E145eB31743E228E57d",
+      "startBlock": 17445930
     },
     {
       "dataSourceName": "HopL1BridgeHOP",

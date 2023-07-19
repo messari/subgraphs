@@ -12,6 +12,9 @@ import {
   ZERO_ADDRESS,
   RewardTokens,
   PolygonHtoken,
+  ArbitrumNovaToken,
+  ArbitrumNovaHtoken,
+  ArbitrumNovaAmm,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -19,20 +22,20 @@ export class HopProtocolPolygonConfigurations implements Configurations {
     return Network.MATIC;
   }
   getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
 
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
-    return "";
+    return bridgeAddress || chainId;
   }
 
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
@@ -72,6 +75,25 @@ export class HopProtocolPolygonConfigurations implements Configurations {
     }
   }
 
+  getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[] {
+    if (tokenAddress == PolygonToken.ETH)
+      return [
+        ArbitrumNovaToken.ETH,
+        ArbitrumNovaHtoken.ETH,
+        "HOP-ETH",
+        "hETH/ETH Nova Pool - ETH",
+        "hETH/ETH Nova Pool - hETH",
+        ArbitrumNovaAmm.ETH,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else {
+      log.critical("Config not found", []);
+    }
+    return [""];
+  }
+
   getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
     if (rewardToken == PolygonRewardToken.USDC) return PolygonAmm.USDC;
     else if (rewardToken == PolygonRewardToken.USDT) return PolygonAmm.USDT;
@@ -109,7 +131,9 @@ export class HopProtocolPolygonConfigurations implements Configurations {
       return this.getXdaiCrossTokenFromTokenAddress(tokenAddress); //Xdai
     } else if (chainId == "137") {
       return this.getPolygonCrossTokenFromTokenAddress(tokenAddress); //Polygon
-    } else if (chainId == "1") {
+    } else if (chainId == "42170")
+      return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
+    else if (chainId == "1") {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress); //Mainnet
     } else {
       log.critical("Chain not found", []);
@@ -264,7 +288,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
   }
 
   getPolygonCrossTokenFromTokenAddress(tokenAddress: string): string {
-    return "";
+    return tokenAddress;
   }
 
   getRewardTokenList(): string[] {
@@ -322,6 +346,13 @@ export class HopProtocolPolygonConfigurations implements Configurations {
     return [];
   }
   getsUSDTokens(): string[] {
+    return [];
+  }
+
+  getMagicPools(): string[] {
+    return [];
+  }
+  getMagicTokens(): string[] {
     return [];
   }
 }

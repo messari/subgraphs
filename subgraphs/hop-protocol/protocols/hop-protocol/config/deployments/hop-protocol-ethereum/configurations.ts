@@ -11,6 +11,9 @@ import {
   PolygonToken,
   PolygonAmm,
   OptimismAmm,
+  ArbitrumNovaHtoken,
+  ArbitrumNovaToken,
+  ArbitrumNovaAmm,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
@@ -28,6 +31,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return ["DAI", "DAI Stablecoin", "18", MainnetBridge.DAI];
     } else if (this.getUsdtTokens().includes(tokenAddress)) {
       return ["USDT", "Tether USD", "6", MainnetBridge.USDT];
+    } else if (this.getMagicTokens().includes(tokenAddress)) {
+      return ["MAGIC", "MAGIC", "18", MainnetBridge.MAGIC];
     } else if (this.getSnxTokens().includes(tokenAddress)) {
       return ["SNX", "SNX", "18", MainnetBridge.SNX];
     } else if (this.getEthTokens().includes(tokenAddress)) {
@@ -55,6 +60,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return ["HOP-SNX", "hSNX/SNX"];
     } else if (this.getEthPools().includes(poolAddress)) {
       return ["HOP-ETH", "hETH/ETH"];
+    } else if (this.getMagicPools().includes(poolAddress)) {
+      return ["HOP-MAGIC", "hMAGIC/MAGIC"];
     } else if (this.getRethPools().includes(poolAddress)) {
       return ["HOP-rETH", "hrETH/ETH"];
     } else if (this.getsUSDPools().includes(poolAddress)) {
@@ -69,7 +76,38 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     return [];
   }
   getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
-    return "";
+    return rewardToken;
+  }
+
+  getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[] {
+    if (tokenAddress == MainnetToken.ETH)
+      return [
+        ArbitrumNovaToken.ETH,
+        ArbitrumNovaHtoken.ETH,
+        "HOP-ETH",
+        "hETH/ETH Nova Pool - ETH",
+        "hETH/ETH Nova Pool - hETH",
+        ArbitrumNovaAmm.ETH,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else if (tokenAddress == MainnetToken.MAGIC)
+      return [
+        ArbitrumNovaToken.MAGIC,
+        ArbitrumNovaHtoken.MAGIC,
+        "HOP-MAGIC",
+        "hMAGIC/MAGIC Nova Pool - MAGIC",
+        "hMAGIC/MAGIC Nova Pool - hMAGIC",
+        ArbitrumNovaAmm.MAGIC,
+        this.getTokenDetails(tokenAddress)[0],
+        this.getTokenDetails(tokenAddress)[1],
+        this.getTokenDetails(tokenAddress)[2],
+      ];
+    else {
+      log.critical("Config not found", []);
+    }
+    return [""];
   }
 
   getTokenAddressFromBridgeAddress(bridgeAddress: string): string[] {
@@ -216,6 +254,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       ArbitrumToken.ETH,
       PolygonToken.ETH,
       OptimismToken.ETH,
+      ArbitrumNovaToken.ETH,
     ];
   }
 
@@ -246,6 +285,12 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   getMaticTokens(): string[] {
     return [PolygonToken.MATIC, XdaiToken.MATIC, MainnetToken.MATIC];
   }
+  getMagicTokens(): string[] {
+    return [ArbitrumToken.MAGIC, ArbitrumNovaToken.MAGIC];
+  }
+  getMagicPools(): string[] {
+    return [ArbitrumAmm.MAGIC, ArbitrumNovaAmm.MAGIC];
+  }
 
   getBridgeList(): string[] {
     return [
@@ -257,6 +302,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       MainnetBridge.SNX,
       MainnetBridge.rETH,
       MainnetBridge.sUSD,
+      MainnetBridge.MAGIC,
     ];
   }
 
@@ -265,13 +311,13 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   }
 
   getTokenAddressFromPoolAddress(poolAddress: string): string[] {
-    return [""];
+    return [poolAddress];
   }
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
-    return "";
+    return tokenAddress;
   }
   getPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    return "";
+    return bridgeAddress;
   }
 
   getCrossTokenAddress(chainId: string, tokenAddress: string): string {
@@ -283,6 +329,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return this.getXdaiCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "137")
       return this.getPolygonCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "42170")
+      return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else if (chainId == "1")
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
     else {
@@ -297,6 +345,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (tokenAddress == MainnetToken.USDT) return ArbitrumToken.USDT;
     else if (tokenAddress == MainnetToken.ETH) return ArbitrumToken.ETH;
     else if (tokenAddress == MainnetToken.rETH) return ArbitrumToken.rETH;
+    else if (tokenAddress == MainnetToken.MAGIC) return ArbitrumToken.MAGIC;
     else {
       log.critical("Arb Crosstoken not found", []);
       return "";
@@ -340,6 +389,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 
   getMainnetCrossTokenFromTokenAddress(tokenAddress: string): string {
     log.critical("Mainnet cross token not found", []);
-    return "";
+    return tokenAddress;
   }
 }
