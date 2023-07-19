@@ -148,6 +148,12 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0x948a9bb69d1d1202c160d26804aefff0634a492e", // Stable Yield Credit
       "0x46ecb116aba95a7c3365a1b159efc3254e86819a", // Doggo
       "0xea14af7ba0103c4d60ced5f6e6829148a613f0f3", // PHB
+      "0xbbda19aabab9ad3ffef43976b18c922e30cf41c5", // Covfefe
+      "0xc7924bf912ebc9b92e3627aed01f816629c7e400", // QAZ
+      "0x948a9bb69d1d1202c160d26804aefff0634a492e", // Stable Yield Credit
+      "0x53a1e9912323b8016424d6287286e3b6de263f76", // PUTIN
+      "0x81ee56e81224378a81d4cfc9135916383248d9eb", // AIRI
+      "0x4f8726a494a7a155d2ef9ea840acdd7f4069059c", // Plasma
     ];
   }
   getBrokenERC20Tokens(): string[] {
