@@ -20,6 +20,8 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   ArbitrumHtoken,
+  ArbitrumNovaHtoken,
+  ArbitrumNovaToken,
   ArbitrumToken,
   BIGDECIMAL_ONE,
   OptimismHtoken,
@@ -66,17 +68,29 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (tokenAddr == Address.fromString(PolygonHtoken.MATIC)) {
     tokenAddr = Address.fromString(PolygonToken.MATIC);
   }
-  if (tokenAddr == Address.fromString(PolygonHtoken.ETH)) {
+  if (
+    tokenAddr.toHexString() == PolygonHtoken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
+  ) {
     tokenAddr = Address.fromString(PolygonToken.ETH);
   }
-  if (tokenAddr.toHexString() == OptimismHtoken.ETH) {
+  if (
+    tokenAddr.toHexString() == OptimismHtoken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
+  ) {
     tokenAddr = Address.fromString(OptimismToken.ETH);
   }
   if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
     tokenAddr = Address.fromString(OptimismToken.SNX);
   }
 
-  if (tokenAddr.toHexString() == XdaiHtoken.ETH) {
+  if (
+    tokenAddr.toHexString() == XdaiHtoken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
+  ) {
     tokenAddr = Address.fromString(XdaiToken.ETH);
   }
 
@@ -84,7 +98,11 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     tokenAddr = Address.fromString(XdaiToken.MATIC);
   }
 
-  if (tokenAddr.toHexString() == ArbitrumHtoken.ETH) {
+  if (
+    tokenAddr.toHexString() == ArbitrumHtoken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
+  ) {
     tokenAddr = Address.fromString(ArbitrumToken.ETH);
   }
 

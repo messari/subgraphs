@@ -266,310 +266,218 @@ export const LP_FEE_TO_OFF = BigDecimal.fromString("3");
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export namespace XdaiBridge {
-  export const USDC =
-    "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8".toLowerCase();
-  export const USDT =
-    "0xfd5a186a7e8453eb867a360526c5d987a00acac2".toLowerCase();
-  export const MATIC =
-    "0x7ac71c29fedf94bac5a5c9ab76e1dd12ea885ccc".toLowerCase();
-  export const DAI = "0x0460352b91d7cf42b0e1c1c30f06b602d9ef2238".toLowerCase();
-  export const ETH = "0xd8926c12c0b2e5cd40cfda49ecaff40252af491b".toLowerCase();
+  export const USDC = "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8";
+  export const USDT = "0xfd5a186a7e8453eb867a360526c5d987a00acac2";
+  export const MATIC = "0x7ac71c29fedf94bac5a5c9ab76e1dd12ea885ccc";
+  export const DAI = "0x0460352b91d7cf42b0e1c1c30f06b602d9ef2238";
+  export const ETH = "0xd8926c12c0b2e5cd40cfda49ecaff40252af491b";
 }
 export namespace XdaiAmm {
-  export const USDC =
-    "0x5c32143c8b198f392d01f8446b754c181224ac26".toLowerCase();
-  export const USDT =
-    "0x3aa637d6853f1d9a9354fe4301ab852a88b237e7".toLowerCase();
-  export const MATIC =
-    "0xaa30d6bba6285d0585722e2440ff89e23ef68864".toLowerCase();
-  export const DAI = "0x24afdca4653042c6d08fb1a754b2535dacf6eb24".toLowerCase();
-  export const ETH = "0x4014dc015641c08788f15bd6eb20da4c47d936d8".toLowerCase();
+  export const USDC = "0x5c32143c8b198f392d01f8446b754c181224ac26";
+  export const USDT = "0x3aa637d6853f1d9a9354fe4301ab852a88b237e7";
+  export const MATIC = "0xaa30d6bba6285d0585722e2440ff89e23ef68864";
+  export const DAI = "0x24afdca4653042c6d08fb1a754b2535dacf6eb24";
+  export const ETH = "0x4014dc015641c08788f15bd6eb20da4c47d936d8";
 }
 
 export namespace XdaiToken {
-  export const USDC =
-    "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83".toLowerCase();
-  export const USDT =
-    "0x4ecaba5870353805a9f068101a40e0f32ed605c6".toLowerCase();
-  export const MATIC =
-    "0x7122d7661c4564b7c6cd4878b06766489a6028a2".toLowerCase();
-  export const DAI = "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d".toLowerCase();
-  export const ETH = "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1".toLowerCase();
+  export const USDC = "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83";
+  export const USDT = "0x4ecaba5870353805a9f068101a40e0f32ed605c6";
+  export const MATIC = "0x7122d7661c4564b7c6cd4878b06766489a6028a2";
+  export const DAI = "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d";
+  export const ETH = "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1";
 }
 
 export namespace XdaiHtoken {
-  export const USDC =
-    "0x9ec9551d4a1a1593b0ee8124d98590cc71b3b09d".toLowerCase();
-  export const USDT =
-    "0x91f8490ec27cbb1b2faedd29c2ec23011d7355fb".toLowerCase();
-  export const MATIC =
-    "0xe38faf9040c7f09958c638bbdb977083722c5156".toLowerCase();
-  export const DAI = "0xb1ea9fed58a317f81eeefc18715dd323fdef45c4".toLowerCase();
-  export const ETH = "0xc46f2004006d4c770346f60a7baa3f1cc67dfd1c".toLowerCase();
+  export const USDC = "0x9ec9551d4a1a1593b0ee8124d98590cc71b3b09d";
+  export const USDT = "0x91f8490ec27cbb1b2faedd29c2ec23011d7355fb";
+  export const MATIC = "0xe38faf9040c7f09958c638bbdb977083722c5156";
+  export const DAI = "0xb1ea9fed58a317f81eeefc18715dd323fdef45c4";
+  export const ETH = "0xc46f2004006d4c770346f60a7baa3f1cc67dfd1c";
 }
 export namespace XdaiRewardToken {
-  export const USDC_A =
-    "0x5d13179c5fa40b87d53ff67ca26245d3d5b2f872".toLowerCase();
-  export const USDC_B =
-    "0x636a7ee78facd079dabc8f81eda1d09aa9d440a7".toLowerCase();
-  export const USDT_A =
-    "0x2c2ab81cf235e86374468b387e241df22459a265".toLowerCase();
-  export const USDT_B =
-    "0x3d4cc8a61c7528fd86c55cfe061a78dcba48edd1".toLowerCase();
-  export const DAI_A =
-    "0x12a3a66720dd925fa93f7c895bc20ca9560adfe7".toLowerCase();
-  export const DAI_B =
-    "0xbf7a02d963b23d84313f07a04ad663409cee5a92".toLowerCase();
-  export const ETH_A =
-    "0xc61ba16e864efbd06a9fe30aab39d18b8f63710a".toLowerCase();
-  export const ETH_B =
-    "0x712f0cf37bdb8299d0666727f73a5caba7c1c24c".toLowerCase();
+  export const USDC_A = "0x5d13179c5fa40b87d53ff67ca26245d3d5b2f872";
+  export const USDC_B = "0x636a7ee78facd079dabc8f81eda1d09aa9d440a7";
+  export const USDT_A = "0x2c2ab81cf235e86374468b387e241df22459a265";
+  export const USDT_B = "0x3d4cc8a61c7528fd86c55cfe061a78dcba48edd1";
+  export const DAI_A = "0x12a3a66720dd925fa93f7c895bc20ca9560adfe7";
+  export const DAI_B = "0xbf7a02d963b23d84313f07a04ad663409cee5a92";
+  export const ETH_A = "0xc61ba16e864efbd06a9fe30aab39d18b8f63710a";
+  export const ETH_B = "0x712f0cf37bdb8299d0666727f73a5caba7c1c24c";
 }
 export namespace MainnetToken {
-  export const USDC =
-    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".toLowerCase();
-  export const USDT =
-    "0xdac17f958d2ee523a2206206994597c13d831ec7".toLowerCase();
-  export const MATIC =
-    "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0".toLowerCase();
-  export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
-  export const ETH = ZERO_ADDRESS.toLowerCase();
-  export const SNX = "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f".toLowerCase();
-  export const sUSD =
-    "0x57ab1ec28d129707052df4df418d58a2d46d5f51".toLowerCase();
-  export const rETH =
-    "0xae78736cd615f374d3085123a210448e74fc6393".toLowerCase();
-  export const MAGIC =
-    "0xb0c7a3ba49c7a6eaba6cd4a96c55a1391070ac9a".toLowerCase();
+  export const USDC = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+  export const USDT = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+  export const MATIC = "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0";
+  export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
+  export const ETH = ZERO_ADDRESS;
+  export const SNX = "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f";
+  export const sUSD = "0x57ab1ec28d129707052df4df418d58a2d46d5f51";
+  export const rETH = "0xae78736cd615f374d3085123a210448e74fc6393";
+  export const MAGIC = "0xb0c7a3ba49c7a6eaba6cd4a96c55a1391070ac9a";
 }
 
 export namespace MainnetBridge {
-  export const USDC =
-    "0x3666f603cc164936c1b87e207f36beba4ac5f18a".toLowerCase();
-  export const USDT =
-    "0x3e4a3a4796d16c0cd582c382691998f7c06420b6".toLowerCase();
-  export const MATIC =
-    "0x22b1cbb8d98a01a3b71d034bb899775a76eb1cc2".toLowerCase();
-  export const DAI = "0x3d4cc8a61c7528fd86c55cfe061a78dcba48edd1".toLowerCase();
-  export const ETH = "0xb8901acb165ed027e32754e0ffe830802919727f".toLowerCase();
-  export const SNX = "0x893246facf345c99e4235e5a7bbee7404c988b96".toLowerCase();
-  export const sUSD =
-    "0x36443fc70e073fe9d50425f82a3ee19fef697d62".toLowerCase();
-  export const rETH =
-    "0x87269b23e73305117d0404557badc459ced0dbec".toLowerCase();
-  export const MAGIC =
-    "0xf074540eb83c86211f305e145eb31743e228e57d".toLowerCase();
+  export const USDC = "0x3666f603cc164936c1b87e207f36beba4ac5f18a";
+  export const USDT = "0x3e4a3a4796d16c0cd582c382691998f7c06420b6";
+  export const MATIC = "0x22b1cbb8d98a01a3b71d034bb899775a76eb1cc2";
+  export const DAI = "0x3d4cc8a61c7528fd86c55cfe061a78dcba48edd1";
+  export const ETH = "0xb8901acb165ed027e32754e0ffe830802919727f";
+  export const SNX = "0x893246facf345c99e4235e5a7bbee7404c988b96";
+  export const sUSD = "0x36443fc70e073fe9d50425f82a3ee19fef697d62";
+  export const rETH = "0x87269b23e73305117d0404557badc459ced0dbec";
+  export const MAGIC = "0xf074540eb83c86211f305e145eb31743e228e57d";
 }
 
 export namespace ArbitrumBridge {
-  export const USDC =
-    "0x0e0e3d2c5c292161999474247956ef542cabf8dd".toLowerCase();
-  export const USDT =
-    "0x72209fe68386b37a40d6bca04f78356fd342491f".toLowerCase();
-  export const DAI = "0x7ac115536fe3a185100b2c4de4cb328bf3a58ba6".toLowerCase();
-  export const ETH = "0x3749c4f034022c39ecaffaba182555d4508caccc".toLowerCase();
-  export const rETH =
-    "0xc315239cfb05f1e130e7e28e603cea4c014c57f0".toLowerCase();
-  export const MAGIC =
-    "0xea5abf2c909169823d939de377ef2bf897a6ce98".toLowerCase();
+  export const USDC = "0x0e0e3d2c5c292161999474247956ef542cabf8dd";
+  export const USDT = "0x72209fe68386b37a40d6bca04f78356fd342491f";
+  export const DAI = "0x7ac115536fe3a185100b2c4de4cb328bf3a58ba6";
+  export const ETH = "0x3749c4f034022c39ecaffaba182555d4508caccc";
+  export const rETH = "0xc315239cfb05f1e130e7e28e603cea4c014c57f0";
+  export const MAGIC = "0xea5abf2c909169823d939de377ef2bf897a6ce98";
 }
 export namespace ArbitrumAmm {
-  export const USDC =
-    "0x10541b07d8ad2647dc6cd67abd4c03575dade261".toLowerCase();
-  export const USDT =
-    "0x18f7402b673ba6fb5ea4b95768aabb8aad7ef18a".toLowerCase();
-  export const DAI = "0xa5a33ab9063395a90ccbea2d86a62eccf27b5742".toLowerCase();
-  export const ETH = "0x652d27c0f72771ce5c76fd400edd61b406ac6d97".toLowerCase();
-  export const rETH =
-    "0x0ded0d521ac7b0d312871d18ea4fde79f03ee7ca".toLowerCase();
-  export const MAGIC =
-    "0x50a3a623d00fd8b8a4f3cbc5aa53d0bc6fa912dd".toLowerCase();
+  export const USDC = "0x10541b07d8ad2647dc6cd67abd4c03575dade261";
+  export const USDT = "0x18f7402b673ba6fb5ea4b95768aabb8aad7ef18a";
+  export const DAI = "0xa5a33ab9063395a90ccbea2d86a62eccf27b5742";
+  export const ETH = "0x652d27c0f72771ce5c76fd400edd61b406ac6d97";
+  export const rETH = "0x0ded0d521ac7b0d312871d18ea4fde79f03ee7ca";
+  export const MAGIC = "0x50a3a623d00fd8b8a4f3cbc5aa53d0bc6fa912dd";
 }
 
 export namespace ArbitrumToken {
-  export const USDC =
-    "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8".toLowerCase();
-  export const USDT =
-    "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9".toLowerCase();
-  export const DAI = "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1".toLowerCase();
-  export const ETH = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase();
-  export const rETH =
-    "0xec70dcb4a1efa46b8f2d97c310c9c4790ba5ffa8".toLowerCase();
-  export const MAGIC =
-    "0x539bde0d7dbd336b79148aa742883198bbf60342".toLowerCase();
+  export const USDC = "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
+  export const USDT = "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9";
+  export const DAI = "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1";
+  export const ETH = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
+  export const rETH = "0xec70dcb4a1efa46b8f2d97c310c9c4790ba5ffa8";
+  export const MAGIC = "0x539bde0d7dbd336b79148aa742883198bbf60342";
 }
 
 export namespace ArbitrumHtoken {
-  export const USDC =
-    "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d".toLowerCase();
-  export const USDT =
-    "0x12e59c59d282d2c00f3166915bed6dc2f5e2b5c7".toLowerCase();
-  export const DAI = "0x46ae9bab8cea96610807a275ebd36f8e916b5c61".toLowerCase();
-  export const ETH = "0xda7c0de432a9346bb6e96ac74e3b61a36d8a77eb".toLowerCase();
-  export const rETH =
-    "0x588bae9c85a605a7f14e551d144279984469423b".toLowerCase();
-  export const MAGIC =
-    "0xc315239cfb05f1e130e7e28e603cea4c014c57f0".toLowerCase();
+  export const USDC = "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d";
+  export const USDT = "0x12e59c59d282d2c00f3166915bed6dc2f5e2b5c7";
+  export const DAI = "0x46ae9bab8cea96610807a275ebd36f8e916b5c61";
+  export const ETH = "0xda7c0de432a9346bb6e96ac74e3b61a36d8a77eb";
+  export const rETH = "0x588bae9c85a605a7f14e551d144279984469423b";
+  export const MAGIC = "0xc315239cfb05f1e130e7e28e603cea4c014c57f0";
 }
 
 export namespace ArbitrumRewardToken {
-  export const USDC =
-    "0xb0cabfe930642ad3e7decdc741884d8c3f7ebc70".toLowerCase();
-  export const USDT =
-    "0x9dd8685463285ad5a94d2c128bda3c5e8a6173c8".toLowerCase();
-  export const DAI = "0xd4d28588ac1d9ef272aa29d4424e3e2a03789d1e".toLowerCase();
-  export const ETH = "0x755569159598f3702bdd7dff6233a317c156d3dd".toLowerCase();
-  export const rETH =
-    "0x3d4cad734b464ed6edcf6254c2a3e5fa5d449b32".toLowerCase();
+  export const USDC = "0xb0cabfe930642ad3e7decdc741884d8c3f7ebc70";
+  export const USDT = "0x9dd8685463285ad5a94d2c128bda3c5e8a6173c8";
+  export const DAI = "0xd4d28588ac1d9ef272aa29d4424e3e2a03789d1e";
+  export const ETH = "0x755569159598f3702bdd7dff6233a317c156d3dd";
+  export const rETH = "0x3d4cad734b464ed6edcf6254c2a3e5fa5d449b32";
 }
 
 export namespace OptimismBridge {
-  export const USDC =
-    "0xa81d244a1814468c734e5b4101f7b9c0c577a8fc".toLowerCase();
-  export const USDT =
-    "0x46ae9bab8cea96610807a275ebd36f8e916b5c61".toLowerCase();
-  export const DAI = "0x7191061d5d4c60f598214cc6913502184baddf18".toLowerCase();
-  export const ETH = "0x83f6244bd87662118d96d9a6d44f09dfff14b30e".toLowerCase();
-  export const SNX = "0x1990bc6dfe2ef605bfc08f5a23564db75642ad73".toLowerCase();
-  export const rETH =
-    "0xa0075e8ce43dcb9970cb7709b9526c1232cc39c2".toLowerCase();
-  export const sUSD =
-    "0x33fe5bb8da466da55a8a32d6ade2bb104e2c5201".toLowerCase();
+  export const USDC = "0xa81d244a1814468c734e5b4101f7b9c0c577a8fc";
+  export const USDT = "0x46ae9bab8cea96610807a275ebd36f8e916b5c61";
+  export const DAI = "0x7191061d5d4c60f598214cc6913502184baddf18";
+  export const ETH = "0x83f6244bd87662118d96d9a6d44f09dfff14b30e";
+  export const SNX = "0x1990bc6dfe2ef605bfc08f5a23564db75642ad73";
+  export const rETH = "0xa0075e8ce43dcb9970cb7709b9526c1232cc39c2";
+  export const sUSD = "0x33fe5bb8da466da55a8a32d6ade2bb104e2c5201";
 }
 export namespace OptimismAmm {
-  export const USDC =
-    "0x3c0ffaca566fccfd9cc95139fef6cba143795963".toLowerCase();
-  export const USDT =
-    "0xec4b41af04cf917b54aeb6df58c0f8d78895b5ef".toLowerCase();
-  export const DAI = "0xf181ed90d6cfac84b8073fdea6d34aa744b41810".toLowerCase();
-  export const ETH = "0xaa30d6bba6285d0585722e2440ff89e23ef68864".toLowerCase();
-  export const rETH =
-    "0x9dd8685463285ad5a94d2c128bda3c5e8a6173c8".toLowerCase();
-  export const sUSD =
-    "0x8d4063e82a4db8cdaed46932e1c71e03ca69bede".toLowerCase();
-  export const SNX = "0x1990bc6dfe2ef605bfc08f5a23564db75642ad73".toLowerCase();
+  export const USDC = "0x3c0ffaca566fccfd9cc95139fef6cba143795963";
+  export const USDT = "0xec4b41af04cf917b54aeb6df58c0f8d78895b5ef";
+  export const DAI = "0xf181ed90d6cfac84b8073fdea6d34aa744b41810";
+  export const ETH = "0xaa30d6bba6285d0585722e2440ff89e23ef68864";
+  export const rETH = "0x9dd8685463285ad5a94d2c128bda3c5e8a6173c8";
+  export const sUSD = "0x8d4063e82a4db8cdaed46932e1c71e03ca69bede";
+  export const SNX = "0x1990bc6dfe2ef605bfc08f5a23564db75642ad73";
 }
 
 export namespace OptimismToken {
-  export const USDC =
-    "0x7f5c764cbc14f9669b88837ca1490cca17c31607".toLowerCase();
-  export const USDT =
-    "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58".toLowerCase();
-  export const DAI = "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1".toLowerCase();
-  export const sUSD =
-    "0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9".toLowerCase();
-  export const ETH = "0x4200000000000000000000000000000000000006".toLowerCase();
-  export const rETH =
-    "0x9bcef72be871e61ed4fbbc7630889bee758eb81d".toLowerCase();
-  export const SNX = "0x8700daec35af8ff88c16bdf0418774cb3d7599b4".toLowerCase();
+  export const USDC = "0x7f5c764cbc14f9669b88837ca1490cca17c31607";
+  export const USDT = "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58";
+  export const DAI = "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1";
+  export const sUSD = "0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9";
+  export const ETH = "0x4200000000000000000000000000000000000006";
+  export const rETH = "0x9bcef72be871e61ed4fbbc7630889bee758eb81d";
+  export const SNX = "0x8700daec35af8ff88c16bdf0418774cb3d7599b4";
 }
 
 export namespace OptimismHtoken {
-  export const USDC =
-    "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8".toLowerCase();
-  export const USDT =
-    "0x2057c8ecb70afd7bee667d76b4cd373a325b1a20".toLowerCase();
-  export const DAI = "0x56900d66d74cb14e3c86895789901c9135c95b16".toLowerCase();
-  export const ETH = "0xe38faf9040c7f09958c638bbdb977083722c5156".toLowerCase();
-  export const SNX = "0x13b7f51bd865410c3acc4d56083c5b56ab38d203".toLowerCase();
-  export const rETH =
-    "0x755569159598f3702bdd7dff6233a317c156d3dd".toLowerCase();
-  export const sUSD =
-    "0x6f03052743cd99ce1b29265e377e320cd24eb632".toLowerCase();
+  export const USDC = "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8";
+  export const USDT = "0x2057c8ecb70afd7bee667d76b4cd373a325b1a20";
+  export const DAI = "0x56900d66d74cb14e3c86895789901c9135c95b16";
+  export const ETH = "0xe38faf9040c7f09958c638bbdb977083722c5156";
+  export const SNX = "0x13b7f51bd865410c3acc4d56083c5b56ab38d203";
+  export const rETH = "0x755569159598f3702bdd7dff6233a317c156d3dd";
+  export const sUSD = "0x6f03052743cd99ce1b29265e377e320cd24eb632";
 }
 
 export namespace OptimismRewardToken {
-  export const USDC =
-    "0xf587b9309c603feedf0445af4d3b21300989e93a".toLowerCase();
-  export const USDT =
-    "0xaeb1b49921e0d2d96fcdbe0d486190b2907b3e0b".toLowerCase();
-  export const DAI = "0x392b9780cfd362bd6951edfa9ebc31e68748b190".toLowerCase();
-  export const ETH = "0x95d6a95becfd98a7032ed0c7d950ff6e0fa8d697".toLowerCase();
-  export const SNX_A =
-    "0x25a5a48c35e75bd2eff53d94f0bb60d5a00e36ea".toLowerCase();
-  export const SNX_B =
-    "0x09992dd7b32f7b35d347de9bdaf1919a57d38e82".toLowerCase();
-  export const rETH =
-    "0x266e2dc3c4c59e42aa07afee5b09e964cffe6778".toLowerCase();
-  export const sUSD_A =
-    "0x2935008ee9943f859c4fbb863c5402ffc06f462e".toLowerCase();
-  export const sUSD_B =
-    "0x25fb92e505f752f730cad0bd4fa17ece4a384266".toLowerCase();
+  export const USDC = "0xf587b9309c603feedf0445af4d3b21300989e93a";
+  export const USDT = "0xaeb1b49921e0d2d96fcdbe0d486190b2907b3e0b";
+  export const DAI = "0x392b9780cfd362bd6951edfa9ebc31e68748b190";
+  export const ETH = "0x95d6a95becfd98a7032ed0c7d950ff6e0fa8d697";
+  export const SNX_A = "0x25a5a48c35e75bd2eff53d94f0bb60d5a00e36ea";
+  export const SNX_B = "0x09992dd7b32f7b35d347de9bdaf1919a57d38e82";
+  export const rETH = "0x266e2dc3c4c59e42aa07afee5b09e964cffe6778";
+  export const sUSD_A = "0x2935008ee9943f859c4fbb863c5402ffc06f462e";
+  export const sUSD_B = "0x25fb92e505f752f730cad0bd4fa17ece4a384266";
 }
 
 export namespace ArbitrumNovaBridge {
-  export const ETH = "0x0e0e3d2c5c292161999474247956ef542cabf8dd".toLowerCase();
-  export const MAGIC =
-    "0x72209fe68386b37a40d6bca04f78356fd342491f".toLowerCase();
+  export const ETH = "0x8796860ca1677bf5d54ce5a348fe4b779a8212f3";
+  export const MAGIC = "0xe638433e2c1df5f7a3a21b0a6b5c4b37278e55dc";
 }
 
 export namespace ArbitrumNovaAmm {
-  export const ETH = "0x0e0e3d2c5c292161999474247956ef542cabf8dd".toLowerCase();
-  export const MAGIC =
-    "0x72209fe68386b37a40d6bca04f78356fd342491f".toLowerCase();
+  export const ETH = "0xd6bfb71b5ad5fd378cac15c72d8652e3b8d542c4";
+  export const MAGIC = "0x40c8fdff725b20862e22953affa0bbaf42d4b467";
 }
 
 export namespace ArbitrumNovaToken {
-  export const ETH = "0x0e0e3d2c5c292161999474247956ef542cabf8dd".toLowerCase();
-  export const MAGIC =
-    "0x72209fe68386b37a40d6bca04f78356fd342491f".toLowerCase();
+  export const ETH = "0x722e8bdd2ce80a4422e880164f2079488e115365";
+  export const MAGIC = "0xe8936ac97a85d708d5312d52c30c18d4533b8a9c";
 }
 
 export namespace ArbitrumNovaHtoken {
-  export const ETH = "0x0e0e3d2c5c292161999474247956ef542cabf8dd".toLowerCase();
-  export const MAGIC =
-    "0x72209fe68386b37a40d6bca04f78356fd342491f".toLowerCase();
+  export const ETH = "0xba9d3040e79ec1e27c67fe8b184f552fe9398f07";
+  export const MAGIC = "0xe3b4a0a9904d75a0334893989d06814ad969d80f";
 }
 
 export namespace PolygonBridge {
-  export const USDC =
-    "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8".toLowerCase();
-  export const USDT =
-    "0x6c9a1acf73bd85463a46b0afc076fbdf602b690b".toLowerCase();
-  export const DAI = "0xecf268be00308980b5b3fcd0975d47c4c8e1382a".toLowerCase();
-  export const ETH = "0xb98454270065a31d71bf635f6f7ee6a518dfb849".toLowerCase();
-  export const MATIC =
-    "0x553bc791d746767166fa3888432038193ceed5e2".toLowerCase();
+  export const USDC = "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8";
+  export const USDT = "0x6c9a1acf73bd85463a46b0afc076fbdf602b690b";
+  export const DAI = "0xecf268be00308980b5b3fcd0975d47c4c8e1382a";
+  export const ETH = "0xb98454270065a31d71bf635f6f7ee6a518dfb849";
+  export const MATIC = "0x553bc791d746767166fa3888432038193ceed5e2";
 }
 export namespace PolygonAmm {
-  export const USDC =
-    "0x5c32143c8b198f392d01f8446b754c181224ac26".toLowerCase();
-  export const USDT =
-    "0xb2f7d27b21a69a033f85c42d5eb079043baadc81".toLowerCase();
-  export const DAI = "0x25fb92e505f752f730cad0bd4fa17ece4a384266".toLowerCase();
-  export const ETH = "0x266e2dc3c4c59e42aa07afee5b09e964cffe6778".toLowerCase();
-  export const MATIC =
-    "0x3d4cc8a61c7528fd86c55cfe061a78dcba48edd1".toLowerCase();
+  export const USDC = "0x5c32143c8b198f392d01f8446b754c181224ac26";
+  export const USDT = "0xb2f7d27b21a69a033f85c42d5eb079043baadc81";
+  export const DAI = "0x25fb92e505f752f730cad0bd4fa17ece4a384266";
+  export const ETH = "0x266e2dc3c4c59e42aa07afee5b09e964cffe6778";
+  export const MATIC = "0x3d4cc8a61c7528fd86c55cfe061a78dcba48edd1";
 }
 
 export namespace PolygonToken {
-  export const USDC =
-    "0x2791bca1f2de4661ed88a30c99a7a9449aa84174".toLowerCase();
-  export const USDT =
-    "0xc2132d05d31c914a87c6611c10748aeb04b58e8f".toLowerCase();
-  export const DAI = "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063".toLowerCase();
-  export const ETH = "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619".toLowerCase();
-  export const MATIC =
-    "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270".toLowerCase();
+  export const USDC = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174";
+  export const USDT = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
+  export const DAI = "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063";
+  export const ETH = "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619";
+  export const MATIC = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
 }
 
 export namespace PolygonHtoken {
-  export const USDC =
-    "0x9ec9551d4a1a1593b0ee8124d98590cc71b3b09d".toLowerCase();
-  export const USDT =
-    "0x9f93aca246f457916e49ec923b8ed099e313f763".toLowerCase();
-  export const DAI = "0xb8901acb165ed027e32754e0ffe830802919727f".toLowerCase();
-  export const ETH = "0x1fdeaf938267ca43388ed1fdb879eaf91e920c7a".toLowerCase();
-  export const MATIC =
-    "0x712f0cf37bdb8299d0666727f73a5caba7c1c24c".toLowerCase();
+  export const USDC = "0x9ec9551d4a1a1593b0ee8124d98590cc71b3b09d";
+  export const USDT = "0x9f93aca246f457916e49ec923b8ed099e313f763";
+  export const DAI = "0xb8901acb165ed027e32754e0ffe830802919727f";
+  export const ETH = "0x1fdeaf938267ca43388ed1fdb879eaf91e920c7a";
+  export const MATIC = "0x712f0cf37bdb8299d0666727f73a5caba7c1c24c";
 }
 export namespace PolygonRewardToken {
-  export const USDC =
-    "0x7811737716942967ae6567b26a5051cc72af550e".toLowerCase();
-  export const USDT =
-    "0x297e5079df8173ae1696899d3eacd708f0af82ce".toLowerCase();
-  export const DAI = "0xd6dc6f69f81537fe9decc18152b7005b45dc2ee7".toLowerCase();
-  export const ETH = "0xaa7b3a4a084e6461d486e53a03cf45004f0963b7".toLowerCase();
+  export const USDC = "0x7811737716942967ae6567b26a5051cc72af550e";
+  export const USDT = "0x297e5079df8173ae1696899d3eacd708f0af82ce";
+  export const DAI = "0xd6dc6f69f81537fe9decc18152b7005b45dc2ee7";
+  export const ETH = "0xaa7b3a4a084e6461d486e53a03cf45004f0963b7";
 }
 
 export const priceTokens = [
@@ -605,11 +513,11 @@ export const priceTokens = [
 ];
 
 export const MESSENGER_ADDRESSES = [
-  "0x25ace71c97b33cc4729cf772ae268934f7ab5fa1".toLowerCase(), //OPTIMISM_L1
-  "0x4200000000000000000000000000000000000007".toLowerCase(), //OPTIMISM_L2
-  "0x4c36d2919e407f0cc2ee3c993ccf8ac26d9ce64e".toLowerCase(), //XDAI_L1
-  "0x75df5af045d91108662d8080fd1fefad6aa0bb59".toLowerCase(), //XDAI_L2
-  "0x4dbd4fc535ac27206064b68ffcf827b0a60bab3f".toLowerCase(), //ARBITRUM_L1
+  "0x25ace71c97b33cc4729cf772ae268934f7ab5fa1", //OPTIMISM_L1
+  "0x4200000000000000000000000000000000000007", //OPTIMISM_L2
+  "0x4c36d2919e407f0cc2ee3c993ccf8ac26d9ce64e", //XDAI_L1
+  "0x75df5af045d91108662d8080fd1fefad6aa0bb59", //XDAI_L2
+  "0x4dbd4fc535ac27206064b68ffcf827b0a60bab3f", //ARBITRUM_L1
 ];
 export const OPTIMISM_GENESIS_HASHES = [
   "0x9168732d683634ce7155a8f6cbc6a1798582ccfa830a4351939d7343cbef675f", //ETH
@@ -643,13 +551,11 @@ export const MESSENGER_EVENT_SIGNATURES = [
   XDAI_L2_SIGNATURE,
 ];
 export namespace RewardTokens {
-  export const HOP = "0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc".toLowerCase();
-  export const OP = "0x4200000000000000000000000000000000000042".toLowerCase();
-  export const GNO = "0x9c58bacc331c9aa871afd802db6379a98e80cedb".toLowerCase();
-  export const rETH_OP =
-    "0xc81d1f0eb955b0c020e5d5b264e1ff72c14d1401".toLowerCase();
-  export const rETH_ARB =
-    "0xb766039cc6db368759c1e56b79affe831d0cc507".toLowerCase();
+  export const HOP = "0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc";
+  export const OP = "0x4200000000000000000000000000000000000042";
+  export const GNO = "0x9c58bacc331c9aa871afd802db6379a98e80cedb";
+  export const rETH_OP = "0xc81d1f0eb955b0c020e5d5b264e1ff72c14d1401";
+  export const rETH_ARB = "0xb766039cc6db368759c1e56b79affe831d0cc507";
 }
 export const GNO_REWARDS = [
   XdaiRewardToken.DAI_A,

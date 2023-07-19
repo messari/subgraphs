@@ -119,6 +119,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.rETH) return [MainnetToken.rETH];
     else if (bridgeAddress == MainnetBridge.sUSD) return [MainnetToken.sUSD];
     else if (bridgeAddress == MainnetBridge.MATIC) return [MainnetToken.MATIC];
+    else if (bridgeAddress == MainnetBridge.MAGIC) return [MainnetToken.MAGIC];
     else {
       log.critical("Token not found", []);
       return [""];
@@ -131,6 +132,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.USDT) return ArbitrumAmm.USDT;
     else if (bridgeAddress == MainnetBridge.ETH) return ArbitrumAmm.ETH;
     else if (bridgeAddress == MainnetBridge.rETH) return ArbitrumAmm.rETH;
+    else if (bridgeAddress == MainnetBridge.MAGIC) return ArbitrumAmm.MAGIC;
     else {
       log.critical("Token not found", []);
 

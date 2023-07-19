@@ -297,13 +297,23 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     return [ArbitrumToken.USDT, ArbitrumHtoken.USDT];
   }
   getEthTokens(): string[] {
-    return [ArbitrumToken.ETH, ArbitrumHtoken.ETH];
+    return [
+      ArbitrumToken.ETH,
+      ArbitrumHtoken.ETH,
+      ArbitrumNovaToken.ETH,
+      ArbitrumNovaHtoken.ETH,
+    ];
   }
   getRethTokens(): string[] {
     return [ArbitrumToken.rETH, ArbitrumHtoken.rETH];
   }
   getMagicTokens(): string[] {
-    return [ArbitrumToken.MAGIC, ArbitrumHtoken.MAGIC];
+    return [
+      ArbitrumToken.MAGIC,
+      ArbitrumHtoken.MAGIC,
+      ArbitrumNovaToken.MAGIC,
+      ArbitrumHtoken.MAGIC,
+    ];
   }
   getRethPools(): string[] {
     return [];
