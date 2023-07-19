@@ -5189,7 +5189,6 @@
       }
     }
   },
-
   "vvs-finance": {
     "schema": "dex-amm",
     "base": "uniswap-forks",
