@@ -1,6 +1,7 @@
-import { Configurations } from "../common/types";
+/* eslint-disable @typescript-eslint/no-magic-numbers, @typescript-eslint/no-unused-vars */
 import * as constants from "../common/constants";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "default";
 
@@ -8,24 +9,23 @@ export const NETWORK_STRING = "default";
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract();
+export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
+export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
+export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
-
-export const CURVE_REGISTRY_ADDRESSES: Address[] = [];
+export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [];
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
@@ -43,6 +43,26 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 export const HARDCODED_STABLES: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
+///////////////////////// ORACLE CONFIG OVERRIDES /////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+class someOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+    ];
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
@@ -57,51 +77,51 @@ export class config implements Configurations {
     return NETWORK_STRING;
   }
 
-  yearnLens(): Address {
+  yearnLens(): OracleContract {
     return YEARN_LENS_CONTRACT_ADDRESS;
   }
-  chainLink(): Address {
+  chainLink(): OracleContract {
     return CHAIN_LINK_CONTRACT_ADDRESS;
   }
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
 
-  aaveOracle(): Address {
+  aaveOracle(): OracleContract {
     return AAVE_ORACLE_CONTRACT_ADDRESS;
   }
   aaveOracleBlacklist(): Address[] {
     return AAVE_ORACLE_BLACKLIST;
   }
 
-  curveCalculations(): Address {
+  curveCalculations(): OracleContract {
     return CURVE_CALCULATIONS_ADDRESS;
   }
   curveCalculationsBlacklist(): Address[] {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
-  sushiCalculations(): Address {
+  sushiCalculations(): OracleContract {
     return SUSHISWAP_CALCULATIONS_ADDRESS;
   }
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
 
-  uniswapForks(): Address[] {
+  uniswapForks(): OracleContract[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;
   }
-  curveRegistry(): Address[] {
+  curveRegistry(): OracleContract[] {
     return CURVE_REGISTRY_ADDRESSES;
   }
 
   hardcodedStables(): Address[] {
     return HARDCODED_STABLES;
   }
+
   ignoreList(): Address[] {
     return [];
   }
-
   ethAddress(): Address {
     return ETH_ADDRESS;
   }
@@ -114,5 +134,12 @@ export class config implements Configurations {
 
   usdcTokenDecimals(): BigInt {
     return USDC_TOKEN_DECIMALS;
+  }
+
+  getOracleOverride(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null
+  ): OracleConfig | null {
+    return new someOverride();
   }
 }

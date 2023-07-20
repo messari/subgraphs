@@ -3,7 +3,7 @@ import * as constants from "../common/constants";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
-export const NETWORK_STRING = "moonbeam";
+export const NETWORK_STRING = "cronos";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -20,16 +20,14 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
-export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xc2b1df84112619d190193e48148000e3990bf627", 1452049),
-];
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x445fe580ef8d70ff569ab36e80c647af338db351", 503734), // SushiSwap
+  new OracleContract("0x145863eb42cf62847a6ca784e6416c1682b1b2ae", 5247), // VVS Finance
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -54,13 +52,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xfa9343c3897324496a05fc75abed6bac29f8a40f"
+  "0xe44fd7fcb2b1581822d0c862b68222998a0c299a"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xacc15dc74880c9944775448304b263d191c6077f"
+  "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23" // Wrapped CRO (WCRO)
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b"
+  "0xc21223249ca28397b4b6541dffaecc539bff0c59"
 );
 
 export class config implements Configurations {

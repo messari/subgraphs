@@ -3,7 +3,7 @@ import * as constants from "../common/constants";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
-export const NETWORK_STRING = "moonbeam";
+export const NETWORK_STRING = "fuse";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -20,16 +20,15 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
-export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xc2b1df84112619d190193e48148000e3990bf627", 1452049),
-];
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x445fe580ef8d70ff569ab36e80c647af338db351", 503734), // SushiSwap
+  new OracleContract("0xe3f85aad0c8dd7337427b9df5d0fb741d65eeeb5", 15645719), // Voltage Finance
+  new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 12936314), // Sushiswap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -54,13 +53,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xfa9343c3897324496a05fc75abed6bac29f8a40f"
+  "0xa722c13135930332eb3d749b2f0906559d2c5b99"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xacc15dc74880c9944775448304b263d191c6077f"
+  "0x0be9e53fd7edac9f859882afdda116645287c629" // Wrapped Fuse (WFUSE)
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b"
+  "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5"
 );
 
 export class config implements Configurations {
