@@ -357,7 +357,7 @@ export function handleCollectPerformanceFee(
     false
   );
   const performanceFeeUSD = utils
-    .bigIntToBigDecimal(performanceFee, 6)
+    .bigIntToBigDecimal(performanceFee, constants.INT_SIX)
     .times(usdcToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
