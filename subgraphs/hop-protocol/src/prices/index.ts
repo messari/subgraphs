@@ -65,32 +65,21 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
     return new CustomPriceType();
   }
+
   if (tokenAddr == Address.fromString(PolygonHtoken.MATIC)) {
     tokenAddr = Address.fromString(PolygonToken.MATIC);
   }
-  if (
-    tokenAddr.toHexString() == PolygonHtoken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
-  ) {
+  if (tokenAddr.toHexString() == PolygonHtoken.ETH) {
     tokenAddr = Address.fromString(PolygonToken.ETH);
   }
-  if (
-    tokenAddr.toHexString() == OptimismHtoken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
-  ) {
+  if (tokenAddr.toHexString() == OptimismHtoken.ETH) {
     tokenAddr = Address.fromString(OptimismToken.ETH);
   }
   if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
     tokenAddr = Address.fromString(OptimismToken.SNX);
   }
 
-  if (
-    tokenAddr.toHexString() == XdaiHtoken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
-  ) {
+  if (tokenAddr.toHexString() == XdaiHtoken.ETH) {
     tokenAddr = Address.fromString(XdaiToken.ETH);
   }
 
@@ -98,11 +87,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     tokenAddr = Address.fromString(XdaiToken.MATIC);
   }
 
-  if (
-    tokenAddr.toHexString() == ArbitrumHtoken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
-  ) {
+  if (tokenAddr.toHexString() == ArbitrumHtoken.ETH) {
     tokenAddr = Address.fromString(ArbitrumToken.ETH);
   }
 
@@ -306,7 +291,9 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   // 8. uniswapV2
   if (
     tokenAddr.toHexString() == XdaiToken.ETH ||
-    tokenAddr.toHexString() == XdaiHtoken.ETH
+    tokenAddr.toHexString() == XdaiHtoken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
+    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
   ) {
     tokenAddr = Address.fromString(XdaiToken.ETH);
 

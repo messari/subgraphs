@@ -182,179 +182,86 @@ export function handleTransferSent(event: TransferSent): void {
   const inputTokenTwo = NetworkConfigs.getTokenAddressFromBridgeAddress(
     event.address.toHexString()
   )[1];
+  const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
+    event.address.toHexString()
+  );
 
-  if (event.params.chainId.toString() == "42170") {
-    const arbitrumNovaConfig =
-      NetworkConfigs.getArbitrumNovaConfigFromTokenAddress(inputTokenOne);
+  const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
+  log.warning("S1 - inputToken: {},  poolAddress: {}", [
+    inputTokenOne,
+    poolAddress,
+  ]);
+  const poolName = poolConfig[0];
+  const poolSymbol = poolConfig[1];
+  const hPoolName = poolConfig[2];
 
-    const novaInputTokenOne = arbitrumNovaConfig[0];
-    const novaInputTokenTwo = arbitrumNovaConfig[1];
-    const poolSymbol = arbitrumNovaConfig[2];
-    const poolName = arbitrumNovaConfig[3];
-    const hPoolName = arbitrumNovaConfig[4];
-    const poolAddress = arbitrumNovaConfig[5];
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
 
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
+  const tokenOne = sdk.Tokens.getOrCreateToken(
+    Address.fromString(inputTokenOne)
+  );
+  const tokenTwo = sdk.Tokens.getOrCreateToken(
+    Address.fromString(inputTokenTwo)
+  );
+  const acc = sdk.Accounts.loadAccount(event.params.recipient);
+  const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress));
 
-    const tokenOne = sdk.Tokens.getOrCreateToken(
-      Address.fromString(novaInputTokenOne)
-    );
-    const tokenTwo = sdk.Tokens.getOrCreateToken(
-      Address.fromString(novaInputTokenTwo)
-    );
-    const acc = sdk.Accounts.loadAccount(event.params.recipient);
-    const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress));
-
-    const hPool = sdk.Pools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(
-        hPoolName,
-        poolSymbol,
-        BridgePoolType.LIQUIDITY,
-        tokenTwo
-      );
-    }
-
-    log.warning("S2 - inputToken: {},  poolAddress: {}", [
-      inputTokenOne,
-      poolAddress,
-    ]);
-
-    pool.pool.relation = hPool.getBytesID();
-    hPool.pool.relation = hPool.getBytesID();
-
-    const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-      event.params.chainId,
-      Address.fromString(
-        NetworkConfigs.getCrossTokenAddress(
-          event.params.chainId.toString(),
-          inputTokenOne
-        )
-      ),
-      CrosschainTokenType.CANONICAL,
-      Address.fromString(inputTokenOne)
-    );
-    log.warning("S3 - inputToken: {},  poolAddress: {}", [
-      inputTokenOne,
-      poolAddress,
-    ]);
-    pool.addDestinationToken(crossToken);
-    acc.transferOut(
-      pool,
-      pool.getDestinationTokenRoute(crossToken)!,
-      event.params.recipient,
-      event.params.amount,
-      event.transaction.hash
-    );
-
-    const receipt = event.receipt;
-
-    if (!receipt) return;
-    updateL2OutgoingBridgeMessage(
-      event,
-      event.params.recipient,
-      event.params.chainId,
-      acc,
-      receipt
-    );
-  } else {
-    const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
-      event.address.toHexString()
-    );
-
-    const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-    log.warning("S1 - inputToken: {},  poolAddress: {}", [
-      inputTokenOne,
-      poolAddress,
-    ]);
-    const poolName = poolConfig[0];
-    const poolSymbol = poolConfig[1];
-    const hPoolName = poolConfig[2];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-
-    const tokenOne = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenOne)
-    );
-    const tokenTwo = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenTwo)
-    );
-    const acc = sdk.Accounts.loadAccount(event.params.recipient);
-    const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress));
-
-    const hPool = sdk.Pools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(
-        hPoolName,
-        poolSymbol,
-        BridgePoolType.LIQUIDITY,
-        tokenTwo
-      );
-    }
-
-    log.warning("S2 - inputToken: {},  poolAddress: {}", [
-      inputTokenOne,
-      poolAddress,
-    ]);
-
-    pool.pool.relation = hPool.getBytesID();
-    hPool.pool.relation = hPool.getBytesID();
-
-    const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-      event.params.chainId,
-      Address.fromString(
-        NetworkConfigs.getCrossTokenAddress(
-          event.params.chainId.toString(),
-          inputTokenOne
-        )
-      ),
-      CrosschainTokenType.CANONICAL,
-      Address.fromString(inputTokenOne)
-    );
-    log.warning("S3 - inputToken: {},  poolAddress: {}", [
-      inputTokenOne,
-      poolAddress,
-    ]);
-    pool.addDestinationToken(crossToken);
-    acc.transferOut(
-      pool,
-      pool.getDestinationTokenRoute(crossToken)!,
-      event.params.recipient,
-      event.params.amount,
-      event.transaction.hash
-    );
-
-    const receipt = event.receipt;
-
-    if (!receipt) return;
-    updateL2OutgoingBridgeMessage(
-      event,
-      event.params.recipient,
-      event.params.chainId,
-      acc,
-      receipt
-    );
+  const hPool = sdk.Pools.loadPool<string>(
+    Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+  );
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne);
   }
+
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo);
+  }
+
+  log.warning("S2 - inputToken: {},  poolAddress: {}", [
+    inputTokenOne,
+    poolAddress,
+  ]);
+
+  pool.pool.relation = hPool.getBytesID();
+  hPool.pool.relation = hPool.getBytesID();
+
+  const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+    event.params.chainId,
+    Address.fromString(
+      NetworkConfigs.getCrossTokenAddress(
+        event.params.chainId.toString(),
+        inputTokenOne
+      )
+    ),
+    CrosschainTokenType.CANONICAL,
+    Address.fromString(inputTokenOne)
+  );
+  log.warning("S3 - inputToken: {},  poolAddress: {}", [
+    inputTokenOne,
+    poolAddress,
+  ]);
+  pool.addDestinationToken(crossToken);
+  acc.transferOut(
+    pool,
+    pool.getDestinationTokenRoute(crossToken)!,
+    event.params.recipient,
+    event.params.amount,
+    event.transaction.hash
+  );
+
+  const receipt = event.receipt;
+
+  if (!receipt) return;
+  updateL2OutgoingBridgeMessage(
+    event,
+    event.params.recipient,
+    event.params.chainId,
+    acc,
+    receipt
+  );
 }

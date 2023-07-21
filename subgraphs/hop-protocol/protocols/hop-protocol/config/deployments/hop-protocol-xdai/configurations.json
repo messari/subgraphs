@@ -4,7 +4,7 @@
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
   "graftEnabled": true,
-  "subgraphId": "Qmcq1VQechvwxJpnVkQg9LuW3hDJRjFmtAS7aF9aeGDAgW",
+  "subgraphId": "QmPFJhkC1S3assspxHkzuQTuonZJuGDQ43wsoUKofcoAkg",
   "graftStartBlock": 25850672,
   "amms": [
     {

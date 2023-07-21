@@ -288,7 +288,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     return [PolygonToken.MATIC, XdaiToken.MATIC, MainnetToken.MATIC];
   }
   getMagicTokens(): string[] {
-    return [ArbitrumToken.MAGIC, ArbitrumNovaToken.MAGIC];
+    return [MainnetToken.MAGIC, ArbitrumToken.MAGIC, ArbitrumNovaToken.MAGIC];
   }
   getMagicPools(): string[] {
     return [ArbitrumAmm.MAGIC, ArbitrumNovaAmm.MAGIC];
@@ -313,12 +313,17 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   }
 
   getTokenAddressFromPoolAddress(poolAddress: string): string[] {
+    //this function is only implemented but never used
     return [poolAddress];
   }
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
+    //this function is only implemented but never used
+
     return tokenAddress;
   }
   getPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    //this function is only implemented but never used
+
     return bridgeAddress;
   }
 
