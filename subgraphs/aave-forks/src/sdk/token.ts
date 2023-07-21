@@ -85,7 +85,7 @@ export class TokenManager {
   }
 
   // convert token amount to USD value
-  _getAmountUSD(amount: BigInt): BigDecimal {
+  getAmountUSD(amount: BigInt): BigDecimal {
     return amount
       .toBigDecimal()
       .div(exponentToBigDecimal(this.getDecimals()))

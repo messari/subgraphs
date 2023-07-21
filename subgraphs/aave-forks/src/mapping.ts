@@ -675,7 +675,7 @@ export function _handleReserveDataUpdated(
       ) {
         emission = BIGINT_ZERO;
       }
-      const emissionUSD = rewardTokenManager._getAmountUSD(emission);
+      const emissionUSD = rewardTokenManager.getAmountUSD(emission);
       const rewardData = new RewardData(rewardToken, emission, emissionUSD);
       manager.updateRewards(rewardData);
     }
@@ -703,7 +703,7 @@ export function _handleDeposit(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager._getAmountUSD(amount);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createDeposit(
     asset,
@@ -772,7 +772,7 @@ export function _handleWithdraw(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager._getAmountUSD(amount);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createWithdraw(
     asset,
@@ -806,7 +806,7 @@ export function _handleBorrow(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager._getAmountUSD(amount);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   manager.createBorrow(
@@ -842,7 +842,7 @@ export function _handleRepay(
     protocolData
   );
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
-  const amountUSD = tokenManager._getAmountUSD(amount);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   // use debtToken Transfer event for Burn/Mint to determine interestRateType of the Repay event
@@ -1049,8 +1049,8 @@ export function _handleFlashLoan(
     procotolData
   );
   const tokenManager = new TokenManager(asset, event);
-  const amountUSD = tokenManager._getAmountUSD(amount);
-  const premiumUSDTotal = tokenManager._getAmountUSD(premiumAmount);
+  const amountUSD = tokenManager.getAmountUSD(amount);
+  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
   const flashloan = manager.createFlashloan(asset, account, amount, amountUSD);
   flashloan.feeAmount = premiumAmount;
   flashloan.feeAmountUSD = premiumUSDTotal;
@@ -1202,7 +1202,7 @@ export function _handleTransfer(
     interestRateType = null;
   }
 
-  const amountUSD = tokenManager._getAmountUSD(amount);
+  const amountUSD = tokenManager.getAmountUSD(amount);
   const manager = new DataManager(
     market.id,
     market.inputToken,
@@ -1293,7 +1293,7 @@ export function _handleAssetConfigUpdated(
     rewardTokenManager.updatePrice(rewardTokenPriceUSD);
   }
 
-  const emissionUSD = rewardTokenManager._getAmountUSD(emission);
+  const emissionUSD = rewardTokenManager.getAmountUSD(emission);
   const rewardData = new RewardData(rewardToken, emission, emissionUSD);
   manager.updateRewards(rewardData);
 }
