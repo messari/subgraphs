@@ -356,8 +356,6 @@ export class HopProtocolOptimismConfigurations implements Configurations {
   }
 
   getMaticPools(): string[] {
-    //this function is only implemented, because it shares the same Interface with the other configs.
-    // It is not used here
     return [];
   }
   getMaticTokens(): string[] {

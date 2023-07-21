@@ -313,17 +313,12 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   }
 
   getTokenAddressFromPoolAddress(poolAddress: string): string[] {
-    //this function is only implemented but never used
     return [poolAddress];
   }
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
-    //this function is only implemented but never used
-
     return tokenAddress;
   }
   getPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-    //this function is only implemented but never used
-
     return bridgeAddress;
   }
 
