@@ -134,231 +134,220 @@ export function handleTokenSwap(event: TokenSwap): void {
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
-  if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-    const amount = event.params.tokenAmounts;
-    if (amount.length == 0) {
-      return;
-    }
-    const liquidity = amount[0].plus(amount[1]);
+  if (!NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
+    log.error("Missing Config", []);
+    return;
+  }
+  const amount = event.params.tokenAmounts;
+  if (amount.length == 0) {
+    return;
+  }
+  const liquidity = amount[0].plus(amount[1]);
 
-    const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[0];
+  const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  )[0];
 
-    const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[1];
+  const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  )[1];
 
-    const poolConfig = NetworkConfigs.getPoolDetails(
-      event.address.toHexString()
-    );
+  const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
 
-    const poolName = poolConfig[1];
-    const hPoolName = poolConfig[2];
-    const poolSymbol = poolConfig[0];
+  const poolName = poolConfig[1];
+  const hPoolName = poolConfig[2];
+  const poolSymbol = poolConfig[0];
 
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
 
-    const pool = sdk.Pools.loadPool<string>(event.address);
-    const token = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenOne)
-    );
-    const hToken = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenTwo)
-    );
-    const acc = sdk.Accounts.loadAccount(event.params.provider);
-    const hPool = sdk.Pools.loadPool<string>(
-      Bytes.fromHexString(event.address.toHexString().concat("-").concat("1"))
-    );
+  const pool = sdk.Pools.loadPool<string>(event.address);
+  const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputTokenOne));
+  const hToken = sdk.Tokens.getOrCreateToken(Address.fromString(inputTokenTwo));
+  const acc = sdk.Accounts.loadAccount(event.params.provider);
+  const hPool = sdk.Pools.loadPool<string>(
+    Bytes.fromHexString(event.address.toHexString().concat("-").concat("1"))
+  );
 
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
-    }
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
+  }
 
-    if (
-      event.transaction.hash.toHexString() ==
-      "0xb164734917a3ab5987544d99f6a5875a95bbb30d57c30dfec8db8d13789490ee"
-    ) {
-      pool.pool._inputTokenLiquidityBalance = event.params.lpTokenSupply.div(
-        BIGINT_TEN_TO_EIGHTEENTH
-      );
-    }
-
-    pool.setOutputTokenSupply(event.params.lpTokenSupply);
-    hPool.setOutputTokenSupply(event.params.lpTokenSupply);
-
-    acc.liquidityDeposit(pool, liquidity);
-
-    pool.pool.relation = hPool.getBytesID();
-    hPool.pool.relation = hPool.getBytesID();
-
-    updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
-
-    log.warning(
-      `LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
-      [
-        bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
-        bigIntToBigDecimal(liquidity, 6).toString(),
-        event.transaction.hash.toHexString(),
-        bigIntToBigDecimal(event.params.fees[0], 6).toString(),
-      ]
+  if (
+    event.transaction.hash.toHexString() ==
+    "0xb164734917a3ab5987544d99f6a5875a95bbb30d57c30dfec8db8d13789490ee"
+  ) {
+    pool.pool._inputTokenLiquidityBalance = event.params.lpTokenSupply.div(
+      BIGINT_TEN_TO_EIGHTEENTH
     );
   }
+
+  pool.setOutputTokenSupply(event.params.lpTokenSupply);
+  hPool.setOutputTokenSupply(event.params.lpTokenSupply);
+
+  acc.liquidityDeposit(pool, liquidity);
+
+  pool.pool.relation = hPool.getBytesID();
+  hPool.pool.relation = hPool.getBytesID();
+
+  updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
+
+  log.warning(
+    `LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
+    [
+      bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
+      bigIntToBigDecimal(liquidity, 6).toString(),
+      event.transaction.hash.toHexString(),
+      bigIntToBigDecimal(event.params.fees[0], 6).toString(),
+    ]
+  );
 }
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
-  if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-    const amount = event.params.tokenAmounts;
-    if (amount.length == 0) {
-      return;
-    }
-
-    const liquidity = amount[0].plus(amount[1]);
-
-    const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[0];
-    const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[1];
-    const poolConfig = NetworkConfigs.getPoolDetails(
-      event.address.toHexString()
-    );
-
-    const poolName = poolConfig[1];
-    const poolSymbol = poolConfig[0];
-    const hPoolName = poolConfig[2];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-
-    const pool = sdk.Pools.loadPool<string>(event.address);
-    const token = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenOne)
-    );
-    const hToken = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenTwo)
-    );
-    const acc = sdk.Accounts.loadAccount(event.params.provider);
-    const hPool = sdk.Pools.loadPool<string>(
-      Bytes.fromHexString(
-        event.address.toHexString().toLowerCase().concat("-").concat("1")
-      )
-    );
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
-    }
-
-    pool.setOutputTokenSupply(event.params.lpTokenSupply);
-    hPool.setOutputTokenSupply(event.params.lpTokenSupply);
-
-    acc.liquidityWithdraw(pool, liquidity);
-
-    updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
-
-    pool.pool.relation = hPool.getBytesID();
-    hPool.pool.relation = hPool.getBytesID();
-
-    log.warning(
-      "LWITH lpTokenSupply: {}, amount6-0: {}, amount18-0: {}, amount6-1: {}, amount18-1: {}, hash: {}",
-      [
-        bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
-        bigIntToBigDecimal(amount[0], 6).toString(),
-        bigIntToBigDecimal(amount[0]).toString(),
-        bigIntToBigDecimal(amount[1], 6).toString(),
-        bigIntToBigDecimal(amount[1]).toString(),
-        event.transaction.hash.toHexString(),
-      ]
-    );
+  if (!NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
+    log.error("Missing Config", []);
+    return;
   }
+  const amount = event.params.tokenAmounts;
+  if (amount.length == 0) {
+    return;
+  }
+
+  const liquidity = amount[0].plus(amount[1]);
+
+  const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  )[0];
+  const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  )[1];
+  const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
+
+  const poolName = poolConfig[1];
+  const poolSymbol = poolConfig[0];
+  const hPoolName = poolConfig[2];
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const pool = sdk.Pools.loadPool<string>(event.address);
+  const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputTokenOne));
+  const hToken = sdk.Tokens.getOrCreateToken(Address.fromString(inputTokenTwo));
+  const acc = sdk.Accounts.loadAccount(event.params.provider);
+  const hPool = sdk.Pools.loadPool<string>(
+    Bytes.fromHexString(
+      event.address.toHexString().toLowerCase().concat("-").concat("1")
+    )
+  );
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
+  }
+
+  pool.setOutputTokenSupply(event.params.lpTokenSupply);
+  hPool.setOutputTokenSupply(event.params.lpTokenSupply);
+
+  acc.liquidityWithdraw(pool, liquidity);
+
+  updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
+
+  pool.pool.relation = hPool.getBytesID();
+  hPool.pool.relation = hPool.getBytesID();
+
+  log.warning(
+    "LWITH lpTokenSupply: {}, amount6-0: {}, amount18-0: {}, amount6-1: {}, amount18-1: {}, hash: {}",
+    [
+      bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
+      bigIntToBigDecimal(amount[0], 6).toString(),
+      bigIntToBigDecimal(amount[0]).toString(),
+      bigIntToBigDecimal(amount[1], 6).toString(),
+      bigIntToBigDecimal(amount[1]).toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 }
+
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
-  if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-    log.warning("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
-      event.params.lpTokenSupply.toString(),
-      event.transaction.hash.toHexString(),
-      bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
-    ]);
-
-    const tokenIndex = event.params.boughtId;
-    if (!tokenIndex.equals(BigInt.zero())) {
-      return;
-    }
-
-    const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[0];
-
-    const amount = event.params.lpTokenAmount.div(BigInt.fromI32(2));
-
-    const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[1];
-
-    const poolConfig = NetworkConfigs.getPoolDetails(
-      event.address.toHexString()
-    );
-
-    const poolName = poolConfig[1];
-    const hPoolName = poolConfig[2];
-    const poolSymbol = poolConfig[0];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-
-    const pool = sdk.Pools.loadPool<string>(event.address);
-    const token = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenOne)
-    );
-    const hToken = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenTwo)
-    );
-    const acc = sdk.Accounts.loadAccount(event.params.provider);
-
-    const hPool = sdk.Pools.loadPool<string>(
-      Bytes.fromHexString(event.address.toHexString().concat("-").concat("1"))
-    );
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
-    }
-
-    pool.setOutputTokenSupply(event.params.lpTokenSupply);
-    hPool.setOutputTokenSupply(event.params.lpTokenSupply);
-
-    acc.liquidityWithdraw(pool, amount.div(BIGINT_TEN_TO_EIGHTEENTH));
-
-    updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
-
-    pool.pool.relation = hPool.getBytesID();
-    hPool.pool.relation = hPool.getBytesID();
-
-    log.warning("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
-      event.params.lpTokenSupply.toString(),
-      bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
-      event.transaction.hash.toHexString(),
-    ]);
+  if (!NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
+    log.error("Missing Config", []);
+    return;
   }
+  log.warning("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
+    event.params.lpTokenSupply.toString(),
+    event.transaction.hash.toHexString(),
+    bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
+  ]);
+
+  const tokenIndex = event.params.boughtId;
+  if (!tokenIndex.equals(BigInt.zero())) {
+    return;
+  }
+
+  const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  )[0];
+
+  const amount = event.params.lpTokenAmount.div(BigInt.fromI32(2));
+
+  const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  )[1];
+
+  const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
+
+  const poolName = poolConfig[1];
+  const hPoolName = poolConfig[2];
+  const poolSymbol = poolConfig[0];
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const pool = sdk.Pools.loadPool<string>(event.address);
+  const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputTokenOne));
+  const hToken = sdk.Tokens.getOrCreateToken(Address.fromString(inputTokenTwo));
+  const acc = sdk.Accounts.loadAccount(event.params.provider);
+
+  const hPool = sdk.Pools.loadPool<string>(
+    Bytes.fromHexString(event.address.toHexString().concat("-").concat("1"))
+  );
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
+  }
+
+  pool.setOutputTokenSupply(event.params.lpTokenSupply);
+  hPool.setOutputTokenSupply(event.params.lpTokenSupply);
+
+  acc.liquidityWithdraw(pool, amount.div(BIGINT_TEN_TO_EIGHTEENTH));
+
+  updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
+
+  pool.pool.relation = hPool.getBytesID();
+  hPool.pool.relation = hPool.getBytesID();
+
+  log.warning("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
+    event.params.lpTokenSupply.toString(),
+    bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
+    event.transaction.hash.toHexString(),
+  ]);
 }

@@ -64,126 +64,133 @@ class TokenInit implements TokenInitializer {
 
 export function handleRewardsPaid(event: RewardPaid): void {
   if (
-    NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
+    !NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
   ) {
-    const amount = event.params.reward;
-    const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
-      event.address.toHexString()
-    );
-
-    const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-    log.warning("GNO RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
-
-    const poolName = poolConfig[1];
-
-    const poolSymbol = poolConfig[0];
-    const hPoolName = poolConfig[2];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-    updateRewardsPaid(
-      sdk.Pools,
-      sdk.Pools,
-      sdk.Tokens,
-      poolName,
-      poolSymbol,
-      hPoolName,
-      poolAddress,
-      event,
-      amount
-    );
+    log.error("Missing Config", []);
+    return;
   }
+  const amount = event.params.reward;
+  const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+    event.address.toHexString()
+  );
+
+  const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
+  log.warning("GNO RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
+
+  const poolName = poolConfig[1];
+
+  const poolSymbol = poolConfig[0];
+  const hPoolName = poolConfig[2];
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  updateRewardsPaid(
+    sdk.Pools,
+    sdk.Pools,
+    sdk.Tokens,
+    poolName,
+    poolSymbol,
+    hPoolName,
+    poolAddress,
+    event,
+    amount
+  );
 }
+
 export function handleStaked(event: Staked): void {
   if (
-    NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
+    !NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
   ) {
-    const amount = event.params.amount;
-
-    const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
-      event.address.toHexString()
-    );
-    log.warning("Staked --> emitter: {}, poolAddress: {}, amount: {}", [
-      event.address.toHexString(),
-      poolAddress,
-      amount.toString(),
-    ]);
-
-    const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-    log.warning("Staked 1 --> poolAddress: {},", [poolAddress]);
-
-    const poolName = poolConfig[1];
-    const hPoolName = poolConfig[2];
-
-    const poolSymbol = poolConfig[0];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-    updateStaked(
-      sdk.Pools,
-      sdk.Pools,
-      sdk.Tokens,
-      poolName,
-      poolSymbol,
-      hPoolName,
-      poolAddress,
-      event.address.toHexString(),
-      amount
-    );
-
-    sdk.Accounts.loadAccount(event.params.user);
+    log.error("Missing Config", []);
+    return;
   }
+  const amount = event.params.amount;
+
+  const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+    event.address.toHexString()
+  );
+  log.warning("Staked --> emitter: {}, poolAddress: {}, amount: {}", [
+    event.address.toHexString(),
+    poolAddress,
+    amount.toString(),
+  ]);
+
+  const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
+  log.warning("Staked 1 --> poolAddress: {},", [poolAddress]);
+
+  const poolName = poolConfig[1];
+  const hPoolName = poolConfig[2];
+
+  const poolSymbol = poolConfig[0];
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  updateStaked(
+    sdk.Pools,
+    sdk.Pools,
+    sdk.Tokens,
+    poolName,
+    poolSymbol,
+    hPoolName,
+    poolAddress,
+    event.address.toHexString(),
+    amount
+  );
+
+  sdk.Accounts.loadAccount(event.params.user);
 }
 
 export function handleWithdrawn(event: Withdrawn): void {
   if (
-    NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
+    !NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
   ) {
-    const amount = event.params.amount;
-
-    const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
-      event.address.toHexString()
-    );
-    log.warning("UnStaked --> emitter: {}, poolAddress: {}, amount: {}", [
-      event.address.toHexString(),
-      poolAddress,
-      amount.toString(),
-    ]);
-
-    const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-    log.warning("UnStaked 1 --> poolAddress: {},", [poolAddress]);
-
-    const poolName = poolConfig[1];
-    const hPoolName = poolConfig[2];
-
-    const poolSymbol = poolConfig[0];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-
-    updateWithdrawn(
-      sdk.Pools,
-      sdk.Pools,
-      sdk.Tokens,
-      poolName,
-      poolSymbol,
-      hPoolName,
-      poolAddress,
-      event.address.toHexString(),
-      amount
-    );
-    sdk.Accounts.loadAccount(event.params.user);
+    log.error("Missing Config", []);
+    return;
   }
+  const amount = event.params.amount;
+
+  const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+    event.address.toHexString()
+  );
+  log.warning("UnStaked --> emitter: {}, poolAddress: {}, amount: {}", [
+    event.address.toHexString(),
+    poolAddress,
+    amount.toString(),
+  ]);
+
+  const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
+  log.warning("UnStaked 1 --> poolAddress: {},", [poolAddress]);
+
+  const poolName = poolConfig[1];
+  const hPoolName = poolConfig[2];
+
+  const poolSymbol = poolConfig[0];
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  updateWithdrawn(
+    sdk.Pools,
+    sdk.Pools,
+    sdk.Tokens,
+    poolName,
+    poolSymbol,
+    hPoolName,
+    poolAddress,
+    event.address.toHexString(),
+    amount
+  );
+  sdk.Accounts.loadAccount(event.params.user);
 }

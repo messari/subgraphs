@@ -59,8 +59,10 @@ const conf = new BridgeConfig(
 );
 
 export function handleTransferSentToL2(event: TransferSentToL2): void {
-  if (!NetworkConfigs.getBridgeList().includes(event.address.toHexString()))
+  if (!NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
+    log.error("Missing Config", []);
     return;
+  }
   const inputTokenOne = NetworkConfigs.getTokenAddressFromBridgeAddress(
     event.address.toHexString()
   )[0];

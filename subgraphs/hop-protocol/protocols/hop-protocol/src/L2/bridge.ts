@@ -172,9 +172,10 @@ export function handleTransferSent(event: TransferSent): void {
       event.params.chainId.toString(),
     ]
   );
-
-  if (!NetworkConfigs.getBridgeList().includes(event.address.toHexString()))
+  if (!NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
+    log.error("Missing Config", []);
     return;
+  }
 
   const inputTokenOne = NetworkConfigs.getTokenAddressFromBridgeAddress(
     event.address.toHexString()
