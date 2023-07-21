@@ -28,7 +28,10 @@ import {
 import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
-import { BIGINT_TEN_TO_EIGHTEENTH } from "../../../../src/sdk/util/constants";
+import {
+  BIGINT_TEN_TO_EIGHTEENTH,
+  SIX,
+} from "../../../../src/sdk/util/constants";
 import { updateAMMTVE } from "../../../../src/sdk/util/tokens";
 
 class Pricer implements TokenPricer {
@@ -203,9 +206,9 @@ export function handleAddLiquidity(event: AddLiquidity): void {
     `LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
     [
       bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
-      bigIntToBigDecimal(liquidity, 6).toString(),
+      bigIntToBigDecimal(liquidity, SIX).toString(),
       event.transaction.hash.toHexString(),
-      bigIntToBigDecimal(event.params.fees[0], 6).toString(),
+      bigIntToBigDecimal(event.params.fees[0], SIX).toString(),
     ]
   );
 }
@@ -271,9 +274,9 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
     "LWITH lpTokenSupply: {}, amount6-0: {}, amount18-0: {}, amount6-1: {}, amount18-1: {}, hash: {}",
     [
       bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
-      bigIntToBigDecimal(amount[0], 6).toString(),
+      bigIntToBigDecimal(amount[0], SIX).toString(),
       bigIntToBigDecimal(amount[0]).toString(),
-      bigIntToBigDecimal(amount[1], 6).toString(),
+      bigIntToBigDecimal(amount[1], SIX).toString(),
       bigIntToBigDecimal(amount[1]).toString(),
       event.transaction.hash.toHexString(),
     ]

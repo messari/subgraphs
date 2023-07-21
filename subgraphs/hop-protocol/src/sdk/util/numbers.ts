@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export function bigIntToBigDecimal(

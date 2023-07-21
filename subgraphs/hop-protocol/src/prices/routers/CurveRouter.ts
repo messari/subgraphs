@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import { getUsdPricePerToken } from "..";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";

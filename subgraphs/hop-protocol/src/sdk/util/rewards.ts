@@ -483,7 +483,7 @@ export function updateRewardsPaid(
       );
       const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
 
-      const dailyEmission = BigInt.fromI32(86400).times(rewardRate);
+      const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
       hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
 
@@ -535,7 +535,7 @@ export function updateRewardsPaid(
       );
       const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
 
-      const dailyEmission = BigInt.fromI32(86400).times(rewardRate);
+      const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
       hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
 
@@ -585,7 +585,7 @@ export function updateRewardsPaid(
       );
       const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
 
-      const dailyEmission = BigInt.fromI32(86400).times(rewardRate);
+      const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
       hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
 

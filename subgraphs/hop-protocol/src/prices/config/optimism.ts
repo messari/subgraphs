@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Configurations } from "../common/types";
 import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
