@@ -43,7 +43,7 @@ export function getForexUsdRate(lpToken: Address): CustomPriceType {
     constants.BIGINT_ZERO
   );
 
-  let price = getLpTokenVirtualPrice(lpToken).times(
+  const price = getLpTokenVirtualPrice(lpToken).times(
     conversionRate.toBigDecimal()
   );
 

@@ -44,6 +44,7 @@ export const AAVE_ORACLE_DECIMALS = 8;
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
+export const CRV_TRI_CRYPTO_IGNORE_BLOCKS = BigInt.fromI32(12936339);
 export const CRV_TRI_CRYPTO_ADDRESS = Address.fromString(
   "0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"
 );

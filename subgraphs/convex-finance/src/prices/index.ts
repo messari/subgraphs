@@ -32,12 +32,12 @@ export function getUsdPricePerToken(
   if (
     block &&
     tokenAddr.equals(constants.CRV_TRI_CRYPTO_ADDRESS) &&
-    block.number.lt(BigInt.fromI32(12936339))
+    block.number.lt(constants.CRV_TRI_CRYPTO_IGNORE_BLOCKS)
   )
     return new CustomPriceType();
 
   // CUSTOM: Forex Oracle
-  let forexPrice = getForexUsdRate(tokenAddr);
+  const forexPrice = getForexUsdRate(tokenAddr);
   if (!forexPrice.reverted) {
     log.debug("[forexPrice] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
