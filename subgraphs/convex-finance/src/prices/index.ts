@@ -3,7 +3,6 @@ import {
   Address,
   ethereum,
   BigDecimal,
-  BigInt,
   dataSource,
 } from "@graphprotocol/graph-ts";
 import { CustomPriceType, OracleType } from "./common/types";

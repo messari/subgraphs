@@ -281,8 +281,8 @@ export class config implements Configurations {
       if (
         tokenAddr &&
         [
-          Address.fromString("0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B"), // TricryptoUSDC
-          Address.fromString("0xf5f5B97624542D72A9E06f04804Bf81baA15e2B4"), // TricryptoUSDT
+          Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
+          Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
         ].includes(tokenAddr)
       ) {
         return new tricryptoOverride();
