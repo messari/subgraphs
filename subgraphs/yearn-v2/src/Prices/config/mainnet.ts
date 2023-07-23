@@ -7,13 +7,13 @@ export const NETWORK_STRING = "mainnet";
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x25BF7b72815476Dd515044F9650Bf79bAd0Df655"
+  "0x25bf7b72815476dd515044f9650bf79bad0df655"
 );
 export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c"
+  "0x7d86446ddb609ed0f5f8684acf30380a356b2b4c"
 );
 export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x8F942C20D02bEfc377D41445793068908E2250D0"
+  "0x8f942c20d02befc377d41445793068908e2250d0"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x8263e161A855B644f582d9C164C66aABEe53f927"
+  "0x8263e161a855b644f582d9c164c66aabee53f927"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
@@ -30,11 +30,11 @@ export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F")
+  Address.fromString("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f")
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D")
+  Address.fromString("0x7a250d5630b4cf539739df2c5dacb4c659f2488d")
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ export const YEARN_LENS_CONTRACT_ADDRESS =
 ///////////////////////////////////////////////////////////////////////////
 
 export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
-  "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+  "0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -89,17 +89,17 @@ WHITELIST_TOKENS.set(
 );
 WHITELIST_TOKENS.set(
   "ETH",
-  Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE")
+  Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 );
 WHITELIST_TOKENS.set(
   "WBTC",
-  Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599")
+  Address.fromString("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599")
 );
 WHITELIST_TOKENS.set(
   "EURS",
-  Address.fromString("0xdB25f211AB05b1c97D595516F45794528a807ad8")
+  Address.fromString("0xdb25f211ab05b1c97d595516f45794528a807ad8")
 );
 WHITELIST_TOKENS.set(
   "LINK",
-  Address.fromString("0x514910771AF9Ca656af840dff83E8264EcF986CA")
+  Address.fromString("0x514910771af9ca656af840dff83e8264ecf986ca")
 );

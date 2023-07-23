@@ -30,7 +30,7 @@ export function createDepositTransaction(
   amount: BigInt,
   amountUSD: BigDecimal
 ): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  const transactionId = "deposit-" + transaction.hash.toHexString();
 
   let depositTransaction = DepositTransaction.load(transactionId);
 
@@ -44,7 +44,8 @@ export function createDepositTransaction(
     depositTransaction.from = transaction.from.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
-    depositTransaction.logIndex = transaction.index.toI32();
+    // log index is zero cause no events are emitted on vault deposit
+    depositTransaction.logIndex = 0;
 
     depositTransaction.asset = assetId;
     depositTransaction.amount = amount;
@@ -63,17 +64,17 @@ export function calculateAmountDeposited(
   vaultAddress: Address,
   sharesMinted: BigInt
 ): BigInt {
-  let vaultContract = VaultContract.bind(vaultAddress);
-  let totalAssets = utils.readValue<BigInt>(
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const totalAssets = utils.readValue<BigInt>(
     vaultContract.try_totalAssets(),
     constants.BIGINT_ZERO
   );
-  let totalSupply = utils.readValue<BigInt>(
+  const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
 
-  let amount = totalSupply.isZero()
+  const amount = totalSupply.isZero()
     ? constants.BIGINT_ZERO
     : sharesMinted.times(totalAssets).div(totalSupply);
 
@@ -109,26 +110,26 @@ export function _Deposit(
     );
   }
 
-  let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+  const inputToken = Token.load(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken!.decimals as u8
   ).toBigDecimal();
 
-  let depositAmountUSD = depositAmount
+  const depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  let totalSupply = utils.readValue<BigInt>(
+  const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
   vault.outputTokenSupply = totalSupply;
 
-  let totalAssets = utils.readValue<BigInt>(
+  const totalAssets = utils.readValue<BigInt>(
     vaultContract.try_totalAssets(),
     constants.BIGINT_ZERO
   );

@@ -30,7 +30,7 @@ export function createWithdrawTransaction(
   amount: BigInt,
   amountUSD: BigDecimal
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -44,7 +44,8 @@ export function createWithdrawTransaction(
     withdrawTransaction.from = transaction.from.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
-    withdrawTransaction.logIndex = transaction.index.toI32();
+    // log index is zero cause no events are emitted on vault withdraw
+    withdrawTransaction.logIndex = 0;
 
     withdrawTransaction.asset = assetId;
     withdrawTransaction.amount = amount;
@@ -63,16 +64,16 @@ export function calculateSharesBurnt(
   vaultAddress: Address,
   withdrawAmount: BigInt
 ): BigInt {
-  let vaultContract = VaultContract.bind(vaultAddress);
-  let totalAssets = utils.readValue<BigInt>(
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const totalAssets = utils.readValue<BigInt>(
     vaultContract.try_totalAssets(),
     constants.BIGINT_ZERO
   );
-  let totalSupply = utils.readValue<BigInt>(
+  const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
-  let sharesBurnt = totalAssets.equals(constants.BIGINT_ZERO)
+  const sharesBurnt = totalAssets.equals(constants.BIGINT_ZERO)
     ? withdrawAmount
     : withdrawAmount.times(totalSupply).div(totalAssets);
 
@@ -83,17 +84,17 @@ export function calculateAmountWithdrawn(
   vaultAddress: Address,
   sharesBurnt: BigInt
 ): BigInt {
-  let vaultContract = VaultContract.bind(vaultAddress);
-  let totalAssets = utils.readValue<BigInt>(
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const totalAssets = utils.readValue<BigInt>(
     vaultContract.try_totalAssets(),
     constants.BIGINT_ZERO
   );
-  let totalSupply = utils.readValue<BigInt>(
+  const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
 
-  let amount = totalSupply.isZero()
+  const amount = totalSupply.isZero()
     ? constants.BIGINT_ZERO
     : sharesBurnt.times(totalAssets).div(totalSupply);
 
@@ -146,26 +147,26 @@ export function _Withdraw(
     );
   }
 
-  let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+  const inputToken = Token.load(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken!.decimals as u8
   ).toBigDecimal();
 
-  let withdrawAmountUSD = withdrawAmount
+  const withdrawAmountUSD = withdrawAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  let totalSupply = utils.readValue<BigInt>(
+  const totalSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
   vault.outputTokenSupply = totalSupply;
 
-  let totalAssets = utils.readValue<BigInt>(
+  const totalAssets = utils.readValue<BigInt>(
     vaultContract.try_totalAssets(),
     constants.BIGINT_ZERO
   );

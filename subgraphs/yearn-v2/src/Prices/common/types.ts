@@ -1,5 +1,5 @@
 import * as constants from "./constants";
-import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { BigDecimal } from "@graphprotocol/graph-ts";
 
 export class Wrapped<T> {
   inner: T;
@@ -23,7 +23,7 @@ export class CustomPriceType {
     _usdPrice: BigDecimal,
     _decimals: i32 = 0
   ): CustomPriceType {
-    let result = new CustomPriceType();
+    const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);
 
