@@ -36,9 +36,8 @@ import { Strategy as StrategyTemplate } from "../../generated/templates";
 export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
-  const performanceFee = event.params.performanceFee;
 
-  let vault = getOrCreateVault(vaultAddress, event.block);
+  const vault = getOrCreateVault(vaultAddress, event.block);
   if (vault) {
     StrategyTemplate.create(strategyAddress);
 
@@ -53,9 +52,8 @@ export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
 export function handleStrategyAdded_v2(event: StrategyAddedV2Event): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
-  const performanceFee = event.params.performanceFee;
 
-  let vault = getOrCreateVault(vaultAddress, event.block);
+  const vault = getOrCreateVault(vaultAddress, event.block);
   if (vault) {
     StrategyTemplate.create(strategyAddress);
 
@@ -68,8 +66,8 @@ export function handleStrategyAdded_v2(event: StrategyAddedV2Event): void {
 }
 
 export function handleDeposit(call: DepositCall): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
     const sharesMinted = call.outputs.value0;
@@ -89,8 +87,8 @@ export function handleDeposit(call: DepositCall): void {
 }
 
 export function handleDepositWithAmount(call: Deposit1Call): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
     const sharesMinted = call.outputs.value0;
@@ -112,8 +110,8 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
 }
 
 export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
     const sharesMinted = call.outputs.value0;
@@ -134,11 +132,11 @@ export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
-    let withdrawAmount = call.outputs.value0;
+    const withdrawAmount = call.outputs.value0;
 
     _Withdraw(
       vaultAddress,
@@ -155,8 +153,8 @@ export function handleWithdraw(call: WithdrawCall): void {
 }
 
 export function handleWithdrawWithShares(call: Withdraw1Call): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
     const sharesBurnt = call.inputs._shares;
@@ -179,8 +177,8 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
 export function handleWithdrawWithSharesAndRecipient(
   call: Withdraw2Call
 ): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
     const sharesBurnt = call.inputs._shares;
@@ -203,8 +201,8 @@ export function handleWithdrawWithSharesAndRecipient(
 export function handleWithdrawWithSharesAndRecipientAndLoss(
   call: Withdraw3Call
 ): void {
-  let vaultAddress = call.to;
-  let vault = getOrCreateVault(vaultAddress, call.block);
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
     const sharesBurnt = call.inputs.maxShares;
@@ -231,7 +229,7 @@ export function handleUpdatePerformanceFee(
   const vault = VaultStore.load(vaultAddress);
 
   if (vault) {
-    let performanceFeeId =
+    const performanceFeeId =
       utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) + vaultAddress;
     const performanceFee = VaultFeeStore.load(performanceFeeId);
 
@@ -240,6 +238,7 @@ export function handleUpdatePerformanceFee(
     }
 
     performanceFee.feePercentage = event.params.performanceFee
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       .div(BigInt.fromI32(100))
       .toBigDecimal();
     performanceFee.save();
@@ -258,7 +257,7 @@ export function handleUpdateManagementFee(
   const vault = VaultStore.load(vaultAddress);
 
   if (vault) {
-    let performanceFeeId =
+    const performanceFeeId =
       utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) + vaultAddress;
     const performanceFee = VaultFeeStore.load(performanceFeeId);
 
@@ -267,6 +266,7 @@ export function handleUpdateManagementFee(
     }
 
     performanceFee.feePercentage = event.params.managementFee
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       .div(BigInt.fromI32(100))
       .toBigDecimal();
     performanceFee.save();
@@ -307,7 +307,7 @@ export function handleDepositEvent(event: DepositEvent): void {
   const vault = getOrCreateVault(vaultAddress, event.block);
 
   if (vault) {
-    let sharesMinted = event.params.shares;
+    const sharesMinted = event.params.shares;
 
     _Deposit(
       event.address,
