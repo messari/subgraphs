@@ -4,7 +4,7 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import { getTotalFees } from "../modules/Fees";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import {
@@ -53,7 +53,6 @@ export function handleRewardAdded(event: RewardAdded): void {
   let cvxRewardEarnedUsd = cvxRewardsEarned
     .div(cvxRewardTokenDecimals)
     .times(cvxRewardTokenPrice.usdPrice)
-    .div(cvxRewardTokenPrice.decimalsBaseTen)
     .truncate(1);
 
   let totalFeesConvex = getTotalFees();
@@ -74,7 +73,6 @@ export function handleRewardAdded(event: RewardAdded): void {
     .truncate(0);
   const supplySideRevenueUSD = supplySideRevenue
     .times(crvRewardTokenPrice.usdPrice)
-    .div(crvRewardTokenPrice.decimalsBaseTen)
     .plus(cvxRewardEarnedUsd)
     .truncate(1);
 
@@ -85,7 +83,6 @@ export function handleRewardAdded(event: RewardAdded): void {
     .truncate(0);
   const protocolSideRevenueUSD = protocolSideRevenue
     .times(crvRewardTokenPrice.usdPrice)
-    .div(crvRewardTokenPrice.decimalsBaseTen)
     .truncate(1);
 
   rewardPoolInfo.historicalRewards = afterHistoricalRewards;

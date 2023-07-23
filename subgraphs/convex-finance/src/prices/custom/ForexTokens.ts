@@ -33,7 +33,6 @@ export function getLpTokenVirtualPrice(lpToken: Address): BigDecimal {
   return constants.BIGDECIMAL_ZERO;
 }
 
-
 export function getForexUsdRate(lpToken: Address): CustomPriceType {
   const ForexToken = FOREX_ORACLES.get(lpToken.toHexString());
   if (!ForexToken) return new CustomPriceType();
@@ -48,6 +47,5 @@ export function getForexUsdRate(lpToken: Address): CustomPriceType {
     conversionRate.toBigDecimal()
   );
 
-  return CustomPriceType.initialize(price, 8);
+  return CustomPriceType.initialize(price, constants.INT_EIGHT);
 }
-
