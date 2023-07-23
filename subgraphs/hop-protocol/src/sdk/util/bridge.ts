@@ -1,4 +1,11 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  Bytes,
+  dataSource,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   ARBITRUM_L1_SIGNATURE,
   MESSENGER_EVENT_SIGNATURES,
@@ -10,6 +17,20 @@ import {
 } from "./constants";
 import { Account } from "../protocols/bridge/account";
 import { reverseChainIDs } from "../protocols/bridge/chainIds";
+import { BridgeConfig } from "../../../src/sdk/protocols/bridge/config";
+import { Versions } from "../../../src/versions";
+
+import { BridgePermissionType } from "../../../src/sdk/protocols/bridge/enums";
+
+export const conf = new BridgeConfig(
+  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
+  "HOP-"
+    .concat(dataSource.network().toUpperCase().replace("-", "_"))
+    .concat("-BRIDGE"),
+  "hop-".concat(dataSource.network().replace("-", "_")).concat("-bridge"),
+  BridgePermissionType.PERMISSIONLESS,
+  Versions
+);
 
 export function updateL1OutgoingBridgeMessage(
   event: ethereum.Event,
@@ -26,13 +47,13 @@ export function updateL1OutgoingBridgeMessage(
     const _topic0 = receipt.logs[index].topics[0].toHexString();
     const _data = receipt.logs[index].data;
 
-    log.warning("S8 - chainID: {}, topic0: {}, txHash: {}", [
+    log.info("S8 - chainID: {}, topic0: {}, txHash: {}", [
       chainId.toString(),
       _topic0,
       event.transaction.hash.toHexString(),
     ]);
     if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue;
-    log.warning("S9 - chainID: {}, inputToken: {}, topic0: {}, txHash: {}", [
+    log.info("S9 - chainID: {}, inputToken: {}, topic0: {}, txHash: {}", [
       chainId.toString(),
       inputToken,
       _topic0,
@@ -41,7 +62,7 @@ export function updateL1OutgoingBridgeMessage(
 
     const data = Bytes.fromUint8Array(_data.subarray(0));
 
-    log.warning(
+    log.info(
       "MessageOUTDT - emittingContractaddress: {}, topic0: {}, logAddress: {}, data: {}",
       [
         event.address.toHexString(),
@@ -61,7 +82,7 @@ export function updateL1OutgoingBridgeMessage(
 
       acc.messageOut(chainId, recipient, _optimismData);
 
-      log.warning("MessageOUT - BridgeAddress: {}, data: {}", [
+      log.info("MessageOUT - BridgeAddress: {}, data: {}", [
         event.address.toHexString(),
         data.toHexString(),
       ]);
@@ -86,7 +107,7 @@ export function updateL2OutgoingBridgeMessage(
 
     const data = Bytes.fromUint8Array(_data.subarray(0));
 
-    log.warning(
+    log.info(
       "MessageOUTDT - emittingContractaddress: {}, topic0: {},  logAddress: {}, data: {}",
       [
         event.address.toHexString(),
@@ -98,13 +119,13 @@ export function updateL2OutgoingBridgeMessage(
     if (_topic0 == XDAI_L2_SIGNATURE || _topic0 == OPTIMISM_L2_SIGNATURE) {
       acc.messageOut(chainId, recipient, data);
     }
-    log.warning("MessageOUTDT2 - TokenAddress: {},  data: {}", [
+    log.info("MessageOUTDT2 - TokenAddress: {},  data: {}", [
       event.address.toHexString(),
       data.toHexString(),
     ]);
   }
 
-  log.warning("TransferOUT - TokenAddress: {},  txHash: {},", [
+  log.info("TransferOUT - TokenAddress: {},  txHash: {},", [
     event.address.toHexString(),
     event.transaction.hash.toHexString(),
   ]);
@@ -126,7 +147,7 @@ export function updateL2IncomingBridgeMessage(
 
     const data = Bytes.fromUint8Array(_data.subarray(0));
 
-    log.warning(
+    log.info(
       "MessageINDT - emittingContractaddress: {}, topic0: {}, logAddress: {}, data: {}",
       [
         event.address.toHexString(),
@@ -145,13 +166,13 @@ export function updateL2IncomingBridgeMessage(
       acc.messageIn(reverseChainIDs.get(Network.MAINNET)!, recipient, data);
     }
 
-    log.warning("MessageIN - TokenAddress: {}, data: {}", [
+    log.info("MessageIN - TokenAddress: {}, data: {}", [
       event.address.toHexString(),
       data.toHexString(),
     ]);
   }
 
-  log.warning("TransferIN - TokenAddress: {},  txHash: {}", [
+  log.info("TransferIN - TokenAddress: {},  txHash: {}", [
     event.address.toHexString(),
     event.transaction.hash.toHexString(),
   ]);

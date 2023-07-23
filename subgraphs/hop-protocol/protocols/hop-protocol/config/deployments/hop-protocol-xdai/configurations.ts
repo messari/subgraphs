@@ -93,6 +93,9 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     return [""];
   }
 
+  getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
   getArbitrumCrossTokenFromTokenAddress(tokenAddress: string): string {
     if (tokenAddress == XdaiToken.USDC) {
       return ArbitrumToken.USDC;

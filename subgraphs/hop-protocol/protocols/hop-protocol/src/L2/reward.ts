@@ -4,17 +4,9 @@ import {
   TokenInitializer,
   TokenParams,
 } from "../../../../src/sdk/protocols/bridge/tokens";
-import { BridgePermissionType } from "../../../../src/sdk/protocols/bridge/enums";
-import { BridgeConfig } from "../../../../src/sdk/protocols/bridge/config";
-import { Versions } from "../../../../src/versions";
+
 import { NetworkConfigs } from "../../../../configurations/configure";
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  log,
-  dataSource,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   RewardPaid,
   Staked,
@@ -29,6 +21,8 @@ import {
   updateStaked,
   updateWithdrawn,
 } from "../../../../src/sdk/util/rewards";
+import { conf } from "../../../../src/sdk/util/bridge";
+import { FOUR } from "../../../../src/sdk/util/constants";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -42,19 +36,14 @@ class Pricer implements TokenPricer {
   }
 }
 
-const conf = new BridgeConfig(
-  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
-  "HOP-"
-    .concat(dataSource.network().toUpperCase().replace("-", "_"))
-    .concat("-BRIDGE"),
-  "hop-".concat(dataSource.network().replace("-", "_")).concat("-bridge"),
-  BridgePermissionType.PERMISSIONLESS,
-  Versions
-);
-
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex());
+
+    if (tokenConfig.length != FOUR) {
+      log.error("Invalid tokenConfig length", []);
+    }
+
     const name = tokenConfig[1];
     const symbol = tokenConfig[0];
     const decimals = BigInt.fromString(tokenConfig[2]).toI32();
@@ -75,7 +64,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
   );
 
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-  log.warning("GNO RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
+  log.info("GNO RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
 
   const poolName = poolConfig[1];
 
@@ -113,14 +102,14 @@ export function handleStaked(event: Staked): void {
   const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
     event.address.toHexString()
   );
-  log.warning("Staked --> emitter: {}, poolAddress: {}, amount: {}", [
+  log.info("Staked --> emitter: {}, poolAddress: {}, amount: {}", [
     event.address.toHexString(),
     poolAddress,
     amount.toString(),
   ]);
 
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-  log.warning("Staked 1 --> poolAddress: {},", [poolAddress]);
+  log.info("Staked 1 --> poolAddress: {},", [poolAddress]);
 
   const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];
@@ -160,14 +149,14 @@ export function handleWithdrawn(event: Withdrawn): void {
   const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
     event.address.toHexString()
   );
-  log.warning("UnStaked --> emitter: {}, poolAddress: {}, amount: {}", [
+  log.info("UnStaked --> emitter: {}, poolAddress: {}, amount: {}", [
     event.address.toHexString(),
     poolAddress,
     amount.toString(),
   ]);
 
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-  log.warning("UnStaked 1 --> poolAddress: {},", [poolAddress]);
+  log.info("UnStaked 1 --> poolAddress: {},", [poolAddress]);
 
   const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];

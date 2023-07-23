@@ -121,7 +121,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.MATIC) return [MainnetToken.MATIC];
     else if (bridgeAddress == MainnetBridge.MAGIC) return [MainnetToken.MAGIC];
     else {
-      log.critical("Token not found", []);
+      log.critical("Bridge not found", []);
       return [""];
     }
   }
@@ -134,8 +134,17 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (bridgeAddress == MainnetBridge.rETH) return ArbitrumAmm.rETH;
     else if (bridgeAddress == MainnetBridge.MAGIC) return ArbitrumAmm.MAGIC;
     else {
-      log.critical("Token not found", []);
+      log.critical("Bridge not found", []);
 
+      return "";
+    }
+  }
+
+  getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    if (bridgeAddress == MainnetBridge.ETH) return ArbitrumNovaAmm.ETH;
+    else if (bridgeAddress == MainnetBridge.MAGIC) return ArbitrumNovaAmm.MAGIC;
+    else {
+      log.critical("Bridge not found", []);
       return "";
     }
   }
@@ -189,6 +198,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return this.getXdaiPoolAddressFromBridgeAddress(bridgeAddress); //Xdai
     } else if (chainId == "137") {
       return this.getPolygonPoolAddressFromBridgeAddress(bridgeAddress); //Polygon
+    } else if (chainId == "42170") {
+      return this.getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress); //Arbitrum Nova
     } else {
       log.critical("Chain not found", []);
       return "";

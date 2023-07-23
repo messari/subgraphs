@@ -21,7 +21,9 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.ARBITRUM_ONE;
   }
-
+  getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
     if (tokenAddress == ArbitrumToken.USDC) return ArbitrumAmm.USDC;
     else if (tokenAddress == ArbitrumToken.DAI) return ArbitrumAmm.DAI;

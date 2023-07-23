@@ -180,6 +180,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     return "";
   }
 
+  getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
+
   getTokenAddressFromBridgeAddress(bridgeAddress: string): string[] {
     if (bridgeAddress == OptimismBridge.USDC) {
       return [OptimismToken.USDC, OptimismHtoken.USDC];

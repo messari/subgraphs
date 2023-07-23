@@ -23,6 +23,7 @@ export interface Configurations {
   getRewardTokenList(): string[];
   getPoolAddressFromRewardTokenAddress(rewardToken: string): string;
   getArbitrumNovaConfigFromTokenAddress(tokenAddress: string): string[];
+  getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress: string): string;
   getUsdcPools(): string[];
   getUsdcTokens(): string[];
   getDaiPools(): string[];

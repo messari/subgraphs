@@ -453,10 +453,11 @@ export function updateRewardsPaid(
   amount: BigInt
 ): void {
   if (GNO_REWARDS.includes(event.address.toHexString())) {
-    log.warning(
-      "GNO RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}",
-      [event.address.toHexString(), poolAddress, amount.toString()]
-    );
+    log.info("GNO RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
+      event.address.toHexString(),
+      poolAddress,
+      amount.toString(),
+    ]);
 
     const pool = pools.loadPool<string>(Address.fromString(poolAddress));
     const hPool = hPools.loadPool<string>(
@@ -473,21 +474,18 @@ export function updateRewardsPaid(
     const Reward = L2_Reward.bind(event.address);
     const rewardRateCall = Reward.try_rewardRate();
     if (!rewardRateCall.reverted) {
-      log.warning(
-        "GNO RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}",
-        [
-          event.transaction.hash.toHexString(),
-          rewardRateCall.value.toString(),
-          BIGINT_TEN_TO_EIGHTEENTH.toString(),
-        ]
-      );
+      log.info("GNO RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}", [
+        event.transaction.hash.toHexString(),
+        rewardRateCall.value.toString(),
+        BIGINT_TEN_TO_EIGHTEENTH.toString(),
+      ]);
       const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
 
       const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
       hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
 
-      log.warning(
+      log.info(
         "GNO RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
         [
           event.transaction.hash.toHexString(),
@@ -496,19 +494,19 @@ export function updateRewardsPaid(
         ]
       );
     } else {
-      log.warning("GNO Rewards rate call reverted", []);
+      log.info("GNO Rewards rate call reverted", []);
     }
   }
   if (OP_REWARDS.includes(event.address.toHexString())) {
     const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
       event.address.toHexString()
     );
-    log.warning("OP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
+    log.info("OP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
       event.address.toHexString(),
       poolAddress,
       amount.toString(),
     ]);
-    log.warning("OP RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
+    log.info("OP RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
 
     const pool = pools.loadPool<string>(Address.fromString(poolAddress));
     const hPool = hPools.loadPool<string>(
@@ -525,21 +523,18 @@ export function updateRewardsPaid(
     const Reward = L2_Reward.bind(event.address);
     const rewardRateCall = Reward.try_rewardRate();
     if (!rewardRateCall.reverted) {
-      log.warning(
-        "OP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}",
-        [
-          event.transaction.hash.toHexString(),
-          rewardRateCall.value.toString(),
-          BIGINT_TEN_TO_EIGHTEENTH.toString(),
-        ]
-      );
+      log.info("OP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}", [
+        event.transaction.hash.toHexString(),
+        rewardRateCall.value.toString(),
+        BIGINT_TEN_TO_EIGHTEENTH.toString(),
+      ]);
       const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
 
       const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
       hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
 
-      log.warning(
+      log.info(
         "OP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
         [
           event.transaction.hash.toHexString(),
@@ -548,14 +543,15 @@ export function updateRewardsPaid(
         ]
       );
     } else {
-      log.warning("OP Rewards rate call reverted", []);
+      log.info("OP Rewards rate call reverted", []);
     }
   }
   if (HOP_REWARDS.includes(event.address.toHexString())) {
-    log.warning(
-      "HOP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}",
-      [event.address.toHexString(), poolAddress, amount.toString()]
-    );
+    log.info("HOP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
+      event.address.toHexString(),
+      poolAddress,
+      amount.toString(),
+    ]);
 
     const pool = pools.loadPool<string>(Address.fromString(poolAddress));
 
@@ -575,21 +571,18 @@ export function updateRewardsPaid(
     const Reward = L2_Reward.bind(event.address);
     const rewardRateCall = Reward.try_rewardRate();
     if (!rewardRateCall.reverted) {
-      log.warning(
-        "HOP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}",
-        [
-          event.transaction.hash.toHexString(),
-          rewardRateCall.value.toString(),
-          BIGINT_TEN_TO_EIGHTEENTH.toString(),
-        ]
-      );
+      log.info("HOP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}", [
+        event.transaction.hash.toHexString(),
+        rewardRateCall.value.toString(),
+        BIGINT_TEN_TO_EIGHTEENTH.toString(),
+      ]);
       const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
 
       const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
       pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
       hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
 
-      log.warning(
+      log.info(
         "HOP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
         [
           event.transaction.hash.toHexString(),
@@ -598,7 +591,7 @@ export function updateRewardsPaid(
         ]
       );
     } else {
-      log.warning("HOP Rewards rate call reverted", []);
+      log.info("HOP Rewards rate call reverted", []);
     }
   }
 }

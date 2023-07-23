@@ -4,19 +4,14 @@ import {
   TokenInitializer,
   TokenParams,
 } from "../../../../src/sdk/protocols/bridge/tokens";
-import {
-  BridgePermissionType,
-  BridgePoolType,
-} from "../../../../src/sdk/protocols/bridge/enums";
-import { BridgeConfig } from "../../../../src/sdk/protocols/bridge/config";
-import { Versions } from "../../../../src/versions";
+import { BridgePoolType } from "../../../../src/sdk/protocols/bridge/enums";
+
 import { NetworkConfigs } from "../../../../configurations/configure";
 import {
   Address,
   BigDecimal,
   BigInt,
   log,
-  dataSource,
   Bytes,
 } from "@graphprotocol/graph-ts";
 import {
@@ -29,10 +24,15 @@ import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
 import {
+  BIGINT_FOUR,
+  BIGINT_TEN_THOUSAND,
   BIGINT_TEN_TO_EIGHTEENTH,
+  FOUR,
   SIX,
+  THREE,
 } from "../../../../src/sdk/util/constants";
 import { updateAMMTVE } from "../../../../src/sdk/util/tokens";
+import { conf } from "../../../../src/sdk/util/bridge";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -46,19 +46,14 @@ class Pricer implements TokenPricer {
   }
 }
 
-const conf = new BridgeConfig(
-  "0x03d7f750777ec48d39d080b020d83eb2cb4e3547",
-  "HOP-"
-    .concat(dataSource.network().toUpperCase().replace("-", "_"))
-    .concat("-BRIDGE"),
-  "hop-".concat(dataSource.network().replace("-", "_")).concat("-bridge"),
-  BridgePermissionType.PERMISSIONLESS,
-  Versions
-);
-
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex());
+
+    if (tokenConfig.length != FOUR) {
+      log.error("Invalid tokenConfig length", []);
+    }
+
     const name = tokenConfig[1];
     const symbol = tokenConfig[0];
     const decimals = BigInt.fromString(tokenConfig[2]).toI32();
@@ -67,73 +62,74 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleTokenSwap(event: TokenSwap): void {
-  if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-    const amount = event.params.tokensSold;
-
-    const fees = amount
-      .times(BigInt.fromString("4"))
-      .div(BigInt.fromString("10000"));
-    log.warning("FEES 2- fees: {}, fees: {}, amount: {}", [
-      fees.toBigDecimal().toString(),
-      fees.toString(),
-      amount.toString(),
-    ]);
-
-    const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[0];
-
-    const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
-      event.address.toHexString()
-    )[1];
-    const poolConfig = NetworkConfigs.getPoolDetails(
-      event.address.toHexString()
-    );
-
-    const poolName = poolConfig[1];
-    const poolSymbol = poolConfig[0];
-    const hPoolName = poolConfig[2];
-
-    const sdk = SDK.initializeFromEvent(
-      conf,
-      new Pricer(),
-      new TokenInit(),
-      event
-    );
-
-    const pool = sdk.Pools.loadPool<string>(event.address);
-    const hPool = sdk.Pools.loadPool<string>(
-      Bytes.fromHexString(event.address.toHexString().concat("-").concat("1"))
-    );
-
-    const tokenOne = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenOne)
-    );
-    const tokenTwo = sdk.Tokens.getOrCreateToken(
-      Address.fromString(inputTokenTwo)
-    );
-
-    sdk.Accounts.loadAccount(event.params.buyer);
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne);
-    }
-    if (!hPool.isInitialized) {
-      hPool.initialize(
-        hPoolName,
-        poolSymbol,
-        BridgePoolType.LIQUIDITY,
-        tokenTwo
-      );
-    }
-
-    updateAMMTVE(event.address, Address.fromBytes(tokenOne.id), hPool, pool);
-
-    pool.pool.relation = hPool.getBytesID();
-    hPool.pool.relation = hPool.getBytesID();
-
-    pool.addRevenueNative(BigInt.zero(), fees);
+  if (!NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
+    log.error("Missing Config", []);
+    return;
   }
+  const amount = event.params.tokensSold;
+
+  const fees = amount.times(BIGINT_FOUR).div(BIGINT_TEN_THOUSAND);
+
+  log.info("FEES 2- fees: {}, fees: {}, amount: {}", [
+    fees.toBigDecimal().toString(),
+    fees.toString(),
+    amount.toString(),
+  ]);
+
+  const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
+    event.address.toHexString()
+  );
+  if (inputToken.length != 2) {
+    log.error("Invalid InputToken length", []);
+    return;
+  }
+  const inputTokenOne = inputToken[0];
+  const inputTokenTwo = inputToken[1];
+
+  const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
+
+  const poolName = poolConfig[1];
+  const poolSymbol = poolConfig[0];
+  const hPoolName = poolConfig[2];
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const pool = sdk.Pools.loadPool<string>(event.address);
+  const hPool = sdk.Pools.loadPool<string>(
+    Bytes.fromHexString(event.address.toHexString().concat("-").concat("1"))
+  );
+
+  const tokenOne = sdk.Tokens.getOrCreateToken(
+    Address.fromString(inputTokenOne)
+  );
+  const tokenTwo = sdk.Tokens.getOrCreateToken(
+    Address.fromString(inputTokenTwo)
+  );
+
+  sdk.Accounts.loadAccount(event.params.buyer);
+
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne);
+  }
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo);
+  }
+
+  updateAMMTVE(event.address, Address.fromBytes(tokenOne.id), hPool, pool);
+
+  pool.pool.relation = hPool.getBytesID();
+  hPool.pool.relation = hPool.getBytesID();
+
+  pool.addRevenueNative(BigInt.zero(), fees);
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
@@ -147,15 +143,21 @@ export function handleAddLiquidity(event: AddLiquidity): void {
   }
   const liquidity = amount[0].plus(amount[1]);
 
-  const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
+  const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
     event.address.toHexString()
-  )[0];
-
-  const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
-    event.address.toHexString()
-  )[1];
+  );
+  if (inputToken.length != 2) {
+    log.error("Invalid InputToken length", []);
+    return;
+  }
+  const inputTokenOne = inputToken[0];
+  const inputTokenTwo = inputToken[1];
 
   const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
 
   const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];
@@ -183,6 +185,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
     hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken);
   }
 
+  //Optimism had a regenesis so we need to manually set the pool's liquidity balance
   if (
     event.transaction.hash.toHexString() ==
     "0xb164734917a3ab5987544d99f6a5875a95bbb30d57c30dfec8db8d13789490ee"
@@ -202,7 +205,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
   updateAMMTVE(event.address, Address.fromBytes(token.id), hPool, pool);
 
-  log.warning(
+  log.info(
     `LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
     [
       bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
@@ -224,13 +227,21 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
   const liquidity = amount[0].plus(amount[1]);
 
-  const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
+  const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
     event.address.toHexString()
-  )[0];
-  const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
-    event.address.toHexString()
-  )[1];
+  );
+  if (inputToken.length != 2) {
+    log.error("Invalid InputToken length", []);
+    return;
+  }
+  const inputTokenOne = inputToken[0];
+  const inputTokenTwo = inputToken[1];
+
   const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
 
   const poolName = poolConfig[1];
   const poolSymbol = poolConfig[0];
@@ -270,7 +281,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   pool.pool.relation = hPool.getBytesID();
   hPool.pool.relation = hPool.getBytesID();
 
-  log.warning(
+  log.info(
     "LWITH lpTokenSupply: {}, amount6-0: {}, amount18-0: {}, amount6-1: {}, amount18-1: {}, hash: {}",
     [
       bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
@@ -288,7 +299,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
     log.error("Missing Config", []);
     return;
   }
-  log.warning("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
+  log.info("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
     event.params.lpTokenSupply.toString(),
     event.transaction.hash.toHexString(),
     bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
@@ -299,17 +310,23 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
     return;
   }
 
-  const inputTokenOne = NetworkConfigs.getTokenAddressFromPoolAddress(
-    event.address.toHexString()
-  )[0];
-
   const amount = event.params.lpTokenAmount.div(BigInt.fromI32(2));
 
-  const inputTokenTwo = NetworkConfigs.getTokenAddressFromPoolAddress(
+  const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
     event.address.toHexString()
-  )[1];
+  );
+  if (inputToken.length != 2) {
+    log.error("Invalid InputToken length", []);
+    return;
+  }
+  const inputTokenOne = inputToken[0];
+  const inputTokenTwo = inputToken[1];
 
   const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString());
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
 
   const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];
@@ -348,7 +365,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   pool.pool.relation = hPool.getBytesID();
   hPool.pool.relation = hPool.getBytesID();
 
-  log.warning("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
+  log.info("LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}", [
     event.params.lpTokenSupply.toString(),
     bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
     event.transaction.hash.toHexString(),

@@ -38,6 +38,9 @@ export class HopProtocolPolygonConfigurations implements Configurations {
     return bridgeAddress || chainId;
   }
 
+  getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
   getPoolAddressFromTokenAddress(tokenAddress: string): string {
     if (tokenAddress == PolygonToken.USDC) {
       return PolygonAmm.USDC; //USDC AMM

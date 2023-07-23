@@ -35,7 +35,7 @@ export function updateAMMTVE(
       pool.setNetValueExportedUSD(
         poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal()
       );
-      log.warning("TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}", [
+      log.info("TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}", [
         poolTVE.toString(),
         poolTVE.div(BIGINT_TEN_TO_SIX).toBigDecimal().toString(),
         inputBalanceCallA.value.toString(),
@@ -49,7 +49,7 @@ export function updateAMMTVE(
       pool.setNetValueExportedUSD(
         poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal()
       );
-      log.warning("TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}", [
+      log.info("TVE1: {}, TVE2: {}, iTB-A: {}, iTB-B: {}, iTLB: {}", [
         poolTVE.toString(),
         poolTVE.div(BIGINT_TEN_TO_EIGHTEENTH).toBigDecimal().toString(),
         inputBalanceCallA.value.toString(),
@@ -58,6 +58,6 @@ export function updateAMMTVE(
       ]);
     }
   } else {
-    log.warning("InputBalanceCall Reverted", []);
+    log.info("InputBalanceCall Reverted", []);
   }
 }
