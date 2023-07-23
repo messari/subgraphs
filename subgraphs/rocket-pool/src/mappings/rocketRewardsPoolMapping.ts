@@ -2,8 +2,8 @@ import { BigInt, Address } from "@graphprotocol/graph-ts";
 import {
   rocketRewardsPool,
   RPLTokensClaimed,
-} from "../../generated/rocketRewardsPool/rocketRewardsPool";
-import { rocketNetworkPrices } from "../../generated/rocketRewardsPool/rocketNetworkPrices";
+} from "../../generated/templates/rocketRewardsPool/rocketRewardsPool";
+import { rocketNetworkPrices } from "../../generated/templates/rocketRewardsPool/rocketNetworkPrices";
 import { RPLRewardInterval, Node } from "../../generated/schema";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
@@ -11,14 +11,7 @@ import {
   ONE_ETHER_IN_WEI,
   ROCKETPOOL_RPL_REWARD_INTERVAL_ID_PREFIX,
 } from "../constants/generalConstants";
-import {
-  ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS,
-  ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_ADDRESS,
-  ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_NAME,
-  ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_NAME,
-  ROCKET_NODE_REWARD_CLAIM_CONTRACT_NAME,
-  ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_ADDRESS,
-} from "../constants/contractConstants";
+import { RocketContractNames } from "../constants/contractConstants";
 import {
   RPLREWARDCLAIMERTYPE_PDAO,
   RPLREWARDCLAIMERTYPE_ODAO,
@@ -29,6 +22,7 @@ import {
   updateSnapshotsTvl,
   updateTotalRewardsMetrics,
 } from "../updaters/financialMetrics";
+import { getRocketContract } from "../entities/rocketContracts";
 
 /**
  * Occurs when an eligible stakeholder on the protocol claims an RPL reward.
@@ -140,8 +134,11 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // We need this to determine the current RPL/ETH price based on the smart contracts.
   // If for some reason this fails, something is horribly wrong and we need to stop indexing.
+  const networkPricesContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NETWORK_PRICES
+  );
   const networkPricesContract = rocketNetworkPrices.bind(
-    Address.fromString(ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS)
+    Address.fromBytes(networkPricesContractEntity.latestAddress)
   );
   const rplETHExchangeRate = networkPricesContract.getRPLPrice();
   let rplRewardETHAmount = BigInt.fromI32(0);
@@ -279,20 +276,24 @@ function getRplRewardClaimerType(
     return rplRewardClaimerType;
 
   // #1: Could be the PDAO.
+  const claimDaoContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_CLAIM_DAO
+  );
   if (
     claimingContract.toHexString() ==
-    Address.fromString(
-      ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_ADDRESS
-    ).toHexString()
+    Address.fromBytes(claimDaoContractEntity.latestAddress).toHexString()
   ) {
     rplRewardClaimerType = RPLREWARDCLAIMERTYPE_PDAO;
   }
 
   // #2: Could be an oracle node.
+  const claimTrustedNodeContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE
+  );
   if (
     claimingContract.toHexString() ==
-    Address.fromString(
-      ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_ADDRESS
+    Address.fromBytes(
+      claimTrustedNodeContractEntity.latestAddress
     ).toHexString()
   ) {
     rplRewardClaimerType = RPLREWARDCLAIMERTYPE_ODAO;
@@ -321,15 +322,15 @@ function getClaimingContractAllowance(
 
   if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_PDAO) {
     return rocketRewardsContract.getClaimingContractAllowance(
-      ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_NAME
+      RocketContractNames.ROCKET_CLAIM_DAO
     );
   } else if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_ODAO) {
     return rocketRewardsContract.getClaimingContractAllowance(
-      ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_NAME
+      RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE
     );
   } else if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_NODE) {
     return rocketRewardsContract.getClaimingContractAllowance(
-      ROCKET_NODE_REWARD_CLAIM_CONTRACT_NAME
+      RocketContractNames.ROCKET_CLAIM_NODE
     );
   } else {
     return BigInt.fromI32(0);

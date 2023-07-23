@@ -1,6 +1,6 @@
-import { BalancesUpdated } from "../../generated/rocketNetworkBalances/rocketNetworkBalances";
-import { rocketTokenRETH } from "../../generated/rocketNetworkBalances/rocketTokenRETH";
-import { rocketDepositPool } from "../../generated/rocketNetworkBalances/rocketDepositPool";
+import { BalancesUpdated } from "../../generated/templates/rocketNetworkBalances/rocketNetworkBalances";
+import { rocketTokenRETH } from "../../generated/templates/rocketNetworkBalances/rocketTokenRETH";
+import { rocketDepositPool } from "../../generated/templates/rocketNetworkBalances/rocketDepositPool";
 import {
   Staker,
   NetworkStakerBalanceCheckpoint,
@@ -12,8 +12,7 @@ import { stakerUtilities } from "../checkpoints/stakerUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import {
   ZERO_ADDRESS_STRING,
-  ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS,
-  ROCKET_TOKEN_RETH_CONTRACT_ADDRESS,
+  RocketContractNames,
 } from "../constants/contractConstants";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { getOrCreateProtocol } from "../entities/protocol";
@@ -33,6 +32,7 @@ import {
   BIGINT_THIRTYTWO,
   BIGINT_ZERO,
 } from "../utils/constants";
+import { getRocketContract } from "../entities/rocketContracts";
 
 /**
  * When enough ODAO members votes on a balance and a consensus threshold is reached, the staker beacon chain state is persisted to the smart contracts.
@@ -59,14 +59,20 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
 
   // Load the RocketTokenRETH contract
   // We will need the rocketvault smart contract state to get specific addresses.
+  const rETHContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_TOKEN_RETH
+  );
   const rETHContract = rocketTokenRETH.bind(
-    Address.fromString(ROCKET_TOKEN_RETH_CONTRACT_ADDRESS)
+    Address.fromBytes(rETHContractEntity.latestAddress)
   );
   if (rETHContract === null) return;
 
   // Load the rocketDepositPool contract
+  const rocketDepositPoolContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_DEPOSIT_POOL
+  );
   const rocketDepositPoolContract = rocketDepositPool.bind(
-    Address.fromString(ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketDepositPoolContractEntity.latestAddress)
   );
   if (rocketDepositPoolContract === null) return;
 

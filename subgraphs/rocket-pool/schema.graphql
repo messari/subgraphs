@@ -1061,3 +1061,10 @@ type Minipool @entity @regularPolling {
   # Block timestamp at which this minipool was marked as finalized.
   finalizedBlockTime: BigInt!
 }
+
+type _RocketContracts @entity {
+  id: ID!
+  keccak256: Bytes!
+  latestAddress: Bytes!
+  allAddresses: [Bytes!]!
+}

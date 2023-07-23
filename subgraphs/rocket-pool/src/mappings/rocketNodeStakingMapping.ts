@@ -3,14 +3,11 @@ import {
   RPLStaked,
   RPLSlashed,
   RPLWithdrawn,
-} from "../../generated/rocketNodeStaking/rocketNodeStaking";
-import { rocketNetworkPrices } from "../../generated/rocketNodeStaking/rocketNetworkPrices";
-import { rocketNodeStaking } from "../../generated/rocketNodeStaking/rocketNodeStaking";
+} from "../../generated/templates/rocketNodeStaking/rocketNodeStaking";
+import { rocketNetworkPrices } from "../../generated/templates/rocketNodeStaking/rocketNetworkPrices";
+import { rocketNodeStaking } from "../../generated/templates/rocketNodeStaking/rocketNodeStaking";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
-import {
-  ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
-  ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS,
-} from "../constants/contractConstants";
+import { RocketContractNames } from "../constants/contractConstants";
 import {
   NODERPLSTAKETRANSACTIONTYPE_STAKED,
   NODERPLSTAKETRANSACTIONTYPE_WITHDRAWAL,
@@ -22,6 +19,7 @@ import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
 import { updateProtocolAndPoolRewardsTvl } from "../updaters/financialMetrics";
+import { getRocketContract } from "../entities/rocketContracts";
 
 /**
  * Occurs when a node operator stakes RPL on his node to collaterize his minipools.
@@ -37,8 +35,11 @@ export function handleRPLStaked(event: RPLStaked): void {
     event.params.amount
   );
   updateUsageMetrics(event.block, event.params.from);
+  const rocketNodeStakingContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_STAKING
+  );
   const rocketNodeStakingContract = rocketNodeStaking.bind(
-    Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
   );
   const totalStake = rocketNodeStakingContract.try_getTotalEffectiveRPLStake();
   if (!totalStake.reverted) {
@@ -106,8 +107,11 @@ function saveNodeRPLStakeTransaction(
   if (node === null) return;
 
   // Load the storage contract because we need to get the rETH contract address. (and some of its state)
+  const rocketNetworkPricesContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NETWORK_PRICES
+  );
   const rocketNetworkPricesContract = rocketNetworkPrices.bind(
-    Address.fromString(ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketNetworkPricesContractEntity.latestAddress)
   );
 
   // Calculate the ETH amount at the time of the transaction.
@@ -144,8 +148,11 @@ function updateNodeRPLBalances(
   transactionType: string
 ): void {
   // We will need the rocket node staking contract to get some latest state for the associated node.
+  const rocketNodeStakingContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_STAKING
+  );
   const rocketNodeStakingContract = rocketNodeStaking.bind(
-    Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
   );
 
   const nodeAddress = Address.fromString(node.id);

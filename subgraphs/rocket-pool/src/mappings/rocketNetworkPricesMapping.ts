@@ -1,9 +1,8 @@
-import { PricesUpdated } from "../../generated/rocketNetworkPrices/rocketNetworkPrices";
-import { rocketNetworkFees } from "../../generated/rocketNetworkPrices/rocketNetworkFees";
-import { rocketDAOProtocolSettingsMinipoolV1 } from "../../generated/rocketNetworkPrices/rocketDAOProtocolSettingsMinipoolV1";
-import { rocketDAOProtocolSettingsMinipoolV2 } from "../../generated/rocketNetworkPrices/rocketDAOProtocolSettingsMinipoolV2";
-import { rocketDAOProtocolSettingsNode } from "../../generated/rocketNetworkPrices/rocketDAOProtocolSettingsNode";
-import { rocketNodeStaking } from "../../generated/rocketNetworkPrices/rocketNodeStaking";
+import { PricesUpdated } from "../../generated/templates/rocketNetworkPrices/rocketNetworkPrices";
+import { rocketNetworkFees } from "../../generated/templates/rocketNetworkPrices/rocketNetworkFees";
+import { rocketDAOProtocolSettingsMinipool } from "../../generated/templates/rocketNetworkPrices/rocketDAOProtocolSettingsMinipool";
+import { rocketDAOProtocolSettingsNode } from "../../generated/templates/rocketNetworkPrices/rocketDAOProtocolSettingsNode";
+import { rocketNodeStaking } from "../../generated/templates/rocketNetworkPrices/rocketNodeStaking";
 import {
   Node,
   NetworkNodeBalanceCheckpoint,
@@ -12,19 +11,14 @@ import {
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { NetworkNodeBalanceMetadata } from "../models/networkNodeBalanceMetadata";
-import {
-  ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V1,
-  ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V2,
-  ROCKET_DAO_PROTOCOL_SETTINGS_NODE_CONTRACT_ADDRESS,
-  ROCKET_NETWORK_FEES_CONTRACT_ADDRESS,
-  ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
-} from "../constants/contractConstants";
+import { RocketContractNames } from "../constants/contractConstants";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { nodeUtilities } from "../checkpoints/nodeUtilities";
 import { EffectiveMinipoolRPLBounds } from "../models/effectiveMinipoolRPLBounds";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
 import { updateSnapshotsTvl } from "../updaters/financialMetrics";
+import { getRocketContract } from "../entities/rocketContracts";
 
 /**
  * When enough ODAO members submitted their votes and a consensus threshold is reached, a new RPL price is comitted to the smart contracts.
@@ -44,8 +38,11 @@ export function handlePricesUpdated(event: PricesUpdated): void {
     return;
 
   // Determine the fee for a new minipool.
+  const networkFeesContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NETWORK_FEES
+  );
   const networkFeesContract = rocketNetworkFees.bind(
-    Address.fromString(ROCKET_NETWORK_FEES_CONTRACT_ADDRESS)
+    Address.fromBytes(networkFeesContractEntity.latestAddress)
   );
   const nodeFeeForNewMinipool = networkFeesContract.getNodeFee();
 
@@ -141,8 +138,11 @@ function generateNodeBalanceCheckpoints(
   if (nodeIds.length === 0) return networkMetadata;
 
   // We will need the rocket node staking contract to get some latest state for the associated node.
+  const rocketNodeStakingContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_STAKING
+  );
   const rocketNodeStakingContract = rocketNodeStaking.bind(
-    Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
   );
 
   // Loop through all the node id's in the protocol.
@@ -288,32 +288,28 @@ function getEffectiveMinipoolRPLBounds(
   let halfDepositAmount = BigInt.fromI32(0);
 
   // Get the half deposit amount from the DAO Protocol settings minipool contract instance.
-  if (blockNumber < BigInt.fromI32(13555066)) {
-    const rocketDAOProtocolSettingsMinipoolContract =
-      rocketDAOProtocolSettingsMinipoolV1.bind(
-        Address.fromString(
-          ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V1
-        )
-      );
+  const rocketDAOProtocolSettingsMinipoolContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_DAO_SETTINGS_MINIPOOL
+  );
+  const rocketDAOProtocolSettingsMinipoolContract =
+    rocketDAOProtocolSettingsMinipool.bind(
+      Address.fromBytes(
+        rocketDAOProtocolSettingsMinipoolContractEntity.latestAddress
+      )
+    );
 
-    halfDepositAmount =
-      rocketDAOProtocolSettingsMinipoolContract.getHalfDepositNodeAmount();
-  } else {
-    const rocketDAOProtocolSettingsMinipoolContract =
-      rocketDAOProtocolSettingsMinipoolV2.bind(
-        Address.fromString(
-          ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V2
-        )
-      );
-
-    halfDepositAmount =
-      rocketDAOProtocolSettingsMinipoolContract.getHalfDepositNodeAmount();
-  }
+  halfDepositAmount =
+    rocketDAOProtocolSettingsMinipoolContract.getHalfDepositNodeAmount();
 
   // Get the DAO Protocol settings node contract instance.
+  const rocketDAOProtocolSettingsNodeContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_DAO_SETTINGS_NODE
+  );
   const rocketDAOProtocolSettingsNodeContract =
     rocketDAOProtocolSettingsNode.bind(
-      Address.fromString(ROCKET_DAO_PROTOCOL_SETTINGS_NODE_CONTRACT_ADDRESS)
+      Address.fromBytes(
+        rocketDAOProtocolSettingsNodeContractEntity.latestAddress
+      )
     );
 
   // Determine the minimum and maximum RPL a minipool needs to be collateralized.
