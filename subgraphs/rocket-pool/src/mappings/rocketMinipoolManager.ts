@@ -7,7 +7,7 @@ import {
 import { rocketNetworkFees } from "../../generated/templates/rocketMinipoolManager/rocketNetworkFees";
 import { rocketNodeStaking } from "../../generated/templates/rocketMinipoolManager/rocketNodeStaking";
 import { RocketContractNames } from "../constants/contractConstants";
-import { Minipool, Node, _RocketContracts } from "../../generated/schema";
+import { Minipool, Node } from "../../generated/schema";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { rocketMinipoolDelegate } from "../../generated/templates";
 import { updateUsageMetrics } from "../updaters/usageMetrics";

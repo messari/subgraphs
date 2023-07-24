@@ -5,7 +5,6 @@ import {
 import { createOrUpdateRocketContract } from "../entities/rocketContracts";
 
 import { SetAddressCall } from "../../generated/rocketStorage/RocketStorage";
-import { _RocketContracts } from "../../generated/schema";
 import {
   rocketDAONodeTrustedActions,
   rocketMinipoolManager,
