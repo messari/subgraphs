@@ -12,15 +12,13 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
 import { Staking as StakingContract } from "../../generated/LevelStake/Staking";
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { RewardTokenType } from "../sdk/util/constants";
 
 export function handleStaked(event: Staked): void {
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
-  const stakingContract = StakingContract.bind(
-    Address.fromString("0x08A12FFedf49fa5f149C73B07E31f99249e40869")
-  );
+  const stakingContract = StakingContract.bind(constants.LEVEL_STAKE_ADDRESS);
   const rewardPerSecond = utils.readValue(
     stakingContract.try_rewardsPerSecond(),
     constants.BIGINT_ZERO
@@ -29,10 +27,7 @@ export function handleStaked(event: Staked): void {
   const seniorLlpToken = sdk.Tokens.getOrCreateToken(
     constants.SENIOR_LLP_ADDRESS
   );
-  const rewardToken = sdk.Tokens.getOrCreateRewardToken(
-    seniorLlpToken,
-    RewardTokenType.STAKE
-  );
+  sdk.Tokens.getOrCreateRewardToken(seniorLlpToken, RewardTokenType.STAKE);
   const rewardTokenEmission = rewardPerSecond.times(
     BigInt.fromI32(constants.SECONDS_PER_DAY)
   );
@@ -48,9 +43,7 @@ export function handleUnstaked(event: Unstaked): void {
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
 
-  const stakingContract = StakingContract.bind(
-    Address.fromString("0x08A12FFedf49fa5f149C73B07E31f99249e40869")
-  );
+  const stakingContract = StakingContract.bind(constants.LEVEL_STAKE_ADDRESS);
   const rewardPerSecond = utils.readValue(
     stakingContract.try_rewardsPerSecond(),
     constants.BIGINT_ZERO
@@ -60,10 +53,7 @@ export function handleUnstaked(event: Unstaked): void {
   const seniorLlpToken = sdk.Tokens.getOrCreateToken(
     constants.SENIOR_LLP_ADDRESS
   );
-  const rewardToken = sdk.Tokens.getOrCreateRewardToken(
-    seniorLlpToken,
-    RewardTokenType.STAKE
-  );
+  sdk.Tokens.getOrCreateRewardToken(seniorLlpToken, RewardTokenType.STAKE);
   const rewardTokenEmission = rewardPerSecond.times(
     BigInt.fromI32(constants.SECONDS_PER_DAY)
   );
@@ -80,17 +70,11 @@ export function handleRewardPerSecondSet(event: RewardsPerSecondSet): void {
   const pool = getOrCreatePool(sdk);
 
   const rewardPerSecond = event.params._rewardsPerSecond;
-  log.warning("[RewardsUpdated] rewardsPerSecond {} ", [
-    rewardPerSecond.toString(),
-  ]);
 
   const seniorLlpToken = sdk.Tokens.getOrCreateToken(
     constants.SENIOR_LLP_ADDRESS
   );
-  const rewardToken = sdk.Tokens.getOrCreateRewardToken(
-    seniorLlpToken,
-    RewardTokenType.STAKE
-  );
+  sdk.Tokens.getOrCreateRewardToken(seniorLlpToken, RewardTokenType.STAKE);
   const rewardTokenEmission = rewardPerSecond.times(
     BigInt.fromI32(constants.SECONDS_PER_DAY)
   );

@@ -1,16 +1,13 @@
 import {
   ClosePosition,
-  DaoFeeSet,
   DecreasePosition,
   IncreasePosition,
-  InterestAccrued,
   LiquidatePosition,
   LiquidityAdded,
   LiquidityRemoved,
   Swap,
-  TokenRiskFactorUpdated,
+  TokenDelisted,
   TokenWhitelisted,
-  UpdatePosition,
 } from "../../generated/Pool/Pool";
 import { swap } from "../modules/swap";
 import { collectFees } from "../modules/fee";
@@ -19,6 +16,7 @@ import { updatePosition } from "../modules/position";
 import { transaction } from "../modules/transaction";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handlePositionIncreased(event: IncreasePosition): void {
   const accountAddress = event.params.account;
@@ -130,15 +128,30 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
   collectFees(feeValue, indexTokenAddress, sdk, pool, true);
   //fee in usd
 }
+export function handleTokenDelisted(event: TokenDelisted): void {
+  const tokenAddress = event.params.token;
 
-export function handleUpdatePosition(event: UpdatePosition): void {
-  // event.params.collateralValue
-  // event.params.entryInterestRate
-  // event.params.entryPrice
-  // event.params.indexPrice
-  // event.params.key
-  // event.params.reserveAmount
-  // event.params.size;
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
+  token._isWhitelisted = false;
+  token.save();
+  const inputTokens = pool.getInputTokens();
+  const idx = inputTokens.indexOf(
+    Bytes.fromHexString(tokenAddress.toHexString())
+  );
+  const inputTokenBalances = pool.pool.inputTokenBalances;
+  inputTokenBalances[idx] = constants.BIGINT_ZERO;
+  pool.setInputTokenBalances(inputTokenBalances);
+}
+
+export function handleTokenWhitelisted(event: TokenWhitelisted): void {
+  const tokenAddress = event.params.token;
+
+  const sdk = initializeSDK(event);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
+  token._isWhitelisted = true;
+  token.save();
 }
 
 export function handleClosePosition(event: ClosePosition): void {
@@ -224,22 +237,4 @@ export function handleSwap(event: Swap): void {
   );
   //fee is in 18 decimals in amount in price
   collectFees(fee, tokenInAddress, sdk, pool);
-}
-
-export function handleInterestAccrued(event: InterestAccrued): void {
-  //not required
-}
-
-export function handleDaoFeeSet(event: DaoFeeSet): void {
-  //not required
-}
-
-export function handleTokenRiskFactorUpdated(
-  event: TokenRiskFactorUpdated
-): void {
-  //not required
-}
-
-export function handleTokenWhitelisted(event: TokenWhitelisted): void {
-  //not required
 }
