@@ -1,11 +1,11 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import {
-  CompoundOracle,
   PriceUpdated,
+  CompoundOracle,
 } from "../../../generated/templates/CompoundOracle/CompoundOracle";
-import { exponentToBigDecimal, MORPHO_COMPOUND_ADDRESS } from "../../constants";
-import { getMarket, getOrInitToken } from "../../utils/initializers";
 import { getCompoundProtocol } from "./fetchers";
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+import { getMarket, getOrInitToken } from "../../utils/initializers";
+import { exponentToBigDecimal, MORPHO_COMPOUND_ADDRESS } from "../../constants";
 
 export function handlePriceUpdated(event: PriceUpdated): void {
   const protocol = getCompoundProtocol(MORPHO_COMPOUND_ADDRESS);
@@ -64,6 +64,7 @@ export function handlePriceUpdated(event: PriceUpdated): void {
   const price = oracle
     .getUnderlyingPrice(marketAddress)
     .toBigDecimal()
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     .div(exponentToBigDecimal(36 - inputToken.decimals));
   market.inputTokenPriceUSD = price;
   market.save();

@@ -1,24 +1,23 @@
-import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { AToken } from "../../../generated/Morpho/AToken";
-import { ERC20 } from "../../../generated/Morpho/ERC20";
-import { LendingPool } from "../../../generated/Morpho/LendingPool";
-import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingPoolAddressesProvider";
 import {
-  MarketCreated,
   MorphoAaveV2,
+  MarketCreated,
 } from "../../../generated/Morpho/MorphoAaveV2";
-import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
-import { ProtocolDataProvider } from "../../../generated/Morpho/ProtocolDataProvider";
-import { Market, UnderlyingTokenMapping } from "../../../generated/schema";
-import { BASE_UNITS, WAD } from "../../constants";
-import { getOrInitMarketList, getOrInitToken } from "../../utils/initializers";
 import { getAaveProtocol } from "./fetchers";
+import { BASE_UNITS, WAD } from "../../constants";
+import { ERC20 } from "../../../generated/Morpho/ERC20";
+import { AToken } from "../../../generated/Morpho/AToken";
+import { updateProtocolAfterNewMarket } from "../../helpers";
+import { LendingPool } from "../../../generated/Morpho/LendingPool";
+import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
+import { Market, UnderlyingTokenMapping } from "../../../generated/schema";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { getOrInitMarketList, getOrInitToken } from "../../utils/initializers";
+import { ProtocolDataProvider } from "../../../generated/Morpho/ProtocolDataProvider";
+import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingPoolAddressesProvider";
 
 export function handleMarketCreated(event: MarketCreated): void {
   // Sync protocol creation since MarketCreated is the first event emitted
   const protocol = getAaveProtocol(event.address);
-  protocol.totalPoolCount = protocol.totalPoolCount + 1;
-  protocol.save();
 
   const aToken = AToken.bind(event.params._poolToken);
   const underlying = ERC20.bind(aToken.UNDERLYING_ASSET_ADDRESS());
@@ -115,6 +114,18 @@ export function handleMarketCreated(event: MarketCreated): void {
   market._poolSupplyRate = poolReserveData.currentLiquidityRate;
   market._poolBorrowRate = poolReserveData.currentVariableBorrowRate;
 
+  market._p2pSupplyIndexFromRates = morpho.p2pSupplyIndex(
+    event.params._poolToken
+  );
+  market._p2pBorrowIndexFromRates = morpho.p2pBorrowIndex(
+    event.params._poolToken
+  );
+  market._p2pSupplyRate = BigInt.zero();
+  market._p2pBorrowRate = BigInt.zero();
+  market._p2pIndexCursor_BI = BigInt.zero();
+  market._reserveFactor_BI = BigInt.zero();
+  market._reserveFactor_BI = BigInt.zero();
+
   market._p2pSupplyIndex = morpho.p2pSupplyIndex(event.params._poolToken);
   market._p2pBorrowIndex = morpho.p2pBorrowIndex(event.params._poolToken);
 
@@ -189,4 +200,6 @@ export function handleMarketCreated(event: MarketCreated): void {
   list.markets = markets.concat([market.id]);
 
   list.save();
+
+  updateProtocolAfterNewMarket(market.id, protocol.id);
 }
