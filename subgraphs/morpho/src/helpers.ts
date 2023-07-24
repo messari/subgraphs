@@ -1,44 +1,54 @@
 import {
-  BigDecimal,
-  BigInt,
-  Bytes,
-  ethereum,
   log,
+  Bytes,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
-  Account,
-  FinancialsDailySnapshot,
-  InterestRate,
-  LendingProtocol,
   Market,
+  Account,
+  Position,
+  InterestRate,
+  _ActiveAccount,
+  LendingProtocol,
+  _PositionCounter,
+  PositionSnapshot,
   MarketDailySnapshot,
   MarketHourlySnapshot,
+  FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
-  Position,
-  PositionSnapshot,
-  _ActiveAccount,
-  _PositionCounter,
 } from "../generated/schema";
 import {
-  INT_ZERO,
-  ActivityType,
-  EventType,
-  SECONDS_PER_HOUR,
-  SECONDS_PER_DAY,
-  PositionSide,
-  BIGDECIMAL_ONE,
-  wadToRay,
   RAY_BI,
-  exponentToBigDecimal,
+  INT_ZERO,
+  EventType,
+  BIGINT_ZERO,
+  ActivityType,
+  PositionSide,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  BIGDECIMAL_ZERO,
   InterestRateSide,
   InterestRateType,
-  BIGDECIMAL_HUNDRED,
   exponentToBigInt,
-  BIGINT_ZERO,
+  BIGDECIMAL_HUNDRED,
+  exponentToBigDecimal,
 } from "./constants";
-import { MorphoPositions } from "./mapping/common";
-import { getMarket, getOrInitToken } from "./utils/initializers";
+import {
+  getMarket,
+  getOrInitToken,
+  getOrInitLendingProtocol,
+} from "./utils/initializers";
+import { IMaths } from "./utils/maths/mathsInterface";
+import {
+  computeGrowthFactors,
+  computeP2PBorrowRate,
+  computeP2PIndex,
+  computeP2PSupplyRate,
+} from "./utils/interestRatesModels";
 
 function getDay(timestamp: BigInt): BigInt {
   return timestamp.div(BigInt.fromI32(SECONDS_PER_DAY));
@@ -75,99 +85,147 @@ export function createInterestRate(
   return interestRate;
 }
 
-export function updateMarketSnapshots(
-  blockNumber: BigInt,
-  timestamp: BigInt,
+export function updateRevenueSnapshots(
   market: Market,
-  newTotalRevenue: BigDecimal,
-  newSupplyRevenue: BigDecimal,
-  newProtocolRevenue: BigDecimal
+  protocol: LendingProtocol,
+  supplySideRevenue: BigDecimal,
+  protocolSideRevenue: BigDecimal,
+  block: ethereum.Block
 ): void {
-  // get and update market daily snapshot
-  const marketDailySnapshot = getOrCreateMarketDailySnapshot(
-    market,
-    timestamp,
-    blockNumber
-  );
+  const financialSnapshot = getOrCreateFinancialDailySnapshots(protocol, block);
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(market, block);
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(market, block);
+
+  const totalRevenue = supplySideRevenue.plus(protocolSideRevenue);
+
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+  financialSnapshot.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialSnapshot.dailySupplySideRevenueUSD =
+    financialSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  financialSnapshot.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialSnapshot.dailyProtocolSideRevenueUSD =
+    financialSnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenue);
+
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(totalRevenue);
+  financialSnapshot.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
+  financialSnapshot.dailyTotalRevenueUSD =
+    financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenue);
+
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot.dailySupplySideRevenueUSD =
+    marketDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot.hourlySupplySideRevenueUSD =
+    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenue);
+
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  marketDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot.dailyProtocolSideRevenueUSD =
+    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolSideRevenue);
+
+  market.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD.plus(totalRevenue);
+  marketDailySnapshot.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD;
+  marketDailySnapshot.dailyTotalRevenueUSD =
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenue);
+  marketHourlySnapshot.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD;
+  marketHourlySnapshot.hourlyTotalRevenueUSD =
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenue);
+
   marketDailySnapshot.rates = getSnapshotRates(
     market.rates,
-    (timestamp.toI32() / SECONDS_PER_DAY).toString()
+    (block.timestamp.toI32() / SECONDS_PER_DAY).toString()
   );
 
-  // update daily revenues
-  marketDailySnapshot.dailySupplySideRevenueUSD =
-    marketDailySnapshot.dailySupplySideRevenueUSD.plus(newSupplyRevenue);
-  marketDailySnapshot.dailyProtocolSideRevenueUSD =
-    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(newProtocolRevenue);
-  marketDailySnapshot.dailyTotalRevenueUSD =
-    marketDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenue);
-  marketDailySnapshot.save();
-
-  // get and update market daily snapshot
-  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
-    market,
-    timestamp,
-    blockNumber
-  );
-
-  // update hourly revenues
-  marketHourlySnapshot.hourlySupplySideRevenueUSD =
-    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(newSupplyRevenue);
-  marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
-    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(newProtocolRevenue);
-  marketHourlySnapshot.hourlyTotalRevenueUSD =
-    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(newTotalRevenue);
   marketHourlySnapshot.save();
+  marketDailySnapshot.save();
+  financialSnapshot.save();
+  protocol.save();
+  market.save();
+}
+
+export function getOrCreateFinancialDailySnapshots(
+  protocol: LendingProtocol,
+  block: ethereum.Block
+): FinancialsDailySnapshot {
+  const snapshotId = getDayId(block.timestamp);
+  let financialMetrics = FinancialsDailySnapshot.load(snapshotId);
+
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(snapshotId);
+    financialMetrics.protocol = protocol.id;
+
+    financialMetrics.days = getDay(block.timestamp).toI32();
+    financialMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTransferUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyFlashloanUSD = BIGDECIMAL_ZERO;
+
+    financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD;
+
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD =
+      protocol.cumulativeProtocolSideRevenueUSD;
+
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD;
+
+    financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+    financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+    financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+    financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+    financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+
+    financialMetrics.blockNumber = block.number;
+    financialMetrics.timestamp = block.timestamp;
+
+    financialMetrics.save();
+  }
+
+  return financialMetrics;
 }
 
 export function updateFinancials(
-  event: ethereum.Event,
   protocol: LendingProtocol,
-  newTotalRevenue: BigDecimal,
-  newProtocolRevenue: BigDecimal,
-  newSupplyRevenue: BigDecimal
+  block: ethereum.Block
 ): void {
-  const snapshotId = getDayId(event.block.timestamp);
-  let snapshot = FinancialsDailySnapshot.load(snapshotId);
+  const financialMetrics = getOrCreateFinancialDailySnapshots(protocol, block);
 
-  // create new snapshot if needed
-  if (!snapshot) {
-    snapshot = new FinancialsDailySnapshot(snapshotId);
-    snapshot.protocol = protocol.id;
-    snapshot.days = getDay(event.block.timestamp).toI32();
-    snapshot.dailyDepositUSD = BigDecimal.zero();
-    snapshot.dailyBorrowUSD = BigDecimal.zero();
-    snapshot.dailyLiquidateUSD = BigDecimal.zero();
-    snapshot.dailyWithdrawUSD = BigDecimal.zero();
-    snapshot.dailyRepayUSD = BigDecimal.zero();
-    snapshot.dailySupplySideRevenueUSD = BigDecimal.zero();
-    snapshot.dailyProtocolSideRevenueUSD = BigDecimal.zero();
-    snapshot.dailyTotalRevenueUSD = BigDecimal.zero();
-    snapshot.dailyTransferUSD = BigDecimal.zero();
-    snapshot.dailyFlashloanUSD = BigDecimal.zero();
-  }
+  financialMetrics.blockNumber = block.number;
+  financialMetrics.timestamp = block.timestamp;
 
-  // update snapshot fields
-  snapshot.blockNumber = event.block.number;
-  snapshot.timestamp = event.block.timestamp;
-  snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  snapshot.dailySupplySideRevenueUSD =
-    snapshot.dailySupplySideRevenueUSD.plus(newSupplyRevenue);
-  snapshot.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  snapshot.dailyProtocolSideRevenueUSD =
-    snapshot.dailyProtocolSideRevenueUSD.plus(newProtocolRevenue);
-  snapshot.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  snapshot.dailyTotalRevenueUSD =
-    snapshot.dailyTotalRevenueUSD.plus(newTotalRevenue);
-  snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  snapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
-  snapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-  snapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
-  snapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
-  snapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  snapshot.save();
+  financialMetrics.save();
 }
 
 export function snapshotUsage(
@@ -380,21 +438,12 @@ export function updateSnapshots(
   amountUSD: BigDecimal,
   amountNative: BigInt,
   eventType: i32,
-  blockTimestamp: BigInt,
-  blockNumber: BigInt
+  block: ethereum.Block
 ): void {
-  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
-    market,
-    blockTimestamp,
-    blockNumber
-  );
-  const marketDailySnapshot = getOrCreateMarketDailySnapshot(
-    market,
-    blockTimestamp,
-    blockNumber
-  );
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(market, block);
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(market, block);
   const financialSnapshot = FinancialsDailySnapshot.load(
-    getDayId(blockTimestamp)
+    getDayId(block.timestamp)
   );
   if (!financialSnapshot) {
     // should NOT happen
@@ -659,8 +708,6 @@ export function subtractPosition(
     position.hashClosed = event.transaction.hash;
     position.blockNumberClosed = event.block.number;
     position.timestampClosed = event.block.timestamp;
-    position._balanceOnPool = BigInt.zero();
-    position._balanceInP2P = BigInt.zero();
     position.save();
 
     //
@@ -716,16 +763,15 @@ export function createAccount(accountID: Bytes): Account {
 
 function getOrCreateMarketDailySnapshot(
   market: Market,
-  blockTimestamp: BigInt,
-  blockNumber: BigInt
+  block: ethereum.Block
 ): MarketDailySnapshot {
-  const snapshotID = getDayId(blockTimestamp);
+  const snapshotID = market.id.concat(getDayId(block.timestamp));
   let snapshot = MarketDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketDailySnapshot(snapshotID);
 
     // initialize zero values to ensure no null runtime errors
-    snapshot.days = getDay(blockTimestamp).toI32();
+    snapshot.days = getDay(block.timestamp).toI32();
     snapshot.dailyActiveTransferrers = INT_ZERO;
     snapshot.dailyActiveFlashloaners = INT_ZERO;
     snapshot.dailyActiveTransferrers = INT_ZERO;
@@ -737,16 +783,16 @@ function getOrCreateMarketDailySnapshot(
     snapshot.dailyActiveBorrowingPositionCount = INT_ZERO;
     snapshot.dailyActiveLendingPositionCount = INT_ZERO;
 
-    snapshot.dailyTransferUSD = BigDecimal.zero();
-    snapshot.dailyFlashloanUSD = BigDecimal.zero();
-    snapshot.dailyDepositUSD = BigDecimal.zero();
-    snapshot.dailyBorrowUSD = BigDecimal.zero();
-    snapshot.dailyLiquidateUSD = BigDecimal.zero();
-    snapshot.dailyWithdrawUSD = BigDecimal.zero();
-    snapshot.dailyRepayUSD = BigDecimal.zero();
-    snapshot.dailyTotalRevenueUSD = BigDecimal.zero();
-    snapshot.dailySupplySideRevenueUSD = BigDecimal.zero();
-    snapshot.dailyProtocolSideRevenueUSD = BigDecimal.zero();
+    snapshot.dailyTransferUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyFlashloanUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.dailyTransferCount = INT_ZERO;
     snapshot.dailyFlashloanCount = INT_ZERO;
     snapshot.dailyActiveLendingPositionCount = INT_ZERO;
@@ -778,7 +824,7 @@ function getOrCreateMarketDailySnapshot(
 
   snapshot.rates = getSnapshotRates(
     market.rates,
-    (blockTimestamp.toI32() / SECONDS_PER_DAY).toString()
+    (block.timestamp.toI32() / SECONDS_PER_DAY).toString()
   );
   snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   snapshot.cumulativeSupplySideRevenueUSD =
@@ -800,8 +846,8 @@ function getOrCreateMarketDailySnapshot(
   snapshot.exchangeRate = market.exchangeRate;
   snapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  snapshot.blockNumber = blockNumber;
-  snapshot.timestamp = blockTimestamp;
+  snapshot.blockNumber = block.number;
+  snapshot.timestamp = block.timestamp;
   snapshot.save();
 
   return snapshot;
@@ -809,35 +855,35 @@ function getOrCreateMarketDailySnapshot(
 
 export function getOrCreateMarketHourlySnapshot(
   market: Market,
-  blockTimestamp: BigInt,
-  blockNumber: BigInt
+  block: ethereum.Block
 ): MarketHourlySnapshot {
-  const snapshotID = getHourId(blockTimestamp);
+  const snapshotID = market.id.concat(getHourId(block.timestamp));
   let snapshot = MarketHourlySnapshot.load(snapshotID);
+
   if (!snapshot) {
     snapshot = new MarketHourlySnapshot(snapshotID);
 
     // initialize zero values to ensure no null runtime errors
-    snapshot.hours = getHour(blockTimestamp).toI32();
-    snapshot.hourlyFlashloanUSD = BigDecimal.zero();
-    snapshot.hourlyTransferUSD = BigDecimal.zero();
-    snapshot.hourlyDepositUSD = BigDecimal.zero();
-    snapshot.hourlyBorrowUSD = BigDecimal.zero();
-    snapshot.hourlyLiquidateUSD = BigDecimal.zero();
-    snapshot.hourlyWithdrawUSD = BigDecimal.zero();
-    snapshot.hourlyRepayUSD = BigDecimal.zero();
-    snapshot.hourlyTotalRevenueUSD = BigDecimal.zero();
-    snapshot.hourlyProtocolSideRevenueUSD = BigDecimal.zero();
-    snapshot.hourlySupplySideRevenueUSD = BigDecimal.zero();
+    snapshot.hours = getHour(block.timestamp).toI32();
+    snapshot.hourlyFlashloanUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyTransferUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.protocol = market.protocol;
     snapshot.market = market.id;
   }
 
-  snapshot.blockNumber = blockNumber;
-  snapshot.timestamp = blockTimestamp;
+  snapshot.blockNumber = block.number;
+  snapshot.timestamp = block.timestamp;
   snapshot.rates = getSnapshotRates(
     market.rates,
-    (blockTimestamp.toI32() / SECONDS_PER_HOUR).toString()
+    (block.timestamp.toI32() / SECONDS_PER_HOUR).toString()
   );
   snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   snapshot.cumulativeSupplySideRevenueUSD =
@@ -908,7 +954,6 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
       ? market._p2pSupplyIndex
       : market._p2pBorrowIndex;
 
-  // TODO: ugly solution
   const balanceOnPool = position
     ._balanceOnPool!.times(poolIndex ? poolIndex : BIGINT_ZERO)
     .div(RAY_BI);
@@ -916,6 +961,7 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
     ._balanceInP2P!.times(p2pIndex ? p2pIndex : BIGINT_ZERO)
     .div(RAY_BI);
   const totalBalance = balanceOnPool.plus(balanceInP2P);
+
   snapshot.hash = event.transaction.hash;
   snapshot.logIndex = event.logIndex.toI32();
   snapshot.nonce = event.transaction.nonce;
@@ -949,120 +995,174 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
  */
 export function updateProtocolPosition(
   protocol: LendingProtocol,
-  market: Market,
-  morphoPositions: MorphoPositions
+  market: Market
 ): void {
-  const newMarketSupplyUSD = morphoPositions.morphoSupplyOnPool
-    .plus(morphoPositions.morphoSupplyP2P)
+  const inputToken = getOrInitToken(market.inputToken);
+
+  const newMarketSupplyOnPool_BI = market
+    ._scaledSupplyOnPool!.times(market._reserveSupplyIndex!)
+    .div(exponentToBigInt(market._indexesOffset));
+
+  const newMarketSupplyOnPool = newMarketSupplyOnPool_BI
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
+
+  const newMarketSupplyInP2P_BI = market
+    ._scaledSupplyInP2P!.times(market._p2pSupplyIndex!)
+    .div(exponentToBigInt(market._indexesOffset));
+
+  const newMarketSupplyInP2P = newMarketSupplyInP2P_BI
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
+
+  const newMarketSupplyCollateral_BI = market._scaledPoolCollateral
+    ? market
+        ._scaledPoolCollateral!.times(market._reserveSupplyIndex!)
+        .div(exponentToBigInt(market._indexesOffset))
+    : BigInt.zero();
+
+  const newMarketSupplyCollateral = newMarketSupplyCollateral_BI
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
+
+  const newMarketSupplyUSD = newMarketSupplyOnPool
+    .plus(newMarketSupplyInP2P)
+    .plus(newMarketSupplyCollateral)
     .times(market.inputTokenPriceUSD);
 
-  const newMarketBorrow = morphoPositions.morphoBorrowOnPool.plus(
-    morphoPositions.morphoBorrowP2P
-  );
-  const newMarketBorrowUSD = newMarketBorrow.times(market.inputTokenPriceUSD);
+  const newMarketBorrowOnPool_BI = market
+    ._scaledBorrowOnPool!.times(market._reserveBorrowIndex!)
+    .div(exponentToBigInt(market._indexesOffset));
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD
-    .minus(market.totalDepositBalanceUSD)
-    .plus(newMarketSupplyUSD);
+  const newMarketBorrowOnPool = newMarketBorrowOnPool_BI
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
 
-  protocol.totalDepositBalanceUSD = protocol.totalValueLockedUSD;
-  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD
-    .minus(market.totalBorrowBalanceUSD)
-    .plus(newMarketBorrowUSD);
-  protocol.save();
+  const newMarketBorrowInP2P_BI = market
+    ._scaledBorrowInP2P!.times(market._p2pBorrowIndex!)
+    .div(exponentToBigInt(market._indexesOffset));
 
-  market.variableBorrowedTokenBalance = morphoPositions.morphoBorrowP2P_BI.plus(
-    morphoPositions.morphoBorrowOnPool_BI
+  const newMarketBorrowInP2P = newMarketBorrowInP2P_BI
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
+
+  const newMarketBorrowUSD = newMarketBorrowOnPool
+    .plus(newMarketBorrowInP2P)
+    .times(market.inputTokenPriceUSD);
+
+  market.variableBorrowedTokenBalance = newMarketBorrowInP2P_BI.plus(
+    newMarketBorrowOnPool_BI
   );
-  market.inputTokenBalance = morphoPositions.morphoSupplyP2P_BI.plus(
-    morphoPositions.morphoSupplyOnPool_BI
-  );
+
+  market.inputTokenBalance = newMarketSupplyOnPool_BI
+    .plus(newMarketSupplyInP2P_BI)
+    .plus(newMarketSupplyCollateral_BI);
+
   market.totalDepositBalanceUSD = newMarketSupplyUSD;
   market.totalBorrowBalanceUSD = newMarketBorrowUSD;
   market.totalValueLockedUSD = newMarketSupplyUSD;
-  market._totalSupplyOnPool = morphoPositions.morphoSupplyOnPool;
-  market._totalSupplyInP2P = morphoPositions.morphoSupplyP2P;
-  market._totalBorrowOnPool = morphoPositions.morphoBorrowOnPool;
-  market._totalBorrowInP2P = morphoPositions.morphoBorrowP2P;
+  market._totalSupplyOnPool = newMarketSupplyOnPool;
+  market._totalSupplyInP2P = newMarketSupplyInP2P;
+  market._totalBorrowOnPool = newMarketBorrowOnPool;
+  market._totalCollateralOnPool = newMarketSupplyCollateral;
+
+  market._totalBorrowInP2P = newMarketBorrowInP2P;
   market.save();
 }
 
-export function updateP2PRates(market: Market): void {
-  const supplyRate = market
-    ._poolSupplyRate!.toBigDecimal()
-    .div(exponentToBigDecimal(market._indexesOffset));
-  const borrowRate = market
-    ._poolBorrowRate!.toBigDecimal()
-    .div(exponentToBigDecimal(market._indexesOffset));
-  let midRate: BigDecimal;
+function computeProportionIdle(market: Market): BigInt {
+  const offset = exponentToBigInt(market._indexesOffset);
 
-  if (borrowRate.lt(supplyRate)) midRate = borrowRate;
-  else {
-    midRate = BIGDECIMAL_ONE.minus(market._p2pIndexCursor!)
-      .times(supplyRate)
-      .plus(borrowRate.times(market._p2pIndexCursor!));
+  if (market._idleSupply && market._idleSupply!.gt(BigInt.zero())) {
+    const totalP2PSupplied = market
+      ._p2pSupplyAmount!.times(market._p2pSupplyIndex!)
+      .div(offset);
+    const proportionIdle = market
+      ._idleSupply!.times(offset)
+      .div(totalP2PSupplied);
+
+    if (proportionIdle.gt(offset)) return offset;
+    return proportionIdle;
   }
-  const p2pSupplyRateWithFees = market.reserveFactor
-    ? midRate.minus(midRate.minus(supplyRate).times(market.reserveFactor!))
-    : midRate;
-  const p2pBorrowRateWithFees = market.reserveFactor
-    ? midRate.plus(borrowRate.minus(midRate).times(market.reserveFactor!))
-    : midRate;
-  let p2pSupplyRateWithDelta = p2pSupplyRateWithFees;
-  if (
-    market._p2pSupplyDelta!.gt(BigInt.zero()) &&
-    market._p2pSupplyAmount!.gt(BigInt.zero())
-  ) {
-    let shareOfTheDelta = wadToRay(market._p2pSupplyDelta!)
-      .times(market._reserveSupplyIndex!)
-      .div(
-        wadToRay(market._p2pSupplyAmount!)
-          .times(market._p2pSupplyIndex!)
-          .div(exponentToBigInt(market._indexesOffset))
-      );
-    if (shareOfTheDelta.gt(exponentToBigInt(market._indexesOffset)))
-      shareOfTheDelta = exponentToBigInt(market._indexesOffset);
-    const sotd = shareOfTheDelta
-      .toBigDecimal()
-      .div(exponentToBigDecimal(market._indexesOffset));
-    p2pSupplyRateWithDelta = p2pSupplyRateWithFees
-      .times(BIGDECIMAL_ONE.minus(sotd))
-      .plus(supplyRate.times(sotd));
-  }
-  let p2pBorrowRateWithDelta = p2pBorrowRateWithFees;
-  if (
-    market._p2pBorrowDelta!.gt(BigInt.zero()) &&
-    market._p2pBorrowAmount!.gt(BigInt.zero())
-  ) {
-    let shareOfTheDelta = wadToRay(market._p2pBorrowDelta!)
-      .times(market._reserveBorrowIndex!)
-      .div(
-        wadToRay(market._p2pBorrowAmount!)
-          .times(market._p2pBorrowIndex!)
-          .div(exponentToBigInt(market._indexesOffset))
-      );
-    if (shareOfTheDelta.gt(exponentToBigInt(market._indexesOffset)))
-      shareOfTheDelta = exponentToBigInt(market._indexesOffset);
-    const sotd = shareOfTheDelta
-      .toBigDecimal()
-      .div(exponentToBigDecimal(market._indexesOffset));
-    p2pBorrowRateWithDelta = p2pBorrowRateWithFees
-      .times(BIGDECIMAL_ONE.minus(sotd))
-      .plus(borrowRate.times(sotd));
-  }
+
+  return BigInt.zero();
+}
+
+export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
+  const proportionIdle = computeProportionIdle(market);
+  const growthFactors = computeGrowthFactors(
+    market._reserveSupplyIndex!,
+    market._reserveBorrowIndex!,
+    market._lastPoolSupplyIndex!,
+    market._lastPoolBorrowIndex!,
+    market._p2pIndexCursor_BI!,
+    market._reserveFactor_BI!,
+    __MATHS__
+  );
+  market._p2pSupplyIndexFromRates = computeP2PIndex(
+    market._lastPoolSupplyIndex!,
+    market._p2pSupplyIndex!,
+    growthFactors.p2pSupplyGrowthFactor,
+    growthFactors.poolSupplyGrowthFactor,
+    market._p2pSupplyDelta!,
+    market._p2pSupplyAmount!,
+    proportionIdle,
+    __MATHS__
+  );
+  market._p2pBorrowIndexFromRates = computeP2PIndex(
+    market._lastPoolBorrowIndex!,
+    market._p2pBorrowIndex!,
+    growthFactors.p2pBorrowGrowthFactor,
+    growthFactors.poolBorrowGrowthFactor,
+    market._p2pBorrowDelta!,
+    market._p2pBorrowAmount!,
+    proportionIdle,
+    __MATHS__
+  );
+  market._p2pBorrowRate = computeP2PBorrowRate(
+    market._poolBorrowRate!,
+    market._poolSupplyRate!,
+    market._lastPoolBorrowIndex!,
+    market._p2pBorrowIndexFromRates!,
+    market._p2pIndexCursor_BI!,
+    market._p2pBorrowDelta!,
+    market._p2pBorrowAmount!,
+    market._reserveFactor_BI!,
+    proportionIdle,
+    __MATHS__
+  );
+  market._p2pSupplyRate = computeP2PSupplyRate(
+    market._poolBorrowRate!,
+    market._poolSupplyRate!,
+    market._lastPoolSupplyIndex!,
+    market._p2pSupplyIndexFromRates!,
+    market._p2pIndexCursor_BI!,
+    market._p2pSupplyDelta!,
+    market._p2pSupplyAmount!,
+    market._reserveFactor_BI!,
+    proportionIdle,
+    __MATHS__
+  );
 
   const p2pSupplyRate = createInterestRate(
     market.id,
     InterestRateSide.LENDER,
     InterestRateType.P2P,
-    p2pSupplyRateWithDelta.times(BIGDECIMAL_HUNDRED)
+    market
+      ._p2pSupplyRate!.toBigDecimal()
+      .div(exponentToBigDecimal(market._indexesOffset))
+      .times(BIGDECIMAL_HUNDRED)
   );
   const p2pBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.P2P,
-    p2pBorrowRateWithDelta.times(BIGDECIMAL_HUNDRED)
+    market
+      ._p2pBorrowRate!.toBigDecimal()
+      .div(exponentToBigDecimal(market._indexesOffset))
+      .times(BIGDECIMAL_HUNDRED)
   );
+  market.save();
 
   if (!market.rates) return;
   const rates = market.rates as string[];
@@ -1076,7 +1176,55 @@ export function updateP2PRates(market: Market): void {
     p2pBorrowRate.id,
     borrowRateId,
   ];
+  market.save();
 }
 
 export const getEventId = (hash: Bytes, logIndex: BigInt): Bytes =>
   hash.concat(Bytes.fromI32(logIndex.toI32()));
+
+export function updateProtocolValues(
+  protocolAddress: Bytes
+): void {
+  const protocol = getOrInitLendingProtocol(
+    Address.fromBytes(protocolAddress)
+  ).protocol;
+
+  const marketIds = protocol._marketIds;
+  let totalValueLockedUSD = BIGDECIMAL_ZERO;
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+
+  for (let marketIdx = 0; marketIdx < marketIds.length; marketIdx++) {
+    const pool = getMarket(Bytes.fromHexString(marketIds[marketIdx]));
+    if (!pool) continue;
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      pool.totalDepositBalanceUSD
+    );
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      pool.totalBorrowBalanceUSD
+    );
+  }
+
+  protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+  protocol.save();
+}
+
+export function updateProtocolAfterNewMarket(
+  poolAddress: Bytes,
+  protocolAddress: Bytes
+): void {
+  const protocol = getOrInitLendingProtocol(
+    Address.fromBytes(protocolAddress)
+  ).protocol;
+
+  const marketIds = protocol._marketIds;
+  marketIds.push(poolAddress.toHexString());
+  protocol._marketIds = marketIds;
+
+  protocol.totalPoolCount += 1;
+  protocol.save();
+}

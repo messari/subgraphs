@@ -3,7 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -115,6 +115,14 @@ export class SushiswapArbitrumConfigurations implements Configurations {
       "0x15e32be99b3af4b7517639b3ac608c93f73e42de", // Bluefin APP
       "0xf5520364a2e2ff1cb2e007df7cbe01c8b2cd7e0d", // ReadON
       "0x014a029338d7953e0df6dc5ea351ade9743c98ed", // Sushiswap AI Card Render
+      "0x806d6626f88834971d9b26f4e8fffc9f6f46bc35", // ArbiDex
+      "0x7753a4ff7c9994ade950095e68eed44f83931dfd", // Ede
+      "0xd4cd3e9d44b8d2b87535bb210eae220daf48f5a3", // Annoyshiba
+      "0xed2be16e5f53365ef8e2a1d2c3ff2fca1d94c8bd", // Zetas
+      "0x0856853f067c1e3dc28e9636ef9de0bddeea0838", // Akuka
+      "0x80b95b558f067ba86d5cd4084889ea0fda5ebd6d", // KerplerHomes
+      "0x930002e02eaff5a40c4e5e9210a44e564e04aba7", // 3Money
+      "0xb24086ecbb8dffb943b5ccf97e6da9a434308f3f",
     ];
   }
   getBrokenERC20Tokens(): string[] {
@@ -124,6 +132,6 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
   }
 }

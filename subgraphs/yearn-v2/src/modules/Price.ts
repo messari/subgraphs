@@ -17,12 +17,12 @@ export function getPriceOfOutputTokens(
   const network = dataSource.network();
   const vaultContract = Vault.bind(vaultAddress);
 
-  let pricePerShare = utils.readValue<BigInt>(
+  const pricePerShare = utils.readValue<BigInt>(
     vaultContract.try_pricePerShare(),
     constants.BIGINT_ZERO
   );
 
-  let virtualPrice = getPriceUsdcRecommended(tokenAddress, network);
+  const virtualPrice = getPriceUsdcRecommended(tokenAddress, network);
 
   return pricePerShare
     .toBigDecimal()

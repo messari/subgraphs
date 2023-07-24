@@ -22,6 +22,7 @@ import {
   IavsTokenType,
   INT_TWO,
   BIGINT_THREE,
+  ZERO_ADDRESS,
 } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
 import {
@@ -129,6 +130,19 @@ export function getCollateralBalance(market: Market, account: Address): BigInt {
   }
 
   return balanceResult.value;
+}
+
+export function getTreasuryAddress(market: Market): Address {
+  const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
+  const tryTreasuryAddress = aTokenContract.try_RESERVE_TREASURY_ADDRESS();
+  if (tryTreasuryAddress.reverted) {
+    log.warning(
+      "[getTreasuryAddress] Error getting treasury address on aToken: {}",
+      [market.outputToken!.toHexString()]
+    );
+    return Address.fromString(ZERO_ADDRESS);
+  }
+  return tryTreasuryAddress.value;
 }
 
 export function getOrCreateFlashloanPremium(

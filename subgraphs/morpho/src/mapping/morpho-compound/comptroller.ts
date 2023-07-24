@@ -1,20 +1,20 @@
-import { Address, log } from "@graphprotocol/graph-ts";
-import { Market, _MarketList } from "../../../generated/schema";
-import { CompoundOracle } from "../../../generated/templates";
-import {
-  NewBorrowCap,
-  NewCloseFactor,
-  NewCollateralFactor,
-  NewPriceOracle,
-} from "../../../generated/templates/Comptroller/Comptroller";
 import {
   BIGDECIMAL_ONE,
   DEFAULT_DECIMALS,
   exponentToBigDecimal,
   MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { getMarket } from "../../utils/initializers";
+import {
+  NewBorrowCap,
+  NewCloseFactor,
+  NewCollateralFactor,
+  NewPriceOracle,
+} from "../../../generated/templates/Comptroller/Comptroller";
 import { getCompoundProtocol } from "./fetchers";
+import { Address } from "@graphprotocol/graph-ts";
+import { Market } from "../../../generated/schema";
+import { CompoundOracle } from "../../../generated/templates";
+import { getMarket, getOrInitMarketList } from "../../utils/initializers";
 
 export function handleNewBorrowCap(event: NewBorrowCap): void {
   const market = Market.load(event.params.cToken);
@@ -24,17 +24,14 @@ export function handleNewBorrowCap(event: NewBorrowCap): void {
 }
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
+  const protocol = getOrInitMarketList(MORPHO_COMPOUND_ADDRESS);
   const closeFactor = event.params.newCloseFactorMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .minus(BIGDECIMAL_ONE);
-  const marketList = _MarketList.load(MORPHO_COMPOUND_ADDRESS);
-  if (!marketList) {
-    log.error("[handleNewCloseFactor] Market list not found", []);
-    return;
-  }
-  for (let i = 0; i < marketList.markets.length; i++) {
-    const market = getMarket(marketList.markets[i]);
+
+  for (let i = 0; i < protocol.markets.length; i++) {
+    const market = getMarket(protocol.markets[i]);
     market.liquidationPenalty = closeFactor;
     market.save();
   }
