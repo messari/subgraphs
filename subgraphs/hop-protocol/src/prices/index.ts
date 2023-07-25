@@ -22,8 +22,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   ArbitrumHtoken,
-  ArbitrumNovaHtoken,
-  ArbitrumNovaToken,
   ArbitrumToken,
   BIGDECIMAL_ONE,
   OptimismHtoken,
@@ -32,8 +30,10 @@ import {
   PolygonHtoken,
   PolygonToken,
   RewardTokens,
+  WETH_ADDRESS,
   XdaiHtoken,
   XdaiToken,
+  ZERO_ADDRESS,
   exponentToBigInt,
   priceTokens,
   safeDiv,
@@ -64,6 +64,10 @@ export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt): BigDecimal[] {
 }
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
+  if (tokenAddr.toHexString() == ZERO_ADDRESS) {
+    tokenAddr = Address.fromString(WETH_ADDRESS);
+  }
+
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
     return new CustomPriceType();
   }
@@ -293,9 +297,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   // 8. uniswapV2
   if (
     tokenAddr.toHexString() == XdaiToken.ETH ||
-    tokenAddr.toHexString() == XdaiHtoken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaToken.ETH ||
-    tokenAddr.toHexString() == ArbitrumNovaHtoken.ETH
+    tokenAddr.toHexString() == XdaiHtoken.ETH
   ) {
     tokenAddr = Address.fromString(XdaiToken.ETH);
 

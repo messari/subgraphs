@@ -18,7 +18,7 @@ import { Token } from "../../../../generated/schema";
 import { getUsdPricePerToken, getUsdPrice } from "../../../../src/prices/index";
 import { bigIntToBigDecimal } from "../../../../src/sdk/util/numbers";
 import { updateL1OutgoingBridgeMessage } from "../../../../src/sdk/util/bridge";
-import { FOUR, THREE } from "../../../../src/sdk/util/constants";
+import { FOUR } from "../../../../src/sdk/util/constants";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -56,7 +56,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
   const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
     event.address.toHexString()
   );
-  if (inputToken.length != 2) {
+  if (inputToken.length != 1) {
     log.error("Invalid InputToken length", []);
     return;
   }
@@ -74,7 +74,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
   );
 
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
-  if (poolConfig.length != THREE) {
+  if (poolConfig.length != 2) {
     log.error("Invalid PoolConfig length", []);
     return;
   }

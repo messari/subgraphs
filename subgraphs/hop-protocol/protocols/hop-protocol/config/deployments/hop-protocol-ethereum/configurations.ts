@@ -257,7 +257,13 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   }
 
   getEthPools(): string[] {
-    return [XdaiAmm.ETH, ArbitrumAmm.ETH, PolygonAmm.ETH, OptimismAmm.ETH];
+    return [
+      ArbitrumNovaAmm.ETH,
+      XdaiAmm.ETH,
+      ArbitrumAmm.ETH,
+      PolygonAmm.ETH,
+      OptimismAmm.ETH,
+    ];
   }
 
   getEthTokens(): string[] {
