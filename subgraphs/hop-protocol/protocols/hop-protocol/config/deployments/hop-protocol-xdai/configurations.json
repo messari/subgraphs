@@ -1,0 +1,123 @@
+{
+  "network": "xdai",
+  "isMainnet": false,
+  "subgraphName": "hop-xdai",
+  "deployment": "HOP_PROTOCOL_XDAI",
+  "graftEnabled": true,
+  "subgraphId": "QmPFJhkC1S3assspxHkzuQTuonZJuGDQ43wsoUKofcoAkg",
+  "graftStartBlock": 25850672,
+  "amms": [
+    {
+      "dataSourceName": "HopL2Amm",
+      "token": "USDC",
+      "address": "0x5C32143C8B198F392d01f8446b754c181224ac26",
+      "startBlock": 16617205
+    },
+    {
+      "dataSourceName": "HopL2AmmUSDT",
+      "token": "USDT",
+      "address": "0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7",
+      "startBlock": 17155190
+    },
+    {
+      "dataSourceName": "HopL2AmmMATIC",
+      "token": "MATIC",
+      "address": "0xaa30D6bba6285d0585722e2440Ff89E23EF68864",
+      "startBlock": 17444919
+    },
+    {
+      "dataSourceName": "HopL2AmmDAI",
+      "token": "DAI",
+      "address": "0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24",
+      "startBlock": 18093612
+    },
+    {
+      "dataSourceName": "HopL2AmmETH",
+      "token": "ETH",
+      "address": "0x4014DC015641c08788F15bD6eB20dA4c47D936d8",
+      "startBlock": 18359665
+    }
+  ],
+  "bridges": [
+    {
+      "dataSourceName": "Bridge",
+      "token": "USDC",
+      "address": "0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8",
+      "startBlock": 16617211
+    },
+    {
+      "dataSourceName": "HopL2BridgeUSDT",
+      "token": "USDT",
+      "address": "0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2",
+      "startBlock": 17155195
+    },
+    {
+      "dataSourceName": "HopL2BridgeMATIC",
+      "token": "MATIC",
+      "address": "0x7ac71c29fEdF94BAc5A5C9aB76E1Dd12Ea885CCC",
+      "startBlock": 17444924
+    },
+    {
+      "dataSourceName": "HopL2BridgeDAI",
+      "token": "DAI",
+      "address": "0x0460352b91D7CF42B0E1C1c30f06B602D9ef2238",
+      "startBlock": 18093617
+    },
+    {
+      "dataSourceName": "HopL2BridgeETH",
+      "token": "ETH",
+      "address": "0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B",
+      "startBlock": 18359713
+    },
+    {
+      "dataSourceName": "HopL2BridgeHOP",
+      "token": "HOP",
+      "address": "0x6F03052743CD99ce1b29265E377e320CD24Eb632",
+      "startBlock": 24309494
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "USDC",
+      "address": "0x5D13179c5fa40b87D53Ff67ca26245D3D5B2F872",
+      "startBlock": 20383705
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDC_B",
+      "token": "USDC",
+      "address": "0x636A7ee78faCd079DaBC8f81EDA1D09AA9D440A7",
+      "startBlock": 24646599
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT_A",
+      "token": "USDT",
+      "address": "0x2C2Ab81Cf235e86374468b387e241DF22459A265",
+      "startBlock": 20895527
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT_B",
+      "token": "USDT",
+      "address": "0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1",
+      "startBlock": 24646600
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI_A",
+      "token": "DAI",
+      "address": "0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7",
+      "startBlock": 20383718
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI_B",
+      "token": "DAI",
+      "address": "0xBF7a02d963b23D84313F07a04ad663409CEE5A92",
+      "startBlock": 24646600
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH_B",
+      "token": "ETH",
+      "address": "0x712F0cf37Bdb8299D0666727F73a5cAbA7c1c24c",
+      "startBlock": 24646599
+    }
+  ]
+}

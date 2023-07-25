@@ -1,0 +1,70 @@
+{
+  "network": "mainnet",
+  "isMainnet": true,
+  "graftEnabled": true,
+  "deployment": "HOP_PROTOCOL_ETHEREUM",
+  "subgraphId": "QmTP91LxyZ8hxThCSsdNF8YsA7yZReRApQyijsNnkCf9m6",
+  "graftStartBlock": 16423244,
+  "bridges": [
+    {
+      "dataSourceName": "Bridge",
+      "token": "USDC",
+      "address": "0x3666f603Cc164936C1b87e207F36BEBa4AC5f18a",
+      "startBlock": 12650032
+    },
+    {
+      "dataSourceName": "HopL1BridgeUSDT",
+      "token": "USDT",
+      "address": "0x3E4a3a4796d16c0Cd582C382691998f7c06420B6",
+      "startBlock": 12860139
+    },
+    {
+      "dataSourceName": "HopL1BridgeRETH",
+      "token": "rETH",
+      "address": "0x87269B23e73305117D0404557bAdc459CEd0dbEc",
+      "startBlock": 17141336
+    },
+    {
+      "dataSourceName": "HopL1BridgeMATIC",
+      "token": "MATIC",
+      "address": "0x22B1Cbb8D98a01a3B71D034BB899775A76Eb1cc2",
+      "startBlock": 12969385
+    },
+    {
+      "dataSourceName": "HopL1BridgeDAI",
+      "token": "DAI",
+      "address": "0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1",
+      "startBlock": 13226217
+    },
+    {
+      "dataSourceName": "HopL1BridgeETH",
+      "token": "ETH",
+      "address": "0xb8901acB165ed027E32754E0FFe830802919727f",
+      "startBlock": 13331564
+    },
+    {
+      "dataSourceName": "HopL1BridgeSNX",
+      "token": "SNX",
+      "address": "0x893246FACF345c99e4235E5A7bbEE7404c988b96",
+      "startBlock": 15634323
+    },
+    {
+      "dataSourceName": "HopL1BridgesUSD",
+      "token": "sUSD",
+      "address": "0x36443fC70E073fe9D50425f82a3eE19feF697d62",
+      "startBlock": 15678491
+    },
+    {
+      "dataSourceName": "HopL1BridgeMAGIC",
+      "token": "MAGIC",
+      "address": "0xf074540eb83c86211F305E145eB31743E228E57d",
+      "startBlock": 17445930
+    },
+    {
+      "dataSourceName": "HopL1BridgeHOP",
+      "token": "HOP",
+      "address": "0x914f986a44AcB623A277d6Bd17368171FCbe4273",
+      "startBlock": 15592825
+    }
+  ]
+}
