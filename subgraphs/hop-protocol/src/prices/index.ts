@@ -47,7 +47,7 @@ const Q192 = BigInt.fromString(
 export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt): BigDecimal[] {
   const num = sqrtPriceX96.times(sqrtPriceX96);
 
-  log.warning("FUNCTION FOUND", []);
+  log.info("FUNCTION FOUND", []);
 
   const denom = Q192;
   const price1 = num

@@ -22,7 +22,7 @@ import {
   updateWithdrawn,
 } from "../../../../src/sdk/util/rewards";
 import { conf } from "../../../../src/sdk/util/bridge";
-import { FOUR } from "../../../../src/sdk/util/constants";
+import { FOUR, THREE } from "../../../../src/sdk/util/constants";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -66,9 +66,12 @@ export function handleRewardsPaid(event: RewardPaid): void {
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
   log.info("GNO RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
 
-  const poolName = poolConfig[1];
-
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
   const poolSymbol = poolConfig[0];
+  const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];
 
   const sdk = SDK.initializeFromEvent(
@@ -109,12 +112,15 @@ export function handleStaked(event: Staked): void {
   ]);
 
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
   log.info("Staked 1 --> poolAddress: {},", [poolAddress]);
 
+  const poolSymbol = poolConfig[0];
   const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];
-
-  const poolSymbol = poolConfig[0];
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -158,10 +164,13 @@ export function handleWithdrawn(event: Withdrawn): void {
   const poolConfig = NetworkConfigs.getPoolDetails(poolAddress);
   log.info("UnStaked 1 --> poolAddress: {},", [poolAddress]);
 
+  if (poolConfig.length != THREE) {
+    log.error("Invalid PoolConfig length", []);
+    return;
+  }
+  const poolSymbol = poolConfig[0];
   const poolName = poolConfig[1];
   const hPoolName = poolConfig[2];
-
-  const poolSymbol = poolConfig[0];
 
   const sdk = SDK.initializeFromEvent(
     conf,
