@@ -1,4 +1,4 @@
-# Lending SDK `1.0.6`
+# Lending SDK `1.0.7`
 
 The lending SDK follows the `3.1.0` lending schema. You can learn about each `manager` class in the class headers, but there are a few things to note.
 

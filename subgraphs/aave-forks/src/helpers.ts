@@ -318,32 +318,36 @@ export function getFlashloanPremiumAmount(
       break;
     }
 
-    // topics[0] - signature
-    const ADDRESS = "address";
-    const DATA_TYPE_TUPLE = "(address,uint256,uint8,uint256)";
-    const logSignature = thisLog.topics[0];
-    if (thisLog.address == event.address && logSignature == eventSignature) {
-      log.info(
-        "[getFlashloanPremiumAmount]tx={}-{} thisLog.logIndex={} thisLog.topics=(1:{},2:{}),thisLog.data={}",
-        [
-          event.transaction.hash.toHexString(),
-          event.logIndex.toString(),
-          thisLog.logIndex.toString(),
-          thisLog.topics.at(1).toHexString(),
-          thisLog.topics.at(2).toHexString(),
-          thisLog.data.toHexString(),
-        ]
-      );
-      const flashLoanAssetAddress = ethereum
-        .decode(ADDRESS, thisLog.topics.at(2))!
-        .toAddress();
-      if (flashLoanAssetAddress.notEqual(assetAddress)) {
-        //
-        continue;
+    if (thisLog.topics.length >= 3) {
+      // topics[0] - signature
+      const ADDRESS = "address";
+      const DATA_TYPE_TUPLE = "(address,uint256,uint8,uint256)";
+      const logSignature = thisLog.topics[0];
+      if (thisLog.address == event.address && logSignature == eventSignature) {
+        log.info(
+          "[getFlashloanPremiumAmount]tx={}-{} thisLog.logIndex={} thisLog.topics=(1:{},2:{}),thisLog.data={}",
+          [
+            event.transaction.hash.toHexString(),
+            event.logIndex.toString(),
+            thisLog.logIndex.toString(),
+            thisLog.topics.at(1).toHexString(),
+            thisLog.topics.at(2).toHexString(),
+            thisLog.data.toHexString(),
+          ]
+        );
+        const flashLoanAssetAddress = ethereum
+          .decode(ADDRESS, thisLog.topics.at(2))!
+          .toAddress();
+        if (flashLoanAssetAddress.notEqual(assetAddress)) {
+          //
+          continue;
+        }
+        const decoded = ethereum
+          .decode(DATA_TYPE_TUPLE, thisLog.data)!
+          .toTuple();
+        flashloanPremiumAmount = decoded[3].toBigInt();
+        break;
       }
-      const decoded = ethereum.decode(DATA_TYPE_TUPLE, thisLog.data)!.toTuple();
-      flashloanPremiumAmount = decoded[3].toBigInt();
-      break;
     }
   }
   return flashloanPremiumAmount;
