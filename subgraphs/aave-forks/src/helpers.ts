@@ -318,7 +318,7 @@ export function getFlashloanPremiumAmount(
       break;
     }
 
-    if (thisLog.topics.length >= 3) {
+    if (thisLog.topics.length >= INT_THREE) {
       // topics[0] - signature
       const ADDRESS = "address";
       const DATA_TYPE_TUPLE = "(address,uint256,uint8,uint256)";
