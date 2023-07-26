@@ -1,11 +1,13 @@
 import {
-  ClosePosition,
   DecreasePosition,
+  DecreasePosition1 as DecreasePositionWithoutSignedPnl,
   IncreasePosition,
   LiquidatePosition,
+  LiquidatePosition2 as LiquidatePositionWithoutSignedPnl,
   LiquidityAdded,
   LiquidityRemoved,
   Swap,
+  Swap2 as SwapWithPrices,
   TokenDelisted,
   TokenWhitelisted,
 } from "../../generated/Pool/Pool";
@@ -37,7 +39,7 @@ export function handlePositionIncreased(event: IncreasePosition): void {
     accountAddress,
     collateralTokenAddress,
     collateralValue,
-    false,
+    constants.IS_COLLATERAL_IN_USD,
     indexTokenAddress,
     sizeChange,
     indexPrice,
@@ -90,7 +92,41 @@ export function handlePositionDecreased(event: DecreasePosition): void {
   collectFees(feeValue, indexTokenAddress, sdk, pool, true);
   //fee in usd
 }
-
+export function handlePositionDecreasedWithoutSignedPnl(
+  event: DecreasePositionWithoutSignedPnl
+): void {
+  const accountAddress = event.params.account;
+  const collateralTokenAddress = event.params.collateralToken;
+  const collateralValue = event.params.collateralChanged;
+  const feeValue = event.params.feeValue;
+  const indexPrice = event.params.indexPrice;
+  const indexTokenAddress = event.params.indexToken;
+  const key = event.params.key;
+  const side = event.params.side;
+  const sizeChange = event.params.sizeChanged;
+  const pnl = event.params.pnl;
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
+  updatePosition(
+    event,
+    key,
+    accountAddress,
+    collateralTokenAddress,
+    collateralValue,
+    true,
+    indexTokenAddress,
+    sizeChange,
+    indexPrice,
+    feeValue,
+    side == constants.Side.LONG,
+    TransactionType.COLLATERAL_OUT,
+    pnl,
+    sdk,
+    pool
+  );
+  collectFees(feeValue, indexTokenAddress, sdk, pool, true);
+  //fee in usd
+}
 export function handlePositionLiquidated(event: LiquidatePosition): void {
   const accountAddress = event.params.account;
   const collateralTokenAddress = event.params.collateralToken;
@@ -128,6 +164,42 @@ export function handlePositionLiquidated(event: LiquidatePosition): void {
   collectFees(feeValue, indexTokenAddress, sdk, pool, true);
   //fee in usd
 }
+export function handlePositionLiquidatedWithoutSignedPnl(
+  event: LiquidatePositionWithoutSignedPnl
+): void {
+  const accountAddress = event.params.account;
+  const collateralTokenAddress = event.params.collateralToken;
+  const collateralValue = event.params.collateralValue;
+  const feeValue = event.params.feeValue;
+  const indexPrice = event.params.indexPrice;
+  const indexTokenAddress = event.params.indexToken;
+  const key = event.params.key;
+  const side = event.params.side;
+  const sizeChange = event.params.size;
+  const realisedPnl = event.params.pnl;
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
+  updatePosition(
+    event,
+    key,
+    accountAddress,
+    collateralTokenAddress,
+    collateralValue,
+    true,
+    indexTokenAddress,
+    sizeChange,
+    indexPrice,
+    feeValue,
+    side == constants.Side.LONG,
+    TransactionType.LIQUIDATE,
+    realisedPnl,
+    sdk,
+    pool
+  );
+  collectFees(feeValue, indexTokenAddress, sdk, pool, true);
+  //fee in usd
+}
+
 export function handleTokenDelisted(event: TokenDelisted): void {
   const tokenAddress = event.params.token;
 
@@ -152,17 +224,6 @@ export function handleTokenWhitelisted(event: TokenWhitelisted): void {
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
   token._isWhitelisted = true;
   token.save();
-}
-
-export function handleClosePosition(event: ClosePosition): void {
-  //increase poolVolume
-
-  event.params.collateralValue;
-  event.params.entryInterestRate;
-  event.params.entryPrice;
-  event.params.key;
-  event.params.reserveAmount;
-  event.params.size;
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
@@ -226,6 +287,30 @@ export function handleSwap(event: Swap): void {
 
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
+  swap(
+    accountAddress,
+    tokenInAddress,
+    amountIn,
+    tokenOutAddress,
+    amountOut,
+    sdk,
+    pool
+  );
+  //fee is in 18 decimals in amount in price
+  collectFees(fee, tokenInAddress, sdk, pool);
+}
+
+export function handleSwapWithPrices(event: SwapWithPrices): void {
+  const amountIn = event.params.amountIn;
+  const amountOut = event.params.amountOut;
+  const tokenInAddress = event.params.tokenIn;
+  const tokenOutAddress = event.params.tokenOut;
+  const accountAddress = event.params.sender;
+  const fee = event.params.fee;
+
+  const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(sdk);
+
   swap(
     accountAddress,
     tokenInAddress,

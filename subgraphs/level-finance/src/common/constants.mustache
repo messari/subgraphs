@@ -168,31 +168,31 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874";
-export const POOL_NAME = "LVLVault";
-export const POOL_SYMBOL = "Vault";
+export const PROTOCOL_ID = "{{protocolId}}";
+export const POOL_NAME = "{{poolName}}";
+export const POOL_SYMBOL = "{{poolSymbol}}";
 export const VAULT_ADDRESS = Address.fromString(
-  "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874"
+  "{{VaultAddr}}"
 );
 export const OUTPUT_TOKEN_ADDRESS = Address.fromString(
-  "0xb5c42f84ab3f786bca9761240546aa9cec1f8821"
+  "{{outputTokenAddress}}"
 );
 export const SENIOR_LLP_ADDRESS = Address.fromString(
-  "0xb5c42f84ab3f786bca9761240546aa9cec1f8821"
+  "{{seniorLLpAddress}}"
 );
 export const LEVEL_TOKEN_ADDRESS = Address.fromString(
-  "0xb64e280e9d1b5dbec4accedb2257a87b400db149"
+  "{{levelTokenAddress}}"
 );
 export const LEVEL_STAKE_ADDRESS = Address.fromString(
-  "0x08a12ffedf49fa5f149c73b07e31f99249e40869"
+  "{{levelStakeAddress}}"
 );
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PRICE_PRECISION_DECIMALS = 12;
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
-export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.35");
-export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.20");
-export const SUPPLY_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.45");
+export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("{{protocolSideRevenuePercent}}");
+export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("{{stakeSideRevenuePercent}}");
+export const SUPPLY_SIDE_REVENUE_PERCENT = BigDecimal.fromString("{{supplySideRevenue}}");
 
 export const VALUE_DECIMALS = 30 as i8;
 export const INTEREST_RATE_DECIMALS = 10 as i8;
@@ -217,3 +217,4 @@ export namespace MasterChef {
 }
 export const INFLATION_INTERVAL = "TIMESTAMP";
 export const STARTING_INFLATION_RATE = BIGINT_ZERO;
+export const IS_COLLATERAL_IN_USD = {{isCollateralInUSD}}

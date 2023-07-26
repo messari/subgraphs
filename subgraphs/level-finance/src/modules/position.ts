@@ -45,7 +45,7 @@ export function updatePosition(
     indexToken,
     utils.bigIntToBigDecimal(
       indexTokenPrice,
-      constants.PRICE_PRECISION_DECIMALS
+      constants.VALUE_DECIMALS - indexToken.decimals
     ),
     event.block
   );
@@ -71,6 +71,16 @@ export function updatePosition(
         collateralUSDDelta
           .times(exponentToBigDecimal(collateralToken.decimals))
           .div(collateralToken.lastPriceUSD!)
+      );
+      log.warning(
+        "[positionUpdated] collateralDelta {} collateralUsdDelta {} collateralTokenAmountDelta {} collateralTokenDecimals {} token {} ",
+        [
+          collateralDelta.toString(),
+          collateralUSDDelta.toString(),
+          collateralTokenAmountDelta.toString(),
+          collateralToken.decimals.toString(),
+          collateralToken.name.toString(),
+        ]
       );
     } else {
       collateralTokenAmountDelta = collateralDelta;
@@ -180,10 +190,7 @@ export function updatePosition(
       event.transaction.from,
       accountAddress,
       position.getBytesID(),
-      utils.bigIntToBigDecimal(
-        liqudateProfit,
-        constants.PRICE_PRECISION_DECIMALS
-      ),
+      utils.bigIntToBigDecimal(liqudateProfit, constants.VALUE_DECIMALS),
       true
     );
 

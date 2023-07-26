@@ -18,6 +18,7 @@ import { RewardTokenType } from "../sdk/util/constants";
 export function handleStaked(event: Staked): void {
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
+  if (constants.LEVEL_STAKE_ADDRESS.equals(constants.NULL.TYPE_ADDRESS)) return;
   const stakingContract = StakingContract.bind(constants.LEVEL_STAKE_ADDRESS);
   const rewardPerSecond = utils.readValue(
     stakingContract.try_rewardsPerSecond(),
@@ -42,7 +43,7 @@ export function handleStaked(event: Staked): void {
 export function handleUnstaked(event: Unstaked): void {
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
-
+  if (constants.LEVEL_STAKE_ADDRESS.equals(constants.NULL.TYPE_ADDRESS)) return;
   const stakingContract = StakingContract.bind(constants.LEVEL_STAKE_ADDRESS);
   const rewardPerSecond = utils.readValue(
     stakingContract.try_rewardsPerSecond(),

@@ -169,7 +169,7 @@ export const ETH_NAME = "Ether";
 /////////////////////////////
 
 export const PROTOCOL_ID = "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874";
-export const POOL_NAME = "LVLVault";
+export const POOL_NAME = "LevelVault";
 export const POOL_SYMBOL = "Vault";
 export const VAULT_ADDRESS = Address.fromString(
   "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874"
@@ -191,7 +191,7 @@ export const PRICE_PRECISION_DECIMALS = 12;
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
 export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.35");
-export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.20");
+export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.2");
 export const SUPPLY_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.45");
 
 export const VALUE_DECIMALS = 30 as i8;
@@ -217,3 +217,4 @@ export namespace MasterChef {
 }
 export const INFLATION_INTERVAL = "TIMESTAMP";
 export const STARTING_INFLATION_RATE = BIGINT_ZERO;
+export const IS_COLLATERAL_IN_USD = false;
