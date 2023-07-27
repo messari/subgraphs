@@ -3732,7 +3732,7 @@
         "status": "prod",
         "versions": {
           "schema": "4.0.0",
-          "subgraph": "1.5.0",
+          "subgraph": "1.6.0",
           "methodology": "1.0.0"
         },
         "files": {
