@@ -1,6 +1,6 @@
 import {
   CdpLiquidated,
-  CdpUpdated,
+  // CdpUpdated,
 } from "../../generated/CdpManager/CdpManager";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../sdk/util/constants";
 import { getDataManager, STETH_ADDRESS } from "../constants";

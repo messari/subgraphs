@@ -11,14 +11,12 @@ import {
   EBTC_ADDRESS,
   LIQUIDATION_FEE_PERCENT,
   MAXIMUM_LTV,
-  PRICE_FEED,
   STETH_ADDRESS,
   getDataManager,
-  getProtocolData,
 } from "../constants";
 import { TokenManager } from "../sdk/token";
 import { getUsdPrice } from "../prices";
-import { BIGINT_TEN_TO_EIGHTEENTH, OracleSource } from "../sdk/util/constants";
+import { BIGINT_TEN_TO_EIGHTEENTH } from "../sdk/util/constants";
 
 /**
  * On deployment of the pool, initialise and populate the market,
