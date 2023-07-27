@@ -11,9 +11,9 @@ import { getUsdPrice } from "../prices";
  * Make necessary adjustments to the system when a CDP changes.
  * @param event The event emitted by the CdpManager when a CDP changes.
  */
-export function handleCdpUpdated(event: CdpUpdated): void {
-  // TODO
-}
+// export function handleCdpUpdated(event: CdpUpdated): void {
+// TODO
+// }
 
 /**
  * Register a liquidation event.

@@ -47,16 +47,6 @@ export function handleSystemDeployed(event: CdpManagerAddressChanged): void {
   market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
   market.borrowedToken = EBTC_ADDRESS;
   market.save();
-
-  const lendingProtocol = dataManager.getOrCreateLendingProtocol(
-    getProtocolData() // data: ProtocolData
-  );
-
-  const oracle = dataManager.getOrCreateOracle(
-    Address.fromBytes(PRICE_FEED), // oracleAddress: Address
-    false, // isUSD: boolean
-    OracleSource.CHAINLINK // source?: string
-  );
 }
 
 /**
@@ -98,7 +88,7 @@ export function handleActivePoolEBTCDebtUpdated(
  */
 export function handleFlashLoanSuccess(event: FlashLoanSuccess): void {
   const dataManager = getDataManager(event);
-  const flashloan = dataManager.createFlashloan(
+  dataManager.createFlashloan(
     Address.fromBytes(STETH_ADDRESS), // asset: Address
     event.params._receiver, // account: Address
     event.params._amount, // amount: BigInt

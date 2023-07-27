@@ -69,8 +69,8 @@ dataSources:
           handler: handleCdpLiquidated
         # - event: CdpPartiallyLiquidated(indexed bytes32,indexed address,uint256,uint256,uint8)
         # - event: CdpSnapshotsUpdated(bytes32,uint256)
-        - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
-          handler: handleCdpUpdated
+        # - event: CdpUpdated(indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256,uint8)
+        #   handler: handleCdpUpdated
         # - event: CollSurplusPoolAddressChanged(address)
         # - event: CollateralAddressChanged(address)
         # - event: CollateralFeePerUnitUpdated(uint256,uint256,uint256)

@@ -50,13 +50,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
+  "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C"
+  "0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c"
 );
 
 export class config implements Configurations {

@@ -82,7 +82,7 @@ export function handleFlashLoanSuccess(event: FlashLoanSuccess): void {
   // TODO: this is a dupe of the same function in ActivePool.ts
   // TODO: how to export imported functions?
   const dataManager = getDataManager(event);
-  const flashloan = dataManager.createFlashloan(
+  dataManager.createFlashloan(
     Address.fromBytes(STETH_ADDRESS), // asset: Address
     event.params._receiver, // account: Address
     event.params._amount, // amount: BigInt
