@@ -2,6 +2,13 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   {{#L1Gateways}}
   - kind: ethereum

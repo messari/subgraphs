@@ -1,16 +1,20 @@
 {
   "network": "avalanche",
-  "PoolAddressesProviderRegistry": {
-    "address": "0x770ef9f4fe897e59daCc474EF11238303F9552b6",
-    "startBlock": 11970175
+  "factory": {
+    "address": "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb",
+    "startBlock": 11970391
   },
-  "RewardsController": {
-    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
-    "startBlock": 12143274
+  "lendingPoolConfigurator": {
+    "startBlock": 11970516,
+    "address": "0x8145eddDf43f50276641b55bd3AD95944510021E"
   },
   "LendingPool": {
     "address": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
     "startBlock": 11970506
+  },
+  "RewardsController": {
+    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "startBlock": 12143274
   },
   "graftEnabled": false,
   "subgraphId": "",

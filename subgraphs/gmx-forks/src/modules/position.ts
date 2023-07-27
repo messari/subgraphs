@@ -187,6 +187,7 @@ export function updateUserPosition(
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
   const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
   const position = sdk.Positions.loadPosition(
+    positionKey,
     pool,
     account,
     indexToken,
@@ -301,6 +302,7 @@ export function updatePositionRealisedPnlUSD(
   );
 
   const position = sdk.Positions.loadPosition(
+    positionKey,
     pool,
     account,
     asset,

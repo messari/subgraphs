@@ -1,41 +1,37 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { ChainLinkContract } from "../../../generated/templates/Strategy/ChainLinkContract";
 
-export function getChainLinkContract(): ChainLinkContract | null {
+export function getTokenPriceUSDC(
+  tokenAddr: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
   const config = utils.getConfig();
-  if (!config || utils.isNullAddress(config.chainLink())) return null;
+  const contractAddress = utils.getContract(config.chainLink(), block);
 
-  return ChainLinkContract.bind(config.chainLink());
-}
+  if (!contractAddress) return new CustomPriceType();
 
-export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  const chainLinkContract = getChainLinkContract();
-
-  if (!chainLinkContract) {
-    return new CustomPriceType();
-  }
-
+  const chainLinkContract = ChainLinkContract.bind(contractAddress);
   const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
     constants.CHAIN_LINK_USD_ADDRESS
   );
 
   if (!result.reverted) {
-    const decimals = chainLinkContract.try_decimals(
-      tokenAddr,
-      constants.CHAIN_LINK_USD_ADDRESS
+    const decimals = utils.readValue<i32>(
+      chainLinkContract.try_decimals(
+        tokenAddr,
+        constants.CHAIN_LINK_USD_ADDRESS
+      ),
+      constants.DEFAULT_USDC_DECIMALS
     );
-
-    if (decimals.reverted) {
-      new CustomPriceType();
-    }
 
     return CustomPriceType.initialize(
       result.value.value1.toBigDecimal(),
-      decimals.value
+      decimals,
+      constants.OracleType.CHAINLINK_FEED
     );
   }
 

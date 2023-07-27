@@ -1,18 +1,18 @@
-import { Address } from "@graphprotocol/graph-ts";
-import { CToken } from "../../../generated/Morpho/CToken";
-import { MorphoCompound } from "../../../generated/Morpho/MorphoCompound";
-import { LendingProtocol, Market } from "../../../generated/schema";
 import {
-  exponentToBigDecimal,
   exponentToBigInt,
+  exponentToBigDecimal,
   MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { MorphoPositions } from "../common";
 import {
-  getOrInitLendingProtocol,
   getOrInitToken,
+  getOrInitLendingProtocol,
 } from "../../utils/initializers";
+import { MorphoPositions } from "../common";
+import { Address } from "@graphprotocol/graph-ts";
+import { CToken } from "../../../generated/Morpho/CToken";
 import { Comptroller } from "../../../generated/templates";
+import { LendingProtocol, Market } from "../../../generated/schema";
+import { MorphoCompound } from "../../../generated/Morpho/MorphoCompound";
 
 export function getCompoundProtocol(protocolAddress: Address): LendingProtocol {
   const morpho = getOrInitLendingProtocol(protocolAddress);

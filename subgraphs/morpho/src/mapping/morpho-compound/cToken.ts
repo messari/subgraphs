@@ -1,17 +1,18 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-import {
-  AccrueInterest,
-  AccrueInterest1,
-  CToken,
-} from "../../../generated/templates/CToken/CToken";
 import {
   BLOCKS_PER_YEAR,
-  MORPHO_COMPOUND_ADDRESS,
   ReserveUpdateParams,
+  MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { getMarket } from "../../utils/initializers";
+import {
+  CToken,
+  AccrueInterest,
+  AccrueInterest1,
+} from "../../../generated/templates/CToken/CToken";
+import { getCompoundProtocol } from "./fetchers";
 import { _handleReserveUpdate } from "../common";
-import { fetchMorphoPositionsCompound, getCompoundProtocol } from "./fetchers";
+import { ethereum } from "@graphprotocol/graph-ts";
+import { getMarket } from "../../utils/initializers";
+import { CompoundMath } from "../../utils/maths/compoundMath";
 
 export function handleAccrueInterestV1(event: AccrueInterest1): void {
   handleAccrueInterest(event);
@@ -34,7 +35,6 @@ function handleAccrueInterest(event: ethereum.Event): void {
   const borrowPoolRate = borrowPoolRatePerBlock.times(BLOCKS_PER_YEAR);
 
   const market = getMarket(event.address);
-  const morphoPositions = fetchMorphoPositionsCompound(market);
 
   _handleReserveUpdate(
     new ReserveUpdateParams(
@@ -46,7 +46,7 @@ function handleAccrueInterest(event: ethereum.Event): void {
       supplyPoolRate,
       borrowPoolRate
     ),
-    morphoPositions,
-    market
+    market,
+    new CompoundMath()
   );
 }

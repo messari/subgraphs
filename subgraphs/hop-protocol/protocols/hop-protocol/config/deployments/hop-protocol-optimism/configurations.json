@@ -1,0 +1,148 @@
+{
+  "network": "optimism",
+  "isMainnet": false,
+  "subgraphName": "hop-optimism",
+  "deployment": "HOP_PROTOCOL_OPTIMISM",
+  "graftEnabled": true,
+  "subgraphId": "QmYSgs5XEqheZHtoQuYaTUPHAsZ2sG3UAm379EmwJrbw95",
+  "graftStartBlock": 106756936,
+
+  "amms": [
+    {
+      "dataSourceName": "HopL2Amm",
+      "token": "USDC",
+      "address": "0x3c0FFAca566fCcfD9Cc95139FEF6CBA143795963",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2AmmUSDT",
+      "token": "USDT",
+      "address": "0xeC4B41Af04cF917b54AEb6Df58c0f8D78895b5Ef",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2AmmDAI",
+      "token": "DAI",
+      "address": "0xF181eD90D6CfaC84B8073FdEA6D34Aa744B41810",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2AmmETH",
+      "token": "ETH",
+      "address": "0xaa30D6bba6285d0585722e2440Ff89E23EF68864",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2AmmSNX",
+      "token": "SNX",
+      "address": "0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73",
+      "startBlock": 26091610
+    },
+    {
+      "dataSourceName": "HopL2AmmsUSD",
+      "token": "sUSD",
+      "address": "0x8d4063E82A4Db8CdAed46932E1c71e03CA69Bede",
+      "startBlock": 27410231
+    },
+    {
+      "dataSourceName": "HopL2AmmrETH",
+      "token": "rETH",
+      "address": "0x9Dd8685463285aD5a94D2c128bda3c5e8a6173c8",
+      "startBlock": 94877549
+    }
+  ],
+  "bridges": [
+    {
+      "dataSourceName": "Bridge",
+      "token": "USDC",
+      "address": "0xa81D244A1814468C734E5b4101F7b9c0c577a8fC",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2BridgeUSDT",
+      "token": "USDT",
+      "address": "0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2BridgeDAI",
+      "token": "DAI",
+      "address": "0x7191061D5d4C60f598214cC6913502184BAddf18",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2BridgeETH",
+      "token": "ETH",
+      "address": "0x83f6244Bd87662118d96D9a6D44f09dffF14b30E",
+      "startBlock": 0
+    },
+    {
+      "dataSourceName": "HopL2BridgeSNX",
+      "token": "SNX",
+      "address": "0x16284c7323c35F4960540583998C98B1CfC581a7",
+      "startBlock": 26092038
+    },
+    {
+      "dataSourceName": "HopL2BridgesUSD",
+      "token": "sUSD",
+      "address": "0x33Fe5bB8DA466dA55a8A32D6ADE2BB104E2C5201",
+      "startBlock": 27410328
+    },
+    {
+      "dataSourceName": "HopL2BridgeRETH",
+      "token": "rETH",
+      "address": "0xA0075E8cE43dcB9970cB7709b9526c1232cc39c2",
+      "startBlock": 94877802
+    },
+    {
+      "dataSourceName": "HopL2BridgeHOP",
+      "token": "HOP",
+      "address": "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
+      "startBlock": 24710333
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "USDC",
+      "address": "0xf587B9309c603feEdf0445aF4D3B21300989e93a",
+      "startBlock": 30117285
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT",
+      "token": "USDT",
+      "address": "0xAeB1b49921E0D2D96FcDBe0D486190B2907B3e0B",
+      "startBlock": 30117312
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI",
+      "token": "DAI",
+      "address": "0x392B9780cFD362bD6951edFA9eBc31e68748b190",
+      "startBlock": 30117302
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH",
+      "token": "ETH",
+      "address": "0x95d6A95BECfd98a7032Ed0c7d950ff6e0Fa8d697",
+      "startBlock": 30117251
+    },
+    {
+      "dataSourceName": "HopL2RewardsSUSD_A",
+      "token": "sUSD",
+      "address": "0x2935008eE9943f859C4fbb863c5402fFC06f462E",
+      "startBlock": 88615959
+    },
+    {
+      "dataSourceName": "HopL2RewardsSUSD_B",
+      "token": "sUSD",
+      "address": "0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266",
+      "startBlock": 88607165
+    },
+    {
+      "dataSourceName": "HopL2RewardsRETH",
+      "token": "rETH",
+      "address": "0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778",
+      "startBlock": 95771182
+    }
+  ]
+}

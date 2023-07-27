@@ -68,7 +68,10 @@ export function getOrCreateToken(address: Address): Token {
 
     token.name = utils.readValue<string>(contract.try_name(), "");
     token.symbol = utils.readValue<string>(contract.try_symbol(), "");
-    token.decimals = utils.readValue<i32>(contract.try_decimals(), 18);
+    token.decimals = utils.readValue<i32>(
+      contract.try_decimals(),
+      constants.INT_EIGHTEEN
+    );
 
     token.save();
   }
@@ -94,7 +97,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  const id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
   if (!usageMetrics) {
@@ -122,7 +125,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -162,34 +165,41 @@ export function getOrCreateAccount(id: string): Account {
 }
 
 export function getOrCreateVaultsDailySnapshots(
-  vaultId: string,
+  vault: VaultStore,
   block: ethereum.Block
 ): VaultDailySnapshot {
-  let id: string = vaultId
+  const id: string = vault.id
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let vaultSnapshots = VaultDailySnapshot.load(id);
 
   if (!vaultSnapshots) {
     vaultSnapshots = new VaultDailySnapshot(id);
-    vaultSnapshots.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
-    vaultSnapshots.vault = vaultId;
+    vaultSnapshots.protocol = vault.protocol;
+    vaultSnapshots.vault = vault.id;
 
-    vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
+    vaultSnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
+    vaultSnapshots.inputTokenBalance = vault.inputTokenBalance;
+    vaultSnapshots.outputTokenSupply = vault.outputTokenSupply
+      ? vault.outputTokenSupply!
+      : constants.BIGINT_ZERO;
+    vaultSnapshots.pricePerShare = vault.pricePerShare
+      ? vault.pricePerShare!
+      : constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.rewardTokenEmissionsAmount =
+      vault.rewardTokenEmissionsAmount;
+    vaultSnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
 
     vaultSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.cumulativeSupplySideRevenueUSD =
+      vault.cumulativeSupplySideRevenueUSD;
 
     vaultSnapshots.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.cumulativeProtocolSideRevenueUSD =
+      vault.cumulativeProtocolSideRevenueUSD;
 
     vaultSnapshots.dailyTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -201,34 +211,41 @@ export function getOrCreateVaultsDailySnapshots(
 }
 
 export function getOrCreateVaultsHourlySnapshots(
-  vaultId: string,
+  vault: VaultStore,
   block: ethereum.Block
 ): VaultHourlySnapshot {
-  let id: string = vaultId
+  const id: string = vault.id
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let vaultSnapshots = VaultHourlySnapshot.load(id);
 
   if (!vaultSnapshots) {
     vaultSnapshots = new VaultHourlySnapshot(id);
-    vaultSnapshots.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
-    vaultSnapshots.vault = vaultId;
+    vaultSnapshots.protocol = vault.protocol;
+    vaultSnapshots.vault = vault.id;
 
-    vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
+    vaultSnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
+    vaultSnapshots.inputTokenBalance = vault.inputTokenBalance;
+    vaultSnapshots.outputTokenSupply = vault.outputTokenSupply
+      ? vault.outputTokenSupply!
+      : constants.BIGINT_ZERO;
+    vaultSnapshots.pricePerShare = vault.pricePerShare
+      ? vault.pricePerShare!
+      : constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.rewardTokenEmissionsAmount =
+      vault.rewardTokenEmissionsAmount;
+    vaultSnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
 
     vaultSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.cumulativeSupplySideRevenueUSD =
+      vault.cumulativeSupplySideRevenueUSD;
 
     vaultSnapshots.hourlyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.cumulativeProtocolSideRevenueUSD =
+      vault.cumulativeProtocolSideRevenueUSD;
 
     vaultSnapshots.hourlyTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -242,7 +259,7 @@ export function getOrCreateVaultsHourlySnapshots(
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  const id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
   let financialMetrics = FinancialsDailySnapshot.load(id);
 
   if (!financialMetrics) {
@@ -350,7 +367,7 @@ export function getOrCreateVault(
       .enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE)
       .concat(constants.CONVEX_BOOSTER_ADDRESS.toHexString());
 
-    let performanceFee = getTotalFees();
+    const performanceFee = getTotalFees();
     utils.createFeeType(
       performanceFeeId,
       constants.VaultFeeType.PERFORMANCE_FEE,

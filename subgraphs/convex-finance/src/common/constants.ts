@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-checksum-addresses */
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 // The network names corresponding to the Network enum in the schema.
@@ -76,6 +77,8 @@ export const CVX_MAX_SUPPLY = BigDecimal.fromString("100000000");
 export const DEFAULT_MANAGEMENT_FEE = BigInt.fromI32(200);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(2000);
 export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
+
+export const INT_EIGHTEEN = 18 as i32;
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);

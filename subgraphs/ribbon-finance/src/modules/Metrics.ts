@@ -77,14 +77,8 @@ export function updateVaultSnapshots(
   const vault = VaultStore.load(vaultAddress.toHexString());
   if (!vault) return;
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress.toHexString(),
-    block
-  );
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress.toHexString(),
-    block
-  );
+  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vault, block);
+  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vault, block);
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;

@@ -1,0 +1,14 @@
+{
+  "deployment": "ACROSS_V2_BOBA",
+  "SpokePool": [
+    {
+      "chain": "Boba",
+      "network": "boba",
+      "address": "0xbbc6009feffc27ce705322832cb2068f8c1e0a58",
+      "startBlock": 619993,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,uint256,uint256,uint64,uint64,uint64,uint32,address,indexed address,indexed address,address,bool)",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,uint256,uint64,indexed uint32,uint32,indexed address,address,indexed address)",
+      "name": "SpokePool1"
+    }
+  ]
+}

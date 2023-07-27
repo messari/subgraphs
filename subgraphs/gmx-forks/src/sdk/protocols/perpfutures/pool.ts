@@ -1,34 +1,37 @@
+import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+
 import {
   sortBytesArray,
   updateArrayAtIndex,
   sortArrayByReference,
 } from "../../util/arrays";
-import {
-  LiquidityPoolFee,
-  Token as TokenSchema,
-  LiquidityPool as LiquidityPoolSchema,
-} from "../../../../generated/schema";
+import { PositionType, TransactionType } from "./enums";
 import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
-import { PositionType, TransactionType } from "./enums";
-import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import {
   exponentToBigDecimal,
   poolArraySort,
   safeDivide,
 } from "../../util/numbers";
 
+import {
+  LiquidityPoolFee,
+  Token as TokenSchema,
+  LiquidityPool as LiquidityPoolSchema,
+} from "../../../../generated/schema";
+
 /**
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  1.3.2
- * SDK Version:     1.1.5
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class PoolManager {
@@ -101,9 +104,8 @@ export class Pool {
     this.pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     this.pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    this.pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     this.pool.cumulativeStakeSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-
+    this.pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
     this.pool.cumulativeEntryPremiumUSD = constants.BIGDECIMAL_ZERO;
@@ -259,9 +261,9 @@ export class Pool {
    */
   refreshTotalValueLocked(): void {
     let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
       const inputTokenBalance = this.pool.inputTokenBalances[idx];
-
       const inputToken = this.tokens.getOrCreateTokenFromBytes(
         this.pool.inputTokens[idx]
       );
@@ -274,7 +276,6 @@ export class Pool {
     }
 
     this.setTotalValueLocked(totalValueLockedUSD);
-
     this.refreshInputTokenWeights();
   }
 
@@ -307,22 +308,6 @@ export class Pool {
   }
 
   /**
-   * Adds a given USD value to the pool and protocol stakeSideRevenue. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param rev {BigDecimal} The value to add to the protocol's stakeSideRevenue.
-   */
-  private addStakeSideRevenueUSD(rev: BigDecimal): void {
-    this.pool.cumulativeTotalRevenueUSD =
-      this.pool.cumulativeTotalRevenueUSD.plus(rev);
-    this.pool.cumulativeStakeSideRevenueUSD =
-      this.pool.cumulativeStakeSideRevenueUSD.plus(rev);
-    this.save();
-
-    this.protocol.addStakeSideRevenueUSD(rev);
-  }
-
-  /**
    * Adds a given USD value to the pool and protocol protocolSideRevenue. It can be a positive or negative amount.
    * Same as for the rest of setters, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
@@ -339,11 +324,29 @@ export class Pool {
   }
 
   /**
-   * Adds a given USD value to the pool and protocol's supplySideRevenue and protocolSideRevenue. It can be a positive or negative amount.
+   * Adds a given USD value to the pool and protocol stakeSideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
+   */
+  private addStakeSideRevenueUSD(rev: BigDecimal): void {
+    this.pool.cumulativeTotalRevenueUSD =
+      this.pool.cumulativeTotalRevenueUSD.plus(rev);
+    this.pool.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD.plus(rev);
+    this.save();
+
+    this.protocol.addStakeSideRevenueUSD(rev);
+  }
+
+  /**
+   * Adds a given USD value to the pool and protocol's supplySideRevenue, protocolSideRevenue, and stakeSideRevenue.
+   * It can be a positive or negative amount.
    * Same as for the rest of setters, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param protocolSide {BigDecimal} The value to add to the protocol's protocolSideRevenue.
    * @param supplySide {BigDecimal} The value to add to the protocol's supplySideRevenue.
+   * @param stakeSide {BigDecimal} The value to add to the protocol's stakeSideRevenue.
    */
   addRevenueUSD(
     protocolSide: BigDecimal,
@@ -361,24 +364,23 @@ export class Pool {
     supplySide: BigInt,
     stakeSide: BigInt
   ): void {
-    const pAmountUSD = this.protocol.pricer.getAmountValueUSD(
+    const protocolAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
       protocolSide,
       this.protocol.event.block
     );
-    const sAmountUSD = this.protocol.pricer.getAmountValueUSD(
+    const supplyAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
       supplySide,
       this.protocol.event.block
     );
-
     const stakeAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
       stakeSide,
       this.protocol.event.block
     );
 
-    this.addRevenueUSD(pAmountUSD, sAmountUSD, stakeAmountUSD);
+    this.addRevenueUSD(protocolAmountUSD, supplyAmountUSD, stakeAmountUSD);
   }
 
   /**

@@ -1,14 +1,11 @@
-import { Address } from "@graphprotocol/graph-ts";
-import { UnderlyingTokenMapping } from "../../../generated/schema";
-import { ReserveDataUpdated } from "../../../generated/templates/LendingPool/LendingPool";
-import { MORPHO_AAVE_V2_ADDRESS, ReserveUpdateParams } from "../../constants";
-import {
-  fetchAssetPrice,
-  fetchMorphoPositionsAaveV2,
-  getAaveProtocol,
-} from "./fetchers";
-import { getMarket, getOrInitToken } from "../../utils/initializers";
 import { _handleReserveUpdate } from "../common";
+import { Address } from "@graphprotocol/graph-ts";
+import { AaveMath } from "../../utils/maths/aaveMath";
+import { fetchAssetPrice, getAaveProtocol } from "./fetchers";
+import { UnderlyingTokenMapping } from "../../../generated/schema";
+import { getMarket, getOrInitToken } from "../../utils/initializers";
+import { MORPHO_AAVE_V2_ADDRESS, ReserveUpdateParams } from "../../constants";
+import { ReserveDataUpdated } from "../../../generated/templates/LendingPool/LendingPool";
 
 /**
  * Updates the reserve data for the given reserve
@@ -41,6 +38,5 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.variableBorrowRate
   );
 
-  const morphoPositions = fetchMorphoPositionsAaveV2(market);
-  _handleReserveUpdate(params, morphoPositions, market);
+  _handleReserveUpdate(params, market, new AaveMath());
 }

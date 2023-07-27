@@ -6,7 +6,14 @@ import {
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { ETH_NAME, ETH_SYMBOL, Network } from "../../sdk/util/constants";
 import { MessageDelivered } from "../../../generated/L1Bridge/Bridge";
-import { ethSideConf, ethAddress, Pricer, TokenInit } from "../../common/utils";
+import {
+  ethSideConf,
+  ethAddress,
+  Pricer,
+  TokenInit,
+  undoAlias,
+} from "../../common/utils";
+import { Address } from "@graphprotocol/graph-ts";
 
 export function handleL1MessageDelivered(event: MessageDelivered): void {
   // -- SDK
@@ -20,7 +27,8 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
   // -- ACCOUNT
 
-  const acc = sdk.Accounts.loadAccount(event.params.sender);
+  const sender = Address.fromString(undoAlias(event.params.sender));
+  const acc = sdk.Accounts.loadAccount(sender);
 
   // -- HANDLE ETH DEPOSIT & MESSAGES
 
@@ -61,7 +69,7 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
     acc.transferOut(
       pool,
       pool.getDestinationTokenRoute(crossToken)!,
-      event.params.sender, // sender and receiver are same when bridging eth
+      sender,
       event.transaction.value,
       event.transaction.hash
     );

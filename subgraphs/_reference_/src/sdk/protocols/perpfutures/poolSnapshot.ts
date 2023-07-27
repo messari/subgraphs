@@ -15,8 +15,8 @@ import {
  * This file contains the PoolSnapshot, which is used to
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
- * Schema Version:  1.3.2
- * SDK Version:     1.1.5
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -268,6 +268,7 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeOutflowVolumeUSD;
 
+    snapshot.inputTokens = this.pool.inputTokens;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
     snapshot.outputTokenSupply = this.pool.outputTokenSupply;
@@ -523,6 +524,7 @@ export class PoolSnapshot {
         previousSnapshot.cumulativePositionCount
       : snapshot.cumulativePositionCount;
 
+    snapshot.inputTokens = this.pool.inputTokens;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
     snapshot.outputTokenSupply = this.pool.outputTokenSupply;

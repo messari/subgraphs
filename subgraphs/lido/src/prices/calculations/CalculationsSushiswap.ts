@@ -1,22 +1,47 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { CustomPriceType, OracleContract } from "../common/types";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/Lido/CalculationsSushiSwap";
 
-export function getSushiSwapContract(network: string): CalculationsSushiContract {
-  return CalculationsSushiContract.bind(constants.SUSHISWAP_CALCULATIONS_ADDRESS_MAP.get(network)!);
+export function getSushiSwapContract(
+  contract: OracleContract,
+  block: ethereum.Block | null = null
+): CalculationsSushiContract | null {
+  if (
+    (block && contract.startBlock.gt(block.number)) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return CalculationsSushiContract.bind(contract.address);
 }
 
-export function getTokenPriceFromSushiSwap(tokenAddr: Address, network: string): CustomPriceType {
-  const curveContract = getSushiSwapContract(network);
-  if (!curveContract) {
-    return new CustomPriceType();
-  }
+export function getTokenPriceUSDC(
+  tokenAddr: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
+  const config = utils.getConfig();
 
-  let tokenPrice: BigDecimal = utils
-    .readValue<BigInt>(curveContract.try_getPriceUsdc(tokenAddr), constants.BIGINT_ZERO)
+  if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
+    return new CustomPriceType();
+
+  const calculationSushiContract = getSushiSwapContract(
+    config.sushiCalculations(),
+    block
+  );
+  if (!calculationSushiContract) return new CustomPriceType();
+
+  const tokenPrice: BigDecimal = utils
+    .readValue<BigInt>(
+      calculationSushiContract.try_getPriceUsdc(tokenAddr),
+      constants.BIGINT_ZERO
+    )
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
+  return CustomPriceType.initialize(
+    tokenPrice,
+    constants.DEFAULT_USDC_DECIMALS,
+    constants.OracleType.SUSHI_CALCULATIONS
+  );
 }

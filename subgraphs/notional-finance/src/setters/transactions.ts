@@ -31,11 +31,7 @@ import { getOrCreateLendingProtocol } from "../getters/protocol";
 import { getOrCreateAccount } from "../getters/account";
 import { getOrCreateMarket } from "../getters/market";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
-import {
-  updateFinancials,
-  updateMarket,
-  updateTVLAndBalances,
-} from "./financialMetrics";
+import { updateMarket, updateTVLAndBalances } from "./financialMetrics";
 import { getTokenFromCurrency } from "../common/util";
 import { Notional } from "../../generated/Notional/Notional";
 
@@ -312,7 +308,6 @@ export function createDeposit(
     event.transaction.to!,
     transactionType
   );
-  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -360,7 +355,6 @@ export function createWithdraw(
     event.transaction.to!,
     transactionType
   );
-  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -407,7 +401,6 @@ export function createBorrow(
     event.transaction.to!,
     transactionType
   );
-  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -454,7 +447,6 @@ export function createRepay(
     event.transaction.to!,
     transactionType
   );
-  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -518,7 +510,6 @@ export function createLiquidate(
   addAccountToProtocol(TransactionType.LIQUIDATOR, liquidatorAccount, event);
 
   // BLOCKER: cannot update these metrics without market id
-  // updateFinancials(event, amountUSD, market.id);
   // updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
 
   return liquidate;

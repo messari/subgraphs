@@ -1,5 +1,4 @@
 import {
-  Token,
   Vault as VaultStore,
   Deposit as DepositTransaction,
 } from "../../generated/schema";
@@ -11,13 +10,13 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
+  getOrCreateToken,
   getOrCreateVault,
   getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens, getPricePerShare } from "./Prices";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
@@ -92,7 +91,13 @@ export function Deposit(
       constants.BIGINT_ZERO
     );
 
-    depositAmount = totalSupply.minus(vault.outputTokenSupply!);
+    const sharesMinted = totalSupply.minus(vault.outputTokenSupply!);
+
+    depositAmount = vault.outputTokenSupply!.isZero()
+      ? sharesMinted
+      : sharesMinted
+          .times(vault.inputTokenBalance)
+          .div(vault.outputTokenSupply!);
   }
 
   // calculate shares minted as per the deposit function in vault contract address
@@ -102,18 +107,17 @@ export function Deposit(
         .times(vault.outputTokenSupply!)
         .div(vault.inputTokenBalance);
 
-  const inputToken = Token.load(vault.inputToken);
-  const inputTokenAddress = Address.fromString(vault.inputToken);
-  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputToken = getOrCreateToken(
+    Address.fromString(vault.inputToken),
+    block
+  );
   const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken!.decimals as u8
-  );
+  ).toBigDecimal();
 
   const depositAmountUSD = depositAmount
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(inputTokenDecimals)
+    .times(inputToken.lastPriceUSD!);
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
@@ -126,16 +130,15 @@ export function Deposit(
   );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal())
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(inputTokenDecimals)
+    .times(inputToken.lastPriceUSD!);
 
   vault.pricePerShare = getPricePerShare(vaultAddress);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
-    inputTokenDecimals
+    inputTokenDecimals,
+    block
   );
 
   vault.save();

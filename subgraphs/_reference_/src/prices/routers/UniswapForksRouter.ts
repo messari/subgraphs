@@ -124,19 +124,13 @@ export function getPriceFromRouter(
     return priceFromRouter;
 
   const factoryContract = UniswapFactoryContract.bind(factoryAddress);
-  let tokenPair = utils.readValue(
+  const tokenPair = utils.readValue(
     factoryContract.try_getPair(token0Address, wethAddress),
     constants.NULL.TYPE_ADDRESS
   );
-  if (tokenPair.equals(constants.NULL.TYPE_ADDRESS)) {
-    tokenPair = utils.readValue(
-      factoryContract.try_getPair(wethAddress, token0Address),
-      constants.NULL.TYPE_ADDRESS
-    );
-  }
   if (tokenPair.equals(constants.NULL.TYPE_ADDRESS)) return priceFromRouter;
 
-  const liquidityUSD = getLpTokenLiquidityUsdc(tokenPair, block);
+  const liquidityUSD = getLpTokenLiquidityUsdc(tokenPair, wethAddress, block);
   priceFromRouter.setLiquidity(liquidityUSD.usdPrice);
 
   return priceFromRouter;
@@ -256,41 +250,45 @@ export function getLpTokenTotalLiquidityUsdc(
 
 function getLpTokenLiquidityUsdc(
   lpAddress: Address,
+  wethAddress: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(lpAddress);
 
-  const token1Address = utils.readValue<Address>(
-    uniSwapPair.try_token1(),
-    constants.NULL.TYPE_ADDRESS
-  );
-  if (token1Address.equals(constants.NULL.TYPE_ADDRESS)) {
-    return new CustomPriceType();
-  }
+  const token0Call = uniSwapPair.try_token0();
+  if (token0Call.reverted) return new CustomPriceType();
+  const token0Address = token0Call.value;
 
-  const token1Price = getTokenPriceUSDC(token1Address, block);
-  if (token1Price.reverted) {
-    return new CustomPriceType();
-  }
-
-  const token1Decimals = utils.getTokenDecimals(token1Address);
+  const token1Call = uniSwapPair.try_token1();
+  if (token1Call.reverted) return new CustomPriceType();
+  const token1Address = token1Call.value;
 
   const reservesCall = uniSwapPair.try_getReserves();
   if (reservesCall.reverted) return new CustomPriceType();
-
   const reserves = reservesCall.value;
-  const reserve1 = reserves.value1;
 
-  if (reserve1.notEqual(constants.BIGINT_ZERO)) {
-    const liquidity1 = reserve1
+  let wethReserves = constants.BIGINT_ZERO;
+  if (token0Address == wethAddress) {
+    wethReserves = reserves.value0;
+  } else if (token1Address == wethAddress) {
+    wethReserves = reserves.value1;
+  }
+
+  const wethPrice = getTokenPriceUSDC(wethAddress, block);
+  if (wethPrice.reverted) {
+    return new CustomPriceType();
+  }
+
+  const wethDecimals = utils.getTokenDecimals(wethAddress);
+
+  if (wethReserves.notEqual(constants.BIGINT_ZERO)) {
+    const liquidity = wethReserves
       .toBigDecimal()
-      .div(
-        constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8).toBigDecimal()
-      )
-      .times(token1Price.usdPrice);
+      .div(constants.BIGINT_TEN.pow(wethDecimals.toI32() as u8).toBigDecimal())
+      .times(wethPrice.usdPrice);
 
     return CustomPriceType.initialize(
-      liquidity1,
+      liquidity,
       constants.DEFAULT_USDC_DECIMALS,
       constants.OracleType.UNISWAP_FORKS_ROUTER
     );

@@ -110,7 +110,9 @@ export class SushiswapMaticConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x43284543540a29de091f0a1526ac033da423e0e6", // SafePoly Token
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

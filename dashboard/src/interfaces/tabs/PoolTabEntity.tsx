@@ -16,14 +16,15 @@ import JSZip from "jszip";
 import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 function addDataPoint(
-  dataFields: { [dataField: string]: { date: Number; value: number }[] },
+  dataFields: { [dataField: string]: { date: Number; value: number; blockNumber: number | null }[] },
   dataFieldMetrics: any,
   fieldName: string,
   value: number,
   timestamp: number,
+  blockNumber: number | null,
   id: string,
 ): { [x: string]: any } {
-  dataFields[fieldName].push({ value: value, date: Number(timestamp) });
+  dataFields[fieldName].push({ value: value, date: Number(timestamp), blockNumber: blockNumber });
   if (!!dataFieldMetrics[fieldName]) {
     if (!dataFieldMetrics[fieldName]?.sum) {
       dataFieldMetrics[fieldName].sum = 0;
@@ -98,7 +99,7 @@ function PoolTabEntity({
 
   // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
   const [dataFieldsState, setDataFieldsState] = useState<{
-    [data: string]: { [dataField: string]: { date: number; value: number }[] };
+    [data: string]: { [dataField: string]: { date: number; value: number; blockNumber: number | null }[] };
   }>({});
   // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
   const [dataFieldMetricsState, setDataFieldMetricsState] = useState<{
@@ -106,7 +107,7 @@ function PoolTabEntity({
   }>({});
   // For the current entity, loop through all instances of that entity
   const [overlayDataFieldsState, setOverlayDataFieldsState] = useState<{
-    [dataField: string]: { date: number; value: number }[];
+    [dataField: string]: { date: number; value: number; blockNumber: number | null }[];
   }>({});
 
   useEffect(() => {
@@ -164,15 +165,16 @@ function PoolTabEntity({
       );
     }
 
-    let dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+    let dataFields: { [dataField: string]: { date: number; value: number; blockNumber: number | null }[] } = {};
     // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
     let dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
 
-    let overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+    let overlayDataFields: { [dataField: string]: { date: number; value: number; blockNumber: number | null }[] } = {};
 
     if (!dataFieldsState?.data) {
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+        const blockNumber = "blockNumber" in timeseriesInstance ? timeseriesInstance["blockNumber"] : null;
         let dateVal: number = Number(timeseriesInstance["timestamp"]);
         dateValueKeys.forEach((key: string) => {
           let factor = 86400;
@@ -186,6 +188,10 @@ function PoolTabEntity({
 
         const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
         const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
+        const overlayBlockNumber =
+          overlayTimeseriesInstance && "blockNumber" in overlayTimeseriesInstance
+            ? overlayTimeseriesInstance["blockNumber"]
+            : null;
         let overlayDateVal: number = Number(overlayTimeseriesInstance?.["timestamp"]) || 0;
         if (!!overlayTimeseriesInstance) {
           dateValueKeys.forEach((key: string) => {
@@ -239,6 +245,7 @@ function PoolTabEntity({
                 fieldName,
                 Number(value),
                 dateVal,
+                blockNumber,
                 timeseriesInstance.id,
               );
               dataFields[fieldName] = returnedData.currentEntityField;
@@ -299,6 +306,7 @@ function PoolTabEntity({
                 fieldName,
                 Number(value),
                 dateVal,
+                blockNumber,
                 timeseriesInstance.id,
               );
               dataFields[fieldName] = returnedData.currentEntityField;
@@ -320,23 +328,25 @@ function PoolTabEntity({
                   dataFieldKey = " [" + idx + "]";
                 }
                 if (!dataFields[fieldName + dataFieldKey]) {
-                  dataFields[fieldName + dataFieldKey] = [{ value: 0, date: dateVal }];
+                  dataFields[fieldName + dataFieldKey] = [{ value: 0, date: dateVal, blockNumber: blockNumber }];
                   dataFieldMetrics[fieldName + dataFieldKey] = { sum: 0 };
                 } else {
                   dataFields[fieldName + dataFieldKey].push({
                     value: 0,
                     date: dateVal,
+                    blockNumber: blockNumber,
                   });
                   dataFieldMetrics[fieldName + dataFieldKey].sum += 0;
                 }
                 if (fieldName === "rewardTokenEmissionsUSD") {
                   if (!dataFields["rewardAPR" + dataFieldKey]) {
-                    dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: dateVal }];
+                    dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: dateVal, blockNumber: blockNumber }];
                     dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
                   } else {
                     dataFields["rewardAPR" + dataFieldKey].push({
                       value: 0,
                       date: dateVal,
+                      blockNumber: blockNumber,
                     });
                     dataFieldMetrics["rewardAPR" + dataFieldKey].sum += 0;
                   }
@@ -470,7 +480,9 @@ function PoolTabEntity({
                     }
                     // Create the reward APR [idx] field
                     if (!dataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
-                      dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [{ value: apr, date: dateVal }];
+                      dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
+                        { value: apr, date: dateVal, blockNumber: blockNumber },
+                      ];
                       dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = {
                         sum: apr,
                         factors: factors.join(", "),
@@ -479,6 +491,7 @@ function PoolTabEntity({
                       dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
                         value: apr,
                         date: dateVal,
+                        blockNumber: blockNumber,
                       });
                       dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
                     }
@@ -492,6 +505,7 @@ function PoolTabEntity({
                   dataFieldKey,
                   Number(value),
                   dateVal,
+                  blockNumber,
                   timeseriesInstance.id,
                 );
                 dataFields[dataFieldKey] = returnedData.currentEntityField;
@@ -512,7 +526,10 @@ function PoolTabEntity({
             });
           }
           if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
-            overlayDataFields[fieldName] = [...overlayDataFields[fieldName], { value: 0, date: dateVal }];
+            overlayDataFields[fieldName] = [
+              ...overlayDataFields[fieldName],
+              { value: 0, date: dateVal, blockNumber: blockNumber },
+            ];
             continue;
           }
           if (!overlayTimeseriesInstance) {
@@ -537,6 +554,7 @@ function PoolTabEntity({
                 fieldName,
                 Number(value),
                 overlayDateVal,
+                blockNumber,
                 overlayTimeseriesInstance.id,
               );
               overlayDataFields[fieldName] = returnedData.currentEntityField;
@@ -584,6 +602,7 @@ function PoolTabEntity({
                 fieldName,
                 Number(value),
                 overlayDateVal,
+                blockNumber,
                 overlayTimeseriesInstance.id,
               );
               overlayDataFields[fieldName] = returnedData.currentEntityField;
@@ -604,20 +623,26 @@ function PoolTabEntity({
                   dataFieldKey = " [" + idx + "]";
                 }
                 if (!overlayDataFields[fieldName + dataFieldKey]) {
-                  overlayDataFields[fieldName + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
+                  overlayDataFields[fieldName + dataFieldKey] = [
+                    { value: 0, date: overlayDateVal, blockNumber: overlayBlockNumber },
+                  ];
                 } else {
                   overlayDataFields[fieldName + dataFieldKey].push({
                     value: 0,
                     date: overlayDateVal,
+                    blockNumber: overlayBlockNumber,
                   });
                 }
                 if (fieldName === "rewardTokenEmissionsUSD") {
                   if (!overlayDataFields["rewardAPR" + dataFieldKey]) {
-                    overlayDataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
+                    overlayDataFields["rewardAPR" + dataFieldKey] = [
+                      { value: 0, date: overlayDateVal, blockNumber: overlayBlockNumber },
+                    ];
                   } else {
                     overlayDataFields["rewardAPR" + dataFieldKey].push({
                       value: 0,
                       date: overlayDateVal,
+                      blockNumber: overlayBlockNumber,
                     });
                   }
                 }
@@ -737,12 +762,13 @@ function PoolTabEntity({
                     // Create the reward APR [idx] field
                     if (!overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
                       overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
-                        { value: apr, date: overlayDateVal },
+                        { value: apr, date: overlayDateVal, blockNumber: overlayBlockNumber },
                       ];
                     } else {
                       overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
                         value: apr,
                         date: overlayDateVal,
+                        blockNumber: overlayBlockNumber,
                       });
                     }
                   }
@@ -755,6 +781,7 @@ function PoolTabEntity({
                   dataFieldKey,
                   Number(value),
                   overlayDateVal,
+                  blockNumber,
                   overlayTimeseriesInstance.id,
                 );
                 overlayDataFields[dataFieldKey] = returnedData.currentEntityField;
