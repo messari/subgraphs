@@ -52,7 +52,7 @@ import { PositionManager } from "./position";
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * SDK Version:     1.0.8
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan
@@ -379,8 +379,7 @@ export class DataManager {
     amountUSD: BigDecimal,
     newBalance: BigInt,
     interestType: string | null = null,
-    isIsolated: boolean = false,
-    principal: BigInt | null = null
+    isIsolated: boolean = false
   ): Deposit {
     const depositor = new AccountManager(account);
     if (depositor.isNewUser()) {
@@ -399,8 +398,7 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.DEPOSIT,
-      this.market.inputTokenPriceUSD,
-      principal
+      this.market.inputTokenPriceUSD
     );
     if (isIsolated) {
       position.setIsolation(isIsolated);
@@ -439,8 +437,7 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
-    interestType: string | null = null,
-    principal: BigInt | null = null
+    interestType: string | null = null
   ): Withdraw | null {
     const withdrawer = new AccountManager(account);
     if (withdrawer.isNewUser()) {
@@ -458,8 +455,7 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.WITHDRAW,
-      this.market.inputTokenPriceUSD,
-      principal
+      this.market.inputTokenPriceUSD
     );
     const positionID = position.getPositionID();
     if (!positionID) {
@@ -505,8 +501,7 @@ export class DataManager {
     newBalance: BigInt,
     tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
     interestType: string | null = null,
-    isIsolated: boolean = false,
-    principal: BigInt | null = null
+    isIsolated: boolean = false
   ): Borrow {
     const borrower = new AccountManager(account);
     if (borrower.isNewUser()) {
@@ -525,8 +520,7 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.BORROW,
-      tokenPriceUSD,
-      principal
+      tokenPriceUSD
     );
 
     if (isIsolated) {
@@ -567,8 +561,7 @@ export class DataManager {
     amountUSD: BigDecimal,
     newBalance: BigInt,
     tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
-    interestType: string | null = null,
-    principal: BigInt | null = null
+    interestType: string | null = null
   ): Repay | null {
     const repayer = new AccountManager(account);
     if (repayer.isNewUser()) {
@@ -586,8 +579,7 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.REPAY,
-      tokenPriceUSD,
-      principal
+      tokenPriceUSD
     );
     const positionID = position.getPositionID();
     if (!positionID) {

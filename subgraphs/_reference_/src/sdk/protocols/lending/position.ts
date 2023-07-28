@@ -30,7 +30,7 @@ import { PositionSide } from "./constants";
  * make changes to a given position.
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * SDK Version:     1.0.8
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan
@@ -100,8 +100,7 @@ export class PositionManager {
     protocol: LendingProtocol,
     newBalance: BigInt,
     transactionType: string,
-    priceUSD: BigDecimal,
-    principal: BigInt | null = null
+    priceUSD: BigDecimal
   ): void {
     let positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -120,7 +119,6 @@ export class PositionManager {
       // update existing position
       position = position!;
       position.balance = newBalance;
-      if (principal) position.principal = principal;
       if (transactionType == TransactionType.DEPOSIT) {
         position.depositCount += INT_ONE;
       } else if (transactionType == TransactionType.BORROW) {
@@ -150,7 +148,7 @@ export class PositionManager {
       position.type = this.interestType;
     }
     position.balance = newBalance;
-    if (principal) position.principal = principal;
+    position.principal = newBalance;
     position.depositCount = INT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.borrowCount = INT_ZERO;
@@ -212,8 +210,7 @@ export class PositionManager {
     protocol: LendingProtocol,
     newBalance: BigInt,
     transactionType: string,
-    priceUSD: BigDecimal,
-    principal: BigInt | null = null
+    priceUSD: BigDecimal
   ): void {
     const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
@@ -232,7 +229,6 @@ export class PositionManager {
     }
 
     position.balance = newBalance;
-    if (principal) position.principal = principal;
 
     if (transactionType == TransactionType.WITHDRAW) {
       position.withdrawCount += INT_ONE;
