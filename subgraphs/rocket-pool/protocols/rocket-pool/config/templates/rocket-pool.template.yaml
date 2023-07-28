@@ -307,6 +307,8 @@ templates:
       eventHandlers:
         - event: RPLTokensClaimed(indexed address,indexed address,uint256,uint256)
           handler: handleRPLTokensClaimed
+        - event: RewardSnapshot(indexed uint256,(uint256,uint256,uint256,bytes32,string,uint256,uint256,uint256[],uint256[],uint256[],uint256),uint256,uint256,uint256)
+          handler: handleRewardSnapshot
       file: ./src/mappings/rocketRewardsPoolMapping.ts
   - kind: ethereum/contract
     name: rocketNetworkPrices
@@ -373,6 +375,8 @@ templates:
       eventHandlers:
         - event: PricesUpdated(uint256,uint256,uint256,uint256)
           handler: handlePricesUpdated
+        - event: PricesUpdated(uint256,uint256,uint256)
+          handler: handlePricesUpdatedAtlas
       file: ./src/mappings/rocketNetworkPricesMapping.ts
   - kind: ethereum/contract
     name: rocketMinipoolManager

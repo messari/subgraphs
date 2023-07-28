@@ -1,4 +1,7 @@
-import { PricesUpdated } from "../../generated/templates/rocketNetworkPrices/rocketNetworkPrices";
+import {
+  PricesUpdated,
+  PricesUpdated1 as PricesUpdatedAtlas,
+} from "../../generated/templates/rocketNetworkPrices/rocketNetworkPrices";
 import { rocketNetworkFees } from "../../generated/templates/rocketNetworkPrices/rocketNetworkFees";
 import { rocketDAOProtocolSettingsMinipool } from "../../generated/templates/rocketNetworkPrices/rocketDAOProtocolSettingsMinipool";
 import { rocketDAOProtocolSettingsNode } from "../../generated/templates/rocketNetworkPrices/rocketDAOProtocolSettingsNode";
@@ -12,7 +15,7 @@ import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { NetworkNodeBalanceMetadata } from "../models/networkNodeBalanceMetadata";
 import { RocketContractNames } from "../constants/contractConstants";
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { nodeUtilities } from "../checkpoints/nodeUtilities";
 import { EffectiveMinipoolRPLBounds } from "../models/effectiveMinipoolRPLBounds";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
@@ -24,6 +27,14 @@ import { getRocketContract } from "../entities/rocketContracts";
  * When enough ODAO members submitted their votes and a consensus threshold is reached, a new RPL price is comitted to the smart contracts.
  */
 export function handlePricesUpdated(event: PricesUpdated): void {
+  pricesUpdated(event.params.rplPrice, event);
+}
+
+export function handlePricesUpdatedAtlas(event: PricesUpdatedAtlas): void {
+  pricesUpdated(event.params.rplPrice, event);
+}
+
+function pricesUpdated(rplPrice: BigInt, event: ethereum.Event): void {
   // Protocol entity should exist, if not, then we attempt to create it.
   let protocol = generalUtilities.getRocketPoolProtocolEntity();
   if (protocol === null || protocol.id == null) {
@@ -49,7 +60,7 @@ export function handlePricesUpdated(event: PricesUpdated): void {
   // Determine the RPL minimum and maximum for a new minipool.
   const effectiveRPLBoundsNewMinipool = getEffectiveMinipoolRPLBounds(
     event.block.number,
-    event.params.rplPrice
+    rplPrice
   );
 
   // Create a new network node balance checkpoint.
@@ -58,7 +69,7 @@ export function handlePricesUpdated(event: PricesUpdated): void {
     protocol.lastNetworkNodeBalanceCheckPoint,
     effectiveRPLBoundsNewMinipool.minimum,
     effectiveRPLBoundsNewMinipool.maximum,
-    event.params.rplPrice,
+    rplPrice,
     nodeFeeForNewMinipool,
     event.block.number,
     event.block.timestamp

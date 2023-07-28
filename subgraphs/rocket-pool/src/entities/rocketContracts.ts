@@ -2,16 +2,16 @@ import { Address, Bytes } from "@graphprotocol/graph-ts";
 
 import { addToArrayAtIndex } from "../utils/arrays";
 
-import { _RocketContracts } from "../../generated/schema";
+import { _RocketContract } from "../../generated/schema";
 
 export function createOrUpdateRocketContract(
   contractName: string,
   key: Bytes,
   value: Address
-): _RocketContracts {
-  let contractEntity = _RocketContracts.load(contractName);
+): _RocketContract {
+  let contractEntity = _RocketContract.load(contractName);
   if (!contractEntity) {
-    contractEntity = new _RocketContracts(contractName);
+    contractEntity = new _RocketContract(contractName);
     contractEntity.allAddresses = [];
   }
 
@@ -26,6 +26,6 @@ export function createOrUpdateRocketContract(
   return contractEntity;
 }
 
-export function getRocketContract(contractName: string): _RocketContracts {
-  return _RocketContracts.load(contractName)!;
+export function getRocketContract(contractName: string): _RocketContract {
+  return _RocketContract.load(contractName)!;
 }

@@ -1,4 +1,10 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  ByteArray,
+  Bytes,
+  crypto,
+} from "@graphprotocol/graph-ts";
 import {
   IncrementNodeFinalisedMinipoolCountCall,
   MinipoolCreated,
@@ -11,7 +17,10 @@ import { Minipool, Node } from "../../generated/schema";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { rocketMinipoolDelegate } from "../../generated/templates";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
-import { getRocketContract } from "../entities/rocketContracts";
+import {
+  createOrUpdateRocketContract,
+  getRocketContract,
+} from "../entities/rocketContracts";
 
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.
@@ -67,6 +76,19 @@ export function handleMinipoolCreated(event: MinipoolCreated): void {
 
   // Get the appropriate delegate template for this block and use it to create another instance of the entity.
   rocketMinipoolDelegate.create(Address.fromString(minipool.id));
+  createOrUpdateRocketContract(
+    RocketContractNames.ROCKET_MINIPOOL_DELEGATE,
+    Bytes.fromByteArray(
+      crypto.keccak256(
+        ByteArray.fromUTF8(
+          "contract.address".concat(
+            RocketContractNames.ROCKET_MINIPOOL_DELEGATE
+          )
+        )
+      )
+    ),
+    Address.fromString(minipool.id)
+  );
 
   updateUsageMetrics(event.block, event.address);
 }

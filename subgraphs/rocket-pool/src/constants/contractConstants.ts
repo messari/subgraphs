@@ -13,6 +13,7 @@ export namespace RocketContractNames {
   export const ROCKET_REWARDS_POOL = "rocketRewardsPool";
   export const ROCKET_MINIPOOL_MANAGER = "rocketMinipoolManager";
   export const ROCKET_MINIPOOL_QUEUE = "rocketMinipoolqueue";
+  export const ROCKET_MINIPOOL_DELEGATE = "rocketMinipoolDelegate";
   export const ROCKET_DAO_NODE_TRUSTED_ACTIONS = "rocketDAONodeTrustedActions";
   export const ROCKET_DEPOSIT_POOL = "rocketDepositPool";
   export const ROCKET_NODE_DEPOSIT = "rocketNodeDeposit";

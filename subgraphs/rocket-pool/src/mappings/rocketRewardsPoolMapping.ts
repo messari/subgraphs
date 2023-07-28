@@ -1,10 +1,15 @@
 import { BigInt, Address } from "@graphprotocol/graph-ts";
 import {
+  RewardSnapshot,
   rocketRewardsPool,
   RPLTokensClaimed,
 } from "../../generated/templates/rocketRewardsPool/rocketRewardsPool";
 import { rocketNetworkPrices } from "../../generated/templates/rocketRewardsPool/rocketNetworkPrices";
-import { RPLRewardInterval, Node } from "../../generated/schema";
+import {
+  RPLRewardInterval,
+  Node,
+  RPLRewardSubmitted,
+} from "../../generated/schema";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import {
@@ -264,6 +269,33 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   updateSnapshotsTvl(event.block);
 }
 
+export function handleRewardSnapshot(event: RewardSnapshot): void {
+  let _RPLRewardSubmitted = RPLRewardSubmitted.load(
+    event.params.submission.rewardIndex.toString()
+  );
+
+  if (!_RPLRewardSubmitted) {
+    _RPLRewardSubmitted = new RPLRewardSubmitted(
+      event.params.submission.rewardIndex.toString()
+    );
+    _RPLRewardSubmitted.rewardIndex = event.params.submission.rewardIndex;
+    _RPLRewardSubmitted.executionBlock = event.params.submission.executionBlock;
+    _RPLRewardSubmitted.consensusBlock = event.params.submission.consensusBlock;
+    _RPLRewardSubmitted.merkleRoot = event.params.submission.merkleRoot;
+    _RPLRewardSubmitted.merkleTreeCID = event.params.submission.merkleTreeCID;
+    _RPLRewardSubmitted.intervalsPassed =
+      event.params.submission.intervalsPassed;
+    _RPLRewardSubmitted.treasuryRPL = event.params.submission.treasuryRPL;
+    _RPLRewardSubmitted.trustedNodeRPL = event.params.submission.trustedNodeRPL;
+    _RPLRewardSubmitted.nodeRPL = event.params.submission.nodeRPL;
+    _RPLRewardSubmitted.nodeETH = event.params.submission.nodeETH;
+    _RPLRewardSubmitted.userETH = event.params.submission.userETH;
+    _RPLRewardSubmitted.block = event.block.number;
+    _RPLRewardSubmitted.blockTime = event.block.timestamp;
+
+    _RPLRewardSubmitted.save();
+  }
+}
 /**
  * Determine the claimer type for a specific RPL reward claim event.
  */
