@@ -146,6 +146,10 @@ export function findUSDPricePerToken(
     }
   }
 
+  if (priceSoFar.equals(BIGDECIMAL_ZERO)) {
+    return priceSoFar;
+  }
+
   // Buffer token pricings that would cause large spikes on the protocol level
   const protocol = getOrCreateProtocol();
   const tokenTVLDelta = absBigDecimal(
