@@ -77,6 +77,13 @@ export function getUsdPricePerToken(
       oraclePrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, block);
     }
 
+    log.info("[OracleStepper] i: {}, oracle: {}, price: {} at block: {}", [
+      tokenAddr.toHexString(),
+      oraclePrice.oracleType,
+      oraclePrice.usdPrice.toString(),
+      block.number.toString(),
+    ]);
+
     if (!oraclePrice.reverted) {
       prices.push(oraclePrice);
     }
@@ -103,7 +110,8 @@ export function getUsdPricePerToken(
 export function getLiquidityBoundPrice(
   tokenAddress: Address,
   tokenPrice: CustomPriceType,
-  amount: BigDecimal
+  amount: BigDecimal,
+  block: ethereum.Block | null = null
 ): BigDecimal {
   const reportedPriceUSD = tokenPrice.usdPrice.times(amount);
   const liquidity = tokenPrice.liquidity;
@@ -120,13 +128,14 @@ export function getLiquidityBoundPrice(
       .div(amount);
 
     log.warning(
-      "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {}",
+      "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {} at block: {}",
       [
         tokenPrice.usdPrice.toString(),
         amount.toString(),
         liquidityBoundPriceUSD.toString(),
         tokenAddress.toHexString(),
         liquidity.toString(),
+        block.number.toString(),
       ]
     );
   }
@@ -146,7 +155,7 @@ export function getUsdPrice(
       tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
       tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
     ) {
-      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
+      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount, block);
     }
     return tokenPrice.usdPrice.times(amount);
   }
