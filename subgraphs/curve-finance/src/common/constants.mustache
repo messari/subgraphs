@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -166,3 +166,11 @@ export const HARDCODED_BASEPOOLS_LP_TOKEN: Address[] = [
   Address.fromString("{{address}}"), // {{name}}
 {{/basePoolsLpToken}}
 ]
+
+export const HARDCODED_MISSING_OLD_POOLS = new TypedMap<Address, Address>();
+{{#missingOldPools}}
+HARDCODED_MISSING_OLD_POOLS.set(
+  Address.fromString("{{address}}"), // {{name}}
+  Address.fromString("{{lpToken}}"),
+);
+{{/missingOldPools}}

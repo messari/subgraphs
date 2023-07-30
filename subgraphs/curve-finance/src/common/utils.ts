@@ -176,23 +176,24 @@ export function getLpTokenFromPool(
   poolAddress: Address,
   block: ethereum.Block
 ): Token {
+  let lpToken = constants.HARDCODED_MISSING_OLD_POOLS.get(poolAddress);
+  if (lpToken) return getOrCreateToken(lpToken, block);
+
   const poolContract = LiquidityPoolContract.bind(poolAddress);
 
-  let lpToken = readValue<Address>(
+  lpToken = readValue<Address>(
     poolContract.try_lp_token(),
     constants.NULL.TYPE_ADDRESS
   );
-  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS)) {
+  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
     return getOrCreateToken(lpToken, block);
-  }
 
   lpToken = readValue<Address>(
     poolContract.try_token(),
     constants.NULL.TYPE_ADDRESS
   );
-  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS)) {
+  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
     return getOrCreateToken(lpToken, block);
-  }
 
   return getOrCreateToken(poolAddress, block);
 }
