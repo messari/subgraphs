@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -127,6 +127,10 @@ export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32({{priceCaching}});
 
+export const CURVE_ADDRESS_PROVIDER = Address.fromString(
+  "0x0000000022d53366457f9d5e68ec105046fc4383"
+);
+
 // Missing Name and Symbol for the ETH token
 export const ETH_ADDRESS = Address.fromString(
   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
@@ -150,3 +154,23 @@ export const POOL_REGISTRIES: Address[] = [
   Address.fromString("{{address}}"), // {{name}}
 {{/poolRegistry}}
 ]
+
+export const HARDCODED_METAPOOLS: Address[] = [
+{{#hardcodedMetaPools}}
+  Address.fromString("{{address}}"), // {{name}}
+{{/hardcodedMetaPools}}
+]
+
+export const HARDCODED_BASEPOOLS_LP_TOKEN: Address[] = [
+{{#basePoolsLpToken}}
+  Address.fromString("{{address}}"), // {{name}}
+{{/basePoolsLpToken}}
+]
+
+export const HARDCODED_MISSING_OLD_POOLS = new TypedMap<Address, Address>();
+{{#missingOldPools}}
+HARDCODED_MISSING_OLD_POOLS.set(
+  Address.fromString("{{address}}"), // {{name}}
+  Address.fromString("{{lpToken}}"),
+);
+{{/missingOldPools}}
