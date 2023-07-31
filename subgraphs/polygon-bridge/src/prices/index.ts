@@ -77,12 +77,22 @@ export function getUsdPricePerToken(
       oraclePrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, block);
     }
 
-    log.info("[OracleStepper] i: {}, oracle: {}, price: {} at block: {}", [
-      tokenAddr.toHexString(),
-      oraclePrice.oracleType,
-      oraclePrice.usdPrice.toString(),
-      block.number.toString(),
-    ]);
+    let blockNumber = "null";
+    if (block) {
+      blockNumber = block.number.toString();
+    }
+
+    log.info(
+      "[OracleStepper] i:{}, token: {}, oracle: {}, reverted?: {}, price: {} at block: {}",
+      [
+        i.toString(),
+        tokenAddr.toHexString(),
+        oraclePrice.oracleType,
+        oraclePrice.reverted.toString(),
+        oraclePrice.usdPrice.toString(),
+        blockNumber,
+      ]
+    );
 
     if (!oraclePrice.reverted) {
       prices.push(oraclePrice);
@@ -127,6 +137,11 @@ export function getLiquidityBoundPrice(
       .times(constants.BIGINT_TEN.pow(tokenPrice.decimals as u8).toBigDecimal())
       .div(amount);
 
+    let blockNumber = "null";
+    if (block) {
+      blockNumber = block.number.toString();
+    }
+
     log.warning(
       "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {} at block: {}",
       [
@@ -135,7 +150,7 @@ export function getLiquidityBoundPrice(
         liquidityBoundPriceUSD.toString(),
         tokenAddress.toHexString(),
         liquidity.toString(),
-        block.number.toString(),
+        blockNumber,
       ]
     );
   }

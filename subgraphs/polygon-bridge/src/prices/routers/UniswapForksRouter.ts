@@ -287,6 +287,24 @@ function getLpTokenLiquidityUsdc(
       .div(constants.BIGINT_TEN.pow(wethDecimals.toI32() as u8).toBigDecimal())
       .times(wethPrice.usdPrice);
 
+    let blockNumber = "null";
+    if (block) {
+      blockNumber = block.number.toString();
+    }
+
+    log.error(
+      "[uniswapLiqudityGetter]lp: {} token0: {} reserves0: {} token1: {} reserves1:{} wethPrice: {} liqudity:{} at block: {}",
+      [
+        lpAddress.toHexString(),
+        token0Address.toHexString(),
+        reserves.value0.toString(),
+        token1Address.toHexString(),
+        reserves.value1.toString(),
+        wethPrice.usdPrice.toString(),
+        liquidity.toString(),
+        blockNumber,
+      ]
+    );
     return CustomPriceType.initialize(
       liquidity,
       constants.DEFAULT_USDC_DECIMALS,

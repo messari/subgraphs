@@ -99,9 +99,9 @@ export class OracleType {
     this.oracleCount = constants.INT_ONE;
     this.oracleOrder = [
       constants.OracleType.CHAINLINK_FEED,
-      constants.OracleType.UNISWAP_FORKS_ROUTER,
-      constants.OracleType.SUSHI_CALCULATIONS,
       constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
       constants.OracleType.CURVE_ROUTER,
       constants.OracleType.CURVE_CALCULATIONS,
     ];
