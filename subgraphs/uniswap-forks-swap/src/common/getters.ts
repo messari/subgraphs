@@ -48,6 +48,13 @@ export function getOrCreateToken(address: string): Token {
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
+
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
     if (NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
       token.name = "";
       token.symbol = "";
@@ -66,12 +73,6 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
-    token.lastPriceUSD = BIGDECIMAL_ZERO;
-    token.lastPriceBlockNumber = BIGINT_ZERO;
-    token._totalSupply = BIGINT_ZERO;
-    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
-    token._largeTVLImpactBuffer = 0;
-    token._largePriceChangeBuffer = 0;
 
     token.save();
   }
