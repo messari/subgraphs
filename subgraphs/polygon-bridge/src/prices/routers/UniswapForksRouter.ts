@@ -307,7 +307,7 @@ function getLpTokenLiquidityUsdc(
     );
     return CustomPriceType.initialize(
       liquidity,
-      constants.DEFAULT_USDC_DECIMALS,
+      constants.BIGINT_ZERO,
       constants.OracleType.UNISWAP_FORKS_ROUTER
     );
   }

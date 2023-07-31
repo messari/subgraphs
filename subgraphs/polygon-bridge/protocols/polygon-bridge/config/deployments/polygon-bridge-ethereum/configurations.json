@@ -9,7 +9,7 @@
   "fxERC20RootTunnel": {
     "startBlock": 10735445
   },
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmSCBvkBEovd179hbducCYBXZFKoKuSwmjjddPJkLPjE5C",
   "graftStartBlock": 12681860
 }
