@@ -36,6 +36,7 @@ import {
   convertTokenToDecimal,
   safeDiv,
 } from "./common/utils/utils";
+import { Logger } from "./common/utils/logger";
 
 // Update the token price of the native token for the specific protocol/network (see network specific configs)
 // Update the token by referencing the native token against pools with the reference token and a stable coin
@@ -77,6 +78,7 @@ export function findUSDPricePerToken(
   if (token.id == NetworkConfigs.getReferenceToken()) {
     return getNativeTokenPriceInUSD(token);
   }
+  const logger = new Logger(event, "findUSDPricePerToken");
   const tokenWhitelist = getOrCreateTokenWhitelist(token.id);
   const whiteList = tokenWhitelist.whitelistPools;
   // for now just take USD from pool with greatest TVL
@@ -140,6 +142,11 @@ export function findUSDPricePerToken(
 
           if (isValidTVL(pool, token, newPrice)) {
             priceSoFar = newPrice;
+          } else {
+            logger.warning("Price too high for token: {} from pool: {}", [
+              token.id,
+              pool.id,
+            ]);
           }
         }
       }
@@ -161,7 +168,7 @@ export function findUSDPricePerToken(
     safeDiv(tokenTVLDelta, protocol.totalValueLockedUSD)
   );
   if (protocolTVLPercentageDelta.gt(BIGDECIMAL_FIVE_PERCENT)) {
-    log.warning("Price too high for token: {} from pool: {}", [
+    logger.warning("Price too high for token: {} from pool: {}", [
       token.id,
       priceSoFar.toString(),
     ]);
@@ -177,7 +184,7 @@ export function findUSDPricePerToken(
     return priceSoFar;
   }
 
-  // If priceSoFar 10x greater or less than token.lastPriceUSD, use token.lastPriceUSD
+  // If priceSoFar 2x greater or less than token.lastPriceUSD, use token.lastPriceUSD
   // Increment buffer so that it allows large price jumps if seen repeatedly
   if (
     priceSoFar.gt(token.lastPriceUSD!.times(BIGDECIMAL_TWO)) ||
@@ -192,7 +199,7 @@ export function findUSDPricePerToken(
 
   token._largePriceChangeBuffer = 0;
   token._largeTVLImpactBuffer = 0;
-
+  token.lastPriceUSD = priceSoFar;
   token.save();
   return priceSoFar;
 }
@@ -220,10 +227,6 @@ function isValidTVL(
 
   // If price is too high, skip this pool
   if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
-    log.warning("Price too high for token: {} from pool: {}", [
-      token.id,
-      pool.id,
-    ]);
     return false;
   }
   return true;
