@@ -2,7 +2,7 @@
   "network": "fantom",
   "defaultNetwork": "Network.FANTOM",
 
-  "priceCaching": 1000,
+  "priceCaching": 7500,
 
   "poolInfoContract": "0x8cC6e2144906e81F496429A1590Ef5f86bb7558f",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
@@ -26,6 +26,18 @@
       "name": "CryptoSwapRegistry",
       "address": "0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c",
       "startBlock": "27552509"
+    },
+    {
+      "name": "CryptoPoolRegistry",
+      "address": "0xe5de15a9c9bbedb4f5ec13b131e61245f2983a69",
+      "startBlock": "34032089"
+    }
+  ],
+
+  "hardcodedMetaPools": [
+    {
+      "name": "Curve.fi fUSDT/DAI/USDC",
+      "address": "0x92d5ebf3593a92888c25c0abef126583d4b5312e"
     }
   ],
 

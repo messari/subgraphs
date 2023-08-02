@@ -4,6 +4,17 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 /////////////////////////////////// COMMON ////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+export namespace OracleType {
+  export const AAVE_ORACLE = "AaveOracle";
+  export const INCH_ORACLE = "InchOracle";
+  export const CURVE_ROUTER = "CurveRouter";
+  export const CHAINLINK_FEED = "ChainlinkFeed";
+  export const YEARN_LENS_ORACLE = "YearnLensOracle";
+  export const CURVE_CALCULATIONS = "CurveCalculations";
+  export const UNISWAP_FORKS_ROUTER = "UniswapForksRouter";
+  export const SUSHI_CALCULATIONS = "SushiswapCalculations";
+}
+
 export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
@@ -12,14 +23,48 @@ export namespace NULL {
 export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000348"
 );
+export const ETH_ADDRESS = Address.fromString(
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+);
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
+export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
-export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000")
-
+export const BIGDECIMAL_NEG_ONE = new BigDecimal(BIGINT_NEG_ONE);
+export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
+export const BIGDECIMAL_FIVE_PERCENT = BigDecimal.fromString("0.05");
+export const BIGDECIMAL_TEN_BILLION = new BigDecimal(
+  BigInt.fromString("10000000000")
+);
 export const DEFAULT_USDC_DECIMALS = 6;
+export const DEFAULT_AAVE_ORACLE_DECIMALS = 8;
+export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+
+export const WETH = "WETH";
+export const NATIVE_TOKEN = "NATIVE_TOKEN";
+export const STABLE_TOKENS: string[] = ["WETH", "DAI", "USDT", "USDC"];
+
+export const BLACKLISTED_TOKENS: Address[] = [
+  Address.fromString("0x0000000000000000000000000000000000000000"), // Null Address
+  Address.fromString("0xb755b949c126c04e0348dd881a5cf55d424742b2"), // Curve USD-BTC-ETH
+  Address.fromString("0xd79138c49c49200a1afc935171d1bdad084fdc95"), // Curve.fi Factory Plain Pool: 3pool
+  Address.fromString("0x37c9be6c81990398e9b87494484afc6a4608c25d"), // Curve.fi Factory Plain Pool: blizz
+  Address.fromString("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10"), // Curve.fi Factory USD Metapool: Defrost H2O
+  Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
+  Address.fromString("0xaa9dfbf31d2f807ca4d9f7be281d75ca7bdce64d"), // Curve.fi Factory Plain Pool: Curve DD2Pool
+  Address.fromString("0x83f798e925bcd4017eb265844fddabb448f1707d"), // iearn USDT
+  Address.fromString("0xe6354ed5bc4b393a5aad09f21c46e101e692d447"), // iearn USDT
+  Address.fromString("0x1be5d71f2da660bfdee8012ddc58d024448a0a59"), // iearn USDT
+  Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
+  Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
+  Address.fromString("0xaa91cdd7abb47f821cf07a2d38cc8668deaf1bdc"), // 2jpy-2-f
+  Address.fromString("0x8343091f2499fd4b6174a46d067a920a3b851ff9"), // jJPY
+];
