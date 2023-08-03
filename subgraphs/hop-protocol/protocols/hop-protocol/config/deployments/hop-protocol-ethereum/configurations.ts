@@ -14,6 +14,8 @@ import {
   ArbitrumNovaHtoken,
   ArbitrumNovaToken,
   ArbitrumNovaAmm,
+  BaseToken,
+  BaseAmm,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
@@ -189,6 +191,15 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     }
   }
 
+  getBasePoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    if (bridgeAddress == MainnetBridge.ETH) return BaseAmm.ETH;
+    else {
+      log.critical("BasePoolAddress not found for bridge: {}", [bridgeAddress]);
+
+      return "";
+    }
+  }
+
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
     if (chainId == "42161") {
       return this.getArbitrumPoolAddressFromBridgeAddress(bridgeAddress); //Arbitrum
@@ -200,6 +211,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return this.getPolygonPoolAddressFromBridgeAddress(bridgeAddress); //Polygon
     } else if (chainId == "42170") {
       return this.getArbitrumNovaPoolAddressFromBridgeAddress(bridgeAddress); //Arbitrum Nova
+    } else if (chainId == "8453") {
+      return this.getBasePoolAddressFromBridgeAddress(bridgeAddress); //Base
     } else {
       log.critical("Chain not found", []);
       return "";
@@ -263,6 +276,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       ArbitrumAmm.ETH,
       PolygonAmm.ETH,
       OptimismAmm.ETH,
+      BaseAmm.ETH,
     ];
   }
 
@@ -274,6 +288,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       PolygonToken.ETH,
       OptimismToken.ETH,
       ArbitrumNovaToken.ETH,
+      BaseToken.ETH,
     ];
   }
 
@@ -352,6 +367,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else if (chainId == "1")
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "8453")
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found", []);
       return "";
@@ -402,6 +419,13 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     else if (tokenAddress == MainnetToken.MATIC) return XdaiToken.MATIC;
     else {
       log.critical("Xdai Crosstoken not found", []);
+      return "";
+    }
+  }
+  getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == MainnetToken.ETH) return BaseToken.ETH;
+    else {
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
       return "";
     }
   }

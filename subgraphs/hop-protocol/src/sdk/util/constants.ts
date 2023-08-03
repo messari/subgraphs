@@ -271,6 +271,8 @@ export const LP_FEE_TO_OFF = BigDecimal.fromString("3");
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
+// source: https://github.com/hop-protocol/hop/blob/develop/packages/core/src/addresses/mainnet.ts
+
 export namespace XdaiBridge {
   export const USDC = "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8";
   export const USDT = "0xfd5a186a7e8453eb867a360526c5d987a00acac2";
@@ -486,6 +488,22 @@ export namespace PolygonRewardToken {
   export const ETH = "0xaa7b3a4a084e6461d486e53a03cf45004f0963b7";
 }
 
+export namespace BaseBridge {
+  export const ETH = "0x3666f603Cc164936C1b87e207F36BEBa4AC5f18a";
+}
+export namespace BaseAmm {
+  export const ETH = "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d";
+}
+export namespace BaseToken {
+  export const ETH = "0x4200000000000000000000000000000000000006";
+}
+export namespace BaseHToken {
+  export const ETH = "0xC1985d7a3429cDC85E59E2E4Fcc805b857e6Ee2E";
+}
+export namespace BaseRewardToken {
+  export const ETH = "0x12e59C59D282D2C00f3166915BED6DC2F5e2B5C7";
+}
+
 export const priceTokens = [
   OptimismToken.USDC,
   OptimismToken.USDT,
@@ -588,6 +606,7 @@ export const HOP_REWARDS = [
   XdaiRewardToken.USDC_B,
   XdaiRewardToken.ETH_B,
   XdaiRewardToken.USDT_B,
+  BaseRewardToken.ETH,
 ];
 
 export const SIX_DECIMAL_TOKENS = [
