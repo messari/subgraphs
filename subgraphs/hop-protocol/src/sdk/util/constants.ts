@@ -489,19 +489,19 @@ export namespace PolygonRewardToken {
 }
 
 export namespace BaseBridge {
-  export const ETH = "0x3666f603Cc164936C1b87e207F36BEBa4AC5f18a";
+  export const ETH = "0x3666f603cc164936c1b87e207f36beba4ac5f18a";
 }
 export namespace BaseAmm {
-  export const ETH = "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d";
+  export const ETH = "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d";
 }
 export namespace BaseToken {
   export const ETH = "0x4200000000000000000000000000000000000006";
 }
 export namespace BaseHToken {
-  export const ETH = "0xC1985d7a3429cDC85E59E2E4Fcc805b857e6Ee2E";
+  export const ETH = "0xc1985d7a3429cdc85e59e2e4fcc805b857e6ee2e";
 }
 export namespace BaseRewardToken {
-  export const ETH = "0x12e59C59D282D2C00f3166915BED6DC2F5e2B5C7";
+  export const ETH = "0x12e59c59d282d2c00f3166915bed6dc2f5e2b5c7";
 }
 
 export const priceTokens = [
