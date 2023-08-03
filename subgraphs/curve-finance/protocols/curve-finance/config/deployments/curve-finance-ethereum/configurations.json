@@ -2,7 +2,7 @@
   "network": "mainnet",
   "defaultNetwork": "Network.MAINNET",
 
-  "priceCaching": 1000,
+  "priceCaching": 6000,
 
   "poolInfoContract": "0xe64608E223433E8a03a1DaaeFD8Cb638C14B552C",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
@@ -39,7 +39,359 @@
     }
   ],
 
+  "missingOldPools": [
+    {
+      "name": "3pool",
+      "address": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+      "lpToken": "0x6c3f90f043a72fa612cbac8115ee7e52bde6e490",
+      "startBlock": "10809473"
+    },
+    {
+      "name": "busd",
+      "address": "0x79a8c46dea5ada233abaffd40f3a0a2b1e5a4f27",
+      "lpToken": "0x3b3ac5386837dc563660fb6a0937dfaa5924333b",
+      "startBlock": "9567295"
+    },
+    {
+      "name": "aave",
+      "address": "0xdebf20617708857ebe4f679508e7b7863a8a8eee",
+      "lpToken": "0xfd2a8fa60abd58efe3eee34dd494cd491dc14900",
+      "startBlock": "11497106"
+    },
+    {
+      "name": "aeth",
+      "address": "0xa96a65c051bf88b4095ee1f2451c2a9d43f53ae2",
+      "lpToken": "0xaa17a236f2badc98ddc0cf999abb47d47fc0a6cf",
+      "startBlock": "11774139"
+    },
+    {
+      "name": "compound",
+      "address": "0xa2b47e3d5c44877cca798226b7b8118f9bfb7a56",
+      "lpToken": "0x845838df265dcd2c412a1dc9e959c7d08537f8a2",
+      "startBlock": "9554040"
+    },
+    {
+      "name": "eurs",
+      "address": "0x0ce6a5ff5217e38315f87032cf90686c96627caa",
+      "lpToken": "0x194ebd173f6cdace046c53eacce9b953f28411d1",
+      "startBlock": "11466871"
+    },
+    {
+      "name": "hbtc",
+      "address": "0x4ca9b3063ec5866a4b82e437059d2c43d1be596f",
+      "lpToken": "0xb19059ebb43466c323583928285a49f558e572fd",
+      "startBlock": "10732328"
+    },
+    {
+      "name": "ib",
+      "address": "0x2dded6da1bf5dbdf597c45fcfaa3194e53ecfeaf",
+      "lpToken": "0x5282a4ef67d9c33135340fb3289cc1711c13638c",
+      "startBlock": "11831119"
+    },
+    {
+      "name": "link",
+      "address": "0xf178c0b5bb7e7abf4e12a4838c7b7c5ba2c623c0",
+      "lpToken": "0xcee60cfa923170e4f8204ae08b4fa6a3f5656f3a",
+      "startBlock": "11875215"
+    },
+    {
+      "name": "pax",
+      "address": "0x06364f10b501e868329afbc005b3492902d6c763",
+      "lpToken": "0xd905e2eaebe188fc92179b6350807d8bd91db0d8",
+      "startBlock": "10041041"
+    },
+    {
+      "name": "ren",
+      "address": "0x93054188d876f558f4a66b2ef1d97d16edf0895b",
+      "lpToken": "0x49849c98ae39fff122806c06791fa73784fb3675",
+      "startBlock": "10151385"
+    },
+    {
+      "name": "saave",
+      "address": "0xeb16ae0052ed37f479f7fe63849198df1765a733",
+      "lpToken": "0x02d341ccb60faaf662bc0554d13778015d1b285c",
+      "startBlock": "11772500"
+    },
+    {
+      "name": "sbtc",
+      "address": "0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714",
+      "lpToken": "0x075b1bb99792c9e1041ba13afef80c91a1e70fb3",
+      "startBlock": "10276641"
+    },
+    {
+      "name": "seth",
+      "address": "0xc5424b857f758e906013f3555dad202e4bdb4567",
+      "lpToken": "0xa3d87fffce63b53e0d54faa1cc983b7eb0b74a9c",
+      "startBlock": "11491884"
+    },
+    {
+      "name": "steth",
+      "address": "0xdc24316b9ae028f1497c275eb9192a3ea0f67022",
+      "lpToken": "0x06325440d014e39736583c165c2963ba99faf14e",
+      "startBlock": "11592551"
+    },
+    {
+      "name": "susd",
+      "address": "0xa5407eae9ba41422680e2e00537571bcc53efbfd",
+      "lpToken": "0xc25a3a3b969415c80451098fa907ec722572917f",
+      "startBlock": "9906598"
+    },
+    {
+      "name": "usdt",
+      "address": "0x52ea46506b9cc5ef470c5bf89f17dc28bb35d85c",
+      "lpToken": "0x9fc689ccada600b6df723d9e47d84d76664a1f23",
+      "startBlock": "9456293"
+    },
+    {
+      "name": "y",
+      "address": "0x45f783cce6b7ff23b2ab2d70e416cdb7d6055f51",
+      "lpToken": "0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8",
+      "startBlock": "9476468"
+    },
+    {
+      "name": "dusd",
+      "address": "0x8038c01a0390a8c547446a0b2c18fc9aefecc10c",
+      "lpToken": "0x3a664ab939fd8482048609f652f9a0b0677337b9",
+      "startBlock": "11187276"
+    },
+    {
+      "name": "gusd",
+      "address": "0x4f062658eaaf2c1ccf8c8e36d6824cdf41167956",
+      "lpToken": "0xd2967f45c4f384deea880f807be904762a3dea07",
+      "startBlock": "11005604"
+    },
+    {
+      "name": "husd",
+      "address": "0x3ef6a01a0f81d6046290f3e2a8c5b843e738e604",
+      "lpToken": "0x5b5cfe992adac0c9d48e05854b2d91c73a003858",
+      "startBlock": "11010070"
+    },
+    {
+      "name": "linkusd",
+      "address": "0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171",
+      "lpToken": "0x6d65b498cb23deaba52db31c93da9bffb340fb8f",
+      "startBlock": "11011556"
+    },
+    {
+      "name": "musd",
+      "address": "0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6",
+      "lpToken": "0x1aef73d49dedc4b1778d0706583995958dc862e6",
+      "startBlock": "11011940"
+    },
+    {
+      "name": "rsv",
+      "address": "0xc18cc39da8b11da8c3541c598ee022258f9744da",
+      "lpToken": "0xc2ee6b0334c261ed60c72f6054450b61b8f18e35",
+      "startBlock": "11037531"
+    },
+    {
+      "name": "usdk",
+      "address": "0x3e01dd8a5e1fb3481f0f589056b428fc308af0fb",
+      "lpToken": "0x97e2768e8e73511ca874545dc5ff8067eb19b787",
+      "startBlock": "11010305"
+    },
+    {
+      "name": "usdn",
+      "address": "0x0f9cb53ebe405d49a0bbdbd291a65ff571bc83e1",
+      "lpToken": "0x4f3e8f405cf5afc05d68142f3783bdfe13811522",
+      "startBlock": "11010514"
+    },
+    {
+      "name": "usdp",
+      "address": "0x42d7025938bec20b69cbae5a77421082407f053a",
+      "lpToken": "0x7eb40e450b9655f4b3cc4259bcc731c63ff55ae6",
+      "startBlock": "11922057"
+    },
+    {
+      "name": "ust",
+      "address": "0x890f4e345b1daed0367a877a1612f86a1f86985f",
+      "lpToken": "0x94e131324b6054c0d789b190b2dac504e4361b53",
+      "startBlock": "11466568"
+    },
+    {
+      "name": "bbtc",
+      "address": "0x071c661b4deefb59e2a3ddb20db036821eee8f4b",
+      "lpToken": "0x410e3e86ef427e30b9235497143881f717d93c2a",
+      "startBlock": "11455022"
+    },
+    {
+      "name": "obtc",
+      "address": "0xd81da8d904b52208541bade1bd6595d8a251f8dd",
+      "lpToken": "0x2fe94ea3d5d4a175184081439753de15aef9d614",
+      "startBlock": "11459238"
+    },
+    {
+      "name": "pbtc",
+      "address": "0x7f55dde206dbad629c080068923b36fe9d6bdbef",
+      "lpToken": "0xde5331ac4b3630f94853ff322b66407e0d6331e8",
+      "startBlock": "11421596"
+    },
+    {
+      "name": "tbtc",
+      "address": "0xc25099792e9349c7dd09759744ea681c7de2cb66",
+      "lpToken": "0x64eda51d3ad40d56b9dfc5554e06f94e1dd786fd",
+      "startBlock": "11095928"
+    },
+    {
+      "name": "tusd",
+      "address": "0xecd5e75afb02efa118af914515d6521aabd189f1",
+      "lpToken": "0xecd5e75afb02efa118af914515d6521aabd189f1",
+      "startBlock": "12010370"
+    },
+    {
+      "name": "busdv2",
+      "address": "0x4807862aa8b2bf68830e4c8dc86d0e9a998e085a",
+      "lpToken": "0x4807862aa8b2bf68830e4c8dc86d0e9a998e085a",
+      "startBlock": "12240440"
+    },
+    {
+      "name": "reth",
+      "address": "0xf9440930043eb3997fc70e1339dbb11f341de7a8",
+      "lpToken": "0x53a901d48795c58f485cbb38df08fa96a24669d5",
+      "startBlock": "12463576"
+    },
+    {
+      "name": "alusd",
+      "address": "0x43b4fdfd4ff969587185cdb6f0bd875c5fc83f8c",
+      "lpToken": "0x43b4fdfd4ff969587185cdb6f0bd875c5fc83f8c",
+      "startBlock": "11956693"
+    },
+    {
+      "name": "tricrypto",
+      "address": "0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5",
+      "lpToken": "0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf",
+      "startBlock": "12521538"
+    },
+    {
+      "name": "rai",
+      "address": "0x618788357d0ebd8a37e763adab3bc575d54c2c7d",
+      "lpToken": "0x6ba5b4e438fa0aaf7c1bd179285af65d13bd3d90",
+      "startBlock": "13634171"
+    },
+    {
+      "name": "mim",
+      "address": "0x5a6a4d54456819380173272a5e8e9b9904bdf41b",
+      "lpToken": "0x5a6a4d54456819380173272a5e8e9b9904bdf41b",
+      "startBlock": "12567592"
+    },
+    {
+      "name": "eurt",
+      "address": "0xfd5db7463a3ab53fd211b4af195c5bccc1a03890",
+      "lpToken": "0xfd5db7463a3ab53fd211b4af195c5bccc1a03890",
+      "startBlock": "12921922"
+    },
+    {
+      "name": "4pool",
+      "address": "0x4e0915c88bc70750d68c481540f081fefaf22273",
+      "lpToken": "0x4e0915c88bc70750d68c481540f081fefaf22273",
+      "startBlock": "14631356"
+    },
+    {
+      "name": "2pool",
+      "address": "0x1005f7406f32a61bd760cfa14accd2737913d546",
+      "lpToken": "0x1005f7406f32a61bd760cfa14accd2737913d546",
+      "startBlock": "14631073"
+    },
+    {
+      "name": "Curve.fi FRAX/USDC",
+      "address": "0xdcef968d416a41cdac0ed8702fac8128a64241a2",
+      "lpToken": "0x3175df0976dfa876431c2e9ee6bc45b65d3473cc",
+      "startBlock": "14939588"
+    },
+    {
+      "name": "frax",
+      "address": "0xd632f22692fac7611d2aa1c0d552930d43caed3b",
+      "lpToken": "0xd632f22692fac7611d2aa1c0d552930d43caed3b",
+      "startBlock": "11972002"
+    },
+    {
+      "name": "lusd",
+      "address": "0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca",
+      "lpToken": "0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca",
+      "startBlock": "12242627"
+    }
+  ],
+
+  "basePoolsLpToken": [
+    {
+      "name": "3crv",
+      "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    },
+    {
+      "name": "renbtc",
+      "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+    },
+    {
+      "name": "susd",
+      "address": "0xC25a3A3b969415c80451098fa907EC722572917F"
+    },
+    {
+      "name": "busd",
+      "address": "0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B"
+    },
+    {
+      "name": "compound",
+      "address": "0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2"
+    },
+    {
+      "name": "hbtc",
+      "address": "0xb19059ebb43466C323583928285a49f558E572Fd"
+    },
+    {
+      "name": "pax",
+      "address": "0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8"
+    },
+    {
+      "name": "ren",
+      "address": "0x49849C98ae39Fff122806C06791Fa73784FB3675"
+    },
+    {
+      "name": "seth",
+      "address": "0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c"
+    },
+    {
+      "name": "usdt",
+      "address": "0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23"
+    },
+    {
+      "name": "y",
+      "address": "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8"
+    },
+    {
+      "name": "dusd",
+      "address": "0x3a664Ab939FD8482048609f652f9a0B0677337B9"
+    },
+    {
+      "name": "gusd",
+      "address": "0xD2967f45c4f384DEEa880F807Be904762a3DeA07"
+    },
+    {
+      "name": "husd",
+      "address": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858"
+    },
+    {
+      "name": "linkusd",
+      "address": "0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F"
+    },
+    {
+      "name": "musd",
+      "address": "0x1AEf73d49Dedc4b1778d0706583995958Dc862e6"
+    },
+    {
+      "name": "rsv",
+      "address": "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35"
+    },
+    {
+      "name": "usdk",
+      "address": "0x97E2768e8E73511cA874545DC5Ff8067eB19B787"
+    },
+    {
+      "name": "usdn",
+      "address": "0x4f3E8F405CF5aFC05D68142F3783bDfE13811522"
+    }
+  ],
+
   "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": ""
+  "subgraphId": "QmWadCH6xvxmwf4MY6xLXSAjXdx3FyqCWVYLAK5rRj2Srx",
+  "graftStartBlock": "16820058"
 }

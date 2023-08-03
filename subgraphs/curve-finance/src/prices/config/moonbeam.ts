@@ -1,34 +1,33 @@
-import * as constants from "../common/constants";
-import { Configurations } from "../common/types";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
+import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
+import { Configurations, ContractInfo, TokenInfo } from "../common/types";
 
 export const NETWORK_STRING = "moonbeam";
-
-///////////////////////////////////////////////////////////////////////////
-///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
-///////////////////////////////////////////////////////////////////////////
-
-export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
-
-export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0xC2b1DF84112619D190193E48148000e3990Bf627"),
+export const CURVE_REGISTRY_ADDRESSES = [
+  ContractInfo.set(
+    Address.fromString("0xc2b1df84112619d190193e48148000e3990bf627"),
+    BigInt.fromI32(1452049)
+  ),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
+  ContractInfo.set(
+    Address.fromString("0x96b244391d98b62d19ae89b1a4dccf0fc56970c7"), // BeamSwap
+    BigInt.fromI32(199158)
+  ),
+  ContractInfo.set(
+    Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
+    BigInt.fromI32(503734)
+  ),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -36,6 +35,7 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const YEARN_LENS_BLACKLIST: Address[] = [];
+export const INCH_ORACLE_BLACKLIST: Address[] = [];
 export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
@@ -44,60 +44,111 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = [];
+export const HARDCODED_STABLES: Address[] = [
+  Address.fromString("0x14df360966a1c4582d2b18edbdae432ea0a27575"), // Axelar Wrapped DAI
+  Address.fromString("0xca01a1d0993565291051daff390892518acfad3a"), // Axelar Wrapped USDC
+  Address.fromString("0xdfd74af792bc6d45d1803f425ce62dd16f8ae038"), // Axelar Wrapped USDT
+  Address.fromString("0x765277eebeca2e31912c9946eae1021199b39c61"), // DAI
+  Address.fromString("0x81ecac0d6be0550a00ff064a4f9dd2400585fe9c"), // USDT  (Celer)
+  Address.fromString("0x8e70cd5b4ff3f62659049e74b6649c6603a0e594"), // USDT
+  Address.fromString("0xc234a67a4f840e61ade794be47de455361b52413"), // DAI
+];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
+export const WHITELISTED_TOKENS = new TypedMap<string, TokenInfo>();
 
-export const ETH_ADDRESS = Address.fromString(
-  "0xfa9343c3897324496a05fc75abed6bac29f8a40f"
+WHITELISTED_TOKENS.set(
+  "USDC",
+  TokenInfo.set(
+    "USDC",
+    6,
+    Address.fromString("0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b")
+  )
 );
-export const WETH_ADDRESS = Address.fromString(
-  "0xacc15dc74880c9944775448304b263d191c6077f"
+
+WHITELISTED_TOKENS.set(
+  "USDT",
+  TokenInfo.set(
+    "USDT",
+    6,
+    Address.fromString("0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73")
+  )
 );
-export const USDC_ADDRESS = Address.fromString(
-  "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b"
+
+WHITELISTED_TOKENS.set(
+  "DAI",
+  TokenInfo.set(
+    "DAI",
+    18,
+    Address.fromString("0x765277eebeca2e31912c9946eae1021199b39c61")
+  )
+);
+
+WHITELISTED_TOKENS.set(
+  "WETH",
+  TokenInfo.set(
+    "WETH",
+    18,
+    Address.fromString("0x30d2a9f5fdf90ace8c17952cbb4ee48a55d916a7")
+  )
+);
+
+WHITELISTED_TOKENS.set(
+  "NATIVE_TOKEN",
+  TokenInfo.set(
+    "GLMR",
+    18,
+    Address.fromString("0xacc15dc74880c9944775448304b263d191c6077f")
+  )
 );
 
 export class config implements Configurations {
-  yearnLens(): Address {
-    return YEARN_LENS_CONTRACT_ADDRESS;
-  }
-  chainLink(): Address {
-    return CHAIN_LINK_CONTRACT_ADDRESS;
+  yearnLens(): ContractInfo | null {
+    return null;
   }
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
 
-  aaveOracle(): Address {
-    return AAVE_ORACLE_CONTRACT_ADDRESS;
+  inchOracle(): ContractInfo | null {
+    return null;
+  }
+  inchOracleBlacklist(): Address[] {
+    return INCH_ORACLE_BLACKLIST;
+  }
+
+  chainLink(): ContractInfo | null {
+    return null;
+  }
+
+  aaveOracle(): ContractInfo | null {
+    return null;
   }
   aaveOracleBlacklist(): Address[] {
     return AAVE_ORACLE_BLACKLIST;
   }
 
-  curveCalculations(): Address {
-    return CURVE_CALCULATIONS_ADDRESS;
+  curveCalculations(): ContractInfo | null {
+    return null;
   }
   curveCalculationsBlacklist(): Address[] {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
-  sushiCalculations(): Address {
-    return SUSHISWAP_CALCULATIONS_ADDRESS;
+  sushiCalculations(): ContractInfo | null {
+    return null;
   }
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
 
-  uniswapForks(): Address[] {
+  uniswapForks(): ContractInfo[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;
   }
-  curveRegistry(): Address[] {
+  curveRegistry(): ContractInfo[] {
     return CURVE_REGISTRY_ADDRESSES;
   }
 
@@ -105,17 +156,7 @@ export class config implements Configurations {
     return HARDCODED_STABLES;
   }
 
-  ethAddress(): Address {
-    return ETH_ADDRESS;
-  }
-  wethAddress(): Address {
-    return WETH_ADDRESS;
-  }
-  usdcAddress(): Address {
-    return USDC_ADDRESS;
-  }
-
-  usdcTokenDecimals(): BigInt {
-    return USDC_TOKEN_DECIMALS;
+  whitelistedTokens(): TypedMap<string, TokenInfo> {
+    return WHITELISTED_TOKENS;
   }
 }

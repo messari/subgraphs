@@ -19,6 +19,15 @@
     }
   ],
 
+  "missingOldPools": [
+    {
+      "name": "3CRV",
+      "address": "0xc5cfada84e902ad92dd40194f0883ad49639b023",
+      "lpToken": "0xc5cfada84e902ad92dd40194f0883ad49639b023",
+      "startBlock": "18000571"
+    }
+  ],
+
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": ""

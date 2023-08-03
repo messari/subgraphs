@@ -11,10 +11,9 @@ import {
   getOrCreateLiquidityPool,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
-import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
+import { RewardData, RewardsInfoType } from "../common/types";
 import { Rewards as PoolRewardsContract } from "../../generated/templates/PoolTemplate/Rewards";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
@@ -39,21 +38,14 @@ export function getRewardsData_v1(
     );
 
     if (rewardToken.equals(constants.NULL.TYPE_ADDRESS)) continue;
-
     rewardTokens.push(rewardToken);
 
-    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
-    if (!rewardRateCall.reverted) {
-      const rewardRate = rewardRateCall.value.getRate();
-      const periodFinish = rewardRateCall.value.getPeriod_finish();
+    const rewardData = new RewardData(gaugeAddress, rewardToken);
 
-      if (periodFinish.lt(block.timestamp)) {
-        rewardRates.push(constants.BIGINT_ZERO);
-      } else {
-        rewardRates.push(rewardRate);
-      }
-    } else {
+    if (rewardData.getPeriodFinish.lt(block.timestamp)) {
       rewardRates.push(constants.BIGINT_ZERO);
+    } else {
+      rewardRates.push(rewardData.getRewardRate);
     }
   }
 
@@ -104,6 +96,7 @@ export function getRewardsData_v3(
 
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   for (let idx = 0; idx < 5; idx++) {
     const rewardToken = utils.readValue<Address>(
       gaugeContract.try_reward_tokens(BigInt.fromI32(idx)),
@@ -113,32 +106,14 @@ export function getRewardsData_v3(
     if (rewardToken.equals(constants.NULL.TYPE_ADDRESS)) {
       return new RewardsInfoType(rewardTokens, rewardRates);
     }
-
     rewardTokens.push(rewardToken);
 
-    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
-    if (!rewardRateCall.reverted) {
-      const rewardRate = rewardRateCall.value.getRate();
+    const rewardData = new RewardData(gaugeAddress, rewardToken);
 
-      if (rewardRateCall.value.getPeriod_finish().lt(block.timestamp)) {
-        rewardRates.push(constants.BIGINT_ZERO);
-      } else {
-        rewardRates.push(rewardRate);
-      }
+    if (rewardData.getPeriodFinish.lt(block.timestamp)) {
+      rewardRates.push(constants.BIGINT_ZERO);
     } else {
-      const rewardRate1Call = gaugeContract.try_reward_data1(rewardToken);
-
-      if (!rewardRate1Call.reverted) {
-        const rewardRate = rewardRate1Call.value.rate;
-
-        if (rewardRate1Call.value.period_finish.lt(block.timestamp)) {
-          rewardRates.push(constants.BIGINT_ZERO);
-        } else {
-          rewardRates.push(rewardRate);
-        }
-      } else {
-        rewardRates.push(constants.BIGINT_ZERO);
-      }
+      rewardRates.push(rewardData.getRewardRate);
     }
   }
 
@@ -153,20 +128,11 @@ export function updateStakedOutputTokenAmount(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  const gaugeTotalSupply = utils.readValue<BigInt>(
-    gaugeContract.try_totalSupply(),
+  const gaugeWorkingSupply = utils.readValue<BigInt>(
+    gaugeContract.try_working_supply(),
     constants.BIGINT_ZERO
   );
-
-  pool.stakedOutputTokenAmount = gaugeTotalSupply;
-
-  if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)) {
-    const gaugeWorkingSupply = utils.readValue<BigInt>(
-      gaugeContract.try_working_supply(),
-      constants.BIGINT_ZERO
-    );
-    pool.stakedOutputTokenAmount = gaugeWorkingSupply;
-  }
+  pool.stakedOutputTokenAmount = gaugeWorkingSupply;
 
   pool.save();
 }
@@ -194,9 +160,7 @@ export function updateControllerRewards(
       constants.BIGINT_ZERO
     )
     .divDecimal(
-      constants.BIGINT_TEN.pow(
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      ).toBigDecimal()
+      utils.exponentToBigDecimal(constants.DEFAULT_DECIMALS.toI32() as u8)
     );
 
   if (
@@ -303,13 +267,12 @@ export function updateRewardTokenEmissions(
   }
   const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const token = getOrCreateToken(rewardTokenAddress, block);
-  const tokenPrice = getUsdPricePerToken(rewardTokenAddress);
+  const token = getOrCreateToken(rewardTokenAddress, block, true);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-    .times(tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen));
+    .divDecimal(utils.exponentToBigDecimal(token.decimals as u8))
+    .times(token.lastPriceUSD!);
 
   pool.rewardTokens = rewardTokens;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
