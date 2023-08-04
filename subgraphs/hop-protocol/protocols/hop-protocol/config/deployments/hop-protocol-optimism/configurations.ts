@@ -109,7 +109,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (chainId == "42170")
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else if (chainId == "8453")
-      return this.getBaseCrossTokenFromTokenAddress(tokenAddress)[0];
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found", []);
       return "";

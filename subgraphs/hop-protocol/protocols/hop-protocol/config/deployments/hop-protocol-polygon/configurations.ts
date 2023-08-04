@@ -140,7 +140,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
     } else if (chainId == "1") {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress); //Mainnet
     } else if (chainId == "8453") {
-      return this.getBaseCrossTokenFromTokenAddress(tokenAddress)[0];
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     } else {
       log.critical("Chain not found", []);
       return "";
