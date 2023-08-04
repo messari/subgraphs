@@ -1,4 +1,10 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ByteArray,
+  crypto,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { Submitted, Transfer, ETHDistributed } from "../../generated/Lido/Lido";
 import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
 import { getOrCreateToken } from "../entities/token";
@@ -17,6 +23,9 @@ import {
   PROTOCOL_ID,
   BIGINT_ZERO,
   LIDO_V2_UPGRADE_BLOCK,
+  INT_TWO,
+  INT_ZERO,
+  INT_THREE,
 } from "../utils/constants";
 import { getOrCreatePool } from "../entities/pool";
 import { Lido } from "../../generated/Lido/Lido";
@@ -45,6 +54,36 @@ export function handleTransfer(event: Transfer): void {
   const value = event.params.value;
   if (sender.toHexString() != ZERO_ADDRESS) {
     return;
+  }
+
+  const receipt = event.receipt;
+  if (!receipt) return;
+  const logs = event.receipt!.logs;
+  if (!logs) return;
+
+  const execute_signature = crypto.keccak256(
+    ByteArray.fromUTF8("Execute(address,address,uint256,bytes)")
+  );
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs.at(i);
+    if (thisLog.topics.length < INT_THREE) continue;
+
+    const topic_signature = thisLog.topics.at(INT_ZERO);
+    const topic_target = ethereum
+      .decode("address", thisLog.topics.at(INT_TWO))!
+      .toAddress();
+
+    if (
+      topic_signature.equals(execute_signature) &&
+      topic_target.equals(Address.fromString(PROTOCOL_ID))
+    ) {
+      log.info(
+        "[handleTransfer] Aragon voting. Skipping tx: {} for counting in protocol's revenue.",
+        [event.transaction.hash.toHexString()]
+      );
+
+      return;
+    }
   }
 
   // update Token lastPrice and lastBlock
