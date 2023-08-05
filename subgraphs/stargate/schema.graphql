@@ -83,6 +83,7 @@ enum Network {
   HARMONY
   PALM
   CURIO
+  BASE
   UNKNOWN_NETWORK
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers, rulesdir/no-checksum-addresses */
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////////
@@ -86,6 +87,7 @@ export namespace Network {
   export const HARMONY = "HARMONY";
   export const PALM = "PALM";
   export const CURIO = "CURIO";
+  export const BASE = "BASE";
 
   export const UNKNOWN_NETWORK = "UNKNOWN_NETWORK";
 }
