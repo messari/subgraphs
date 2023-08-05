@@ -5,8 +5,8 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO } from "../constants";
-import { getOrCreateToken } from "../getters";
+import { BIGINT_ONE, BIGINT_ZERO } from "../../../../../src/common/constants";
+import { getOrCreateToken } from "../../../../../src/common/getters";
 
 export function createMasterChefStakingPool(
   event: ethereum.Event,

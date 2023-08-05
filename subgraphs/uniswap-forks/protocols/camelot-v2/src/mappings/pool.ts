@@ -3,109 +3,52 @@ import {
   Burn,
   FeePercentUpdated,
   Mint,
+  SetStableSwap,
   Swap,
   Sync,
   Transfer,
 } from "../../../../generated/templates/Pair/Pair";
 import { UsageType } from "../../../../src/common/constants";
-import { createPoolFees } from "../../src/common/creators";
 import {
   updateFinancials,
-  updateInputTokenBalances,
   updatePoolMetrics,
-  updateTvlAndTokenPrices,
   updateUsageMetrics,
-} from "../../src/common/updateMetrics";
+} from "../../../../src/common/updateMetrics";
+import { convertTokenToDecimal } from "../../../../src/common/utils/utils";
 import {
-  BIGINT_THOUSAND,
-  BIGINT_ZERO,
-  INT_THREE,
-  ZERO_ADDRESS,
-} from "../common/constants";
-import {
-  createDeposit,
-  createSwapHandleVolumeAndFees,
-  createWithdraw,
-} from "../common/creators";
-import { getLiquidityPool } from "../common/getters";
-import {
-  handleTransferBurn,
-  handleTransferMint,
-  handleTransferToPoolBurn,
-} from "../common/handlers";
-import { bigIntToBigDecimal } from "../common/utils/numbers";
+  handleBurn as handlePoolBurn,
+  handleMint as handlePoolMint,
+  handleSync as handlePoolSync,
+  handleTransfer as handlePoolTransfer,
+} from "../../../../src/mappings/pool";
+import { createPoolFees } from "../../src/common/creators";
+import {} from "../../src/common/updateMetrics";
+import { INT_THREE, PairType } from "../common/constants";
+import { createSwapHandleVolumeAndFees } from "../common/creators";
+import { _HelperStore } from "../../../../generated/schema";
 
 // Handle transfers event.
 // The transfers are either occur as a part of the Mint or Burn event process.
 // The tokens being transferred in these events are the LP tokens from the liquidity pool that emitted this event.
 export function handleTransfer(event: Transfer): void {
-  const pool = getLiquidityPool(event.address.toHexString());
-
-  // ignore initial transfers for first adds
-  if (
-    event.params.to.toHexString() == ZERO_ADDRESS &&
-    event.params.value.equals(BIGINT_THOUSAND) &&
-    pool.outputTokenSupply! == BIGINT_ZERO
-  ) {
-    return;
-  }
-  // mints
-  if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    handleTransferMint(
-      event,
-      pool,
-      event.params.value,
-      event.params.to.toHexString()
-    );
-  }
-  // Case where direct send first on native token withdrawls.
-  // For burns, mint tokens are first transferred to the pool before transferred for burn.
-  // This gets the EOA that made the burn loaded into the _Transfer.
-
-  if (event.params.to == event.address) {
-    handleTransferToPoolBurn(event, event.params.from.toHexString());
-  }
-  // burn
-  if (
-    event.params.to.toHexString() == ZERO_ADDRESS &&
-    event.params.from == event.address
-  ) {
-    handleTransferBurn(
-      event,
-      pool,
-      event.params.value,
-      event.params.from.toHexString()
-    );
-  }
+  handlePoolTransfer(event);
 }
 
 // Handle Sync event.
 // Emitted after every Swap, Mint, and Burn event.
 // Gives information about the rebalancing of tokens used to update tvl, balances, and token pricing
 export function handleSync(event: Sync): void {
-  updateInputTokenBalances(
-    event,
-    event.address.toHexString(),
-    event.params.reserve0,
-    event.params.reserve1
-  );
-  updateTvlAndTokenPrices(event, event.address.toHexString());
+  handlePoolSync(event);
 }
 
 // Handle a mint event emitted from a pool contract. Considered a deposit into the given liquidity pool.
 export function handleMint(event: Mint): void {
-  createDeposit(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
-  updateFinancials(event);
-  updatePoolMetrics(event);
+  handlePoolMint(event);
 }
 
 // Handle a burn event emitted from a pool contract. Considered a withdraw into the given liquidity pool.
 export function handleBurn(event: Burn): void {
-  createWithdraw(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
-  updateFinancials(event);
-  updatePoolMetrics(event);
+  handlePoolBurn(event);
 }
 
 // Handle a swap event emitted from a pool contract.
@@ -125,13 +68,23 @@ export function handleSwap(event: Swap): void {
 }
 
 export function handleFeePercentUpdated(event: FeePercentUpdated): void {
-  const token0TradeFee = bigIntToBigDecimal(
+  const token0TradeFee = convertTokenToDecimal(
     BigInt.fromI32(event.params.token0FeePercent),
     INT_THREE
   );
-  const token1TradeFee = bigIntToBigDecimal(
+  const token1TradeFee = convertTokenToDecimal(
     BigInt.fromI32(event.params.token0FeePercent),
     INT_THREE
   );
   createPoolFees(event.address.toHexString(), token0TradeFee, token1TradeFee);
+}
+
+export function handleSetStableSwap(event: SetStableSwap): void {
+  const helperStore = new _HelperStore(event.address.toHexString());
+  if (event.params.stableSwap) {
+    helperStore.valueString = PairType.STABLE;
+  } else {
+    helperStore.valueString = PairType.VOLATILE;
+  }
+  helperStore.save();
 }

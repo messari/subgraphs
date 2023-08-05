@@ -29,7 +29,6 @@ import {
   SECONDS_PER_HOUR,
   BIGINT_TEN,
 } from "./constants";
-import { createPoolFees } from "./creators";
 import { findUSDPricePerToken } from "../price/price";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
@@ -58,13 +57,8 @@ export function getOrCreateProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getLiquidityPool(
-  poolAddress: string,
-  blockNumber: BigInt
-): LiquidityPool {
+export function getLiquidityPool(poolAddress: string): LiquidityPool {
   const pool = LiquidityPool.load(poolAddress)!;
-  pool.fees = createPoolFees(poolAddress, blockNumber);
-  pool.save();
   return pool;
 }
 

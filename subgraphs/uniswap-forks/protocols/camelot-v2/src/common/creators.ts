@@ -5,47 +5,48 @@ import {
   BigInt,
   ethereum,
   log,
-  store,
 } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../configurations/configure";
 import {
-  Account,
-  Deposit,
   LiquidityPool,
   LiquidityPoolFee,
   Swap as SwapEvent,
   Token,
-  Withdraw,
   _HelperStore,
   _LiquidityPoolAmount,
 } from "../../../../generated/schema";
 import { Pair as PairTemplate } from "../../../../generated/templates";
-import { getTrackedVolumeUSD } from "../price";
 import {
   BIGDECIMAL_FIFTY_PERCENT,
   BIGDECIMAL_ZERO,
   BIGINT_NEG_ONE,
   BIGINT_ZERO,
-  INT_ONE,
   INT_ZERO,
   LiquidityPoolFeeType,
-  PROTOCOL_FEE_SHARE_ID,
-} from "./constants";
+} from "../../../../src/common/constants";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
-  getLiquidityPoolFee,
   getOrCreateLPToken,
   getOrCreateProtocol,
   getOrCreateToken,
-  getOrCreateTransfer,
-} from "./getters";
+} from "../../../../src/common/getters";
+import { updateTokenWhitelists } from "../../../../src/common/updateMetrics";
 import {
-  updateDepositHelper,
-  updateTokenWhitelists,
-  updateVolumeAndFees,
-} from "./updateMetrics";
-import { convertTokenToDecimal, percToDec } from "./utils/utils";
+  convertTokenToDecimal,
+  percToDec,
+} from "../../../../src/common/utils/utils";
+import { getTrackedVolumeUSD } from "../../../../src/price/price";
+import { PROTOCOL_FEE_SHARE_ID, PairType } from "./constants";
+import { updateVolumeAndFees } from "./updateMetrics";
+
+function getOrCreateLiquidityPoolFee(id: string): LiquidityPoolFee {
+  let fee = LiquidityPoolFee.load(id);
+  if (!fee) {
+    fee = new LiquidityPoolFee(id);
+  }
+  return fee;
+}
 
 // Create seperate fees for both tokens to handle directional fees
 // If fee percent is not the same for both tokens, then fee types are set to dynamic and amounts to null
@@ -54,27 +55,31 @@ export function createPoolFees(
   token0TradingFee: BigDecimal | null = null,
   token1TradingFee: BigDecimal | null = null
 ): string[] {
-  const poolLpFee = getLiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  const poolLpFeeToken0 = getLiquidityPoolFee(poolAddress.concat("-lp-fee-0"));
-  const poolLpFeeToken1 = getLiquidityPoolFee(poolAddress.concat("-lp-fee-1"));
+  const poolLpFee = getOrCreateLiquidityPoolFee(poolAddress.concat("-lp-fee"));
+  const poolLpFeeToken0 = getOrCreateLiquidityPoolFee(
+    poolAddress.concat("-lp-fee-0")
+  );
+  const poolLpFeeToken1 = getOrCreateLiquidityPoolFee(
+    poolAddress.concat("-lp-fee-1")
+  );
 
-  const poolProtocolFee = getLiquidityPoolFee(
+  const poolProtocolFee = getOrCreateLiquidityPoolFee(
     poolAddress.concat("-protocol-fee")
   );
-  const poolProtocolFeeToken0 = getLiquidityPoolFee(
+  const poolProtocolFeeToken0 = getOrCreateLiquidityPoolFee(
     poolAddress.concat("-protocol-fee-0")
   );
-  const poolProtocolFeeToken1 = getLiquidityPoolFee(
+  const poolProtocolFeeToken1 = getOrCreateLiquidityPoolFee(
     poolAddress.concat("-protocol-fee-1")
   );
 
-  const poolTradingFee = getLiquidityPoolFee(
+  const poolTradingFee = getOrCreateLiquidityPoolFee(
     poolAddress.concat("-trading-fee")
   );
-  const poolTradingFeeToken0 = getLiquidityPoolFee(
+  const poolTradingFeeToken0 = getOrCreateLiquidityPoolFee(
     poolAddress.concat("-trading-fee-0")
   );
-  const poolTradingFeeToken1 = getLiquidityPoolFee(
+  const poolTradingFeeToken1 = getOrCreateLiquidityPoolFee(
     poolAddress.concat("-trading-fee-1")
   );
 
@@ -195,9 +200,11 @@ export function createLiquidityPool(
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
+  const helperStore = new _HelperStore(poolAddress);
   // Used to track the number of deposits in a liquidity pool
-  const poolDeposits = new _HelperStore(poolAddress);
-  poolDeposits.valueInt = INT_ZERO;
+  helperStore.valueInt = INT_ZERO;
+  // Liquidity pool pair type
+  helperStore.valueString = PairType.VOLATILE;
 
   // update number of pools
   protocol.totalPoolCount += 1;
@@ -211,148 +218,7 @@ export function createLiquidityPool(
   token1.save();
   LPtoken.save();
   poolAmounts.save();
-  poolDeposits.save();
-}
-
-// Create Account entity for participating account
-export function createAndIncrementAccount(accountId: string): i32 {
-  let account = Account.load(accountId);
-  if (!account) {
-    account = new Account(accountId);
-    account.save();
-
-    return INT_ONE;
-  }
-  return INT_ZERO;
-}
-
-// Create a Deposit entity and update deposit count on a Mint event for the specific pool..
-export function createDeposit(
-  event: ethereum.Event,
-  amount0: BigInt,
-  amount1: BigInt
-): void {
-  const transfer = getOrCreateTransfer(event);
-
-  const pool = getLiquidityPool(event.address.toHexString());
-
-  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
-
-  token0._totalSupply = token0._totalSupply.plus(amount0);
-  token1._totalSupply = token1._totalSupply.plus(amount1);
-
-  token0._totalValueLockedUSD = convertTokenToDecimal(
-    token0._totalSupply,
-    token0.decimals
-  ).times(token0.lastPriceUSD!);
-  token1._totalValueLockedUSD = convertTokenToDecimal(
-    token1._totalSupply,
-    token1.decimals
-  ).times(token1.lastPriceUSD!);
-
-  token0.save();
-  token1.save();
-
-  // update exchange info (except balances, sync will cover that)
-  const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
-  const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
-
-  const reserve0Amount = pool.inputTokenBalances[0];
-  const reserve1Amount = pool.inputTokenBalances[1];
-
-  const logIndexI32 = event.logIndex.toI32();
-  const transactionHash = event.transaction.hash.toHexString();
-  const deposit = new Deposit(
-    transactionHash.concat("-").concat(event.logIndex.toString())
-  );
-
-  deposit.hash = transactionHash;
-  deposit.logIndex = logIndexI32;
-  deposit.protocol = NetworkConfigs.getFactoryAddress();
-  deposit.to = pool.id;
-  deposit.from = transfer.sender!;
-  deposit.blockNumber = event.block.number;
-  deposit.timestamp = event.block.timestamp;
-  deposit.inputTokens = [pool.inputTokens[INT_ZERO], pool.inputTokens[INT_ONE]];
-  deposit.outputToken = pool.outputToken;
-  deposit.inputTokenAmounts = [amount0, amount1];
-  deposit.outputTokenAmount = transfer.liquidity;
-  deposit.reserveAmounts = [reserve0Amount, reserve1Amount];
-  deposit.amountUSD = token0
-    .lastPriceUSD!.times(token0Amount)
-    .plus(token1.lastPriceUSD!.times(token1Amount));
-  deposit.pool = pool.id;
-
-  updateDepositHelper(event.address);
-
-  deposit.save();
-}
-
-// Create a Withdraw entity on a Burn event for the specific pool..
-export function createWithdraw(
-  event: ethereum.Event,
-  amount0: BigInt,
-  amount1: BigInt
-): void {
-  const transfer = getOrCreateTransfer(event);
-
-  const pool = getLiquidityPool(event.address.toHexString());
-
-  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
-
-  token0._totalSupply = token0._totalSupply.minus(amount0);
-  token1._totalSupply = token1._totalSupply.minus(amount1);
-
-  token0._totalValueLockedUSD = convertTokenToDecimal(
-    token0._totalSupply,
-    token0.decimals
-  ).times(token0.lastPriceUSD!);
-  token1._totalValueLockedUSD = convertTokenToDecimal(
-    token1._totalSupply,
-    token1.decimals
-  ).times(token1.lastPriceUSD!);
-
-  token0.save();
-  token1.save();
-
-  // update exchange info (except balances, sync will cover that)
-  const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
-  const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
-
-  const reserve0Amount = pool.inputTokenBalances[0];
-  const reserve1Amount = pool.inputTokenBalances[1];
-
-  const logIndexI32 = event.logIndex.toI32();
-  const transactionHash = event.transaction.hash.toHexString();
-  const withdrawal = new Withdraw(
-    transactionHash.concat("-").concat(event.logIndex.toString())
-  );
-
-  withdrawal.hash = transactionHash;
-  withdrawal.logIndex = logIndexI32;
-  withdrawal.protocol = NetworkConfigs.getFactoryAddress();
-  withdrawal.to = transfer.sender!;
-  withdrawal.from = pool.id;
-  withdrawal.blockNumber = event.block.number;
-  withdrawal.timestamp = event.block.timestamp;
-  withdrawal.inputTokens = [
-    pool.inputTokens[INT_ZERO],
-    pool.inputTokens[INT_ONE],
-  ];
-  withdrawal.outputToken = pool.outputToken;
-  withdrawal.inputTokenAmounts = [amount0, amount1];
-  withdrawal.outputTokenAmount = transfer.liquidity;
-  withdrawal.reserveAmounts = [reserve0Amount, reserve1Amount];
-  withdrawal.amountUSD = token0
-    .lastPriceUSD!.times(token0Amount)
-    .plus(token1.lastPriceUSD!.times(token1Amount));
-  withdrawal.pool = pool.id;
-
-  store.remove("_Transfer", transfer.id);
-
-  withdrawal.save();
+  helperStore.save();
 }
 
 // Handle swaps data and update entities volumes and fees

@@ -27,6 +27,7 @@ import {
   safeDiv,
 } from "../common/utils/utils";
 import { NetworkConfigs } from "../../configurations/configure";
+import { findStablePairUSDPriceForToken } from "../../protocols/camelot-v2/src/price";
 
 // Update the token price of the native token for the specific protocol/network (see network specific configs)
 // Update the token by referencing the native token against pools with the reference token and a stable coin
@@ -85,7 +86,7 @@ export function findUSDPricePerToken(
     for (let i = 0; i < whiteList.length; ++i) {
       const poolAddress = whiteList[i];
       const poolAmounts = getLiquidityPoolAmounts(poolAddress);
-      const pool = getLiquidityPool(poolAddress, event.block.number);
+      const pool = getLiquidityPool(poolAddress);
 
       if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         const priceTokenIndex: i32 = get_token_index(pool, token);
@@ -111,6 +112,18 @@ export function findUSDPricePerToken(
           largestLiquidityWhitelistTokens = whitelistTokenLocked;
           // token1 per our token * nativeToken per token1
 
+          if (NetworkConfigs.getProtocolSlug() == "camelot-v2") {
+            const newPrice = findStablePairUSDPriceForToken(
+              pool,
+              whitelistToken,
+              token
+            );
+            if (newPrice) {
+              priceSoFar = newPrice;
+              continue;
+            }
+          }
+
           const newPrice = safeDiv(
             poolAmounts.inputTokenBalances[whitelistTokenIndex],
             poolAmounts.inputTokenBalances[priceTokenIndex]
@@ -122,6 +135,10 @@ export function findUSDPricePerToken(
         }
       }
     }
+  }
+
+  if (BIGDECIMAL_ZERO.equals(priceSoFar)) {
+    return priceSoFar;
   }
 
   // Buffer token pricings that would cause large spikes on the protocol level

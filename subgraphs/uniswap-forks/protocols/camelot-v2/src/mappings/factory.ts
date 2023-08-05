@@ -1,18 +1,18 @@
-import { NetworkConfigs } from "../../../../configurations/configure";
 import {
   OwnerFeeShareUpdated,
   PairCreated,
 } from "../../../../generated/Factory/Factory";
 import { LiquidityPoolFee } from "../../../../generated/schema";
 import { LiquidityPoolFeeType } from "../../../../src/common/constants";
+import { Logger } from "../../../../src/common/utils/logger";
+import { convertTokenToDecimal } from "../../../../src/common/utils/utils";
 import { INT_THREE, PROTOCOL_FEE_SHARE_ID } from "../common/constants";
 import { createLiquidityPool } from "../common/creators";
-import { Logger } from "../common/utils/logger";
-import { bigIntToBigDecimal } from "../common/utils/numbers";
 
+// Percentage of fees that go to owner address, applies to all pools
 export function handleOwnerFeeShareUpdated(event: OwnerFeeShareUpdated): void {
   const protocolFee = new LiquidityPoolFee(PROTOCOL_FEE_SHARE_ID);
-  protocolFee.feePercentage = bigIntToBigDecimal(
+  protocolFee.feePercentage = convertTokenToDecimal(
     event.params.ownerFeeShare,
     INT_THREE
   );
@@ -21,21 +21,8 @@ export function handleOwnerFeeShareUpdated(event: OwnerFeeShareUpdated): void {
 }
 
 export function handlePairCreated(event: PairCreated): void {
-  const logger = new Logger(event, "handlePairCreated");
-  if (
-    NetworkConfigs.getUntrackedPairs().includes(event.params.pair.toHexString())
-  ) {
-    logger.warning(
-      "farm found in UntrackedPairs list, not tracking: {}    {}     {}",
-      [
-        event.params.pair.toHexString(),
-        event.params.token0.toHexString(),
-        event.params.token1.toHexString(),
-      ]
-    );
-    return;
-  }
-  logger.info("create farm {}    {}     {}", [
+  const log = new Logger(event, "handlePairCreated");
+  log.info("create farm {}    {}     {}", [
     event.params.pair.toHexString(),
     event.params.token0.toHexString(),
     event.params.token1.toHexString(),

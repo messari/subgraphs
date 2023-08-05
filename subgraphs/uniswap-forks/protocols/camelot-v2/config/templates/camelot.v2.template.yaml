@@ -99,3 +99,5 @@ templates:
           handler: handleSync
         - event: FeePercentUpdated(uint16,uint16)
           handler: handleFeePercentUpdated
+        - event: SetStableSwap(bool,bool)
+          handler: handleSetStableSwap
