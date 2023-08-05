@@ -305,9 +305,10 @@ function getLpTokenLiquidityUsdc(
         blockNumber,
       ]
     );
+    // liquidity is already in USD so we should not use USDC decimals with it
     return CustomPriceType.initialize(
       liquidity,
-      constants.BIGINT_ZERO,
+      0,
       constants.OracleType.UNISWAP_FORKS_ROUTER
     );
   }
