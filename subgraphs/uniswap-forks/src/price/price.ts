@@ -20,6 +20,7 @@ import {
   PRICE_CHANGE_BUFFER_LIMIT,
   BIGDECIMAL_TEN_BILLION,
   BIGDECIMAL_FIVE_PERCENT,
+  INT_FIVE,
 } from "../common/constants";
 import {
   absBigDecimal,
@@ -249,7 +250,7 @@ export function getTrackedVolumeUSD(
 
   // if less than 5 LPs, require high minimum reserve amount amount or return 0
   // Updated from original subgraph. Number of deposits may not equal number of liquidity providers
-  if (poolDeposits.valueInt < 5) {
+  if (poolDeposits.valueInt < INT_FIVE) {
     const reserve0USD = pool.inputTokenBalances[0].times(price0USD);
     const reserve1USD = pool.inputTokenBalances[1].times(price1USD);
     if (

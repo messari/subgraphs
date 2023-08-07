@@ -88,6 +88,6 @@ function try_callGetAmountOut(
   if (result.reverted) {
     return null;
   }
-  let value = result.value;
+  const value = result.value;
   return value[0].toBigInt();
 }
