@@ -489,18 +489,23 @@ export namespace PolygonRewardToken {
 }
 
 export namespace BaseBridge {
+  export const USDC = "0x46ae9bab8cea96610807a275ebd36f8e916b5c61";
   export const ETH = "0x3666f603cc164936c1b87e207f36beba4ac5f18a";
 }
 export namespace BaseAmm {
+  export const USDC = "0x022c5ce6f1add7423268d41e08df521d5527c2a0";
   export const ETH = "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d";
 }
 export namespace BaseToken {
+  export const USDC = "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca";
   export const ETH = "0x4200000000000000000000000000000000000006";
 }
 export namespace BaseHToken {
+  export const USDC = "0x74fa978eaffa312bc92e76df40fcc1bfe7637aeb";
   export const ETH = "0xc1985d7a3429cdc85e59e2e4fcc805b857e6ee2e";
 }
 export namespace BaseRewardToken {
+  export const USDC = "0x7ac115536fe3a185100b2c4de4cb328bf3a58ba6";
   export const ETH = "0x12e59c59d282d2c00f3166915bed6dc2f5e2b5c7";
 }
 
@@ -606,6 +611,7 @@ export const HOP_REWARDS = [
   XdaiRewardToken.USDC_B,
   XdaiRewardToken.ETH_B,
   XdaiRewardToken.USDT_B,
+  BaseRewardToken.USDC,
   BaseRewardToken.ETH,
 ];
 

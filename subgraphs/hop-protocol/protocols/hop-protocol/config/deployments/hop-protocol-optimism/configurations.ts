@@ -186,9 +186,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
   }
 
   getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == OptimismToken.USDC) return BaseToken.USDC;
     if (tokenAddress == OptimismToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("BaseCrossToken not found for token: {}", []);
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }

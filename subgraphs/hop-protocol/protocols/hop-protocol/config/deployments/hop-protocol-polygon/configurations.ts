@@ -211,9 +211,10 @@ export class HopProtocolPolygonConfigurations implements Configurations {
   }
 
   getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == PolygonToken.USDC) return BaseToken.USDC;
     if (tokenAddress == PolygonToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("BaseCrossToken not found for token: {}", []);
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }

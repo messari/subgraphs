@@ -192,6 +192,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   }
 
   getBasePoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    if (bridgeAddress == MainnetBridge.USDC) return BaseAmm.USDC;
     if (bridgeAddress == MainnetBridge.ETH) return BaseAmm.ETH;
     else {
       log.critical("BasePoolAddress not found for bridge: {}", [bridgeAddress]);
@@ -231,7 +232,13 @@ export class HopProtocolEthereumConfigurations implements Configurations {
   }
 
   getUsdcPools(): string[] {
-    return [PolygonAmm.USDC, XdaiAmm.USDC, ArbitrumAmm.USDC, OptimismAmm.USDC];
+    return [
+      PolygonAmm.USDC,
+      XdaiAmm.USDC,
+      ArbitrumAmm.USDC,
+      OptimismAmm.USDC,
+      BaseAmm.USDC,
+    ];
   }
 
   getUsdcTokens(): string[] {
@@ -241,6 +248,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       ArbitrumToken.USDC,
       OptimismToken.USDC,
       MainnetToken.USDC,
+      BaseToken.USDC,
     ];
   }
   getDaiPools(): string[] {
@@ -423,6 +431,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     }
   }
   getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == MainnetToken.USDC) return BaseToken.USDC;
     if (tokenAddress == MainnetToken.ETH) return BaseToken.ETH;
     else {
       log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);

@@ -170,6 +170,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   }
 
   getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == ArbitrumToken.USDC) return BaseToken.USDC;
     if (tokenAddress == ArbitrumToken.ETH) return BaseToken.ETH;
     else {
       log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);

@@ -159,9 +159,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
   }
 
   getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == XdaiToken.USDC) return BaseToken.USDC;
     if (tokenAddress == XdaiToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("BaseCrossToken not found for token: {}", []);
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
