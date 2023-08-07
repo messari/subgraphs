@@ -2,13 +2,18 @@
 
 - The code that faciliates the basic operations of this exchange are forked from Uniswap V2. The two main contracts that are forked and used to index data from swaps, deposits, withdraws, and more are the `UniswapV2Factory` and `Pair` contracts.
 
+- There are two notable features to Camelot V2 which are different from other Uniswap V2 forks:
+
+1. Swap fees can be adjusted based on the swap direction (buying or selling)
+2. Pools with correlated assets can use the Solidly (Curve) formula
+
 ## Networks
 
 - Arbitrum
 
 ## Calculation Methodology v1.0.0
 
-- Sum accross all liquidity pools for protocol metric.
+- Sum across all liquidity pools for protocol metric.
 
 ### Total Value Locked (TVL) USD
 
