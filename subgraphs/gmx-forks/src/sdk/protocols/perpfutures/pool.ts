@@ -770,20 +770,6 @@ export class Pool {
     cumulativeOutflowVolumeByTokenAmount.push(constants.BIGINT_ZERO);
     cumulativeOutflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
 
-    poolArraySort(
-      inputTokens,
-      inputTokenBalances,
-      fundingrates,
-      cumulativeVolumeByTokenAmount,
-      cumulativeVolumeByTokenUSD,
-      cumulativeInflowVolumeByTokenAmount,
-      cumulativeInflowVolumeByTokenUSD,
-      cumulativeClosedInflowVolumeByTokenAmount,
-      cumulativeClosedInflowVolumeByTokenUSD,
-      cumulativeOutflowVolumeByTokenAmount,
-      cumulativeOutflowVolumeByTokenUSD
-    );
-
     this.pool.inputTokens = inputTokens;
     this.pool.fundingrate = fundingrates;
     this.pool.cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
