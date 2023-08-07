@@ -272,13 +272,20 @@ export function _handleProposalCreated(
     "1220" + ipfsHash.toHexString().slice(2)
   ).toBase58();
   const data = ipfs.cat(hash);
-  const proposalData = json.try_fromBytes(data as Bytes);
-  let descriptionJSON: JSONValue | null = null;
-  if (proposalData.isOk && proposalData.value.kind == JSONValueKind.OBJECT) {
-    const jsonData = proposalData.value.toObject();
-    descriptionJSON = jsonData.get("description");
-    if (descriptionJSON) {
-      description = descriptionJSON.toString();
+  if (data) {
+    const proposalData = json.try_fromBytes(data as Bytes);
+    let descriptionJSON: JSONValue | null = null;
+    if (proposalData.isOk) {
+      // proposalData is either a JSON object or a raw string
+      if (proposalData.value.kind == JSONValueKind.OBJECT) {
+        const jsonData = proposalData.value.toObject();
+        descriptionJSON = jsonData.get("description");
+        if (descriptionJSON) {
+          description = descriptionJSON.toString();
+        }
+      }
+    } else {
+      description = data.toString();
     }
   }
   proposal.description = description;
