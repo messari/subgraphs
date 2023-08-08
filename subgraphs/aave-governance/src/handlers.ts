@@ -31,10 +31,13 @@ import {
   DelegateChange,
 } from "../generated/schema";
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   return value.divDecimal(
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     BigInt.fromI32(10)
       .pow(<u8>decimals)
       .toBigDecimal()
