@@ -242,7 +242,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.0.2",
+          "subgraph": "2.0.3",
           "methodology": "1.1.0"
         },
         "files": {
@@ -268,7 +268,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.0.2",
+          "subgraph": "2.0.3",
           "methodology": "1.1.0"
         },
         "files": {
@@ -294,7 +294,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.0.2",
+          "subgraph": "2.0.3",
           "methodology": "1.1.0"
         },
         "files": {
