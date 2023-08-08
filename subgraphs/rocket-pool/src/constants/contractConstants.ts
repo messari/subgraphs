@@ -5,6 +5,7 @@ export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
 export const ZERO_ADDRESS = Address.fromString(ZERO_ADDRESS_STRING);
 
 export namespace RocketContractNames {
+  export const ROCKET_VAULT = "rocketVault";
   export const ROCKET_TOKEN_RETH = "rocketTokenRETH";
   export const ROCKET_NETWORK_BALANCES = "rocketNetworkBalances";
   export const ROCKET_NETWORK_PRICES = "rocketNetworkPrices";
@@ -12,7 +13,7 @@ export namespace RocketContractNames {
   export const ROCKET_NODE_STAKING = "rocketNodeStaking";
   export const ROCKET_REWARDS_POOL = "rocketRewardsPool";
   export const ROCKET_MINIPOOL_MANAGER = "rocketMinipoolManager";
-  export const ROCKET_MINIPOOL_QUEUE = "rocketMinipoolqueue";
+  export const ROCKET_MINIPOOL_QUEUE = "rocketMinipoolQueue";
   export const ROCKET_MINIPOOL_DELEGATE = "rocketMinipoolDelegate";
   export const ROCKET_DAO_NODE_TRUSTED_ACTIONS = "rocketDAONodeTrustedActions";
   export const ROCKET_DEPOSIT_POOL = "rocketDepositPool";
@@ -25,10 +26,19 @@ export namespace RocketContractNames {
   export const ROCKET_DAO_SETTINGS_MINIPOOL =
     "rocketDAOProtocolSettingsMinipool";
   export const ROCKET_DAO_SETTINGS_NODE = "rocketDAOProtocolSettingsNode";
+  export const ROCKET_AUCTION_MANAGER = "rocketAuctionManager";
 }
 
 // https://docs.rocketpool.net/developers/usage/contracts/contracts.html#interacting-with-rocket-pool
 export const KeyToContractName = new TypedMap<ByteArray, string>();
+KeyToContractName.set(
+  crypto.keccak256(
+    ByteArray.fromUTF8(
+      "contract.address".concat(RocketContractNames.ROCKET_VAULT)
+    )
+  ),
+  RocketContractNames.ROCKET_VAULT
+);
 KeyToContractName.set(
   crypto.keccak256(
     ByteArray.fromUTF8(
@@ -92,6 +102,14 @@ KeyToContractName.set(
     )
   ),
   RocketContractNames.ROCKET_MINIPOOL_QUEUE
+);
+KeyToContractName.set(
+  crypto.keccak256(
+    ByteArray.fromUTF8(
+      "contract.address".concat(RocketContractNames.ROCKET_MINIPOOL_DELEGATE)
+    )
+  ),
+  RocketContractNames.ROCKET_MINIPOOL_DELEGATE
 );
 KeyToContractName.set(
   crypto.keccak256(
@@ -176,4 +194,12 @@ KeyToContractName.set(
     )
   ),
   RocketContractNames.ROCKET_DAO_SETTINGS_NODE
+);
+KeyToContractName.set(
+  crypto.keccak256(
+    ByteArray.fromUTF8(
+      "contract.address".concat(RocketContractNames.ROCKET_AUCTION_MANAGER)
+    )
+  ),
+  RocketContractNames.ROCKET_AUCTION_MANAGER
 );

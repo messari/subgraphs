@@ -1,6 +1,8 @@
 import { BalancesUpdated } from "../../generated/templates/rocketNetworkBalances/rocketNetworkBalances";
 import { rocketTokenRETH } from "../../generated/templates/rocketNetworkBalances/rocketTokenRETH";
 import { rocketDepositPool } from "../../generated/templates/rocketNetworkBalances/rocketDepositPool";
+import { rocketVault } from "../../generated/templates/rocketNetworkBalances/rocketVault";
+import { rocketNodeStaking } from "../../generated/templates/rocketNetworkBalances/rocketNodeStaking";
 import {
   Staker,
   NetworkStakerBalanceCheckpoint,
@@ -14,7 +16,7 @@ import {
   ZERO_ADDRESS_STRING,
   RocketContractNames,
 } from "../constants/contractConstants";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
@@ -31,6 +33,7 @@ import {
   BIGINT_SIXTEEN,
   BIGINT_THIRTYTWO,
   BIGINT_ZERO,
+  RPL_ADDRESS,
 } from "../utils/constants";
 import { getRocketContract } from "../entities/rocketContracts";
 
@@ -174,31 +177,59 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
   const withdrawableMinipools =
     balanceCheckpoint!.withdrawableMinipools.times(BIGINT_THIRTYTWO);
 
-  log.error(
-    "[master TVL calculation raw inputs] queuedMinipools: {}, stakingMinipools: {}, stakingUnbondedMinipools: {}, withdrawableMinipools: {} ",
-    [
-      balanceCheckpoint!.queuedMinipools.toString(),
-      balanceCheckpoint!.stakingMinipools.toString(),
-      balanceCheckpoint!.stakingUnbondedMinipools.toString(),
-      balanceCheckpoint!.withdrawableMinipools.toString(),
-    ]
+  // TVL Methodology: https://github.com/DefiLlama/DefiLlama-Adapters/blob/main/projects/rocketpool/index.js#L90
+
+  const rocketVaultContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_VAULT
   );
-  log.error(
-    "[master TVL calculation] queuedMinipools: {}, stakingMinipools: {}, stakingUnbondedMinipools: {}, withdrawableMinipools: {} ",
-    [
-      queuedMinipools.toString(),
-      stakingMinipools.toString(),
-      stakingUnbondedMinipools.toString(),
-      withdrawableMinipools.toString(),
-    ]
+  const rocketVaultContract = rocketVault.bind(
+    Address.fromBytes(rocketVaultContractEntity.latestAddress)
+  );
+  const rocketDepositPoolBalance = rocketVaultContract.balanceOf(
+    RocketContractNames.ROCKET_DEPOSIT_POOL
+  );
+  const rocketTokenRETHBalance = rocketVaultContract.balanceOf(
+    RocketContractNames.ROCKET_TOKEN_RETH
   );
 
   const ethTVL = queuedMinipools
     .plus(stakingMinipools)
-    .plus(stakingMinipools)
-    .plus(stakingUnbondedMinipools)
-    .plus(withdrawableMinipools);
-  updateProtocolAndPoolTvl(event.block.number, event.block.timestamp, ethTVL);
+    .plus(withdrawableMinipools)
+    .plus(rocketDepositPoolBalance)
+    .plus(rocketTokenRETHBalance);
+
+  const rocketNodeStakingContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_STAKING
+  );
+  const rocketNodeStakingContract = rocketNodeStaking.bind(
+    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
+  );
+  const totalRPLStakeCall = rocketNodeStakingContract.try_getTotalRPLStake();
+  let totalRPLStake = BIGINT_ZERO;
+  if (!totalRPLStakeCall.reverted) {
+    totalRPLStake = totalRPLStakeCall.value;
+  }
+
+  const rocketDAONodeTrustedActions_rplBalance =
+    rocketVaultContract.balanceOfToken(
+      RocketContractNames.ROCKET_DAO_NODE_TRUSTED_ACTIONS,
+      Address.fromString(RPL_ADDRESS)
+    );
+  const rocketAuctionManager_rplBalance = rocketVaultContract.balanceOfToken(
+    RocketContractNames.ROCKET_AUCTION_MANAGER,
+    Address.fromString(RPL_ADDRESS)
+  );
+
+  const rplTVL = totalRPLStake
+    .plus(rocketDAONodeTrustedActions_rplBalance)
+    .plus(rocketAuctionManager_rplBalance);
+
+  updateProtocolAndPoolTvl(
+    event.block.number,
+    event.block.timestamp,
+    rplTVL,
+    ethTVL
+  );
 }
 
 /**

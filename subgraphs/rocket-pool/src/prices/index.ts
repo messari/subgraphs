@@ -71,14 +71,19 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       return new CustomPriceType();
     }
 
-    const tokenPrice: BigDecimal = utils
+    const tokenPriceInEth: BigDecimal = utils
       .readValue<BigInt>(
         rplPriceContract.try_getRPLPrice(),
         constants.BIGINT_ZERO
       )
       .toBigDecimal();
+    const ethPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
 
-    return CustomPriceType.initialize(tokenPrice, constants.SIXTEEN_DECIMALS);
+    const tokenPrice = tokenPriceInEth
+      .times(ethPrice.usdPrice)
+      .div(ethPrice.decimalsBaseTen);
+
+    return CustomPriceType.initialize(tokenPrice, constants.EIGHTEEN_DECIMALS);
   }
 
   const network = dataSource.network();

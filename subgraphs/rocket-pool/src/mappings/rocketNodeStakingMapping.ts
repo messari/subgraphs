@@ -18,7 +18,6 @@ import { ethereum } from "@graphprotocol/graph-ts";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
-import { updateProtocolAndPoolRewardsTvl } from "../updaters/financialMetrics";
 import { getRocketContract } from "../entities/rocketContracts";
 
 /**
@@ -35,20 +34,6 @@ export function handleRPLStaked(event: RPLStaked): void {
     event.params.amount
   );
   updateUsageMetrics(event.block, event.params.from);
-  const rocketNodeStakingContractEntity = getRocketContract(
-    RocketContractNames.ROCKET_NODE_STAKING
-  );
-  const rocketNodeStakingContract = rocketNodeStaking.bind(
-    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
-  );
-  const totalStake = rocketNodeStakingContract.try_getTotalEffectiveRPLStake();
-  if (!totalStake.reverted) {
-    updateProtocolAndPoolRewardsTvl(
-      event.block.number,
-      event.block.timestamp,
-      totalStake.value
-    );
-  }
 }
 
 /**

@@ -22,6 +22,7 @@ import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
 import { updateSnapshotsTvl } from "../updaters/financialMetrics";
 import { getRocketContract } from "../entities/rocketContracts";
+import { BIGINT_TWO } from "../utils/constants";
 
 /**
  * When enough ODAO members submitted their votes and a consensus threshold is reached, a new RPL price is comitted to the smart contracts.
@@ -309,8 +310,9 @@ function getEffectiveMinipoolRPLBounds(
       )
     );
 
-  halfDepositAmount =
-    rocketDAOProtocolSettingsMinipoolContract.getHalfDepositNodeAmount();
+  halfDepositAmount = rocketDAOProtocolSettingsMinipoolContract
+    .getLaunchBalance()
+    .div(BIGINT_TWO);
 
   // Get the DAO Protocol settings node contract instance.
   const rocketDAOProtocolSettingsNodeContractEntity = getRocketContract(
