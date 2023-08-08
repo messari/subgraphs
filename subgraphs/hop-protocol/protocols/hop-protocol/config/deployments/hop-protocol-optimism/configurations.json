@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-optimism",
   "deployment": "HOP_PROTOCOL_OPTIMISM",
-  "graftEnabled": true,
-  "subgraphId": "QmPdXmZbhVZJdB4yQ7tLKCdqkYqybbpP8L8ja4CtHtpBbH",
-  "graftStartBlock": 107450787,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0,
   "amms": [
     {
       "dataSourceName": "HopL2Amm",
