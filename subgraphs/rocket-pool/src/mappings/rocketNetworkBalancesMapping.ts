@@ -172,8 +172,6 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
     balanceCheckpoint!.queuedMinipools.times(BIGINT_SIXTEEN);
   const stakingMinipools =
     balanceCheckpoint!.stakingMinipools.times(BIGINT_THIRTYTWO);
-  const stakingUnbondedMinipools =
-    balanceCheckpoint!.stakingUnbondedMinipools.times(BIGINT_THIRTYTWO);
   const withdrawableMinipools =
     balanceCheckpoint!.withdrawableMinipools.times(BIGINT_THIRTYTWO);
 
