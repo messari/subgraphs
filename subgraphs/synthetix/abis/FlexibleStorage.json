@@ -1,0 +1,1000 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_resolver",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor",
+    "signature": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "fromContractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "toContractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "removeAccessFromPreviousContract",
+        "type": "bool"
+      }
+    ],
+    "name": "KeyMigrated",
+    "type": "event",
+    "signature": "0xa3db9c909daa141b61562c797dae4dc4b3d7751686068c98111db87b2a8c374c"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "value",
+        "type": "address"
+      }
+    ],
+    "name": "ValueDeletedAddress",
+    "type": "event",
+    "signature": "0xec1140277b8f20820dc76b92216489238a207d5f22c964099303820fbd2bdf66"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "value",
+        "type": "bool"
+      }
+    ],
+    "name": "ValueDeletedBool",
+    "type": "event",
+    "signature": "0x321123223c2c7bffd7484ae8fb80c6eb45aa5537df0a621c47833ab9376a4a9c"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "value",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ValueDeletedBytes32",
+    "type": "event",
+    "signature": "0x1f751825a531bf2a176e42d5cb792bb7228163cf53e36b033509ccbe869cfd93"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "value",
+        "type": "int256"
+      }
+    ],
+    "name": "ValueDeletedInt",
+    "type": "event",
+    "signature": "0x78962c711b5655608c554689ba42e4890d9e5d3f590b99842612ad39cd7ae0ae"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "ValueDeletedUInt",
+    "type": "event",
+    "signature": "0x8a6b612c1a1e056bc504f34fe56106a878fca2d1a50be35360d02ac39d4d4662"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "value",
+        "type": "address"
+      }
+    ],
+    "name": "ValueSetAddress",
+    "type": "event",
+    "signature": "0x524fb430ecbfd4606a947f9ae445dbf7c9703944cf928789b86f3a8aad639365"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "value",
+        "type": "bool"
+      }
+    ],
+    "name": "ValueSetBool",
+    "type": "event",
+    "signature": "0x9c94ad4cfff55907724cb65340f342d3897dd884e6cd3c2d3777087191d5eb7b"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "value",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ValueSetBytes32",
+    "type": "event",
+    "signature": "0x961abb018d8a303304c9f1ff1f306c7493a8b68b381bbe4e9a3abf9588a95280"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "value",
+        "type": "int256"
+      }
+    ],
+    "name": "ValueSetInt",
+    "type": "event",
+    "signature": "0x0d8877f604dfe262a8ac3904781814f022156c9341af779608a2ae0beef1906c"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "ValueSetUInt",
+    "type": "event",
+    "signature": "0x60738523f766167cfd2310c61593dc795bc9d77de9276ed7e0c514df55e0a2c9"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "deleteAddressValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x8f6b95a3"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "deleteBoolValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x1625e3ef"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "deleteBytes32Value",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x35ab2708"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "deleteIntValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xfdfc4c13"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "deleteUIntValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x18f662ed"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getAddressValue",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x9ee5955a"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "getAddressValues",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x8ca0adaf"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getBoolValue",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xd994502d"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "getBoolValues",
+    "outputs": [
+      {
+        "internalType": "bool[]",
+        "name": "",
+        "type": "bool[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xc13a2b0c"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getBytes32Value",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xf7833c5d"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "getBytes32Values",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x8408a5e5"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getIntValue",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xc4f610ed"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "getIntValues",
+    "outputs": [
+      {
+        "internalType": "int256[]",
+        "name": "",
+        "type": "int256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x142a391e"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getUIntValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x23257c2b"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "getUIntValues",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xb67fa7ed"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "hashes",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xd658d2e9"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "fromContractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "toContractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "removeAccessFromPreviousContract",
+        "type": "bool"
+      }
+    ],
+    "name": "migrateContractKey",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x5bda91e2"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "resolverProxy",
+    "outputs": [
+      {
+        "internalType": "contract IAddressResolver",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x6a59e495"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "value",
+        "type": "address"
+      }
+    ],
+    "name": "setAddressValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x4dca0978"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "values",
+        "type": "address[]"
+      }
+    ],
+    "name": "setAddressValues",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x3bd6ad89"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "value",
+        "type": "bool"
+      }
+    ],
+    "name": "setBoolValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x3f28a6fc"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bool[]",
+        "name": "values",
+        "type": "bool[]"
+      }
+    ],
+    "name": "setBoolValues",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xf9c39d2f"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "value",
+        "type": "bytes32"
+      }
+    ],
+    "name": "setBytes32Value",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x004b62d6"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "values",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "setBytes32Values",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xc89eb562"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "int256",
+        "name": "value",
+        "type": "int256"
+      }
+    ],
+    "name": "setIntValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xd71a9b01"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "int256[]",
+        "name": "values",
+        "type": "int256[]"
+      }
+    ],
+    "name": "setIntValues",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xab15985d"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "record",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "setUIntValue",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x1d5b277f"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "contractName",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "records",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "setUIntValues",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x03cdc017"
+  }
+]

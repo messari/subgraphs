@@ -1,0 +1,815 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "rateStalePeriod",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x0ee4951b"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "nominateNewOwner",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x1627540c"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "initiationTime",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x17c70de4"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "currencyKeys",
+        "type": "bytes4[]"
+      },
+      {
+        "name": "newRates",
+        "type": "uint256[]"
+      },
+      {
+        "name": "timeSent",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateRates",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x1d2fed16"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_beneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "setSelfDestructBeneficiary",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x20714f88"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "invertedKeys",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x2ea913d4"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "terminateSelfDestruct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x3278c960"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "deleteRate",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x36080694"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKeys",
+        "type": "bytes4[]"
+      }
+    ],
+    "name": "anyRateIsStale",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x370d62ad"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "sourceCurrencyKey",
+        "type": "bytes4"
+      },
+      {
+        "name": "sourceAmount",
+        "type": "uint256"
+      },
+      {
+        "name": "destinationCurrencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "effectiveValue",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x39d66fc0"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "priceUpdateLock",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x44d010d4"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "nominatedOwner",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x53a47bb7"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKeys",
+        "type": "bytes4[]"
+      }
+    ],
+    "name": "ratesForCurrencies",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x5dc2944a"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_priceUpdateLock",
+        "type": "bool"
+      }
+    ],
+    "name": "setPriceUpdateLock",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x70bb5959"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "acceptOwnership",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x79ba5097"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_time",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRateStalePeriod",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x79cb657a"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_oracle",
+        "type": "address"
+      }
+    ],
+    "name": "setOracle",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x7adbf973"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "oracle",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x7dc0d1d0"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKeys",
+        "type": "bytes4[]"
+      }
+    ],
+    "name": "lastRateUpdateTimesForCurrencies",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x89f8ab94"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x8da5cb5b"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "selfDestruct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x9cb8a26a"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "SELFDESTRUCT_DELAY",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xa461fc82"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "xdrParticipants",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xaa687daf"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "rateIsFrozen",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xad752d67"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "rateForCurrency",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xaf1ff972"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "selfDestructInitiated",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xb8225dec"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "initiateSelfDestruct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xbd32aa44"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "lastRateUpdateTimeForCurrency",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xc0e59e4d"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      },
+      {
+        "name": "entryPoint",
+        "type": "uint256"
+      },
+      {
+        "name": "upperLimit",
+        "type": "uint256"
+      },
+      {
+        "name": "lowerLimit",
+        "type": "uint256"
+      }
+    ],
+    "name": "setInversePricing",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xc17266eb"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "selfDestructBeneficiary",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xc58aaae6"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "removeInversePricing",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xd24bdad5"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "name": "inversePricing",
+    "outputs": [
+      {
+        "name": "entryPoint",
+        "type": "uint256"
+      },
+      {
+        "name": "upperLimit",
+        "type": "uint256"
+      },
+      {
+        "name": "lowerLimit",
+        "type": "uint256"
+      },
+      {
+        "name": "frozen",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xd95bb9a1"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "name": "rates",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xde5eb832"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "name": "lastRateUpdateTimes",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xe1686e72"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "rateIsStale",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xea3d4109"
+  },
+  {
+    "inputs": [
+      {
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "name": "_oracle",
+        "type": "address"
+      },
+      {
+        "name": "_currencyKeys",
+        "type": "bytes4[]"
+      },
+      {
+        "name": "_newRates",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "newOracle",
+        "type": "address"
+      }
+    ],
+    "name": "OracleUpdated",
+    "type": "event",
+    "signature": "0x3df77beb5db05fcdd70a30fc8adf3f83f9501b68579455adbd100b8180940394"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "rateStalePeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "RateStalePeriodUpdated",
+    "type": "event",
+    "signature": "0x16529d8c407b08938da67de7fa4319199baffce4f5d1971f812cc770b0237e66"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "currencyKeys",
+        "type": "bytes4[]"
+      },
+      {
+        "indexed": false,
+        "name": "newRates",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "RatesUpdated",
+    "type": "event",
+    "signature": "0x7a72efae5f6b256f1ca71728b01f9dd7004ff3770dcaef4c44872b94d9f9e91b"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "RateDeleted",
+    "type": "event",
+    "signature": "0x2cefb058ca1556b021b67f710e3df89c564650f01fef8cd944cbb14d7358680b"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "currencyKey",
+        "type": "bytes4"
+      },
+      {
+        "indexed": false,
+        "name": "entryPoint",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "upperLimit",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "lowerLimit",
+        "type": "uint256"
+      }
+    ],
+    "name": "InversePriceConfigured",
+    "type": "event",
+    "signature": "0x2133db505c9d92361db62ae15e94eb366fc5188c73bb9943966e6176c026c79e"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "currencyKey",
+        "type": "bytes4"
+      }
+    ],
+    "name": "InversePriceFrozen",
+    "type": "event",
+    "signature": "0x684252d859279842b23fadbb3debd086980415e4b545844875fd4189cac852a8"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "SelfDestructTerminated",
+    "type": "event",
+    "signature": "0x6adcc7125002935e0aa31697538ebbd65cfddf20431eb6ecdcfc3e238bfd082c"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "beneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "SelfDestructed",
+    "type": "event",
+    "signature": "0x8a09e1677ced846cb537dc2b172043bd05a1a81ad7e0033a7ef8ba762df990b7"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "selfDestructDelay",
+        "type": "uint256"
+      }
+    ],
+    "name": "SelfDestructInitiated",
+    "type": "event",
+    "signature": "0xcbd94ca75b8dc45c9d80c77e851670e78843c0d75180cb81db3e2158228fa9a6"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "newBeneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "SelfDestructBeneficiaryUpdated",
+    "type": "event",
+    "signature": "0xd5da63a0b864b315bc04128dedbc93888c8529ee6cf47ce664dc204339228c53"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerNominated",
+    "type": "event",
+    "signature": "0x906a1c6bd7e3091ea86693dd029a831c19049ce77f1dce2ce0bab1cacbabce22"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "oldOwner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerChanged",
+    "type": "event",
+    "signature": "0xb532073b38c83145e3e5135377a08bf9aab55bc0fd7c1179cd4fb995d2a5159c"
+  }
+]

@@ -1,0 +1,545 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "uniswapAddress",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x0e2feb05"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "synth",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x115f4fee"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "to_addr",
+        "type": "address"
+      }
+    ],
+    "name": "recoverETH",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x134dfcd8"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "nominateNewOwner",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x1627540c"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_paused",
+        "type": "bool"
+      }
+    ],
+    "name": "setPaused",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x16c38b3c"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "initiationTime",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x17c70de4"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_beneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "setSelfDestructBeneficiary",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x20714f88"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "isArbable",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x2464e10d"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "terminateSelfDestruct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x3278c960"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "exchangeRates",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x4ffcd9df"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "nominatedOwner",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x53a47bb7"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_exchangeRatesAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setExchangeRates",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x56e44954"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_acceptable_slippage",
+        "type": "uint256"
+      },
+      {
+        "name": "_max_delay",
+        "type": "uint256"
+      },
+      {
+        "name": "_off_peg_min",
+        "type": "uint256"
+      }
+    ],
+    "name": "setParams",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x5a0ce676"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x5c975abb"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "uniswapExchange",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x62b856b5"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "synthetix",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x759b5225"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_synthAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setSynthAddress",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x79264cbf"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "acceptOwnership",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x79ba5097"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "erc20_addr",
+        "type": "address"
+      },
+      {
+        "name": "to_addr",
+        "type": "address"
+      }
+    ],
+    "name": "recoverERC20",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x886f039a"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x8da5cb5b"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "lastPauseTime",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x91b4ded9"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "selfDestruct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x9cb8a26a"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "SELFDESTRUCT_DELAY",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xa461fc82"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "arbSynthRate",
+    "outputs": [
+      {
+        "name": "reward_tokens",
+        "type": "uint256"
+      }
+    ],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function",
+    "signature": "0xa9e394b8"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "selfDestructInitiated",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xb8225dec"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_uniswapAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setUniswapExchange",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xb838eb92"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "initiateSelfDestruct",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xbd32aa44"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "synthetixProxy",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xbdd12482"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "selfDestructBeneficiary",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xc58aaae6"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_address",
+        "type": "address"
+      }
+    ],
+    "name": "setSynthetix",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xfec9f9da"
+  },
+  {
+    "inputs": [
+      {
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "isPaused",
+        "type": "bool"
+      }
+    ],
+    "name": "PauseChanged",
+    "type": "event",
+    "signature": "0x8fb6c181ee25a520cf3dd6565006ef91229fcfe5a989566c2a3b8c115570cec5"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "SelfDestructTerminated",
+    "type": "event",
+    "signature": "0x6adcc7125002935e0aa31697538ebbd65cfddf20431eb6ecdcfc3e238bfd082c"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "beneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "SelfDestructed",
+    "type": "event",
+    "signature": "0x8a09e1677ced846cb537dc2b172043bd05a1a81ad7e0033a7ef8ba762df990b7"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "selfDestructDelay",
+        "type": "uint256"
+      }
+    ],
+    "name": "SelfDestructInitiated",
+    "type": "event",
+    "signature": "0xcbd94ca75b8dc45c9d80c77e851670e78843c0d75180cb81db3e2158228fa9a6"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "newBeneficiary",
+        "type": "address"
+      }
+    ],
+    "name": "SelfDestructBeneficiaryUpdated",
+    "type": "event",
+    "signature": "0xd5da63a0b864b315bc04128dedbc93888c8529ee6cf47ce664dc204339228c53"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerNominated",
+    "type": "event",
+    "signature": "0x906a1c6bd7e3091ea86693dd029a831c19049ce77f1dce2ce0bab1cacbabce22"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "oldOwner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerChanged",
+    "type": "event",
+    "signature": "0xb532073b38c83145e3e5135377a08bf9aab55bc0fd7c1179cd4fb995d2a5159c"
+  }
+]

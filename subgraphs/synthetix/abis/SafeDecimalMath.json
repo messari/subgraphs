@@ -1,0 +1,92 @@
+[
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x313ce567"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "PRECISE_UNIT",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x864029e7"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "unit",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "pure",
+    "type": "function",
+    "signature": "0x907af6c0"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "UNIT",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x9d8e2177"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "preciseUnit",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "pure",
+    "type": "function",
+    "signature": "0xd5e5e6e6"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "highPrecisionDecimals",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xdef4419d"
+  }
+]
