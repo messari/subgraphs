@@ -1,12 +1,12 @@
 {
-  "deployment": "STARGATE_METIS",
-  "network": "metis",
+  "deployment": "STARGATE_BASE",
+  "network": "base",
   "file": "./src/mappings/handlers.ts",
   "lpStaking": [
     {
       "name": "LPStaking_0",
-      "address": "0x45A01E4e04F14f7A4a6702c74187c5F6222033cd",
-      "startBlock": 4320637,
+      "address": "0x06Eb48763f117c7Be887296CDcdfad2E4092739C",
+      "startBlock": 2127825,
       "abi": "LPStakingTime",
       "depositHandler": "handleStakeForTimeRewards",
       "withdrawHandler": "handleUnstakeForTimeRewards"
