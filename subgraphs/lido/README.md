@@ -387,12 +387,15 @@ SUM(`Staking Rewards (ETH)`) OVER `time`
 
 ### Treasury Revenue (ETH):
 
-FOR every tx WITH triggered the evt `lido."LidoOracle_evt_PostTotalShares"`:
+FOR every** tx WITH triggered the evt `lido."LidoOracle_evt_PostTotalShares"`:
 
     SUM(`value`/1e18) FROM `stETH erc20."ERC20_evt_Transfer"`
     WHERE `to` = '\x3e40d73eb977dc6a537af587d48316fee66e9c8c'
 
 _Note_:0x3e40d73eb977dc6a537af587d48316fee66e9c8c Treasury address
+
+> ** [Treasury contract](https://etherscan.io/address/0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb#readProxyContract#F13) doubles as [Aragon Agent contract](https://docs.lido.fi/deployed-contracts/#lido-v2-dao-contracts). To not count DAO treasury transfers into protocol's revenue, we ignore transactions which execute voting. </br>
+> Example of such a transaction: https://etherscan.io/tx/0x673804d1c993c21f50f019cefb4c4cfb5e0a9e0ca2d78d6a59c33b321887a277
 
 **Contract:** stETH erc20 0xae7ab96520de3a18e5e111b5eaab095312d7fe84
 
