@@ -139,7 +139,7 @@ export function createPoolRewardToken(
   event: ethereum.Event,
   poolAddress: string
 ): void {
-  const pool = getLiquidityPool(poolAddress, event.block.number);
+  const pool = getLiquidityPool(poolAddress);
 
   pool.rewardTokens = [
     getOrCreateRewardToken(event, NetworkConfigs.getRewardToken()).id,
@@ -149,11 +149,8 @@ export function createPoolRewardToken(
 }
 
 // Remove reward token from liquidity pool from HoneyFarm set contract call (PoolRemoved event)
-export function removePoolRewardToken(
-  poolAddress: string,
-  blockNumber: BigInt
-): void {
-  const pool = getLiquidityPool(poolAddress, blockNumber);
+export function removePoolRewardToken(poolAddress: string): void {
+  const pool = getLiquidityPool(poolAddress);
 
   pool.rewardTokens = [];
 

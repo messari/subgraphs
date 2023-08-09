@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI as ERC20 } from "../../generated/Factory/TokenABI";
 import {
@@ -29,7 +29,6 @@ import {
   SECONDS_PER_HOUR,
   BIGINT_TEN,
 } from "./constants";
-import { createPoolFees } from "./creators";
 import { findUSDPricePerToken } from "../price/price";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
@@ -58,13 +57,8 @@ export function getOrCreateProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getLiquidityPool(
-  poolAddress: string,
-  blockNumber: BigInt
-): LiquidityPool {
+export function getLiquidityPool(poolAddress: string): LiquidityPool {
   const pool = LiquidityPool.load(poolAddress)!;
-  pool.fees = createPoolFees(poolAddress, blockNumber);
-  pool.save();
   return pool;
 }
 
