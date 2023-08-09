@@ -15,6 +15,7 @@ import {
   ArbitrumNovaToken,
   ArbitrumNovaHtoken,
   ArbitrumNovaAmm,
+  BaseToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolOptimismConfigurations implements Configurations {
@@ -107,6 +108,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "42170")
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
+    else if (chainId == "8453")
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found", []);
       return "";
@@ -178,6 +181,15 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (tokenAddress == OptimismToken.rETH) return MainnetToken.rETH;
     else {
       log.critical("Token not found", []);
+    }
+    return "";
+  }
+
+  getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == OptimismToken.USDC) return BaseToken.USDC;
+    if (tokenAddress == OptimismToken.ETH) return BaseToken.ETH;
+    else {
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
