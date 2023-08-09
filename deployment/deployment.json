@@ -7349,7 +7349,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7371,7 +7371,7 @@
         "network": "avalanche",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7393,7 +7393,7 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7415,7 +7415,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7437,7 +7437,7 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7459,7 +7459,7 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7481,7 +7481,7 @@
         "network": "fantom",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
@@ -7503,7 +7503,7 @@
         "network": "base",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.1.0",
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },

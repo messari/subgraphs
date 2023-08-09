@@ -5,8 +5,8 @@ import { NetworkConfigs } from "../../configurations/configure";
 import { SDK } from "../sdk/protocols/bridge";
 import { BridgePoolType } from "../sdk/protocols/bridge/enums";
 
-import { Factory } from "../../generated/LPStaking/Factory";
-import { Pool } from "../../generated/LPStaking/Pool";
+import { Factory } from "../../generated/LPStaking_0/Factory";
+import { Pool } from "../../generated/LPStaking_0/Pool";
 import { PoolTemplate } from "../../generated/templates";
 
 export function checkPoolCount(sdk: SDK): void {
