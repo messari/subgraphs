@@ -15,6 +15,7 @@ import {
   ArbitrumNovaToken,
   ArbitrumNovaAmm,
   ArbitrumNovaHtoken,
+  BaseToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolArbitrumConfigurations implements Configurations {
@@ -73,6 +74,8 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else if (chainId == "1")
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "8453")
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found", []);
       return "";
@@ -162,6 +165,15 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     else if (tokenAddress == ArbitrumToken.MAGIC) return MainnetToken.MAGIC;
     else {
       log.critical("Token not found", []);
+    }
+    return "";
+  }
+
+  getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == ArbitrumToken.USDC) return BaseToken.USDC;
+    if (tokenAddress == ArbitrumToken.ETH) return BaseToken.ETH;
+    else {
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
