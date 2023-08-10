@@ -23,13 +23,7 @@ export default function PositionTab({
 }: PositionTabProps) {
   let poolDropDown = null;
   if (poolsList) {
-    poolDropDown = (
-      <PoolDropDown
-        poolId={poolId}
-        pools={poolsList[poolNames]}
-        setPoolId={(x) => setPoolId(x)}
-      />
-    );
+    poolDropDown = <PoolDropDown poolId={poolId} pools={poolsList[poolNames]} setPoolId={(x) => setPoolId(x)} />;
   } else if (poolListLoading) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }

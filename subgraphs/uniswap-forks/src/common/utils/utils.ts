@@ -1,6 +1,7 @@
 import { BigInt, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_NEG_ONE,
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
@@ -90,4 +91,11 @@ export function isSameSign(a: BigInt, b: BigInt): boolean {
     return true;
   }
   return false;
+}
+
+export function absBigDecimal(value: BigDecimal): BigDecimal {
+  if (value.lt(BIGDECIMAL_ZERO)) {
+    return value.times(BIGDECIMAL_NEG_ONE);
+  }
+  return value;
 }

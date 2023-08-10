@@ -1,0 +1,20 @@
+{
+  "name": "arbitrum-one-bridge",
+  "license": "MIT",
+  "version": "1.0.0",
+  "repository": "https://github.com/messari/subgraphs/blob/master/subgraphs/arbitrum-one-bridge",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "codegen": "graph codegen"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.32.0",
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.0",
+    "typescript": "^4.9.4"
+  }
+}

@@ -23,7 +23,7 @@ export function readValue<T>(
 export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   const token = ERC20Contract.bind(tokenAddr);
 
-  let decimals = readValue<BigInt>(
+  const decimals = readValue<BigInt>(
     token.try_decimals(),
     constants.DEFAULT_DECIMALS
   );
@@ -49,7 +49,7 @@ export function createFeeType(
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   const protocol = getOrCreateYieldAggregator();
 
-  let vaultIds = protocol._vaultIds;
+  const vaultIds = protocol._vaultIds;
   vaultIds.push(vaultAddress.toHexString());
   protocol._vaultIds = vaultIds;
 

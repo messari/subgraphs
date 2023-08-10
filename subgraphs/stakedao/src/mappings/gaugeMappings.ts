@@ -13,7 +13,7 @@ import * as constants from "../common/constants";
 import { Vault as VaultStore } from "../../generated/schema";
 import { log, BigInt, Address } from "@graphprotocol/graph-ts";
 import { getOrCreateRewardToken } from "../common/initializers";
-import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
+import { Strategy as StrategyContract } from "../../generated/Controller/Strategy";
 
 export function handleAddReward(call: AddRewardCall): void {
   const gaugeAddress = call.to;
@@ -23,11 +23,11 @@ export function handleAddReward(call: AddRewardCall): void {
   const vault = VaultStore.load(vaultAddress.toHexString());
 
   if (vault) {
-    let rewardTokensIds: string[] = [];
+    const rewardTokensIds: string[] = [];
     let rewardTokenAddress: Address;
 
     // Assuming that their are a maximum of 10 rewardTokens in the vault.
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= constants.INT_TEN; i++) {
       rewardTokenAddress = utils.readValue<Address>(
         gaugeContract.try_rewardTokens(BigInt.fromI32(i)),
         constants.ZERO_ADDRESS
@@ -66,7 +66,7 @@ export function handleRewardAdded(event: RewardAdded): void {
   const strategyAddress = Address.fromString(vault._strategy);
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  let performanceFee = utils
+  const performanceFee = utils
     .readValue<BigInt>(
       strategyContract.try_performanceFee(),
       constants.BIGINT_ZERO
@@ -75,13 +75,13 @@ export function handleRewardAdded(event: RewardAdded): void {
 
   const rewardEarned = event.params.reward.toBigDecimal();
 
-  let rewardTokenAddress = Address.fromString(vault._rewardTokensIds[0]);
-  let rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardTokenAddress = Address.fromString(vault._rewardTokensIds[0]);
+  const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     utils.getTokenDecimals(rewardTokenAddress).toI32() as u8
   ).toBigDecimal();
 
-  let supplySideRewardEarned = rewardEarned.times(
+  const supplySideRewardEarned = rewardEarned.times(
     constants.BIGDECIMAL_ONE.minus(performanceFee.div(constants.DENOMINATOR))
   );
   const supplySideRewardEarnedUSD = supplySideRewardEarned
@@ -89,7 +89,7 @@ export function handleRewardAdded(event: RewardAdded): void {
     .times(rewardTokenPrice.usdPrice)
     .div(rewardTokenPrice.decimalsBaseTen);
 
-  let protocolSideRewardEarned = rewardEarned
+  const protocolSideRewardEarned = rewardEarned
     .times(performanceFee)
     .div(constants.BIGDECIMAL_HUNDRED);
   const protocolSideRewardEarnedUSD = protocolSideRewardEarned

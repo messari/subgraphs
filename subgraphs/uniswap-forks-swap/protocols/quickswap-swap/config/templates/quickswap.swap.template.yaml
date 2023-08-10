@@ -1,0 +1,81 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+features:
+  - grafting
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{factory.address}}"
+      abi: Factory
+      startBlock: {{factory.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
+      abis:
+        - name: Factory
+          file: ./abis/quickswap/Factory.json
+        - name: TokenABI
+          file: ./abis/quickswap/ERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
+      abis:
+        - name: Pair
+          file: ./abis/quickswap/Pair.json
+        - name: Factory
+          file: ./abis/quickswap/Factory.json
+        - name: TokenABI
+          file: ./abis/quickswap/ERC20.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+          

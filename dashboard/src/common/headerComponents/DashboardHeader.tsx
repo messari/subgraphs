@@ -25,7 +25,7 @@ export const DashboardHeader = ({
   protocolId,
   subgraphToQueryURL,
   schemaVersion,
-  versionsJSON
+  versionsJSON,
 }: DashboardHeaderProps) => {
   return (
     <div>

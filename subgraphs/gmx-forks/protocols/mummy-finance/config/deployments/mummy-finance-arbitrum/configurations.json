@@ -1,0 +1,28 @@
+{
+  "network": "arbitrum-one",
+  "protocolName": "Mummy Finance",
+  "protocolSlug": "mummy-finance",
+  "protocolId": "0x65dcb38637b526305be55f14b24a4ab2bd177780",
+  "poolName": "MMYVault",
+  "poolSymbol": "Vault",
+  "protocolSideRevenuePercent": "0.1",
+  "stakeSideRevenuePercent": "0.3",
+  "priceCachingBlocks": 0,
+  "mlpAddress": "0x41cd8cafc24a771031b9eb9c57cfc94d86045eb6",
+  "mmyAddress": "0xa6d7d0e650aa40ffa42d845a354c12c2bc0ab15f",
+  "esMMYAddress": "0x68d1ca32aee9a73534429d8376743bf222ff1870",
+  "VaultAddr": "0x304951d7172bcada54ccac1e4674862b3d5b3d5b",
+  "VaultStartBlock": 96903389,
+  "FeeGlpRewardDistributorAddr": "0x8ad880a11172235c6800ae882cd699ffe0172fba",
+  "FeeGlpRewardDistributorStartBlock": 96904185,
+  "EsgmxGlpRewardDistributorAddr": "0xfdc9b5be032216315bbe8c06b1c4f563d1689b85",
+  "EsgmxGlpRewardDistributorStartBlock": 96904201,
+  "deployment": "MUMMY_ARBITRUM",
+  "glpManagers": [
+    {
+      "name": "GlpManager_V1",
+      "address": "0x65dcb38637b526305be55f14b24a4ab2bd177780",
+      "startBlock": 96903486
+    }
+  ]
+}

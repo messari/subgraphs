@@ -1,0 +1,43 @@
+{
+  "network": "moonriver",
+  "Bridge": {
+    "address": "0x841ce48F9446C8E281D3F1444cB859b4A6D0738C",
+    "startBlock": 1050601
+  },
+  "OriginalTokenVault": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 1152962
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 1152962
+  },
+  "PeggedTokenBridge": {
+    "address": "0x374B8a9f3eC5eB2D97ECA84Ea27aCa45aa1C57EF",
+    "startBlock": 1152962
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 20884938
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 20884938
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 20884938
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 20884938
+  },
+  "MessageBus": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 20884938
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

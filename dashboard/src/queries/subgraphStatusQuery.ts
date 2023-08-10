@@ -147,12 +147,16 @@ export function getPendingSubgraphsOnProtocolQuery(protocol: any) {
     return null;
   }
   try {
-    const depoKeys = Object.keys(protocol).filter(x => !x.toUpperCase().includes('DECENTRALIZED'));
+    const depoKeys = Object.keys(protocol).filter((x) => !x.toUpperCase().includes("DECENTRALIZED"));
     if (depoKeys.length > 0) {
       let query = `{`;
-      depoKeys.forEach(depo => {
-        const slug = protocol[depo].split('name/')[1];
-        query += `${slug.split('-').join('_').split('/').join('_')}: indexingStatusForPendingVersion(subgraphName: "${slug}") {
+      depoKeys.forEach((depo) => {
+        const slug = protocol[depo].split("name/")[1];
+        query += `${slug
+          .split("-")
+          .join("_")
+          .split("/")
+          .join("_")}: indexingStatusForPendingVersion(subgraphName: "${slug}") {
           subgraph
           health
           entityCount
@@ -161,7 +165,7 @@ export function getPendingSubgraphsOnProtocolQuery(protocol: any) {
       query += ` }`;
       return gql`
         ${query}
-        `;
+      `;
     }
     return null;
   } catch (err: any) {

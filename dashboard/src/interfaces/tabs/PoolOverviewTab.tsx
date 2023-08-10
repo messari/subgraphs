@@ -130,18 +130,16 @@ function PoolOverviewTab({
     }
 
     table = (
-      (
-        <Grid key={"tableID"}>
-          <Box my={3}>
-            <CopyLinkToClipboard link={window.location.href} scrollId={"tableID"}>
-              <Typography variant="h4" id={"tableID"}>
-                {poolOverviewRequest?.poolOverviewError?.message}
-              </Typography>
-            </CopyLinkToClipboard>
-          </Box>
-        </Grid>
-      )
-    )
+      <Grid key={"tableID"}>
+        <Box my={3}>
+          <CopyLinkToClipboard link={window.location.href} scrollId={"tableID"}>
+            <Typography variant="h4" id={"tableID"}>
+              {poolOverviewRequest?.poolOverviewError?.message}
+            </Typography>
+          </CopyLinkToClipboard>
+        </Box>
+      </Grid>
+    );
   } else if (poolOverviewRequest.poolOverviewLoading) {
     table = (
       <div>
@@ -174,7 +172,7 @@ function PoolOverviewTab({
           setTableIssues(x);
         }}
       />
-    )
+    );
   }
 
   return (

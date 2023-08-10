@@ -3,7 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -41,12 +41,12 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+        toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
       )
     );
   }
@@ -78,25 +78,25 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1");
+    return toLowerCase("0x82af49447d8a07e3bd95bd0d56f35241523fbab1");
   }
   getRewardToken(): string {
-    return toLowerCase("0xd4d42F0b6DEF4CE0383636770eF773390d85c61A");
+    return toLowerCase("0xd4d42f0b6def4ce0383636770ef773390d85c61a");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
       "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // wETH
       "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // wBTC
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
+      "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // DAI
       "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // USDT
       "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // USDC
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
-      "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", // USDT
+      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // USDC
+      "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // DAI
+      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // USDT
     ]);
   }
   getStableOraclePools(): string[] {
@@ -109,7 +109,21 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x3010eadefaba5756226c0543ab4ea1f975018c65", // HonorWorld
+      "0x5204ca6252643b1cfc6bbac05698c45e70f2cb1c", // Pi Network
+      "0x15e32be99b3af4b7517639b3ac608c93f73e42de", // Bluefin APP
+      "0xf5520364a2e2ff1cb2e007df7cbe01c8b2cd7e0d", // ReadON
+      "0x014a029338d7953e0df6dc5ea351ade9743c98ed", // Sushiswap AI Card Render
+      "0x806d6626f88834971d9b26f4e8fffc9f6f46bc35", // ArbiDex
+      "0x7753a4ff7c9994ade950095e68eed44f83931dfd", // Ede
+      "0xd4cd3e9d44b8d2b87535bb210eae220daf48f5a3", // Annoyshiba
+      "0xed2be16e5f53365ef8e2a1d2c3ff2fca1d94c8bd", // Zetas
+      "0x0856853f067c1e3dc28e9636ef9de0bddeea0838", // Akuka
+      "0x80b95b558f067ba86d5cd4084889ea0fda5ebd6d", // KerplerHomes
+      "0x930002e02eaff5a40c4e5e9210a44e564e04aba7", // 3Money
+      "0xb24086ecbb8dffb943b5ccf97e6da9a434308f3f",
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];
@@ -118,6 +132,6 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
   }
 }

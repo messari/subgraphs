@@ -107,6 +107,7 @@ export function getWithdrawnTokenAmounts(
     if (log.topics.length == 0) continue;
 
     const topic_signature = log.topics.at(0);
+
     if (
       crypto
         .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
@@ -183,9 +184,9 @@ export function Withdraw(
       block
     );
 
-    const inputTokenDecimals = constants.BIGINT_TEN.pow(
+    const inputTokenDecimals = utils.exponentToBigDecimal(
       inputToken.decimals as u8
-    ).toBigDecimal();
+    );
 
     inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
     withdrawAmountUSD = withdrawAmountUSD.plus(
@@ -197,9 +198,13 @@ export function Withdraw(
 
   pool.inputTokenBalances = utils.getPoolBalances(pool);
   pool.totalValueLockedUSD = utils.getPoolTVL(
-    utils.getOrCreateTokenFromString(pool.outputToken!, block),
-    tokenSupplyAfterWithdrawal
+    pool,
+    tokenSupplyAfterWithdrawal,
+    block
   );
+  pool._tvlUSDExcludingBasePoolLpTokens =
+    utils.getPoolTVLExcludingBasePoolLpToken(pool, block);
+
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
@@ -222,7 +227,7 @@ export function Withdraw(
     event,
     block
   );
-  utils.updateProtocolTotalValueLockedUSD();
+  utils.updateProtocolTotalValueLockedUSD(block);
   UpdateMetricsAfterWithdraw(block);
 
   log.info(

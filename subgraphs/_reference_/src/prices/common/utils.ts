@@ -13,11 +13,17 @@ import * as OPTIMISM from "../config/optimism";
 import * as AVALANCHE from "../config/avalanche";
 import * as ARBITRUM_ONE from "../config/arbitrum";
 
-import { Configurations } from "./types";
+import { Configurations, CustomPriceType } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
 import { _ERC20 } from "../../../generated/UniswapV2Factory/_ERC20";
-import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  BigDecimal,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 
 export function isNullAddress(tokenAddr: Address): boolean {
   return tokenAddr.equals(constants.NULL.TYPE_ADDRESS);
@@ -93,4 +99,74 @@ export function getConfig(): Configurations {
   }
 
   return new TEMPLATE.config();
+}
+
+function sortByPrices(prices: CustomPriceType[]): CustomPriceType[] {
+  const pricesSorted = prices.sort(function (a, b) {
+    const x = a.usdPrice;
+    const y = b.usdPrice;
+
+    if (x < y) return -1;
+    if (x > y) return 1;
+    return 0;
+  });
+
+  return pricesSorted;
+}
+
+function pairwiseDiffOfPrices(prices: CustomPriceType[]): BigDecimal[] {
+  const diff: BigDecimal[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    const x = prices[i].usdPrice;
+    const y = prices[i - 1].usdPrice;
+
+    diff.push(x.minus(y));
+  }
+
+  return diff;
+}
+
+export function kClosestPrices(
+  k: i32,
+  prices: CustomPriceType[]
+): CustomPriceType[] {
+  // sort by USD prices
+  const pricesSorted = sortByPrices(prices);
+
+  // pairwise difference in USD prices
+  const pairwiseDiff = pairwiseDiffOfPrices(pricesSorted);
+
+  // k minimum difference values and their original indexes
+  const pairwiseDiffCopy = pairwiseDiff.map<BigDecimal>((x: BigDecimal) => x);
+  const pairwiseDiffSortedSlice = pairwiseDiffCopy.sort().slice(0, k);
+  const minDiffAtIdx: i32[] = [];
+  for (let i = 0; i < pairwiseDiffSortedSlice.length; i++) {
+    const idx = pairwiseDiff.indexOf(pairwiseDiffSortedSlice[i]);
+    minDiffAtIdx.push(idx as i32);
+  }
+
+  // k closest USD price values
+  const kClosestPrices: CustomPriceType[] = [];
+  for (let i = 0; i < minDiffAtIdx.length; i++) {
+    if (!kClosestPrices.includes(pricesSorted[minDiffAtIdx[i]])) {
+      kClosestPrices.push(pricesSorted[minDiffAtIdx[i]]);
+    }
+    if (!kClosestPrices.includes(pricesSorted[minDiffAtIdx[i] + 1])) {
+      kClosestPrices.push(pricesSorted[minDiffAtIdx[i] + 1]);
+    }
+  }
+
+  return kClosestPrices;
+}
+
+export function averagePrice(prices: CustomPriceType[]): CustomPriceType {
+  let summationUSDPrice = constants.BIGDECIMAL_ZERO;
+  for (let i = 0; i < prices.length; i++) {
+    summationUSDPrice = summationUSDPrice.plus(prices[i].usdPrice);
+  }
+
+  return CustomPriceType.initialize(
+    summationUSDPrice.div(new BigDecimal(BigInt.fromI32(prices.length as i32))),
+    constants.DEFAULT_USDC_DECIMALS
+  );
 }

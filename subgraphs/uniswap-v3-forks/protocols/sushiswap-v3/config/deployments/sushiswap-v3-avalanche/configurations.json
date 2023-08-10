@@ -1,0 +1,11 @@
+{
+  "network": "avalanche",
+  "factoryAddress": "0x3e603c14af37ebdad31709c4f848fc6ad5bec715",
+  "factoryAddressStartBlock": 28186391,
+  "nonFungiblePositionManagerAddress": "0xf87bc5535602077d340806d71f805ea9907a843d",
+  "nonFungiblePositionManagerAddressStartBlock": 28207919,
+  "deployment": "SUSHISWAP_V3_AVALANCHE",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { errorNotification, postError } from "./messageDiscord.js";
+import { errorNotification, postAlert } from "./messageDiscord.js";
 
 const queryContents = `
 subgraph
@@ -22,15 +22,51 @@ chains {
   }
 }`;
 
-export async function generateEndpoints(data, protocolNameToBaseMapping) {
+export async function generateProtocolToBaseMap(data) {
+  const protocolToBaseMap = {};
+  if (Object.keys(data)?.length > 0) {
+    Object.keys(data).forEach((protocolName) => {
+      const protocol = data[protocolName];
+      protocolToBaseMap[protocolName] = protocol.base;
+    })
+  }
+  return protocolToBaseMap;
+}
+
+export async function generateDecenEndpoints(data) {
+  const hostedEndpointToDecenNetwork = {};
   try {
-    const protocolNameToBaseMappingCopy = JSON.parse(JSON.stringify(protocolNameToBaseMapping));
-    const subgraphEndpoints = {};
-    const hostedEndpointToDecenNetwork = {};
     if (Object.keys(data)?.length > 0) {
       Object.keys(data).forEach((protocolName) => {
         const protocol = data[protocolName];
-        protocolNameToBaseMappingCopy[protocolName] = protocol.base;
+        if (!protocol.schema) {
+          return;
+        }
+        Object.values(protocol.deployments).forEach((depoData) => {
+          let hostedServiceId = "";
+          const hostedServiceObject = depoData?.services["hosted-service"];
+          if (!!hostedServiceObject) {
+            hostedServiceId = hostedServiceObject?.slug;
+          }
+          const decenObj = depoData?.services["decentralized-network"];
+          if (!!decenObj) {
+            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (decenObj?.["query-id"]);
+          }
+        });
+      })
+    }
+  } catch (err) {
+    errorNotification("ERROR LOCATION 1 " + err.message);
+  }
+  return hostedEndpointToDecenNetwork;
+}
+
+export async function generateEndpoints(data) {
+  try {
+    const subgraphEndpoints = {};
+    if (Object.keys(data)?.length > 0) {
+      Object.keys(data).forEach((protocolName) => {
+        const protocol = data[protocolName];
         if (!protocol.schema) {
           return;
         }
@@ -46,13 +82,10 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
             hostedServiceId = depoData?.services["hosted-service"]?.slug;
           }
           subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId;
-          if (!!depoData?.services["decentralized-network"]) {
-            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (depoData?.services["decentralized-network"]?.["query-id"]);
-          }
         });
       });
     }
-    return { subgraphEndpoints, protocolNameToBaseMapping: protocolNameToBaseMappingCopy, hostedEndpointToDecenNetwork };
+    return subgraphEndpoints;
   } catch (err) {
     errorNotification("ERROR LOCATION 1 " + err.message);
   }
@@ -130,7 +163,7 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     try {
       res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery });
     } catch (err) {
-      postError('ERROR QUERYING INDEX STATUS - ' + err.message);
+      postAlert('ERROR QUERYING INDEX STATUS - ' + err.message);
     }
     try {
       res?.data?.data?.indexingStatuses?.forEach(obj => {
@@ -150,10 +183,10 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
         }
       });
     } catch (err) {
-      postError('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
+      postAlert('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
     }
   } else {
-    postError('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
+    postAlert('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
   }
   return decenSubgraphHashToIndexingObj;
 }
@@ -165,7 +198,6 @@ export async function indexStatusFlow(deployments) {
 
     const indexingStatusQueriesArray = generateIndexStatus.indexingStatusQueries;
     const indexData = await getIndexingStatusData(indexingStatusQueriesArray);
-    const invalidDeployments = [];
     Object.keys(indexData).forEach((indexDataName) => {
       const realNameString = indexDataName.split("_").join("-");
       if (!indexData[indexDataName] && indexDataName.includes("pending")) {
@@ -192,16 +224,12 @@ export async function indexStatusFlow(deployments) {
       }
 
       if (
-        !indexData[indexDataName]
+        !indexData[indexDataName] || parseFloat(deployments[realNameString]?.indexedPercentage) < 10
       ) {
-        invalidDeployments.push(realNameString);
-      }
-
-      if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
-        invalidDeployments.push(realNameString);
+        delete deployments[realNameString];
       }
     });
-    return { invalidDeployments, deployments };
+    return deployments;
   } catch (err) {
     errorNotification("ERROR LOCATION 2 " + err.message);
   }

@@ -1,0 +1,11 @@
+{
+  "network": "moonriver",
+  "factoryAddress": "0x2f255d3f3c0a3726c6c99e74566c4b18e36e3ce6",
+  "factoryAddressStartBlock": 3945310,
+  "nonFungiblePositionManagerAddress": "0xd045d27c1f7e7f770a807b0a85d8e3f852e0f2be",
+  "nonFungiblePositionManagerAddressStartBlock": 3949049,
+  "deployment": "SUSHISWAP_V3_MOONRIVER",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

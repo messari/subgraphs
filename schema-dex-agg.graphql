@@ -48,7 +48,7 @@ enum TokenType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: Bytes!
 
@@ -89,7 +89,7 @@ type Token @entity {
   tokenDailySnapshots: [TokenDailySnapshot!]! @derivedFrom(field: "token")
 }
 
-type TokenDailySnapshot @entity {
+type TokenDailySnapshot @entity @dailySnapshot {
   "  { Smart contract address of the token }-{ # of days since Unix epoch time }  "
   id: ID!
 
@@ -126,7 +126,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity(immutable: true) {
+type RewardToken @entity(immutable: true) @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: Bytes!
 
@@ -202,7 +202,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type DexAggProtocol implements Protocol @entity {
+type DexAggProtocol implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -280,7 +280,7 @@ type DexAggProtocol implements Protocol @entity {
 Virtual Pools represent swapped token groups. DEX Aggs use liquidity pools from other protocols,
 so we use virtual pools to track metrics for swaps between specific token groups.
 """
-type VirtualPool @entity {
+type VirtualPool @entity @regularPolling {
   " { `InputTokens: {Sorted token addresses separated by `-`}` + `OutputTokens: {Sorted token addresses separated by `-`}` } "
   id: Bytes!
 
@@ -350,7 +350,7 @@ type VirtualPool @entity {
 ##### Virtual Pool Timeseries #####
 ###################################
 
-type VirtualPoolDailySnapshot @entity {
+type VirtualPoolDailySnapshot @entity @dailySnapshot {
   " { Address of the VirtualPool }-{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -427,7 +427,7 @@ type VirtualPoolDailySnapshot @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -456,7 +456,7 @@ type UsageMetricsDailySnapshot @entity {
   blockNumber: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -485,7 +485,7 @@ type UsageMetricsHourlySnapshot @entity {
   blockNumber: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -533,7 +533,7 @@ type FinancialsDailySnapshot @entity {
 ##### Account-Level Data #####
 ##############################
 
-type Account @entity {
+type Account @entity @regularPolling {
   " { Account address } "
   id: Bytes!
 
@@ -559,7 +559,7 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Swap @entity(immutable: true) {
+type Swap @entity(immutable: true) @transaction {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 

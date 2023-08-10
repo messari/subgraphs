@@ -101,14 +101,14 @@ export namespace ActivityType {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-export const EULER_ADDRESS = "0x27182842E098f60e3D576794A5bFFb0777E025d3";
+export const EULER_ADDRESS = "0x27182842e098f60e3d576794a5bffb0777e025d3";
 export const EXEC_PROXY_ADDRESS = "0x59828fdf7ee634aaad3f58b19fdba3b03e2d9d80";
 export const USDC_WETH_03_ADDRESS = "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8";
 export const USDC_ERC20_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
-export const EULER_GENERAL_VIEW_ADDRESS = "0x9D2B3052f5A3c156A34FC32cD08E9F5501720ea4";
-export const EULER_GENERAL_VIEW_V2_ADDRESS = "0xACC25c4d40651676FEEd43a3467F3169e3E68e42";
+export const EULER_GENERAL_VIEW_ADDRESS = "0x9d2b3052f5a3c156a34fc32cd08e9f5501720ea4";
+export const EULER_GENERAL_VIEW_V2_ADDRESS = "0xacc25c4d40651676feed43a3467f3169e3e68e42";
 export const CRYPTEX_MARKET_ID = "0x321c2fe4446c7c963dc41dd58879af648838f98d";
 export const EULSTAKES_ADDRESS = "0xc697bb6625d9f7adcf0fbf0cbd4dcf50d8716cd3";
 // EUL token address is the same as EUL market address
@@ -119,7 +119,7 @@ export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const USDT_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-export const WSETH_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0";
+export const WStETH_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0";
 
 ////////////////////////
 ///// Type Helpers /////

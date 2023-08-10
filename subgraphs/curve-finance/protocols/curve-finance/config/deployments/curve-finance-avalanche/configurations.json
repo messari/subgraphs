@@ -2,7 +2,7 @@
   "network": "avalanche",
   "defaultNetwork": "Network.AVALANCHE",
 
-  "priceCaching": 1000,
+  "priceCaching": 7500,
 
   "poolInfoContract": "0xADf698e4d8Df08b3E2c79682891636eF00F6e205",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",

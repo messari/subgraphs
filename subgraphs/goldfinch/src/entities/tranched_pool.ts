@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   TranchedPool,
   JuniorTrancheInfo,
   SeniorTrancheInfo,
   CreditLine,
-  TranchedPoolToken,
+  PoolToken,
 } from "../../generated/schema";
 import {
   TranchedPool as TranchedPoolContract,
@@ -22,7 +23,6 @@ import {
 } from "../common/constants";
 import { getOrInitUser } from "./user";
 import { getOrInitCreditLine, initOrUpdateCreditLine } from "./credit_line";
-import { getOrInitSeniorPoolStatus } from "./senior_pool";
 import {
   getTotalDeposited,
   isV1StyleDeal,
@@ -42,6 +42,7 @@ import {
 } from "../common/utils";
 import { getBackerRewards } from "./backer_rewards";
 import { BackerRewards as BackerRewardsContract } from "../../generated/BackerRewards/BackerRewards";
+import { getOrInitSeniorPoolStatus } from "./senior_pool";
 
 export function updatePoolCreditLine(
   address: Address,
@@ -601,7 +602,7 @@ export function updatePoolRewardsClaimable(
   );
   const poolTokenIds = tranchedPool.tokens;
   for (let i = 0; i < poolTokenIds.length; i++) {
-    const poolToken = assert(TranchedPoolToken.load(poolTokenIds[i]));
+    const poolToken = assert(PoolToken.load(poolTokenIds[i]));
     poolToken.rewardsClaimable =
       backerRewardsContract.poolTokenClaimableRewards(
         BigInt.fromString(poolToken.id)
@@ -623,7 +624,7 @@ export function updatePoolTokensRedeemable(tranchedPool: TranchedPool): void {
   );
   const poolTokenIds = tranchedPool.tokens;
   for (let i = 0; i < poolTokenIds.length; i++) {
-    const poolToken = assert(TranchedPoolToken.load(poolTokenIds[i]));
+    const poolToken = assert(PoolToken.load(poolTokenIds[i]));
     const availableToWithdrawResult =
       tranchedPoolContract.try_availableToWithdraw(
         BigInt.fromString(poolToken.id)

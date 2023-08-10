@@ -13,7 +13,7 @@ import { ActiveAccount } from "../../generated/schema";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
+  getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateYieldAggregator();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
@@ -31,7 +31,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
+  const dailyActiveAccountId = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   )
     .toString()
@@ -56,16 +56,10 @@ export function updateVaultSnapshots(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  let vault = getOrCreateVault(vaultAddress, block);
+  const vault = getOrCreateVault(vaultAddress, block);
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress.toHexString(),
-    block
-  );
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress.toHexString(),
-    block
-  );
+  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vault, block);
+  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vault, block);
 
   vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
     vault.cumulativeSupplySideRevenueUSD;

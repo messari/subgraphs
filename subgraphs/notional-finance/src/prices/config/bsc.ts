@@ -1,108 +1,123 @@
-import { Address, TypedMap } from "@graphprotocol/graph-ts";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import * as constants from "../common/constants";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Configurations, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "bsc";
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract();
+export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
+export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
+export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
+export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
+
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
-///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
+/////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-
-export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
-SUSHISWAP_ROUTER_ADDRESS.set(
-  "routerV1",
-  Address.fromString("0x0000000000000000000000000000000000000000")
-);
-SUSHISWAP_ROUTER_ADDRESS.set(
-  "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
-);
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
+  new OracleContract("0x10ed43c718714eb63d5aa57b78b54704e256024e", 6810080), // PancakeSwap v2
+  new OracleContract("0x05ff2b0db69458a0750badebc4f9e13add608c7f", 586899), // PancakeSwap v1
+];
 
 ///////////////////////////////////////////////////////////////////////////
-////////////////////////// PANCAKESWAP CONTRACT ///////////////////////////
-///////////////////////////////////////////////////////////////////////////
-// NOTE: PancakeSwap is a Uniswap Fork
-
-export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
-UNISWAP_ROUTER_ADDRESS.set(
-  "routerV1",
-  Address.fromString("0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8") // Biswap v2 Router
-);
-UNISWAP_ROUTER_ADDRESS.set(
-  "routerV2",
-  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E") // Pancakeswap v2 Router
-);
-
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////// YEARNLENS CONTRACT //////////////////////////
+/////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS =
-  "0x0000000000000000000000000000000000000000";
+export const YEARN_LENS_BLACKLIST: Address[] = [];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [];
+export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
+export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
-///////////////////////////// CHAINLINK CONTRACT //////////////////////////
+//////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
+export const HARDCODED_STABLES: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_DECIMALS = 18;
+export const USDC_TOKEN_DECIMALS = BigInt.fromI32(18);
 
-export const WHITELIST_TOKENS = new TypedMap<string, Address>();
-WHITELIST_TOKENS.set(
-  "WETH",
-  Address.fromString("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c")
+export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const WETH_ADDRESS = Address.fromString(
+  "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
 );
-WHITELIST_TOKENS.set(
-  "USDT",
-  Address.fromString("0x55d398326f99059ff775485246999027b3197955")
+export const USDC_ADDRESS = Address.fromString(
+  "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
 );
-WHITELIST_TOKENS.set(
-  "DAI",
-  Address.fromString("0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3")
-);
-WHITELIST_TOKENS.set(
-  "USDC",
-  Address.fromString("0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d")
-);
-WHITELIST_TOKENS.set(
-  "ETH",
-  Address.fromString("0x2170ed0880ac9a755fd29b2688956bd959f933f8")
-);
-WHITELIST_TOKENS.set(
-  "WBTC",
-  Address.fromString("0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c")
-);
-WHITELIST_TOKENS.set(
-  "EURS",
-  Address.fromString("0x0000000000000000000000000000000000000000")
-);
-WHITELIST_TOKENS.set(
-  "LINK",
-  Address.fromString("0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd")
-);
+
+export class config implements Configurations {
+  network(): string {
+    return NETWORK_STRING;
+  }
+
+  yearnLens(): OracleContract {
+    return YEARN_LENS_CONTRACT_ADDRESS;
+  }
+  chainLink(): OracleContract {
+    return CHAIN_LINK_CONTRACT_ADDRESS;
+  }
+  yearnLensBlacklist(): Address[] {
+    return YEARN_LENS_BLACKLIST;
+  }
+
+  aaveOracle(): OracleContract {
+    return AAVE_ORACLE_CONTRACT_ADDRESS;
+  }
+  aaveOracleBlacklist(): Address[] {
+    return AAVE_ORACLE_BLACKLIST;
+  }
+
+  curveCalculations(): OracleContract {
+    return CURVE_CALCULATIONS_ADDRESS;
+  }
+  curveCalculationsBlacklist(): Address[] {
+    return CURVE_CALCULATIONS_BLACKSLIST;
+  }
+
+  sushiCalculations(): OracleContract {
+    return SUSHISWAP_CALCULATIONS_ADDRESS;
+  }
+  sushiCalculationsBlacklist(): Address[] {
+    return SUSHI_CALCULATIONS_BLACKSLIST;
+  }
+
+  uniswapForks(): OracleContract[] {
+    return UNISWAP_FORKS_ROUTER_ADDRESSES;
+  }
+  curveRegistry(): OracleContract[] {
+    return CURVE_REGISTRY_ADDRESSES;
+  }
+
+  hardcodedStables(): Address[] {
+    return HARDCODED_STABLES;
+  }
+
+  ethAddress(): Address {
+    return ETH_ADDRESS;
+  }
+  wethAddress(): Address {
+    return WETH_ADDRESS;
+  }
+  usdcAddress(): Address {
+    return USDC_ADDRESS;
+  }
+
+  usdcTokenDecimals(): BigInt {
+    return USDC_TOKEN_DECIMALS;
+  }
+}

@@ -1,0 +1,181 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  # this section is for price oracle import path
+  - kind: ethereum
+    name: UniswapV2Factory
+    network: {{ network }}
+    source:
+      abi: UniswapV2Factory
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: {{ AxelarGateway.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: AxelarGateway
+    network: {{ network }}
+    source:
+      address: "{{ AxelarGateway.address }}"
+      startBlock: {{ AxelarGateway.startBlock }}
+      abi: AxelarGateway
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: AxelarGateway
+          file: ./abis/AxelarGateway.json
+        - name: BurnableMintableCappedERC20
+          file: ./abis/BurnableMintableCappedERC20.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: TokenSent(indexed address,string,string,string,uint256)
+          handler: handleTokenSent
+        - event: TokenDeployed(string,address)
+          handler: handleTokenDeployed
+        # outgoing messages
+        - event: ContractCallWithToken(indexed address,string,string,indexed bytes32,bytes,string,uint256)
+          handler: handleContractCallWithToken
+        - event: ContractCall(indexed address,string,string,indexed bytes32,bytes)
+          handler: handleContractCall
+        # incoming messages
+        - event: ContractCallApprovedWithMint(indexed bytes32,string,string,indexed address,indexed bytes32,string,uint256,bytes32,uint256)
+          handler: handleContractCallApprovedWithMint
+        - event: ContractCallApproved(indexed bytes32,string,string,indexed address,indexed bytes32,bytes32,uint256)
+          handler: handleContractCallApproved
+        # command execution
+        - event: Executed(indexed bytes32)
+          handler: handleCommandExecuted
+          receipt: true
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: AxelarGasService
+    network: {{ network }}
+    source:
+      address: "{{ AxelarGasService.address }}"
+      startBlock: {{ AxelarGasService.startBlock }}
+      abi: AxelarGasService
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: AxelarGateway
+          file: ./abis/AxelarGateway.json
+        - name: AxelarGasService
+          file: ./abis/AxelarGasService.json
+        - name: BurnableMintableCappedERC20
+          file: ./abis/BurnableMintableCappedERC20.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: GasPaidForContractCall(indexed address,string,string,indexed bytes32,address,uint256,address)
+          handler: handleGasPaidForContractCall
+        - event: GasPaidForContractCallWithToken(indexed address,string,string,indexed bytes32,string,uint256,address,uint256,address)
+          handler: handleGasPaidForContractCallWithToken
+        - event: NativeGasPaidForContractCall(indexed address,string,string,indexed bytes32,uint256,address)
+          handler: handleNativeGasPaidForContractCall
+        - event: NativeGasPaidForContractCallWithToken(indexed address,string,string,indexed bytes32,string,uint256,uint256,address)
+          handler: handleNativeGasPaidForContractCallWithToken
+        - event: GasAdded(indexed bytes32,indexed uint256,address,uint256,address)
+          handler: handleGasAdded
+        - event: NativeGasAdded(indexed bytes32,indexed uint256,uint256,address)
+          handler: handleNativeGasAdded
+      {{#supportCallHandlers}}
+      callHandlers:
+        - function: refund(address,address,uint256)
+          handler: handleFeeRefund
+      {{/supportCallHandlers}}
+      file: ./src/mappings.ts

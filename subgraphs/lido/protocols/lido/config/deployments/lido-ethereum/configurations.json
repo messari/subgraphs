@@ -1,1 +1,5 @@
-{}
+{
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

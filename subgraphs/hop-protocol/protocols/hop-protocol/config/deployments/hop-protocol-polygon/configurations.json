@@ -1,0 +1,99 @@
+{
+  "network": "matic",
+  "isMainnet": false,
+  "subgraphName": "hop-polygon",
+  "deployment": "HOP_PROTOCOL_POLYGON",
+  "graftEnabled": true,
+  "subgraphId": "QmQhux3MYTgebT8HpxJeW9VtvpytByGujQ4umNVm2K5sDY",
+  "graftStartBlock": 37748303,
+  "amms": [
+    {
+      "dataSourceName": "HopL2Amm",
+      "token": "USDC",
+      "address": "0x5C32143C8B198F392d01f8446b754c181224ac26",
+      "startBlock": 15810000
+    },
+    {
+      "dataSourceName": "HopL2AmmUSDT",
+      "token": "USDT",
+      "address": "0xB2f7d27B21a69a033f85C42d5EB079043BAadC81",
+      "startBlock": 17058866
+    },
+    {
+      "dataSourceName": "HopL2AmmMATIC",
+      "token": "MATIC",
+      "address": "0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1",
+      "startBlock": 17669083
+    },
+    {
+      "dataSourceName": "HopL2AmmDAI",
+      "token": "DAI",
+      "address": "0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266",
+      "startBlock": 19112508
+    },
+    {
+      "dataSourceName": "HopL2AmmETH",
+      "token": "ETH",
+      "address": "0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778",
+      "startBlock": 19706846
+    }
+  ],
+  "bridges": [
+    {
+      "dataSourceName": "Bridge",
+      "token": "USDC",
+      "address": "0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8",
+      "startBlock": 15810015
+    },
+    {
+      "dataSourceName": "HopL2BridgeUSDT",
+      "token": "USDT",
+      "address": "0x6c9a1ACF73bd85463A46B0AFc076FBdf602b690B",
+      "startBlock": 17058878
+    },
+    {
+      "dataSourceName": "HopL2BridgeMATIC",
+      "token": "MATIC",
+      "address": "0x553bC791D746767166fA3888432038193cEED5E2",
+      "startBlock": 17669097
+    },
+    {
+      "dataSourceName": "HopL2BridgeDAI",
+      "token": "DAI",
+      "address": "0xEcf268Be00308980B5b3fcd0975D47C4C8e1382a",
+      "startBlock": 19112518
+    },
+    {
+      "dataSourceName": "HopL2BridgeETH",
+      "token": "ETH",
+      "address": "0xb98454270065A31D71Bf635F6F7Ee6A518dFb849",
+      "startBlock": 19706859
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "USDC",
+      "address": "0x7811737716942967Ae6567B26a5051cC72af550E",
+      "startBlock": 34505750
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT",
+      "token": "USDT",
+      "address": "0x297E5079DF8173Ae1696899d3eACD708f0aF82Ce",
+      "startBlock": 34505757
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI",
+      "token": "DAI",
+      "address": "0xd6dC6F69f81537Fe9DEcc18152b7005B45Dc2eE7",
+      "startBlock": 34505754
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH",
+      "token": "ETH",
+      "address": "0xAA7b3a4A084e6461D486E53a03CF45004F0963b7",
+      "startBlock": 34505746
+    }
+  ]
+}

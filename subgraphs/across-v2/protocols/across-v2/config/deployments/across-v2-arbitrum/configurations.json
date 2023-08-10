@@ -1,0 +1,23 @@
+{
+  "deployment": "ACROSS_V2_ARBITRUM",
+  "SpokePool": [
+    {
+      "chain": "Arbitrum",
+      "network": "arbitrum-one",
+      "address": "0xb88690461ddbab6f04dfad7df66b7725942feb9c",
+      "startBlock": 69579,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,uint256,uint256,uint64,uint64,uint64,uint32,address,indexed address,indexed address,address,bool)",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,uint256,uint64,indexed uint32,uint32,indexed address,address,indexed address)",
+      "name": "SpokePool1"
+    },
+    {
+      "chain": "Arbitrum",
+      "network": "arbitrum-one",
+      "address": "0xe35e9842fceaca96570b734083f4a58e8f7c5f2a",
+      "startBlock": 83868041,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,indexed uint256,uint256,int64,int64,indexed uint32,address,address,indexed address,address,bytes,(address,bytes,int64,bool,int256))",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,indexed uint256,int64,indexed uint32,uint32,address,address,indexed address,bytes)",
+      "name": "SpokePool2"
+    }
+  ]
+}

@@ -369,8 +369,8 @@ export function handleSwapOut(event: Swap): void {
   const supplyFee = event.params.lpFee;
   pool.addRevenueNative(protocolFee, supplyFee);
 
-  const account = sdk.Accounts.loadAccount(event.params.from);
-  account.transferOut(pool, route!, event.params.from, amount);
+  const account = sdk.Accounts.loadAccount(event.transaction.from);
+  account.transferOut(pool, route!, event.transaction.from, amount);
 
   checkPoolCount(sdk);
 }
