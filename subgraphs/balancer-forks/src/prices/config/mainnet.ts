@@ -72,6 +72,7 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x0316eb71485b0ab14103307bf65a021042c6d380"), // Huobi BTC
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
   Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
+  Address.fromString("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"), // Alchemix
 ];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
