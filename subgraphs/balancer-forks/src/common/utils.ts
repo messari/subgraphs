@@ -93,6 +93,17 @@ export function getOutputTokenPriceUSD(
   return outputTokenPriceUSD;
 }
 
+export function getPoolId(poolAddress: Address): Bytes {
+  const poolContract = WeightedPoolContract.bind(poolAddress);
+
+  let poolId = readValue<Bytes>(poolContract.try_getPoolId(), Bytes.empty());
+  if (poolId.notEqual(Bytes.empty())) return poolId;
+
+  poolId = readValue<Bytes>(poolContract.try_POOL_ID(), Bytes.empty());
+
+  return poolId;
+}
+
 export function getPoolTokensInfo(
   poolAddress: Address,
   poolId: Bytes

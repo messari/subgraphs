@@ -404,10 +404,7 @@ export function getOrCreateLiquidityPool(
     pool.symbol = utils.readValue<string>(poolContract.try_symbol(), "");
     pool.protocol = constants.VAULT_ADDRESS.toHexString();
 
-    const poolId = utils.readValue<Bytes>(
-      poolContract.try_getPoolId(),
-      Bytes.empty()
-    );
+    const poolId = utils.getPoolId(poolAddress);
     pool._poolId = poolId.toHexString();
 
     const inputTokensInfo = utils.getPoolTokensInfo(poolAddress, poolId);
