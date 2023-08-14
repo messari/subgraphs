@@ -13,6 +13,7 @@ export namespace Network {
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
   export const BSC = "BSC"; // aka BNB Chain
+  export const BASE = "BASE";
   export const CELO = "CELO";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
