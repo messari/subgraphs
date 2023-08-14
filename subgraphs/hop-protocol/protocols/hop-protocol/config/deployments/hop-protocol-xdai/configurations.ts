@@ -15,6 +15,7 @@ import {
   ArbitrumNovaToken,
   ArbitrumNovaHtoken,
   ArbitrumNovaAmm,
+  BaseToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
@@ -68,6 +69,8 @@ export class HopProtocolxDaiConfigurations implements Configurations {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "42170")
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
+    else if (chainId == "8453")
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found", []);
       return "";
@@ -151,6 +154,15 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else if (tokenAddress == XdaiToken.ETH) return MainnetToken.ETH;
     else {
       log.critical("Token not found", []);
+    }
+    return "";
+  }
+
+  getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == XdaiToken.USDC) return BaseToken.USDC;
+    if (tokenAddress == XdaiToken.ETH) return BaseToken.ETH;
+    else {
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }

@@ -15,6 +15,7 @@ import {
   ArbitrumNovaToken,
   ArbitrumNovaHtoken,
   ArbitrumNovaAmm,
+  BaseToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -134,10 +135,12 @@ export class HopProtocolPolygonConfigurations implements Configurations {
       return this.getXdaiCrossTokenFromTokenAddress(tokenAddress); //Xdai
     } else if (chainId == "137") {
       return this.getPolygonCrossTokenFromTokenAddress(tokenAddress); //Polygon
-    } else if (chainId == "42170")
+    } else if (chainId == "42170") {
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
-    else if (chainId == "1") {
+    } else if (chainId == "1") {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress); //Mainnet
+    } else if (chainId == "8453") {
+      return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     } else {
       log.critical("Chain not found", []);
       return "";
@@ -203,6 +206,15 @@ export class HopProtocolPolygonConfigurations implements Configurations {
       return MainnetToken.ETH; //MAINNET ETH
     } else {
       log.critical("Token not found", []);
+    }
+    return "";
+  }
+
+  getBaseCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == PolygonToken.USDC) return BaseToken.USDC;
+    if (tokenAddress == PolygonToken.ETH) return BaseToken.ETH;
+    else {
+      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
