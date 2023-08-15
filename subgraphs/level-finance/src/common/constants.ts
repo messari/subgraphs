@@ -203,6 +203,7 @@ export const DEFAULT_DECIMALS_PRECISION =
   BigInt.fromI32(10).pow(DEFAULT_DECIMALS);
 
 export const PRICE_FEED_PRECISION = BigInt.fromI32(10).pow(PRICE_FEED_DECIMALS);
+export const FUNDING_RATE_PRECISION = BigDecimal.fromString("0.00001");
 
 export enum Side {
   LONG,

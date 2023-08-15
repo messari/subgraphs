@@ -13,12 +13,12 @@ import {
 } from "../../generated/Pool/Pool";
 import { swap } from "../modules/swap";
 import { collectFees } from "../modules/fee";
+import { Bytes } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { updatePosition } from "../modules/position";
 import { transaction } from "../modules/transaction";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
-import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handlePositionIncreased(event: IncreasePosition): void {
   const accountAddress = event.params.account;
@@ -107,6 +107,7 @@ export function handlePositionDecreasedWithoutSignedPnl(
   const pnl = event.params.pnl;
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(sdk);
+
   updatePosition(
     event,
     key,

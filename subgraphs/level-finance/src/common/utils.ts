@@ -7,10 +7,10 @@ import {
   Address,
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
+import { getOrCreateTranche } from "./initializers";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { Token as TokenSchema } from "../../generated/schema";
 import { LpToken as LpTokenContract } from "../../generated/Pool/LpToken";
-import { getOrCreateTranche } from "./initializers";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -150,8 +150,9 @@ export function getLpTokenSupply(trancheAddress: Address): BigInt {
 
 export function getOutputTokenPrice(pool: Pool): BigDecimal {
   const tranchesAddresses = pool.pool._tranches;
-  let pricesSum = constants.BIGDECIMAL_ZERO;
+  if (!tranchesAddresses) return constants.BIGDECIMAL_ZERO;
 
+  let pricesSum = constants.BIGDECIMAL_ZERO;
   for (let i = 0; i < tranchesAddresses!.length; i++) {
     const tranche = getOrCreateTranche(tranchesAddresses![i]);
     pricesSum = pricesSum.plus(
@@ -188,5 +189,5 @@ export function calculateFundingRate(
 ): BigDecimal {
   return borrowedAssetUSD
     .div(totalAssetUSD)
-    .times(BigDecimal.fromString("0.00001"));
+    .times(constants.FUNDING_RATE_PRECISION);
 }

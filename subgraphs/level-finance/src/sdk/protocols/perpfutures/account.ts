@@ -33,11 +33,12 @@ import {
  *  - Making a position
  *  - Making position snapshots
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 class LoadAccountResponse {
@@ -544,7 +545,6 @@ export class Account {
     liquidate.blockNumber = this.event.block.number;
     liquidate.timestamp = this.event.block.timestamp;
     liquidate.account = liquidator;
-    liquidate.liquidator = liquidator;
     liquidate.liquidatee = liquidatee;
     liquidate.asset = asset;
     liquidate.amount = amountLiquidated;

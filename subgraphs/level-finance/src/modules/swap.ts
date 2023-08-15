@@ -2,6 +2,7 @@ import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { getOrCreateAccount } from "../common/initializers";
+
 export function swap(
   accountAddress: Address,
   tokenInAddress: Address,

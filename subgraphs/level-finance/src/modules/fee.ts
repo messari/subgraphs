@@ -1,9 +1,8 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 export function collectFees(
   fee: BigInt,

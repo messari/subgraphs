@@ -1,4 +1,9 @@
 import {
+  getOrCreateMasterChef,
+  createMasterChefStakingPool,
+  updateMasterChefTotalAllocation,
+} from "../../src/common/initializers";
+import {
   Deposit,
   Withdraw,
   LogSetPool,
@@ -6,14 +11,9 @@ import {
   EmergencyWithdraw,
   LogRewardPerSecond,
 } from "../../generated/LevelMasterV2/LevelMaster";
-import {
-  getOrCreateMasterChef,
-  createMasterChefStakingPool,
-  updateMasterChefTotalAllocation,
-} from "../../src/common/initializers";
-import { _MasterChefStakingPool } from "../../generated/schema";
-import { updateMasterChef } from "../modules/chef";
 import * as constants from "../common/constants";
+import { updateMasterChef } from "../modules/chef";
+import { _MasterChefStakingPool } from "../../generated/schema";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {

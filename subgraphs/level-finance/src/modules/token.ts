@@ -4,10 +4,10 @@ import {
 } from "../sdk/protocols/perpfutures/tokens";
 import * as utils from "../common/utils";
 import { Token } from "../../generated/schema";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { TokenPricer } from "../sdk/protocols/config";
 import { ERC20 } from "../../generated/Pool/ERC20";
-import { getUsdPricePerToken } from "../prices";
 import {
   Address,
   BigDecimal,

@@ -64,7 +64,6 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-
       eventHandlers:
         - event: IncreasePosition(bytes32,address,address,address,uint256,uint256,uint8,uint256,uint256)
           handler: handlePositionIncreased

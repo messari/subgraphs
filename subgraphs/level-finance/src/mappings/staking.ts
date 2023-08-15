@@ -10,10 +10,10 @@ import {
 } from "../../generated/LevelStake/Staking";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { getOrCreatePool, initializeSDK } from "../common/initializers";
-import { Staking as StakingContract } from "../../generated/LevelStake/Staking";
 import { BigInt, log } from "@graphprotocol/graph-ts";
 import { RewardTokenType } from "../sdk/util/constants";
+import { getOrCreatePool, initializeSDK } from "../common/initializers";
+import { Staking as StakingContract } from "../../generated/LevelStake/Staking";
 
 export function handleStaked(event: Staked): void {
   const sdk = initializeSDK(event);

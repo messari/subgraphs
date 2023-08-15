@@ -1,8 +1,8 @@
+import * as utils from "../common/utils";
+import { Token } from "../../generated/schema";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { getOrCreateTranche } from "../common/initializers";
-import { Token } from "../../generated/schema";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
-import * as utils from "../common/utils";
 
 export function updateTranche(
   trancheAddress: Address,

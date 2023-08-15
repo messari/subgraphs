@@ -1,11 +1,11 @@
-import { getOrCreateAccount } from "../common/initializers";
+import { updateTranche } from "./tranche";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { getOrCreateAccount } from "../common/initializers";
 import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
-import { updateTranche } from "./tranche";
 
 export function transaction(
   accountAddress: Address,

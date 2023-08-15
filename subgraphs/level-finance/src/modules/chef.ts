@@ -1,14 +1,14 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
-import { getRewardsPerDay } from "../../src/common/rewards";
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateMasterChef,
   getOrCreatePool,
   initializeSDK,
 } from "../../src/common/initializers";
-import { _MasterChefStakingPool } from "../../generated/schema";
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
 import { RewardTokenType } from "../sdk/util/constants";
+import { getRewardsPerDay } from "../../src/common/rewards";
+import { _MasterChefStakingPool } from "../../generated/schema";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChef(
