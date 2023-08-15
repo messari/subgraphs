@@ -74,8 +74,11 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // If we don't have an indexed RPL Reward interval,
   // or if the last indexed RPL Reward interval isn't equal to the current one in the smart contracts:
+  const claimIntervalTimeStartCall =
+    rocketRewardPoolContract.try_getClaimIntervalTimeStart();
+  if (claimIntervalTimeStartCall.reverted) return;
   const smartContractCurrentRewardIntervalStartTime =
-    rocketRewardPoolContract.getClaimIntervalTimeStart();
+    claimIntervalTimeStartCall.value;
   let previousActiveIndexedRewardInterval: RPLRewardInterval | null = null;
   let previousActiveIndexedRewardIntervalId: string | null = null;
   if (
@@ -106,12 +109,20 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
     }
 
     // Create a new RPL Reward interval so we can add this first claim to it.
+    const claimIntervalRewardsTotalCall =
+      rocketRewardPoolContract.try_getClaimIntervalRewardsTotal();
+    if (claimIntervalRewardsTotalCall.reverted) return;
+
+    const claimIntervalTimeCall =
+      rocketRewardPoolContract.try_getClaimIntervalTime();
+    if (claimIntervalTimeCall.reverted) return;
+
     activeIndexedRewardInterval =
       rocketPoolEntityFactory.createRPLRewardInterval(
         ROCKETPOOL_RPL_REWARD_INTERVAL_ID_PREFIX +
           generalUtilities.extractIdForEntity(event),
         previousActiveIndexedRewardIntervalId,
-        rocketRewardPoolContract.getClaimIntervalRewardsTotal(),
+        claimIntervalRewardsTotalCall.value,
         getClaimingContractAllowance(RPLREWARDCLAIMERTYPE_PDAO, event.address),
         getClaimingContractAllowance(RPLREWARDCLAIMERTYPE_ODAO, event.address),
         getClaimingContractAllowance(RPLREWARDCLAIMERTYPE_NODE, event.address),
@@ -123,7 +134,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
             )
           : BigInt.fromI32(0),
         smartContractCurrentRewardIntervalStartTime,
-        rocketRewardPoolContract.getClaimIntervalTime(),
+        claimIntervalTimeCall.value,
         event.block.number,
         event.block.timestamp
       );
@@ -145,7 +156,9 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   const networkPricesContract = rocketNetworkPrices.bind(
     Address.fromBytes(networkPricesContractEntity.latestAddress)
   );
-  const rplETHExchangeRate = networkPricesContract.getRPLPrice();
+  const rplPriceCall = networkPricesContract.try_getRPLPrice();
+  if (rplPriceCall.reverted) return;
+  const rplETHExchangeRate = rplPriceCall.value;
   let rplRewardETHAmount = BigInt.fromI32(0);
   if (rplETHExchangeRate > BigInt.fromI32(0)) {
     rplRewardETHAmount = event.params.amount
@@ -353,17 +366,26 @@ function getClaimingContractAllowance(
   const rocketRewardsContract = rocketRewardsPool.bind(rewardsPoolAddress);
 
   if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_PDAO) {
-    return rocketRewardsContract.getClaimingContractAllowance(
-      RocketContractNames.ROCKET_CLAIM_DAO
-    );
+    const claimingContractAllowanceCall =
+      rocketRewardsContract.try_getClaimingContractAllowance(
+        RocketContractNames.ROCKET_CLAIM_DAO
+      );
+    if (claimingContractAllowanceCall.reverted) return BigInt.fromI32(0);
+    return claimingContractAllowanceCall.value;
   } else if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_ODAO) {
-    return rocketRewardsContract.getClaimingContractAllowance(
-      RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE
-    );
+    const claimingContractAllowanceCall =
+      rocketRewardsContract.try_getClaimingContractAllowance(
+        RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE
+      );
+    if (claimingContractAllowanceCall.reverted) return BigInt.fromI32(0);
+    return claimingContractAllowanceCall.value;
   } else if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_NODE) {
-    return rocketRewardsContract.getClaimingContractAllowance(
-      RocketContractNames.ROCKET_CLAIM_NODE
-    );
+    const claimingContractAllowanceCall =
+      rocketRewardsContract.try_getClaimingContractAllowance(
+        RocketContractNames.ROCKET_CLAIM_NODE
+      );
+    if (claimingContractAllowanceCall.reverted) return BigInt.fromI32(0);
+    return claimingContractAllowanceCall.value;
   } else {
     return BigInt.fromI32(0);
   }

@@ -56,7 +56,9 @@ function pricesUpdated(rplPrice: BigInt, event: ethereum.Event): void {
   const networkFeesContract = rocketNetworkFees.bind(
     Address.fromBytes(networkFeesContractEntity.latestAddress)
   );
-  const nodeFeeForNewMinipool = networkFeesContract.getNodeFee();
+  const nodeFeeCall = networkFeesContract.try_getNodeFee();
+  if (nodeFeeCall.reverted) return;
+  const nodeFeeForNewMinipool = nodeFeeCall.value;
 
   // Determine the RPL minimum and maximum for a new minipool.
   const effectiveRPLBoundsNewMinipool = getEffectiveMinipoolRPLBounds(
@@ -298,6 +300,8 @@ function getEffectiveMinipoolRPLBounds(
   const effectiveRPLBounds = new EffectiveMinipoolRPLBounds();
 
   let halfDepositAmount = BigInt.fromI32(0);
+  let minimumPerMinipoolStake = BigInt.fromI32(0);
+  let maximumPerMinipoolStake = BigInt.fromI32(0);
 
   // Get the half deposit amount from the DAO Protocol settings minipool contract instance.
   const rocketDAOProtocolSettingsMinipoolContractEntity = getRocketContract(
@@ -310,9 +314,11 @@ function getEffectiveMinipoolRPLBounds(
       )
     );
 
-  halfDepositAmount = rocketDAOProtocolSettingsMinipoolContract
-    .getLaunchBalance()
-    .div(BIGINT_TWO);
+  const launchBalanceCall =
+    rocketDAOProtocolSettingsMinipoolContract.try_getLaunchBalance();
+  if (!launchBalanceCall.reverted) {
+    halfDepositAmount = launchBalanceCall.value.div(BIGINT_TWO);
+  }
 
   // Get the DAO Protocol settings node contract instance.
   const rocketDAOProtocolSettingsNodeContractEntity = getRocketContract(
@@ -325,15 +331,26 @@ function getEffectiveMinipoolRPLBounds(
       )
     );
 
+  const minimumPerMinipoolStakeCall =
+    rocketDAOProtocolSettingsNodeContract.try_getMinimumPerMinipoolStake();
+  if (!minimumPerMinipoolStakeCall.reverted) {
+    minimumPerMinipoolStake = minimumPerMinipoolStakeCall.value;
+  }
+  const maximumPerMinipoolStakeCall =
+    rocketDAOProtocolSettingsNodeContract.try_getMaximumPerMinipoolStake();
+  if (!minimumPerMinipoolStakeCall.reverted) {
+    maximumPerMinipoolStake = maximumPerMinipoolStakeCall.value;
+  }
+
   // Determine the minimum and maximum RPL a minipool needs to be collateralized.
   effectiveRPLBounds.minimum = nodeUtilities.getMinimumRPLForNewMinipool(
     halfDepositAmount,
-    rocketDAOProtocolSettingsNodeContract.getMinimumPerMinipoolStake(),
+    minimumPerMinipoolStake,
     rplPrice
   );
   effectiveRPLBounds.maximum = nodeUtilities.getMaximumRPLForNewMinipool(
     halfDepositAmount,
-    rocketDAOProtocolSettingsNodeContract.getMaximumPerMinipoolStake(),
+    maximumPerMinipoolStake,
     rplPrice
   );
 

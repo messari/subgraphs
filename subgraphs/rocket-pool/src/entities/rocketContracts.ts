@@ -1,7 +1,5 @@
 import { Address, Bytes } from "@graphprotocol/graph-ts";
-
 import { addToArrayAtIndex } from "../utils/arrays";
-
 import { _RocketContract } from "../../generated/schema";
 
 export function createOrUpdateRocketContract(

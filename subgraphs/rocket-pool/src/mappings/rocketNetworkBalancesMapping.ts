@@ -80,17 +80,26 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
   if (rocketDepositPoolContract === null) return;
 
   // How much is the total staker ETH balance in the deposit pool?
-  const depositPoolBalance = rocketDepositPoolContract.getBalance();
-  const depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
+  const balanceCall = rocketDepositPoolContract.try_getBalance();
+  if (balanceCall.reverted) return;
+  const depositPoolBalance = balanceCall.value;
+
+  const excessBalanceCall = rocketDepositPoolContract.try_getExcessBalance();
+  if (excessBalanceCall.reverted) return;
+  const depositPoolExcessBalance = excessBalanceCall.value;
 
   // The RocketEth contract balance is equal to the total collateral - the excess deposit pool balance.
+  const totalCollateralCall = rETHContract.try_getTotalCollateral();
+  if (totalCollateralCall.reverted) return;
   const stakerETHInRocketETHContract = getRocketETHBalance(
     depositPoolExcessBalance,
-    rETHContract.getTotalCollateral()
+    totalCollateralCall.value
   );
 
   // Attempt to create a new network balance checkpoint.
-  const rETHExchangeRate = rETHContract.getExchangeRate();
+  const exchangeRateCall = rETHContract.try_getExchangeRate();
+  if (exchangeRateCall.reverted) return;
+  const rETHExchangeRate = exchangeRateCall.value;
   const checkpoint =
     rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
       generalUtilities.extractIdForEntity(event),
@@ -183,12 +192,17 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
   const rocketVaultContract = rocketVault.bind(
     Address.fromBytes(rocketVaultContractEntity.latestAddress)
   );
-  const rocketDepositPoolBalance = rocketVaultContract.balanceOf(
+  const depositPoolBalanceCall = rocketVaultContract.try_balanceOf(
     RocketContractNames.ROCKET_DEPOSIT_POOL
   );
-  const rocketTokenRETHBalance = rocketVaultContract.balanceOf(
+  if (depositPoolBalanceCall.reverted) return;
+  const rocketDepositPoolBalance = depositPoolBalanceCall.value;
+
+  const rETHBalanceCall = rocketVaultContract.try_balanceOf(
     RocketContractNames.ROCKET_TOKEN_RETH
   );
+  if (rETHBalanceCall.reverted) return;
+  const rocketTokenRETHBalance = rETHBalanceCall.value;
 
   const ethTVL = queuedMinipools
     .plus(stakingMinipools)
@@ -208,15 +222,23 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
     totalRPLStake = totalRPLStakeCall.value;
   }
 
-  const rocketDAONodeTrustedActions_rplBalance =
-    rocketVaultContract.balanceOfToken(
+  const balanceOfDaoNodeTrustedActionsCall =
+    rocketVaultContract.try_balanceOfToken(
       RocketContractNames.ROCKET_DAO_NODE_TRUSTED_ACTIONS,
       Address.fromString(RPL_ADDRESS)
     );
-  const rocketAuctionManager_rplBalance = rocketVaultContract.balanceOfToken(
-    RocketContractNames.ROCKET_AUCTION_MANAGER,
-    Address.fromString(RPL_ADDRESS)
-  );
+  if (balanceOfDaoNodeTrustedActionsCall.reverted) return;
+  const rocketDAONodeTrustedActions_rplBalance =
+    balanceOfDaoNodeTrustedActionsCall.value;
+
+  const balanceOfAuctionManagerActionsCall =
+    rocketVaultContract.try_balanceOfToken(
+      RocketContractNames.ROCKET_AUCTION_MANAGER,
+      Address.fromString(RPL_ADDRESS)
+    );
+  if (balanceOfAuctionManagerActionsCall.reverted) return;
+  const rocketAuctionManager_rplBalance =
+    balanceOfAuctionManagerActionsCall.value;
 
   const rplTVL = totalRPLStake
     .plus(rocketDAONodeTrustedActions_rplBalance)

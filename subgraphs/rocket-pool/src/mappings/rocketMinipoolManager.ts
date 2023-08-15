@@ -196,7 +196,10 @@ function getNewMinipoolFee(): BigInt {
   );
   if (networkFeesContract === null) return BigInt.fromI32(0);
 
-  return networkFeesContract.getNodeFee();
+  const nodeFeeCall = networkFeesContract.try_getNodeFee();
+  if (nodeFeeCall.reverted) return BigInt.fromI32(0);
+
+  return nodeFeeCall.value;
 }
 
 /**
@@ -214,12 +217,21 @@ function setEffectiveRPLStaked(node: Node): void {
 
   // Load the effective RPL staked state from the smart contracts and update the node.
   const nodeAddress = Address.fromString(node.id);
-  node.effectiveRPLStaked =
-    rocketNodeStakingContract.getNodeEffectiveRPLStake(nodeAddress);
-  node.minimumEffectiveRPL =
-    rocketNodeStakingContract.getNodeMinimumRPLStake(nodeAddress);
-  node.maximumEffectiveRPL =
-    rocketNodeStakingContract.getNodeMaximumRPLStake(nodeAddress);
+
+  const nodeEffectiveRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeEffectiveRPLStake(nodeAddress);
+  if (!nodeEffectiveRPLStakeCall.reverted)
+    node.effectiveRPLStaked = nodeEffectiveRPLStakeCall.value;
+
+  const nodeMinimumRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeMinimumRPLStake(nodeAddress);
+  if (!nodeMinimumRPLStakeCall.reverted)
+    node.minimumEffectiveRPL = nodeMinimumRPLStakeCall.value;
+
+  const nodeMaximumRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeMaximumRPLStake(nodeAddress);
+  if (!nodeMaximumRPLStakeCall.reverted)
+    node.maximumEffectiveRPL = nodeMaximumRPLStakeCall.value;
 }
 
 /**

@@ -100,7 +100,9 @@ function saveNodeRPLStakeTransaction(
   );
 
   // Calculate the ETH amount at the time of the transaction.
-  const rplETHExchangeRate = rocketNetworkPricesContract.getRPLPrice();
+  const rplPriceCall = rocketNetworkPricesContract.try_getRPLPrice();
+  if (rplPriceCall.reverted) return;
+  const rplETHExchangeRate = rplPriceCall.value;
   const ethAmount = amount.times(rplETHExchangeRate).div(ONE_ETHER_IN_WEI);
 
   // Create a new transaction for the given values.
@@ -141,9 +143,16 @@ function updateNodeRPLBalances(
   );
 
   const nodeAddress = Address.fromString(node.id);
-  node.rplStaked = rocketNodeStakingContract.getNodeRPLStake(nodeAddress);
-  node.effectiveRPLStaked =
-    rocketNodeStakingContract.getNodeEffectiveRPLStake(nodeAddress);
+
+  const nodeRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeRPLStake(nodeAddress);
+  if (nodeRPLStakeCall.reverted) return;
+  node.rplStaked = nodeRPLStakeCall.value;
+
+  const nodeEffectiveRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeEffectiveRPLStake(nodeAddress);
+  if (nodeEffectiveRPLStakeCall.reverted) return;
+  node.effectiveRPLStaked = nodeEffectiveRPLStakeCall.value;
 
   // This isn't accessible via smart contracts, so we have to keep track manually.
   if (

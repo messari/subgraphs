@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-checksum-addresses */
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Versions } from "../versions";
 
@@ -171,5 +172,5 @@ export const RETH_NAME = "RETH";
 /////////////////////////////
 
 // steth / Reth address
-export const RETH_ADDRESS = "0xae78736cd615f374d3085123a210448e74fc6393";
-export const RPL_ADDRESS = "0xd33526068d116ce69f19a9ee46f0bd304f21a51f";
+export const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
+export const RPL_ADDRESS = "0xD33526068D116cE69F19A9ee46F0bd304F21A51f";
