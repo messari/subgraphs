@@ -346,10 +346,11 @@ export function getFlashloanPremiumAmount(
           //
           continue;
         }
-        const decoded = ethereum
-          .decode(DATA_TYPE_TUPLE, thisLog.data)!
-          .toTuple();
-        flashloanPremiumAmount = decoded[3].toBigInt();
+        const decoded = ethereum.decode(DATA_TYPE_TUPLE, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        flashloanPremiumAmount = logData[3].toBigInt();
         break;
       }
     }

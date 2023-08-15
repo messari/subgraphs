@@ -803,10 +803,11 @@ function getBalanceTransferAmount(event: ethereum.Event): BigInt {
       const logSignature = thisLog.topics[0];
       if (thisLog.address == event.address && logSignature == eventSignature) {
         const UINT256_UINT256 = "(uint256,uint256)";
-        const decoded = ethereum
-          .decode(UINT256_UINT256, thisLog.data)!
-          .toTuple();
-        btAmount = decoded[0].toBigInt();
+        const decoded = ethereum.decode(UINT256_UINT256, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        btAmount = logData[0].toBigInt();
 
         break;
       }
