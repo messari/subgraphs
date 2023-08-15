@@ -56,28 +56,28 @@ export class SushiswapV3BaseConfigurations implements Configurations {
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA", // USDbC
-      "0xEB466342C4d449BC9f53A865D5Cb90586f405215", // axlUSDC
-      "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", // DAI
+      "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", // USDbC
+      "0xeb466342c4d449bc9f53a865d5cb90586f405215", // axlUSDC
+      "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", // DAI
       "0x4200000000000000000000000000000000000006", // WETH
-      "0x8544FE9D190fD7EC52860abBf45088E81Ee24a8c", // TOSHI
-      "0x27D2DECb4bFC9C76F0309b8E88dec3a601Fe25a8", // BALD
-      "0x0FA70E156Cd3B03aC4080bfe55BD8AB50f5Bcb98", // YOU
-      "0x23ee2343B892b1BB63503a4FAbc840E0e2C6810f", // AXL
-      "0x22DC834C3Ff3e45f484bF24B9B07b851B981900f", // SMUDCAT
-      "0xa4220a2B0Cb10BF5FDC3B8c3D9E13728f5E7ca56", // MOCHI
+      "0x8544fe9d190fd7ec52860abbf45088e81ee24a8c", // TOSHI
+      "0x27d2decb4bfc9c76f0309b8e88dec3a601fe25a8", // BALD
+      "0x0fa70e156cd3b03ac4080bfe55bd8ab50f5bcb98", // YOU
+      "0x23ee2343b892b1bb63503a4fabc840e0e2c6810f", // AXL
+      "0x22dc834c3ff3e45f484bf24b9b07b851b981900f", // SMUDCAT
+      "0xa4220a2b0cb10bf5fdc3b8c3d9e13728f5e7ca56", // MOCHI
     ]);
   }
   getStableCoins(): Bytes[] {
     return stringToBytesList([
-      "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA", // USDbC
-      "0xEB466342C4d449BC9f53A865D5Cb90586f405215", // axlUSDC
-      "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", // DAI
+      "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", // USDbC
+      "0xeb466342c4d449bc9f53a865d5cb90586f405215", // axlUSDC
+      "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", // DAI
     ]);
   }
   getStableOraclePools(): Bytes[] {
     return stringToBytesList([
-      "0x7AA3bc844710220272D9e14cB4B4BB067953D8AC", // WETH/axlUSDC
+      "0x7aa3bc844710220272d9e14cb4b4bb067953d8ac", // WETH/axlUSDC
     ]);
   }
   getUntrackedPairs(): Bytes[] {
