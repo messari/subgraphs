@@ -27,6 +27,7 @@ import { HoneyswapGnosisConfigurations } from "../../protocols/honeyswap/config/
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-polygon/configurations";
 import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
 import { BiswapBscConfigurations } from "../../protocols/biswap/config/deployments/biswap-bsc/configurations";
+import { CamelotV2Configurations } from "../../protocols/camelot-v2/config/deployments/camelot-v2-arbitrum/configurations";
 
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
@@ -123,6 +124,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.BISWAP_BSC: {
       return new BiswapBscConfigurations();
+    }
+    case Deploy.CAMELOT_V2_ARBITRUM: {
+      return new CamelotV2Configurations();
     }
     default: {
       log.critical(

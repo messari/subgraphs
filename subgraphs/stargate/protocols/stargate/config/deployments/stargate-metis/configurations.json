@@ -4,7 +4,7 @@
   "file": "./src/mappings/handlers.ts",
   "lpStaking": [
     {
-      "name": "LPStakingTime",
+      "name": "LPStaking_0",
       "address": "0x45A01E4e04F14f7A4a6702c74187c5F6222033cd",
       "startBlock": 4320637,
       "abi": "LPStakingTime",

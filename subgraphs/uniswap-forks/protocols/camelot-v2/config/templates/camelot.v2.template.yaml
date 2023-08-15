@@ -1,0 +1,103 @@
+specVersion: 0.0.6
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+features: 
+  - grafting
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{factory.address}}"
+      abi: Factory
+      startBlock: {{factory.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/camelot-v2/Factory.json
+        - name: TokenABI
+          file: ./abis/camelot-v2/ERC20.json
+        - name: Pair
+          file: ./abis/camelot-v2/Pair.json
+      eventHandlers:
+        - event: OwnerFeeShareUpdated(uint256,uint256)
+          handler: handleOwnerFeeShareUpdated
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./protocols/camelot-v2/src/mappings/factory.ts
+  - kind: ethereum
+    name: CamelotMaster
+    network: {{network}}
+    source:
+      address: "{{master.address}}"
+      abi: CamelotMaster
+      startBlock: {{master.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: CamelotMaster
+          file: ./abis/camelot-v2/CamelotMaster.json
+        - name: NFTPool
+          file: ./abis/camelot-v2/NFTPool.json
+        - name: GrailTokenV2
+          file: ./abis/camelot-v2/GrailTokenV2.json
+        - name: TokenABI
+          file: ./abis/camelot-v2/ERC20.json
+        - name: Pair
+          file: ./abis/camelot-v2/Pair.json
+      eventHandlers:
+        - event: PoolAdded(indexed address,uint256)
+          handler: handlePoolAdded
+        - event: PoolSet(indexed address,uint256)
+          handler: handlePoolSet
+        - event: PoolUpdated(indexed address,uint256,uint256)
+          handler: handlePoolUpdated
+      file: ./protocols/camelot-v2/src/mappings/CamelotMaster.ts
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/camelot-v2/src/mappings/pool.ts
+      entities: []
+      abis:
+        - name: Pair
+          file: ./abis/camelot-v2/Pair.json
+        - name: Factory
+          file: ./abis/camelot-v2/Factory.json
+        - name: TokenABI
+          file: ./abis/camelot-v2/ERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+        - event: FeePercentUpdated(uint16,uint16)
+          handler: handleFeePercentUpdated
+        - event: SetStableSwap(bool,bool)
+          handler: handleSetStableSwap

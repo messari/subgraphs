@@ -461,6 +461,7 @@ export function _handleReserveDataUpdated(
   event: ethereum.Event,
   liquidityRate: BigInt, // deposit rate in ray
   liquidityIndex: BigInt,
+  variableBorrowIndex: BigInt,
   variableBorrowRate: BigInt,
   stableBorrowRate: BigInt,
   protocolData: ProtocolData,
@@ -549,15 +550,17 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
-  if (!market._liquidityIndex) {
-    market._liquidityIndex = BIGINT_ONE_RAY;
+  let currSupplyIndex = market.supplyIndex;
+  if (!currSupplyIndex) {
+    manager.updateSupplyIndex(BIGINT_ONE_RAY);
+    currSupplyIndex = BIGINT_ONE_RAY;
   }
   const liquidityIndexDiff = liquidityIndex
-    .minus(market._liquidityIndex!)
+    .minus(currSupplyIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
-  market._liquidityIndex = liquidityIndex; // must update to current liquidity index
-  market.save();
+  manager.updateSupplyIndex(liquidityIndex); // must update to current liquidity index
+  manager.updateBorrowIndex(variableBorrowIndex);
 
   const newRevenueBD = tryScaledSupply.value
     .toBigDecimal()

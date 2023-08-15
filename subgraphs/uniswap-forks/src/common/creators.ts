@@ -176,10 +176,7 @@ export function createDeposit(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
+  const pool = getLiquidityPool(event.address.toHexString());
 
   const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
@@ -242,10 +239,7 @@ export function createWithdraw(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
+  const pool = getLiquidityPool(event.address.toHexString());
 
   const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
@@ -323,10 +317,7 @@ export function createSwapHandleVolumeAndFees(
   }
 
   const protocol = getOrCreateProtocol();
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
+  const pool = getLiquidityPool(event.address.toHexString());
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   const token0 = getOrCreateToken(event, pool.inputTokens[0]);

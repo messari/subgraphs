@@ -1,8 +1,14 @@
 /* eslint-disable prefer-const */
-import { ERC20 } from "../../generated/LPStaking/ERC20";
-import { ERC20SymbolBytes } from "../../generated/LPStaking/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/LPStaking/ERC20NameBytes";
+import { ERC20 } from "../../generated/LPStaking_0/ERC20";
+import { ERC20SymbolBytes } from "../../generated/LPStaking_0/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/LPStaking_0/ERC20NameBytes";
 import { Address } from "@graphprotocol/graph-ts";
+import {
+  DEFAULT_DECIMALS,
+  INT_ZERO,
+  INT_NINE,
+  INT_SIXTEEN,
+} from "../sdk/util/constants";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
@@ -110,14 +116,14 @@ class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    let staticDefinitions = new Array<StaticTokenDefinition>(6);
+    let staticDefinitions = new Array<StaticTokenDefinition>(INT_ZERO);
 
     // Add DGD
     let tokenDGD = new StaticTokenDefinition(
       Address.fromString("0xe0b7927c4af23765cb51314a0e0521a9645f0e2a"),
       "DGD",
       "DGD",
-      9 as i32
+      INT_NINE
     );
     staticDefinitions.push(tokenDGD);
 
@@ -126,7 +132,7 @@ class StaticTokenDefinition {
       Address.fromString("0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"),
       "AAVE",
       "Aave Token",
-      18 as i32
+      DEFAULT_DECIMALS as i32
     );
     staticDefinitions.push(tokenAAVE);
 
@@ -135,7 +141,7 @@ class StaticTokenDefinition {
       Address.fromString("0xeb9951021698b42e4399f9cbb6267aa35f82d59d"),
       "LIF",
       "Lif",
-      18 as i32
+      DEFAULT_DECIMALS as i32
     );
     staticDefinitions.push(tokenLIF);
 
@@ -144,7 +150,7 @@ class StaticTokenDefinition {
       Address.fromString("0xbdeb4b83251fb146687fa19d1c660f99411eefe3"),
       "SVD",
       "savedroid",
-      18 as i32
+      DEFAULT_DECIMALS as i32
     );
     staticDefinitions.push(tokenSVD);
 
@@ -153,7 +159,7 @@ class StaticTokenDefinition {
       Address.fromString("0xbb9bc244d798123fde783fcc1c72d3bb8c189413"),
       "TheDAO",
       "TheDAO",
-      16 as i32
+      INT_SIXTEEN
     );
     staticDefinitions.push(tokenTheDAO);
 
@@ -162,7 +168,7 @@ class StaticTokenDefinition {
       Address.fromString("0x38c6a68304cdefb9bec48bbfaaba5c5b47818bb2"),
       "HPB",
       "HPBCoin",
-      18 as i32
+      DEFAULT_DECIMALS as i32
     );
     staticDefinitions.push(tokenHPB);
 

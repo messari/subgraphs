@@ -702,7 +702,7 @@ enum NodeRPLStakeTransactionType {
 }
 
 # Keeps track of the RPL staking transactions for a node.
-type NodeRPLStakeTransaction @entity @transaction {
+type NodeRPLStakeTransaction @entity {
   # Composite key based on transaction hash of the triggered event and its log index.
   id: ID!
 

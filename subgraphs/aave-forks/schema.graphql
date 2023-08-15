@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 3.0.1
+# Version: 3.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -78,7 +78,7 @@ enum RewardTokenType {
   STAKE
 }
 
-type RewardToken @entity @regularPolling {
+type RewardToken @entity(immutable: true) @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -884,8 +884,17 @@ type Market @entity @regularPolling {
   " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
   stableBorrowedTokenBalance: BigInt
 
+  " Last updated timestamp of supply/borrow index. "
+  indexLastUpdatedTimestamp: BigInt
+
+  " Index used by the protocol to calculate interest generated on the supply token (ie, liquidityIndex in Aave)"
+  supplyIndex: BigInt
+
   " Allowed limit to how much of the underlying asset can be supplied to this market. "
   supplyCap: BigInt
+
+  " Index used by the protocol to calculate the interest paid on the borrowed token (ie, variableBorrowIndex in Aave))"
+  borrowIndex: BigInt
 
   " Allowed limit for how much of the underlying asset can be borrowed from this market. "
   borrowCap: BigInt
@@ -1026,9 +1035,6 @@ type Market @entity @regularPolling {
 
   ##### Add Ons #####
 
-  " Base token interest multiplier for interest. Used to get revenue "
-  _baseBorrowIndex: BigInt
-
   " Rewards borrow speed for this market"
   _baseTrackingBorrowSpeed: BigInt
 
@@ -1040,9 +1046,6 @@ type Market @entity @regularPolling {
 
   " The stable debt token address correlated to the reserve asset "
   _sToken: Token
-
-  " An aggregate metric of the average borrow rate across all borrows "
-  _liquidityIndex: BigInt
 
   " The state of the protocol prior to being paused (isActive / canUseAsCollateral / canBorrowFrom) "
   _prePauseState: [Boolean!]
@@ -1543,6 +1546,9 @@ type Position @entity @regularPolling {
   " Token balance in this position, in native amounts "
   balance: BigInt!
 
+  " The token balance of this position without interest generated (Used to calculate interest generated on a position) "
+  principal: BigInt
+
   " Number of deposits related to this position "
   depositCount: Int!
 
@@ -1585,6 +1591,8 @@ type Position @entity @regularPolling {
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 
+  ##### Add Ons #####
+
   " efficient mode flag "
   _eMode: Boolean
 }
@@ -1625,6 +1633,14 @@ type PositionSnapshot @entity(immutable: true) @hourlySnapshot {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  ##### Interest Tracking Fields #####
+
+  " The principal value without interest accrued. Used to calculate interest per position. "
+  principal: BigInt
+
+  " Base borrow OR supply index (based on the position side). Used to calculate interest across snapshots. "
+  index: BigInt
 }
 
 # Helper entity for calculating daily/hourly active users
@@ -1961,7 +1977,7 @@ type Liquidate implements Event @entity(immutable: true) @transaction {
 # e.g. transferring aTokens (collateral) directly, not a deposit.
 # Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
-type Transfer implements Event @entity(immutable: true) {
+type Transfer implements Event @entity(immutable: true) @transaction {
   " { Transaction hash }{ Log index } "
   id: Bytes!
 

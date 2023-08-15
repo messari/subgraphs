@@ -1,6 +1,6 @@
-# Lending SDK `1.0.1`
+# Lending SDK `1.0.6`
 
-The lending SDK follows the `3.0.1` lending schema. You can learn about each `manager` class in the class headers, but there are a few things to note.
+The lending SDK follows the `3.1.0` lending schema. You can learn about each `manager` class in the class headers, but there are a few things to note.
 
 As a general rule of thumb you want to do a few things before you create an `event` entity. Whether that is in the `Deposit` handler or a unique handler before that.
 

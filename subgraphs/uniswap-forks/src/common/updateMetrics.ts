@@ -33,6 +33,7 @@ import {
 } from "./constants";
 import { convertTokenToDecimal, percToDec } from "./utils/utils";
 import { NetworkConfigs } from "../../configurations/configure";
+import { createPoolFees } from "./creators";
 
 // Update FinancialsDailySnapshots entity
 // Updated on Swap, Burn, and Mint events.
@@ -129,10 +130,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -207,11 +205,11 @@ export function updateInputTokenBalances(
   reserve0: BigInt,
   reserve1: BigInt
 ): void {
-  const pool = getLiquidityPool(poolAddress, event.block.number);
+  const pool = getLiquidityPool(poolAddress);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO], false);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE], false);
 
   const tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
   const tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);
@@ -228,7 +226,7 @@ export function updateTvlAndTokenPrices(
   event: ethereum.Event,
   poolAddress: string
 ): void {
-  const pool = getLiquidityPool(poolAddress, event.block.number);
+  const pool = getLiquidityPool(poolAddress);
 
   const protocol = getOrCreateProtocol();
 
@@ -289,6 +287,9 @@ export function updateVolumeAndFees(
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+
+  // Ensure fees are up to date
+  pool.fees = createPoolFees(pool.id, event.block.number);
   const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
   const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 

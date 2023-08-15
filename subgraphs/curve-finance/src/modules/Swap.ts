@@ -9,6 +9,7 @@ import {
   Address,
   ethereum,
   BigDecimal,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import {
   updateTokenVolume,
@@ -23,6 +24,7 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { equalsIgnoreCase } from "../common/utils";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -90,9 +92,9 @@ export function UpdateMetricsAfterSwap(block: ethereum.Block): void {
 
 export function Swap(
   liquidityPoolAddress: Address,
-  sold_id: BigInt,
+  soldId: BigInt,
   amountIn: BigInt,
-  bought_id: BigInt,
+  boughtId: BigInt,
   amountOut: BigInt,
   buyer: Address,
   transaction: ethereum.Transaction,
@@ -105,37 +107,37 @@ export function Swap(
   let tokenOut: string;
 
   if (!underlying) {
-    tokenIn = pool._inputTokensOrdered[sold_id.toI32()];
-    tokenOut = pool._inputTokensOrdered[bought_id.toI32()];
+    tokenIn = pool._inputTokensOrdered[soldId.toI32()];
+    tokenOut = pool._inputTokensOrdered[boughtId.toI32()];
   } else {
     const underlyingCoins = utils.getPoolUnderlyingCoinsFromRegistry(
       liquidityPoolAddress,
       Address.fromString(pool._registryAddress)
     );
-
     if (underlyingCoins.length == 0) return;
 
-    tokenIn = underlyingCoins[sold_id.toI32()].toHexString();
-    tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
+    tokenIn = underlyingCoins[soldId.toI32()].toHexString();
+    tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
 
-    if (bought_id.toI32() == 0) {
-      // Exception: https://etherscan.io/address/0x06cb22615ba53e60d67bf6c341a0fd5e718e1655#code#L750
+    if (
+      pool._isMetapool &&
+      boughtId.equals(constants.BIGINT_ZERO) &&
+      (equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET) ||
+        equalsIgnoreCase(dataSource.network(), constants.Network.FANTOM) ||
+        equalsIgnoreCase(dataSource.network(), constants.Network.MATIC) ||
+        equalsIgnoreCase(dataSource.network(), constants.Network.ARBITRUM_ONE))
+    )
       tokenIn = pool._inputTokensOrdered.at(-1);
-    }
   }
 
   const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
   const amountInUSD = amountIn
-    .divDecimal(
-      constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(utils.exponentToBigDecimal(tokenInStore.decimals as u8))
     .times(tokenInStore.lastPriceUSD!);
 
   const tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block);
   const amountOutUSD = amountOut
-    .divDecimal(
-      constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(utils.exponentToBigDecimal(tokenOutStore.decimals as u8))
     .times(tokenOutStore.lastPriceUSD!);
 
   createSwapTransaction(
@@ -182,8 +184,6 @@ export function Swap(
   updateProtocolRevenue(liquidityPoolAddress, volumeUSD, block);
   updateSnapshotsVolume(liquidityPoolAddress, volumeUSD, block);
   UpdateMetricsAfterSwap(block);
-
-  utils.updateProtocolTotalValueLockedUSD();
 
   log.info(
     "[Exchange] LiquidityPool: {}, tokenIn: {}, tokenOut: {}, amountInUSD: {}, amountOutUSD: {}, isUnderlying: {}, TxnHash: {}",

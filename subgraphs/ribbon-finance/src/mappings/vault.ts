@@ -89,7 +89,6 @@ export function handleDeposit(event: DepositEvent): void {
   getOrCreateVault(vaultAddress, event.block);
   updateVaultTVL(vaultAddress, block);
   updateUsageMetrics(event.block, event.params.account);
-  updateFinancials(block);
   updateVaultSnapshots(vaultAddress, event.block);
 
   Transaction(
@@ -99,6 +98,7 @@ export function handleDeposit(event: DepositEvent): void {
     event.block,
     constants.TransactionType.DEPOSIT
   );
+  updateFinancials(block);
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -109,7 +109,6 @@ export function handleWithdraw(event: WithdrawEvent): void {
   getOrCreateVault(vaultAddress, event.block);
   updateVaultTVL(vaultAddress, block);
   updateUsageMetrics(event.block, event.params.account);
-  updateFinancials(block);
   updateVaultSnapshots(vaultAddress, event.block);
 
   Transaction(
@@ -119,6 +118,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
     event.block,
     constants.TransactionType.WITHDRAW
   );
+  updateFinancials(block);
 }
 
 export function handleInstantWithdraw(event: InstantWithdraw): void {
@@ -128,7 +128,6 @@ export function handleInstantWithdraw(event: InstantWithdraw): void {
 
   updateVaultTVL(vaultAddress, block);
   updateUsageMetrics(event.block, event.params.account);
-  updateFinancials(block);
   updateVaultSnapshots(vaultAddress, event.block);
 
   Transaction(
@@ -138,6 +137,7 @@ export function handleInstantWithdraw(event: InstantWithdraw): void {
     event.block,
     constants.TransactionType.WITHDRAW
   );
+  updateFinancials(block);
 }
 
 export function handleCollectVaultFees(event: CollectVaultFees): void {
@@ -302,7 +302,6 @@ export function handleWithdrawWithFee(event: WithdrawWithFee): void {
   getOrCreateVault(vaultAddress, event.block);
   updateVaultTVL(vaultAddress, block);
   updateUsageMetrics(event.block, event.params.account);
-  updateFinancials(block);
   updateVaultSnapshots(vaultAddress, block);
 
   Transaction(
@@ -313,6 +312,7 @@ export function handleWithdrawWithFee(event: WithdrawWithFee): void {
     constants.TransactionType.WITHDRAW,
     feeAmount
   );
+  updateFinancials(block);
 }
 
 export function handleCollectManagementFee(event: CollectManagementFee): void {
@@ -357,7 +357,7 @@ export function handleCollectPerformanceFee(
     false
   );
   const performanceFeeUSD = utils
-    .bigIntToBigDecimal(performanceFee, 6)
+    .bigIntToBigDecimal(performanceFee, constants.INT_SIX)
     .times(usdcToken.lastPriceUSD!);
 
   updateRevenueSnapshots(

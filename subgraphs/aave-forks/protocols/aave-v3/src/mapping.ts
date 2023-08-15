@@ -282,6 +282,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event,
     event.params.liquidityRate,
     event.params.liquidityIndex,
+    event.params.variableBorrowIndex,
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
     protocolData,
@@ -654,7 +655,7 @@ function storeReserveFactor(
 ): void {
   // Set reserveFactor if not set, as setReserveFactor() may be never called
   // and no ReserveFactorChanged event is emitted
-  if (market.reserveFactor || market.reserveFactor!.gt(BIGDECIMAL_ZERO)) {
+  if (market.reserveFactor && market.reserveFactor!.gt(BIGDECIMAL_ZERO)) {
     // we should only need to do this when market.reserveFactor is not set or equal to 0.0
     // changing reserveFactor config should emit ReserveFactorChanged event and handled
     // by handleReserveFactorChanged
