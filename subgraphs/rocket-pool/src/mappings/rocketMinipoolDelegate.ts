@@ -2,17 +2,16 @@ import { BigInt } from "@graphprotocol/graph-ts";
 import {
   EtherDeposited,
   StatusUpdated,
-} from "../../../generated/templates/rocketMinipoolDelegateV2/rocketMinipoolDelegateV2";
-import { Minipool, Node } from "../../../generated/schema";
+} from "../../generated/templates/rocketMinipoolDelegate/rocketMinipoolDelegate";
+import { Minipool, Node } from "../../generated/schema";
 import {
   MINIPOOLSTATUS_STAKING,
   MINIPOOLSTATUS_WITHDRAWABLE,
-} from "../../constants/enumConstants";
-import {
-  ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V1,
-  ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V2,
-} from "../../constants/contractConstants";
-import { updateUsageMetrics } from "../../updaters/usageMetrics";
+} from "../constants/enumConstants";
+import { RocketContractNames } from "../constants/contractConstants";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
+import { getRocketContract } from "../entities/rocketContracts";
+
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.
  */
@@ -58,12 +57,12 @@ export function handleEtherDeposited(event: EtherDeposited): void {
   const minipool = Minipool.load(event.address.toHexString());
   if (minipool === null) return;
 
+  // Get the address of the rocket node deposit contract.
   // Check if the deposit came from a node.
-  if (
-    ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V1 ==
-      event.params.from.toHexString() ||
-    ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V2 == event.params.from.toHexString()
-  ) {
+  const nodeDepositContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_DEPOSIT
+  );
+  if (nodeDepositContractEntity.allAddresses.includes(event.params.from)) {
     // The deposit came from a node and is a 'node' deposit.
     minipool.nodeDepositBlockTime = event.block.timestamp;
     minipool.nodeDepositETHAmount = event.params.amount;

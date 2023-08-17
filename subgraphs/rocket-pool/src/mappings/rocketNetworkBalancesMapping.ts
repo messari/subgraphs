@@ -1,6 +1,8 @@
-import { BalancesUpdated } from "../../generated/rocketNetworkBalances/rocketNetworkBalances";
-import { rocketTokenRETH } from "../../generated/rocketNetworkBalances/rocketTokenRETH";
-import { rocketDepositPool } from "../../generated/rocketNetworkBalances/rocketDepositPool";
+import { BalancesUpdated } from "../../generated/templates/rocketNetworkBalances/rocketNetworkBalances";
+import { rocketTokenRETH } from "../../generated/templates/rocketNetworkBalances/rocketTokenRETH";
+import { rocketDepositPool } from "../../generated/templates/rocketNetworkBalances/rocketDepositPool";
+import { rocketVault } from "../../generated/templates/rocketNetworkBalances/rocketVault";
+import { rocketNodeStaking } from "../../generated/templates/rocketNetworkBalances/rocketNodeStaking";
 import {
   Staker,
   NetworkStakerBalanceCheckpoint,
@@ -12,10 +14,9 @@ import { stakerUtilities } from "../checkpoints/stakerUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import {
   ZERO_ADDRESS_STRING,
-  ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS,
-  ROCKET_TOKEN_RETH_CONTRACT_ADDRESS,
+  RocketContractNames,
 } from "../constants/contractConstants";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
@@ -32,7 +33,9 @@ import {
   BIGINT_SIXTEEN,
   BIGINT_THIRTYTWO,
   BIGINT_ZERO,
+  RPL_ADDRESS,
 } from "../utils/constants";
+import { getRocketContract } from "../entities/rocketContracts";
 
 /**
  * When enough ODAO members votes on a balance and a consensus threshold is reached, the staker beacon chain state is persisted to the smart contracts.
@@ -59,29 +62,44 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
 
   // Load the RocketTokenRETH contract
   // We will need the rocketvault smart contract state to get specific addresses.
+  const rETHContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_TOKEN_RETH
+  );
   const rETHContract = rocketTokenRETH.bind(
-    Address.fromString(ROCKET_TOKEN_RETH_CONTRACT_ADDRESS)
+    Address.fromBytes(rETHContractEntity.latestAddress)
   );
   if (rETHContract === null) return;
 
   // Load the rocketDepositPool contract
+  const rocketDepositPoolContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_DEPOSIT_POOL
+  );
   const rocketDepositPoolContract = rocketDepositPool.bind(
-    Address.fromString(ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketDepositPoolContractEntity.latestAddress)
   );
   if (rocketDepositPoolContract === null) return;
 
   // How much is the total staker ETH balance in the deposit pool?
-  const depositPoolBalance = rocketDepositPoolContract.getBalance();
-  const depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
+  const balanceCall = rocketDepositPoolContract.try_getBalance();
+  if (balanceCall.reverted) return;
+  const depositPoolBalance = balanceCall.value;
+
+  const excessBalanceCall = rocketDepositPoolContract.try_getExcessBalance();
+  if (excessBalanceCall.reverted) return;
+  const depositPoolExcessBalance = excessBalanceCall.value;
 
   // The RocketEth contract balance is equal to the total collateral - the excess deposit pool balance.
+  const totalCollateralCall = rETHContract.try_getTotalCollateral();
+  if (totalCollateralCall.reverted) return;
   const stakerETHInRocketETHContract = getRocketETHBalance(
     depositPoolExcessBalance,
-    rETHContract.getTotalCollateral()
+    totalCollateralCall.value
   );
 
   // Attempt to create a new network balance checkpoint.
-  const rETHExchangeRate = rETHContract.getExchangeRate();
+  const exchangeRateCall = rETHContract.try_getExchangeRate();
+  if (exchangeRateCall.reverted) return;
+  const rETHExchangeRate = exchangeRateCall.value;
   const checkpoint =
     rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
       generalUtilities.extractIdForEntity(event),
@@ -163,36 +181,75 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
     balanceCheckpoint!.queuedMinipools.times(BIGINT_SIXTEEN);
   const stakingMinipools =
     balanceCheckpoint!.stakingMinipools.times(BIGINT_THIRTYTWO);
-  const stakingUnbondedMinipools =
-    balanceCheckpoint!.stakingUnbondedMinipools.times(BIGINT_THIRTYTWO);
   const withdrawableMinipools =
     balanceCheckpoint!.withdrawableMinipools.times(BIGINT_THIRTYTWO);
 
-  log.error(
-    "[master TVL calculation raw inputs] queuedMinipools: {}, stakingMinipools: {}, stakingUnbondedMinipools: {}, withdrawableMinipools: {} ",
-    [
-      balanceCheckpoint!.queuedMinipools.toString(),
-      balanceCheckpoint!.stakingMinipools.toString(),
-      balanceCheckpoint!.stakingUnbondedMinipools.toString(),
-      balanceCheckpoint!.withdrawableMinipools.toString(),
-    ]
+  // TVL Methodology: https://github.com/DefiLlama/DefiLlama-Adapters/blob/main/projects/rocketpool/index.js#L90
+
+  const rocketVaultContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_VAULT
   );
-  log.error(
-    "[master TVL calculation] queuedMinipools: {}, stakingMinipools: {}, stakingUnbondedMinipools: {}, withdrawableMinipools: {} ",
-    [
-      queuedMinipools.toString(),
-      stakingMinipools.toString(),
-      stakingUnbondedMinipools.toString(),
-      withdrawableMinipools.toString(),
-    ]
+  const rocketVaultContract = rocketVault.bind(
+    Address.fromBytes(rocketVaultContractEntity.latestAddress)
   );
+  const depositPoolBalanceCall = rocketVaultContract.try_balanceOf(
+    RocketContractNames.ROCKET_DEPOSIT_POOL
+  );
+  if (depositPoolBalanceCall.reverted) return;
+  const rocketDepositPoolBalance = depositPoolBalanceCall.value;
+
+  const rETHBalanceCall = rocketVaultContract.try_balanceOf(
+    RocketContractNames.ROCKET_TOKEN_RETH
+  );
+  if (rETHBalanceCall.reverted) return;
+  const rocketTokenRETHBalance = rETHBalanceCall.value;
 
   const ethTVL = queuedMinipools
     .plus(stakingMinipools)
-    .plus(stakingMinipools)
-    .plus(stakingUnbondedMinipools)
-    .plus(withdrawableMinipools);
-  updateProtocolAndPoolTvl(event.block.number, event.block.timestamp, ethTVL);
+    .plus(withdrawableMinipools)
+    .plus(rocketDepositPoolBalance)
+    .plus(rocketTokenRETHBalance);
+
+  const rocketNodeStakingContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_STAKING
+  );
+  const rocketNodeStakingContract = rocketNodeStaking.bind(
+    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
+  );
+  const totalRPLStakeCall = rocketNodeStakingContract.try_getTotalRPLStake();
+  let totalRPLStake = BIGINT_ZERO;
+  if (!totalRPLStakeCall.reverted) {
+    totalRPLStake = totalRPLStakeCall.value;
+  }
+
+  const balanceOfDaoNodeTrustedActionsCall =
+    rocketVaultContract.try_balanceOfToken(
+      RocketContractNames.ROCKET_DAO_NODE_TRUSTED_ACTIONS,
+      Address.fromString(RPL_ADDRESS)
+    );
+  if (balanceOfDaoNodeTrustedActionsCall.reverted) return;
+  const rocketDAONodeTrustedActions_rplBalance =
+    balanceOfDaoNodeTrustedActionsCall.value;
+
+  const balanceOfAuctionManagerActionsCall =
+    rocketVaultContract.try_balanceOfToken(
+      RocketContractNames.ROCKET_AUCTION_MANAGER,
+      Address.fromString(RPL_ADDRESS)
+    );
+  if (balanceOfAuctionManagerActionsCall.reverted) return;
+  const rocketAuctionManager_rplBalance =
+    balanceOfAuctionManagerActionsCall.value;
+
+  const rplTVL = totalRPLStake
+    .plus(rocketDAONodeTrustedActions_rplBalance)
+    .plus(rocketAuctionManager_rplBalance);
+
+  updateProtocolAndPoolTvl(
+    event.block.number,
+    event.block.timestamp,
+    rplTVL,
+    ethTVL
+  );
 }
 
 /**
