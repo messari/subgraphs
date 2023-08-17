@@ -5263,8 +5263,12 @@
           "prepare:constants": false
         },
         "services": {
+          "hosted-service": {
+            "slug": "substream-uniswap-v2-ethereum",
+            "query-id": "substream-uniswap-v2-ethereum"
+          },
           "decentralized-network": {
-            "slug": "substreams-uniswap-v2-ethereum",
+            "slug": "substream-uniswap-v2-ethereum",
             "query-id": "J2oP9UNBjsnuDDW1fAoHKskyrNLFNBB2badQU6UvEtJp"
           }
         }
