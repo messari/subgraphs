@@ -99,7 +99,7 @@ export function getProtocolData(): ProtocolData {
     );
   } else if (equalsIgnoreCase(network, Network.BASE)) {
     return new ProtocolData(
-      Bytes.fromHexString("0x45939657d1CA34A8FA39A924B71D28Fe8431e581"),
+      Bytes.fromHexString("0x45939657d1ca34a8fa39a924b71d28fe8431e581"),
       PROTOCOL,
       PROTOCOL_NAME,
       PROTOCOL_SLUG,
@@ -138,7 +138,7 @@ export function getRewardAddress(): Address {
   } else if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
     return Address.fromString("0x88730d254a2f7e6ac8388c3198afd694ba9f7fae");
   } else if (equalsIgnoreCase(network, Network.BASE)) {
-    return Address.fromString("0x123964802e6ABabBE1Bc9547D72Ef1B69B00A6b1");
+    return Address.fromString("0x123964802e6ababbe1bc9547d72ef1b69b00a6b1");
   }
 
   log.critical("[getRewardAddress] Unsupported network: {}", [network]);
