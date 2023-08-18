@@ -2149,6 +2149,10 @@
           "prepare:constants": false
         },
         "services": {
+          "hosted-service": {
+            "query-id": "compound-v3-base",
+            "slug": "compound-v3-base"
+          },
           "decentralized-network": {
             "slug": "compound-v3-base",
             "query-id": "AwoxEZbiWLvv6e3QdvdMZw4WDURdGbvPfHmZRc8Dpfz9"
