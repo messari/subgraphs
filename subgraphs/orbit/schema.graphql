@@ -84,6 +84,7 @@ enum Network {
   PALM
   CURIO
   UNKNOWN_NETWORK
+  XDAI
 }
 
 enum ProtocolType {
