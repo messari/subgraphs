@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import {
   UniswapPair as UniswapPairContract,
   UniswapPair__getReservesResult,
-} from "../../../generated/rocketTokenRETH/UniswapPair";
+} from "../../../generated/rocketStorage/UniswapPair";
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/rocketTokenRETH/UniswapRouter";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/rocketStorage/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
   if (

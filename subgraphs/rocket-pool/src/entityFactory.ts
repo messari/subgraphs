@@ -14,7 +14,7 @@ import {
   NodeBalanceCheckpoint,
   Minipool,
 } from "../generated/schema";
-import { BalancesUpdated } from "../generated/rocketNetworkBalances/rocketNetworkBalances";
+import { BalancesUpdated } from "../generated/templates/rocketNetworkBalances/rocketNetworkBalances";
 import { ROCKETPOOL_PROTOCOL_ROOT_ID } from "./constants/generalConstants";
 
 class RocketPoolEntityFactory {

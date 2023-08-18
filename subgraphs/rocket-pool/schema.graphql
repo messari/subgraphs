@@ -800,6 +800,30 @@ type RPLRewardInterval @entity {
   blockTime: BigInt!
 }
 
+# Represents an reward interval during which RPL can be claimed by different types of claimers.
+type RPLRewardSubmitted @entity {
+  # Reward Index
+  id: ID!
+
+  rewardIndex: BigInt!
+  executionBlock: BigInt!
+  consensusBlock: BigInt!
+  merkleRoot: Bytes!
+  merkleTreeCID: String!
+  intervalsPassed: BigInt!
+  treasuryRPL: BigInt!
+  trustedNodeRPL: [BigInt!]!
+  nodeRPL: [BigInt!]!
+  nodeETH: [BigInt!]!
+  userETH: BigInt!
+
+  # On what block number was this interval created.
+  block: BigInt!
+
+  # At what time was this interval created.
+  blockTime: BigInt!
+}
+
 # Represents the RPL reward claimer options.
 enum RPLRewardClaimerType {
   PDAO
@@ -1060,4 +1084,11 @@ type Minipool @entity @regularPolling {
 
   # Block timestamp at which this minipool was marked as finalized.
   finalizedBlockTime: BigInt!
+}
+
+type _RocketContract @entity {
+  id: ID!
+  keccak256: Bytes!
+  latestAddress: Bytes!
+  allAddresses: [Bytes!]!
 }

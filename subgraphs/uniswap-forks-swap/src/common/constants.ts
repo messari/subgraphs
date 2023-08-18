@@ -19,6 +19,7 @@ export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
+  export const BASE = "BASE";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";

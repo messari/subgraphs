@@ -79,8 +79,37 @@
     "type": "event"
   },
   {
+    "anonymous": false,
     "inputs": [
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "block",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rplPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "time",
+        "type": "uint256"
+      }
+    ],
+    "name": "PricesUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
     "name": "decreaseEffectiveRPLStake",
     "outputs": [],
@@ -89,8 +118,16 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_block", "type": "uint256" },
-      { "internalType": "uint256", "name": "_rplPrice", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_block",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rplPrice",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "_effectiveRplStake",
@@ -105,48 +142,88 @@
   {
     "inputs": [],
     "name": "getEffectiveRPLStake",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getEffectiveRPLStakeUpdatedBlock",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getLatestReportableBlock",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getPricesBlock",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getRPLPrice",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "inConsensus",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
     "name": "increaseEffectiveRPLStake",
     "outputs": [],
@@ -155,8 +232,16 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "_block", "type": "uint256" },
-      { "internalType": "uint256", "name": "_rplPrice", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_block",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rplPrice",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "_effectiveRplStake",
@@ -171,7 +256,13 @@
   {
     "inputs": [],
     "name": "version",
-    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   }
