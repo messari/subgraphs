@@ -301,6 +301,18 @@ export function getNetworkSpecificConstant(
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
     toChainMapping.set(
+      "TON",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    toChainMapping.set(
+      "WEMIX",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    toChainMapping.set(
+      "ICON",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    toChainMapping.set(
       "ORBIT",
       Address.fromString("0x1b57Ce997Ca6a009ce54bB2d37DEbEBadFDbBb06")
     );

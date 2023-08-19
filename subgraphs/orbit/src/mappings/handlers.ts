@@ -277,12 +277,13 @@ function _handleTransferIn(
     token
   );
   pool.addDestinationToken(crossToken);
-  log.debug("Made it {}: hti 1 abc with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
+  // log.debug("Made it {}: hti 1 abc with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(receiver))
-  log.debug("Made it {}: hti 2 with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
-  if (sender.byteLength == 20 && receiver.byteLength == 20) {
-    account.transferIn(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(sender), amount);
+  // log.debug("Made it {}: hti 2 with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
+  if (sender.byteLength != 20) {
+    sender = receiver
   }
+  account.transferIn(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(sender), amount);
 }
 
 function _handleTransferOut(
@@ -299,7 +300,7 @@ function _handleTransferOut(
   dstPoolId: Address | null = null,
 ): void {
   if (!dstPoolId) {
-    log.warning("dstPoolId is null for transaction: {}", [event.transaction.hash.toHexString()]);
+    log.warning("dstPoolId is null for transaction: {} and chain: {}", [event.transaction.hash.toHexString(), toChain]);
     return;
   }
   // log.debug("Made it here 1.5: {}", [event.transaction.hash.toHexString()]);
@@ -314,6 +315,10 @@ function _handleTransferOut(
   // log.debug("Made it here 2: {}", [event.transaction.hash.toHexString()]);
   const context = dataSource.context();
   // log.debug("Made it here abc: {}", [event.transaction.hash.toHexString()]);
+  const account = sdk.Accounts.loadAccount(Address.fromBytes(sender))
+  if (receiver.byteLength != 20) {
+    receiver = sender
+  }
   // // If Receiver is taxReceiver, this is the tax fee
   if (receiver.byteLength == 20 && Address.fromBytes(receiver) == Address.fromString(taxReceiver)) {
     log.debug("Made it here 3: {}", [event.transaction.hash.toHexString()]);
@@ -332,20 +337,9 @@ function _handleTransferOut(
   pool.addDestinationToken(crossToken);
   log.debug("Made it {}: hto only 1 with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
   if (sender.byteLength == 20 && receiver.byteLength == 20) {
-    const account = sdk.Accounts.loadAccount(Address.fromBytes(sender))
     account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(receiver), amount);
   }
   // log.debug("Made it here 6: {}", [event.transaction.hash.toHexString()]);
 }
-
-
-// export function handleLockIn(event: Deposit): void {
-//   log.warning("transaction hash: {} Block number: {}", [
-//     event.transaction.hash.toHexString(),
-//     event.block.number.toString(),
-//   ]);
-
-//   new Pricer();
-// }
 
 
