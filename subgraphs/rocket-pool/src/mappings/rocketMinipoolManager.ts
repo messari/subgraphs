@@ -1,22 +1,26 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  ByteArray,
+  Bytes,
+  crypto,
+} from "@graphprotocol/graph-ts";
 import {
   IncrementNodeFinalisedMinipoolCountCall,
   MinipoolCreated,
   MinipoolDestroyed,
-} from "../../../generated/rocketMinipoolManagerV1/rocketMinipoolManagerV1";
-import { rocketNetworkFees } from "../../../generated/rocketMinipoolManagerV1/rocketNetworkFees";
-import { rocketNodeStaking } from "../../../generated/rocketMinipoolManagerV1/rocketNodeStaking";
+} from "../../generated/templates/rocketMinipoolManager/rocketMinipoolManager";
+import { rocketNetworkFees } from "../../generated/templates/rocketMinipoolManager/rocketNetworkFees";
+import { rocketNodeStaking } from "../../generated/templates/rocketMinipoolManager/rocketNodeStaking";
+import { RocketContractNames } from "../constants/contractConstants";
+import { Minipool, Node } from "../../generated/schema";
+import { rocketPoolEntityFactory } from "../entityFactory";
+import { rocketMinipoolDelegate } from "../../generated/templates";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 import {
-  ROCKET_NETWORK_FEES_CONTRACT_ADDRESS,
-  ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
-} from "../../constants/contractConstants";
-import { Minipool, Node } from "../../../generated/schema";
-import { rocketPoolEntityFactory } from "../../entityFactory";
-import {
-  rocketMinipoolDelegateV1,
-  rocketMinipoolDelegateV2,
-} from "../../../generated/templates";
-import { updateUsageMetrics } from "../../updaters/usageMetrics";
+  createOrUpdateRocketContract,
+  getRocketContract,
+} from "../entities/rocketContracts";
 
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.
@@ -71,11 +75,20 @@ export function handleMinipoolCreated(event: MinipoolCreated): void {
   node.save();
 
   // Get the appropriate delegate template for this block and use it to create another instance of the entity.
-  if (event.block.number < BigInt.fromI32(13535384)) {
-    rocketMinipoolDelegateV1.create(Address.fromString(minipool.id));
-  } else {
-    rocketMinipoolDelegateV2.create(Address.fromString(minipool.id));
-  }
+  rocketMinipoolDelegate.create(Address.fromString(minipool.id));
+  createOrUpdateRocketContract(
+    RocketContractNames.ROCKET_MINIPOOL_DELEGATE,
+    Bytes.fromByteArray(
+      crypto.keccak256(
+        ByteArray.fromUTF8(
+          "contract.address".concat(
+            RocketContractNames.ROCKET_MINIPOOL_DELEGATE
+          )
+        )
+      )
+    ),
+    Address.fromString(minipool.id)
+  );
 
   updateUsageMetrics(event.block, event.address);
 }
@@ -175,12 +188,18 @@ export function handleIncrementNodeFinalisedMinipoolCount(
  */
 function getNewMinipoolFee(): BigInt {
   // Get the network fees contract instance.
+  const networkFeesContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NETWORK_FEES
+  );
   const networkFeesContract = rocketNetworkFees.bind(
-    Address.fromString(ROCKET_NETWORK_FEES_CONTRACT_ADDRESS)
+    Address.fromBytes(networkFeesContractEntity.latestAddress)
   );
   if (networkFeesContract === null) return BigInt.fromI32(0);
 
-  return networkFeesContract.getNodeFee();
+  const nodeFeeCall = networkFeesContract.try_getNodeFee();
+  if (nodeFeeCall.reverted) return BigInt.fromI32(0);
+
+  return nodeFeeCall.value;
 }
 
 /**
@@ -188,19 +207,31 @@ function getNewMinipoolFee(): BigInt {
  */
 function setEffectiveRPLStaked(node: Node): void {
   // We need this to get the new (minimum/maximum) effective RPL staked for the node.
+  const rocketNodeStakingContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NODE_STAKING
+  );
   const rocketNodeStakingContract = rocketNodeStaking.bind(
-    Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
+    Address.fromBytes(rocketNodeStakingContractEntity.latestAddress)
   );
   if (rocketNodeStakingContract === null) return;
 
   // Load the effective RPL staked state from the smart contracts and update the node.
   const nodeAddress = Address.fromString(node.id);
-  node.effectiveRPLStaked =
-    rocketNodeStakingContract.getNodeEffectiveRPLStake(nodeAddress);
-  node.minimumEffectiveRPL =
-    rocketNodeStakingContract.getNodeMinimumRPLStake(nodeAddress);
-  node.maximumEffectiveRPL =
-    rocketNodeStakingContract.getNodeMaximumRPLStake(nodeAddress);
+
+  const nodeEffectiveRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeEffectiveRPLStake(nodeAddress);
+  if (!nodeEffectiveRPLStakeCall.reverted)
+    node.effectiveRPLStaked = nodeEffectiveRPLStakeCall.value;
+
+  const nodeMinimumRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeMinimumRPLStake(nodeAddress);
+  if (!nodeMinimumRPLStakeCall.reverted)
+    node.minimumEffectiveRPL = nodeMinimumRPLStakeCall.value;
+
+  const nodeMaximumRPLStakeCall =
+    rocketNodeStakingContract.try_getNodeMaximumRPLStake(nodeAddress);
+  if (!nodeMaximumRPLStakeCall.reverted)
+    node.maximumEffectiveRPL = nodeMaximumRPLStakeCall.value;
 }
 
 /**

@@ -14,16 +14,12 @@ import {
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
-import {
-  RETH_ADDRESS,
-  RPL_ADDRESS,
-  ETH_ADDRESS,
-  getStorageAddress,
-  PRICEENCODE,
-} from "../utils/constants";
-import { rocketTokenRETH } from "../../generated/rocketTokenRETH/rocketTokenRETH";
-import { rocketNetworkPrices } from "../../generated/rocketNetworkPrices/rocketNetworkPrices";
+import { RETH_ADDRESS, RPL_ADDRESS, ETH_ADDRESS } from "../utils/constants";
+import { rocketTokenRETH } from "../../generated/templates/rocketTokenRETH/rocketTokenRETH";
+import { rocketNetworkPrices } from "../../generated/templates/rocketNetworkPrices/rocketNetworkPrices";
 import * as utils from "./common/utils";
+import { getRocketContract } from "../entities/rocketContracts";
+import { RocketContractNames } from "../constants/contractConstants";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   // Check if tokenAddr is a NULL Address
@@ -64,22 +60,30 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   if (tokenAddr.equals(Address.fromString(RPL_ADDRESS))) {
-    const storageAddress = getStorageAddress(PRICEENCODE);
-
-    const rplPriceContract = rocketNetworkPrices.bind(storageAddress);
+    const rplPriceContractEntity = getRocketContract(
+      RocketContractNames.ROCKET_NETWORK_PRICES
+    );
+    const rplPriceContract = rocketNetworkPrices.bind(
+      Address.fromBytes(rplPriceContractEntity.latestAddress)
+    );
 
     if (!rplPriceContract) {
       return new CustomPriceType();
     }
 
-    const tokenPrice: BigDecimal = utils
+    const tokenPriceInEth: BigDecimal = utils
       .readValue<BigInt>(
         rplPriceContract.try_getRPLPrice(),
         constants.BIGINT_ZERO
       )
       .toBigDecimal();
+    const ethPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
 
-    return CustomPriceType.initialize(tokenPrice, constants.SIXTEEN_DECIMALS);
+    const tokenPrice = tokenPriceInEth
+      .times(ethPrice.usdPrice)
+      .div(ethPrice.decimalsBaseTen);
+
+    return CustomPriceType.initialize(tokenPrice, constants.EIGHTEEN_DECIMALS);
   }
 
   const network = dataSource.network();
