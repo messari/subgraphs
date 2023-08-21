@@ -1,4 +1,10 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 
 import { Perpetual } from "./protocol";
 import * as constants from "../../util/constants";
@@ -10,8 +16,8 @@ import { Token, RewardToken } from "../../../../generated/schema";
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -48,6 +54,16 @@ export class TokenManager {
       token.save();
     }
     return token;
+  }
+
+  updateTokenPrice(
+    token: Token,
+    usdPrice: BigDecimal,
+    block: ethereum.Block
+  ): void {
+    token.lastPriceUSD = usdPrice;
+    token.lastPriceBlockNumber = block.number;
+    token.save();
   }
 
   getOrCreateTokenFromBytes(address: Bytes): Token {

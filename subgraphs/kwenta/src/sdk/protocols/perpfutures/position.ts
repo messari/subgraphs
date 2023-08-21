@@ -19,11 +19,12 @@ import { PositionModified } from "../../../../generated/templates/FuturesV1Marke
  * make all of the storage changes that occur in the position and
  * its corresponding snapshots.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 class LoadPositionResponse {
   position: Position;
@@ -101,7 +102,7 @@ export class PositionManager {
     let entity = PositionSchema.load(positionId);
 
     // if entity.hashClosed is not null that means last position is closed, and we have to open a new position
-    if (entity != null && entity.isClosed) {
+    if (entity != null && !!entity.hashClosed) {
       positionId = this.getPositionId(pool, account, false);
 
       entity = null;
@@ -137,7 +138,6 @@ export class PositionManager {
       entity.price = eventPosition.params.lastPrice;
       entity.fundingIndex = eventPosition.params.fundingIndex;
       entity.size = eventPosition.params.size;
-      entity.isClosed = false;
 
       entity.save();
     }
@@ -218,7 +218,6 @@ export class Position {
     this.position.hashClosed = event.transaction.hash;
     this.position.blockNumberClosed = event.block.number;
     this.position.timestampClosed = event.block.timestamp;
-    this.position.isClosed = true;
     this.save();
 
     this.account.closePosition(this.position.side);
@@ -276,7 +275,7 @@ export class Position {
     this.position.balance = amount;
     this.position.balanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -289,7 +288,7 @@ export class Position {
     this.position.collateralBalance = amount;
     this.position.collateralBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -301,7 +300,7 @@ export class Position {
   setBalanceClosed(token: Token, amount: BigInt): void {
     this.position.closeBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -313,7 +312,7 @@ export class Position {
   setCollateralBalanceClosed(token: Token, amount: BigInt): void {
     this.position.closeCollateralBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -325,7 +324,7 @@ export class Position {
   setRealisedPnlClosed(token: Token, amount: BigInt): void {
     this.position.realisedPnlUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 

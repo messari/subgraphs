@@ -11,7 +11,12 @@ import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
-import { bigIntToBigDecimal, exponentToBigDecimal } from "../../util/numbers";
+import {
+  bigIntToBigDecimal,
+  exponentToBigDecimal,
+  poolArraySort,
+  safeDivide,
+} from "../../util/numbers";
 
 import {
   LiquidityPoolFee,
@@ -23,11 +28,12 @@ import {
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class PoolManager {
@@ -100,6 +106,7 @@ export class Pool {
     this.pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     this.pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    this.pool.cumulativeStakeSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
@@ -177,7 +184,6 @@ export class Pool {
     this.pool._lastSnapshotDayID = constants.BIGINT_ZERO;
     this.pool._lastSnapshotHourID = constants.BIGINT_ZERO;
     this.pool._lastUpdateTimestamp = event.block.timestamp;
-
     this.pool.longOpenInterest = constants.BIGINT_ZERO;
     this.pool.shortOpenInterest = constants.BIGINT_ZERO;
     this.pool.totalOpenInterest = constants.BIGINT_ZERO;
@@ -274,7 +280,7 @@ export class Pool {
     }
 
     this.setTotalValueLocked(totalValueLockedUSD);
-    // this.refreshInputTokenWeights();
+    this.refreshInputTokenWeights();
   }
 
   /**
@@ -322,32 +328,63 @@ export class Pool {
   }
 
   /**
-   * Adds a given USD value to the pool and protocol's supplySideRevenue and protocolSideRevenue. It can be a positive or negative amount.
+   * Adds a given USD value to the pool and protocol stakeSideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
+   */
+  private addStakeSideRevenueUSD(rev: BigDecimal): void {
+    this.pool.cumulativeTotalRevenueUSD =
+      this.pool.cumulativeTotalRevenueUSD.plus(rev);
+    this.pool.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD.plus(rev);
+    this.save();
+
+    this.protocol.addStakeSideRevenueUSD(rev);
+  }
+
+  /**
+   * Adds a given USD value to the pool and protocol's supplySideRevenue, protocolSideRevenue, and stakeSideRevenue.
+   * It can be a positive or negative amount.
    * Same as for the rest of setters, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param protocolSide {BigDecimal} The value to add to the protocol's protocolSideRevenue.
    * @param supplySide {BigDecimal} The value to add to the protocol's supplySideRevenue.
+   * @param stakeSide {BigDecimal} The value to add to the protocol's stakeSideRevenue.
    */
-  addRevenueUSD(protocolSide: BigDecimal, supplySide: BigDecimal): void {
+  addRevenueUSD(
+    protocolSide: BigDecimal,
+    supplySide: BigDecimal,
+    stakeSide: BigDecimal
+  ): void {
     this.addSupplySideRevenueUSD(supplySide);
     this.addProtocolSideRevenueUSD(protocolSide);
+    this.addStakeSideRevenueUSD(stakeSide);
   }
 
   addRevenueByToken(
     token: TokenSchema,
     protocolSide: BigInt,
-    supplySide: BigInt
+    supplySide: BigInt,
+    stakeSide: BigInt
   ): void {
-    const pAmountUSD = this.protocol.pricer.getAmountValueUSD(
+    const protocolAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
-      protocolSide
+      protocolSide,
+      this.protocol.event.block
     );
-    const sAmountUSD = this.protocol.pricer.getAmountValueUSD(
+    const supplyAmountUSD = this.protocol.pricer.getAmountValueUSD(
       token,
-      supplySide
+      supplySide,
+      this.protocol.event.block
+    );
+    const stakeAmountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      stakeSide,
+      this.protocol.event.block
     );
 
-    this.addRevenueUSD(pAmountUSD, sAmountUSD);
+    this.addRevenueUSD(protocolAmountUSD, supplyAmountUSD, stakeAmountUSD);
   }
 
   /**
@@ -414,12 +451,31 @@ export class Pool {
     this.protocol.addWithdrawPremiumUSD(premium);
   }
 
+  addUsdPremium(amountUSD: BigDecimal, transactionType: TransactionType): void {
+    if (transactionType == TransactionType.DEPOSIT) {
+      this.addDepositPremiumUSD(amountUSD);
+    }
+    if (transactionType == TransactionType.WITHDRAW) {
+      this.addWithdrawPremiumUSD(amountUSD);
+    }
+    if (transactionType == TransactionType.COLLATERAL_IN) {
+      this.addEntryPremiumUSD(amountUSD);
+    }
+    if (transactionType == TransactionType.COLLATERAL_OUT) {
+      this.addExitPremiumUSD(amountUSD);
+    }
+  }
+
   addPremiumByToken(
     token: TokenSchema,
     amount: BigInt,
     transactionType: TransactionType
   ): void {
-    const premiumUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+    const premiumUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
 
     if (transactionType == TransactionType.DEPOSIT) {
       this.addDepositPremiumUSD(premiumUSD);
@@ -436,34 +492,12 @@ export class Pool {
   }
 
   /**
-   * Adds a given USD value to the pool's long and total openInterestUSD.
+   * Set the new long and total openInterest amount in the pool
+   * And update the long and total openInterestUSD.
    *
-   * @param amountChangeUSD {BigDecimal} The value to add to the pool's openInterest in USD.
+   * @param amount {BigInt} The new longOpenInterest Amount
+   * @param price  {BigInt} The last token price
    */
-
-  updateLongOpenInterest(amountChange: BigInt, price: BigInt): void {
-    const longOpenInterest = this.pool.longOpenInterest.plus(amountChange);
-    const totalOpenInterest = this.pool.totalOpenInterest.plus(amountChange);
-
-    this.pool.totalOpenInterest = totalOpenInterest;
-    this.pool.longOpenInterest = longOpenInterest;
-
-    const longOpenInterestUSD = bigIntToBigDecimal(longOpenInterest).times(
-      bigIntToBigDecimal(price)
-    );
-    const totalOpenInterestUSD = bigIntToBigDecimal(totalOpenInterest).times(
-      bigIntToBigDecimal(price)
-    );
-    const amountChangeUSD = longOpenInterestUSD.minus(
-      this.pool.longOpenInterestUSD
-    );
-
-    this.pool.totalOpenInterestUSD = totalOpenInterestUSD;
-    this.pool.longOpenInterestUSD = longOpenInterestUSD;
-    this.save();
-    this.protocol.updateLongOpenInterestUSD(amountChangeUSD);
-  }
-
   setLongOpenInterest(amount: BigInt, price: BigInt): void {
     const longOpenInterest = amount;
     const totalOpenInterest = this.pool.totalOpenInterest.plus(
@@ -486,9 +520,40 @@ export class Pool {
     this.pool.totalOpenInterestUSD = totalOpenInterestUSD;
     this.pool.longOpenInterestUSD = longOpenInterestUSD;
     this.save();
-    this.protocol.updateLongOpenInterestUSD(amountChangeUSD);
+    this.protocol.updateLongOpenInterestUSD(amountChangeUSD, true);
   }
 
+  /**
+   * Adds a given USD value to the pool's long and total openInterestUSD.
+   *
+   * @param amountChangeUSD {BigDecimal} The value to add to the pool's openInterest in USD.
+   */
+  updateLongOpenInterestUSD(
+    amountChangeUSD: BigDecimal,
+    isIncrease: bool
+  ): void {
+    if (isIncrease) {
+      this.pool.totalOpenInterestUSD =
+        this.pool.totalOpenInterestUSD.plus(amountChangeUSD);
+      this.pool.longOpenInterestUSD =
+        this.pool.longOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      this.pool.totalOpenInterestUSD =
+        this.pool.totalOpenInterestUSD.minus(amountChangeUSD);
+      this.pool.longOpenInterestUSD =
+        this.pool.longOpenInterestUSD.minus(amountChangeUSD);
+    }
+    this.save();
+    this.protocol.updateLongOpenInterestUSD(amountChangeUSD, isIncrease);
+  }
+
+  /**
+   * Set the new short and total openInterest amount in the pool
+   * And update the short and total openInterestUSD.
+   *
+   * @param amount {BigInt} The new shortOpenInterest Amount
+   * @param price  {BigInt} The last token price
+   */
   setShortOpenInterest(amount: BigInt, price: BigInt): void {
     const shortOpenInterest = amount;
     const totalOpenInterest = this.pool.totalOpenInterest.plus(
@@ -510,38 +575,7 @@ export class Pool {
     this.pool.totalOpenInterestUSD = totalOpenInterestUSD;
     this.pool.shortOpenInterestUSD = shortOpenInterestUSD;
     this.save();
-    this.protocol.updateShortOpenInterestUSD(amountChangeUSD);
-  }
-
-  updateShortOpenInterest(amountChange: BigInt, price: BigInt): void {
-    const shortOpenInterest = this.pool.shortOpenInterest.plus(amountChange);
-    const totalOpenInterest = this.pool.totalOpenInterest.plus(amountChange);
-
-    this.pool.totalOpenInterest = totalOpenInterest;
-    this.pool.shortOpenInterest = shortOpenInterest;
-    const shortOpenInterestUSD = bigIntToBigDecimal(shortOpenInterest).times(
-      bigIntToBigDecimal(price)
-    );
-    const totalOpenInterestUSD = bigIntToBigDecimal(totalOpenInterest).times(
-      bigIntToBigDecimal(price)
-    );
-    const amountChangeUSD = shortOpenInterestUSD.minus(
-      this.pool.shortOpenInterestUSD
-    );
-
-    this.pool.totalOpenInterestUSD = totalOpenInterestUSD;
-    this.pool.shortOpenInterestUSD = shortOpenInterestUSD;
-    this.save();
-    this.protocol.updateShortOpenInterestUSD(amountChangeUSD);
-  }
-  updateLongOpenInterestUSD(amountChangeUSD: BigDecimal): void {
-    this.pool.totalOpenInterestUSD =
-      this.pool.totalOpenInterestUSD.plus(amountChangeUSD);
-    this.pool.longOpenInterestUSD =
-      this.pool.longOpenInterestUSD.plus(amountChangeUSD);
-
-    this.save();
-    this.protocol.updateLongOpenInterestUSD(amountChangeUSD);
+    this.protocol.updateShortOpenInterestUSD(amountChangeUSD, true);
   }
 
   /**
@@ -549,14 +583,23 @@ export class Pool {
    *
    * @param amountChangeUSD {BigDecimal} The value to add to the pool's openInterest in USD.
    */
-  updateShortOpenInterestUSD(amountChangeUSD: BigDecimal): void {
-    this.pool.totalOpenInterestUSD =
-      this.pool.totalOpenInterestUSD.plus(amountChangeUSD);
-    this.pool.shortOpenInterestUSD =
-      this.pool.shortOpenInterestUSD.plus(amountChangeUSD);
-
+  updateShortOpenInterestUSD(
+    amountChangeUSD: BigDecimal,
+    isIncrease: bool
+  ): void {
+    if (isIncrease) {
+      this.pool.totalOpenInterestUSD =
+        this.pool.totalOpenInterestUSD.plus(amountChangeUSD);
+      this.pool.shortOpenInterestUSD =
+        this.pool.shortOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      this.pool.totalOpenInterestUSD =
+        this.pool.totalOpenInterestUSD.minus(amountChangeUSD);
+      this.pool.shortOpenInterestUSD =
+        this.pool.shortOpenInterestUSD.minus(amountChangeUSD);
+    }
     this.save();
-    this.protocol.updateShortOpenInterestUSD(amountChangeUSD);
+    this.protocol.updateShortOpenInterestUSD(amountChangeUSD, isIncrease);
   }
 
   /**
@@ -629,9 +672,26 @@ export class Pool {
     if (!this.pool.outputToken) return;
 
     const token = this.tokens.getOrCreateTokenFromBytes(this.pool.outputToken!);
-    const price = this.protocol.pricer.getTokenPrice(token);
+    let price = this.protocol.pricer.getTokenPrice(
+      token,
+      this.protocol.event.block
+    );
+
+    if (
+      price.equals(constants.BIGDECIMAL_ZERO) &&
+      !this.pool.outputTokenSupply!.equals(constants.BIGINT_ZERO)
+    ) {
+      price = this.pool.totalValueLockedUSD.div(
+        this.pool
+          .outputTokenSupply!.toBigDecimal()
+          .div(constants.BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal())
+      );
+    }
 
     this.pool.outputTokenPriceUSD = price;
+    token.lastPriceUSD = price;
+    token.lastPriceBlockNumber = this.protocol.event.block.number;
+    token.save();
     this.save();
   }
 
@@ -664,8 +724,11 @@ export class Pool {
    * @returns The converted amount.
    */
   getInputTokenAmountPrice(token: TokenSchema, amount: BigInt): BigDecimal {
-    const price = this.protocol.getTokenPricer().getTokenPrice(token);
+    const price = this.protocol
+      .getTokenPricer()
+      .getTokenPrice(token, this.protocol.event.block);
     token.lastPriceUSD = price;
+    token.lastPriceBlockNumber = this.protocol.event.block.number;
     token.save();
 
     return amount.divDecimal(exponentToBigDecimal(token.decimals)).times(price);
@@ -688,9 +751,9 @@ export class Pool {
       );
 
       inputTokenWeights.push(
-        inputTokenTVL
-          .div(this.pool.totalValueLockedUSD)
-          .times(constants.BIGDECIMAL_HUNDRED)
+        safeDivide(inputTokenTVL, this.pool.totalValueLockedUSD).times(
+          constants.BIGDECIMAL_HUNDRED
+        )
       );
     }
 
@@ -722,13 +785,13 @@ export class Pool {
     if (amounts.length != this.pool.inputTokenBalances.length) {
       return;
     }
-
     const newBalances = addArrays<BigInt>(
       this.pool.inputTokenBalances,
       amounts
     );
     this.setInputTokenBalances(newBalances, updateMetrics);
   }
+
   /**
    * Sets the pool fundingRate.
    * @param fundingrate pool funding rate.
@@ -738,6 +801,89 @@ export class Pool {
     this.pool.save();
   }
 
+  setInputTokens(inputTokens: TokenSchema[]): void {
+    this.pool.inputTokens = inputTokens.map<Bytes>((token) => token.id);
+    this.pool.save();
+  }
+
+  setInputTokensById(inputTokenIds: Bytes[]): void {
+    this.pool.inputTokens = inputTokenIds;
+    this.pool.save();
+  }
+
+  tokenExists(token: TokenSchema): bool {
+    return this.pool.inputTokens.includes(token.id);
+  }
+
+  addInputToken(
+    token: TokenSchema,
+    newTokenBalance: BigInt = constants.BIGINT_ZERO
+  ): void {
+    const inputTokens = this.pool.inputTokens;
+    const inputTokenBalances = this.pool.inputTokenBalances;
+    const fundingrates = this.pool.fundingrate;
+    const cumulativeVolumeByTokenAmount =
+      this.pool.cumulativeVolumeByTokenAmount;
+    const cumulativeVolumeByTokenUSD = this.pool.cumulativeVolumeByTokenUSD;
+    const cumulativeInflowVolumeByTokenAmount =
+      this.pool.cumulativeInflowVolumeByTokenAmount;
+    const cumulativeInflowVolumeByTokenUSD =
+      this.pool.cumulativeInflowVolumeByTokenUSD;
+    const cumulativeClosedInflowVolumeByTokenAmount =
+      this.pool.cumulativeClosedInflowVolumeByTokenAmount;
+    const cumulativeClosedInflowVolumeByTokenUSD =
+      this.pool.cumulativeClosedInflowVolumeByTokenUSD;
+    const cumulativeOutflowVolumeByTokenAmount =
+      this.pool.cumulativeOutflowVolumeByTokenAmount;
+    const cumulativeOutflowVolumeByTokenUSD =
+      this.pool.cumulativeOutflowVolumeByTokenUSD;
+
+    inputTokens.push(token.id);
+    inputTokenBalances.push(newTokenBalance);
+    fundingrates.push(constants.BIGDECIMAL_ZERO);
+
+    cumulativeVolumeByTokenAmount.push(constants.BIGINT_ZERO);
+    cumulativeVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
+    cumulativeInflowVolumeByTokenAmount.push(constants.BIGINT_ZERO);
+    cumulativeInflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
+    cumulativeClosedInflowVolumeByTokenAmount.push(constants.BIGINT_ZERO);
+    cumulativeClosedInflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
+    cumulativeOutflowVolumeByTokenAmount.push(constants.BIGINT_ZERO);
+    cumulativeOutflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
+
+    poolArraySort(
+      inputTokens,
+      inputTokenBalances,
+      fundingrates,
+      cumulativeVolumeByTokenAmount,
+      cumulativeVolumeByTokenUSD,
+      cumulativeInflowVolumeByTokenAmount,
+      cumulativeInflowVolumeByTokenUSD,
+      cumulativeClosedInflowVolumeByTokenAmount,
+      cumulativeClosedInflowVolumeByTokenUSD,
+      cumulativeOutflowVolumeByTokenAmount,
+      cumulativeOutflowVolumeByTokenUSD
+    );
+
+    this.pool.inputTokens = inputTokens;
+    this.pool.fundingrate = fundingrates;
+    this.pool.cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
+    this.pool.cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
+    this.pool.cumulativeInflowVolumeByTokenAmount =
+      cumulativeInflowVolumeByTokenAmount;
+    this.pool.cumulativeInflowVolumeByTokenUSD =
+      cumulativeInflowVolumeByTokenUSD;
+    this.pool.cumulativeClosedInflowVolumeByTokenAmount =
+      cumulativeClosedInflowVolumeByTokenAmount;
+    this.pool.cumulativeClosedInflowVolumeByTokenUSD =
+      cumulativeClosedInflowVolumeByTokenUSD;
+    this.pool.cumulativeOutflowVolumeByTokenAmount =
+      cumulativeOutflowVolumeByTokenAmount;
+    this.pool.cumulativeOutflowVolumeByTokenUSD =
+      cumulativeOutflowVolumeByTokenUSD;
+    this.pool.save();
+    this.setInputTokenBalances(inputTokenBalances, true);
+  }
   /**
    * Sets the rewardTokenEmissions and its USD value for a given reward token.
    * It will also create the RewardToken entity and add it to the pool rewardTokens array
@@ -752,7 +898,11 @@ export class Pool {
     amount: BigInt
   ): void {
     const rToken = this.tokens.getOrCreateRewardToken(token, type);
-    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
     if (!this.pool.rewardTokens) {
       this.pool.rewardTokens = [rToken.id];
       this.pool.rewardTokenEmissionsAmount = [amount];
@@ -882,7 +1032,11 @@ export class Pool {
    * @param amount The amount of the token
    */
   addVolumeByToken(token: TokenSchema, amount: BigInt): void {
-    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
 
     const tokenIndex = this.pool.inputTokens.indexOf(token.id);
     if (tokenIndex == -1) return;
@@ -904,13 +1058,48 @@ export class Pool {
   }
 
   /**
+   * Adds the volume of a given input token by its amount and its USD value.
+   * It will also add the amount to the total volume of the pool and the protocol
+   * @param token The input token
+   * @param amount The amount of the token
+   */
+  addCumulativeVolumeByTokenAmount(token: TokenSchema, amount: BigInt): void {
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
+
+    const tokenIndex = this.pool.inputTokens.indexOf(token.id);
+    if (tokenIndex == -1) return;
+
+    const cumulativeVolumeByTokenAmount =
+      this.pool.cumulativeVolumeByTokenAmount;
+    const cumulativeVolumeByTokenUSD = this.pool.cumulativeVolumeByTokenUSD;
+
+    cumulativeVolumeByTokenAmount[tokenIndex] =
+      cumulativeVolumeByTokenAmount[tokenIndex].plus(amount);
+    cumulativeVolumeByTokenUSD[tokenIndex] =
+      cumulativeVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    this.pool.cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
+    this.pool.cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
+
+    this.save();
+  }
+
+  /**
    * Adds the inflow volume of a given input token by its amount and its USD value.
    * It will also add the amount to the total inflow volume of the pool and the protocol
    * @param token The input token
    * @param amount The amount of the token
    */
   addInflowVolumeByToken(token: TokenSchema, amount: BigInt): void {
-    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
 
     const tokenIndex = this.pool.inputTokens.indexOf(token.id);
     if (tokenIndex == -1) return;
@@ -941,7 +1130,11 @@ export class Pool {
    * @param amount The amount of the token
    */
   addOutflowVolumeByToken(token: TokenSchema, amount: BigInt): void {
-    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
 
     const tokenIndex = this.pool.inputTokens.indexOf(token.id);
     if (tokenIndex == -1) return;
@@ -972,7 +1165,11 @@ export class Pool {
    * @param amount The amount of the token
    */
   addClosedInflowVolumeByToken(token: TokenSchema, amount: BigInt): void {
-    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(
+      token,
+      amount,
+      this.protocol.event.block
+    );
 
     const tokenIndex = this.pool.inputTokens.indexOf(token.id);
     if (tokenIndex == -1) return;

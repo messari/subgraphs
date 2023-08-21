@@ -19,11 +19,12 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * This file contains the Perpetual class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 /**
@@ -203,7 +204,9 @@ export class Perpetual {
    * @param amount {BigDecimal} The value to add to the protocol's TVL.
    */
   addTotalValueLocked(amount: BigDecimal): void {
-    this.setTotalValueLocked(this.protocol.totalValueLockedUSD.plus(amount));
+    const tvl = this.protocol.totalValueLockedUSD.plus(amount);
+
+    this.setTotalValueLocked(tvl);
   }
 
   /**
@@ -369,12 +372,21 @@ export class Perpetual {
    *
    * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
    */
-  updateLongOpenInterestUSD(amountChangeUSD: BigDecimal): void {
-    this.protocol.totalOpenInterestUSD =
-      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
-    this.protocol.longOpenInterestUSD =
-      this.protocol.longOpenInterestUSD.plus(amountChangeUSD);
-
+  updateLongOpenInterestUSD(
+    amountChangeUSD: BigDecimal,
+    isIncrease: bool
+  ): void {
+    if (isIncrease) {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+      this.protocol.longOpenInterestUSD =
+        this.protocol.longOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.minus(amountChangeUSD);
+      this.protocol.longOpenInterestUSD =
+        this.protocol.longOpenInterestUSD.minus(amountChangeUSD);
+    }
     this.save();
   }
 
@@ -383,11 +395,21 @@ export class Perpetual {
    *
    * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
    */
-  updateShortOpenInterestUSD(amountChangeUSD: BigDecimal): void {
-    this.protocol.totalOpenInterestUSD =
-      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
-    this.protocol.shortOpenInterestUSD =
-      this.protocol.shortOpenInterestUSD.plus(amountChangeUSD);
+  updateShortOpenInterestUSD(
+    amountChangeUSD: BigDecimal,
+    isIncrease: bool
+  ): void {
+    if (isIncrease) {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+      this.protocol.shortOpenInterestUSD =
+        this.protocol.shortOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      this.protocol.totalOpenInterestUSD =
+        this.protocol.totalOpenInterestUSD.minus(amountChangeUSD);
+      this.protocol.shortOpenInterestUSD =
+        this.protocol.shortOpenInterestUSD.minus(amountChangeUSD);
+    }
 
     this.save();
   }

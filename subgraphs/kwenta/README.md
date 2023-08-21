@@ -1,28 +1,61 @@
-# Template Subgraph
+# Kwenta Subgraph
 
 ## Calculation Methodology v1.0.0
 
-### TODO
+### Total Value Locked (TVL)
 
-Explain how the main metrics are calculated for this subgraph.
+Sum of all the margin deposits
 
-See [Compound](../compound-forks/protocols/compound-v2/README.md) or [Uniswap](../uniswap-forks/protocols/uniswap-v2/README.md) for inspiration.
+> TVL of a Pool = ∑ value of all assets to be provided as collateral pool
 
-## Notes
+> TVL of the Protocol = ∑ TVL of of all the pools
 
-Any issues, discrepancies, unique logic to report.
+### Open Intereest
 
-## Links
+> Open Interest = ∑ value of open positions
 
-Links to the relevant sources to learn about this protocol.
+Calculated by fetching pool contract market size and skew data
 
-- Protocol: https://uniswap.org/
-- Analytics: https://v2.info.uniswap.org/
-- Docs: https://docs.uniswap.org/protocol/V2/introduction
-- Smart contracts: https://github.com/Uniswap/v2-core
-- Deployed addresses: https://docs.uniswap.org/protocol/V2/reference/smart-contracts/factory
-- Official subgraph: https://github.com/Uniswap/v2-subgraph
+> Long Open Interest = (marketSize + marketSkew) / 2
 
-## Contract Relationship Map (Optional)
+> Short Open Interest = (marketSize - marketSkew) / 2
 
-A map of relationships between contracts and interactions
+> Total Open Interest = Long + Short Open Interest
+
+### Volume
+
+- Volume: The total cumulative value of all the trades executed
+
+- Inflow Volume: The total cumulative value of margin deposited
+- Outflow Volume: The total cumulative value of margin withdrawn
+
+### Revenue/Fees
+
+The protocol take two fees - Keeper Fees and Maker/Takes Fees
+
+- Keeper Fees: A dynamic fees to execute the trade
+- Maker/Taker Fees: Normal Maker/Taker fees they vary depending on the market
+
+Protocol Side Revenue = Zero
+
+Supply-Side Revenue = Total Fees (currently Kwenta don't charge any fees)
+
+Total Revenue = Total Fees
+
+### Unique Users
+
+**Count of Unique Addresses which have interacted with the protocol via any transaction:**
+
+- Margin deposits and withdrawals
+
+- Position Modified - new, updated or closed
+
+- Liquidations
+
+## References and Useful Links
+
+- Other existing subgraph: https://thegraph.com/hosted-service/subgraph/kwenta/optimism-main
+
+- Other official and unofficial data sources: https://kwenta.eth.limo/stats/, https://tokenterminal.com/terminal/projects/kwenta
+
+- Documentation: https://docs.kwenta.io/

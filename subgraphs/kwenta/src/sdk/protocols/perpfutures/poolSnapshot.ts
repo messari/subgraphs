@@ -15,11 +15,12 @@ import {
  * This file contains the PoolSnapshot, which is used to
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * Schema Version:  1.3.3
+ * SDK Version:     1.1.6
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
+ *  - @dmelotik
  */
 
 export class PoolSnapshot {
@@ -65,10 +66,10 @@ export class PoolSnapshot {
   }
 
   private isInitialized(): boolean {
-    // log.error(
-    //   "[isInitialized] cannot create snapshots, pool: {} not initialized",
-    //   [this.pool.id.toHexString()]
-    // );
+    log.error(
+      "[isInitialized] cannot create snapshots, pool: {} not initialized",
+      [this.pool.id.toHexString()]
+    );
 
     return this.pool._lastSnapshotDayID &&
       this.pool._lastSnapshotHourID &&
@@ -89,6 +90,7 @@ export class PoolSnapshot {
     snapshot.hours = hour;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
 
@@ -107,6 +109,14 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeProtocolSideRevenueUSD
         )
       : snapshot.cumulativeProtocolSideRevenueUSD;
+
+    snapshot.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD;
+    snapshot.hourlyStakeSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : snapshot.cumulativeStakeSideRevenueUSD;
 
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     snapshot.hourlyTotalRevenueUSD = previousSnapshot
@@ -264,6 +274,7 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeOutflowVolumeUSD;
 
+    snapshot.inputTokens = this.pool.inputTokens;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
     snapshot.outputTokenSupply = this.pool.outputTokenSupply;
@@ -272,12 +283,6 @@ export class PoolSnapshot {
     snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
 
-    snapshot.marketSize = this.pool.marketSize;
-    snapshot.marketSkew = this.pool.marketSkew;
-
-    snapshot.longOpenInterest = this.pool.longOpenInterest;
-    snapshot.shortOpenInterest = this.pool.shortOpenInterest;
-    snapshot.totalOpenInterest = this.pool.totalOpenInterest;
     snapshot.save();
   }
 
@@ -292,6 +297,7 @@ export class PoolSnapshot {
     snapshot.days = day;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
+    snapshot.timestamp = this.event.block.timestamp;
 
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
 
@@ -310,6 +316,14 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeProtocolSideRevenueUSD
         )
       : snapshot.cumulativeProtocolSideRevenueUSD;
+
+    snapshot.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD;
+    snapshot.dailyStakeSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : snapshot.cumulativeStakeSideRevenueUSD;
 
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     snapshot.dailyTotalRevenueUSD = previousSnapshot
@@ -470,35 +484,22 @@ export class PoolSnapshot {
     snapshot.cumulativeUniqueUsers = this.pool.cumulativeUniqueUsers;
 
     const dailyActivityHelper = initActivityHelper(
-      Bytes.fromUTF8("daily-".concat(this.dayID.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.DAILY.concat("-").concat(day.toString())
+      )
     );
     snapshot.dailyActiveUsers = dailyActivityHelper.activeUsers;
+    snapshot.dailyActiveDepositors = dailyActivityHelper.activeDepositors;
+    snapshot.dailyActiveBorrowers = dailyActivityHelper.activeBorrowers;
+    snapshot.dailyActiveLiquidators = dailyActivityHelper.activeLiquidators;
+    snapshot.dailyActiveLiquidatees = dailyActivityHelper.activeLiquidatees;
 
     snapshot.cumulativeUniqueDepositors = this.pool.cumulativeUniqueDepositors;
-    snapshot.dailyActiveDepositors = previousSnapshot
-      ? snapshot.cumulativeUniqueDepositors -
-        previousSnapshot.cumulativeUniqueDepositors
-      : snapshot.cumulativeUniqueDepositors;
-
     snapshot.cumulativeUniqueBorrowers = this.pool.cumulativeUniqueBorrowers;
-    snapshot.dailyActiveBorrowers = previousSnapshot
-      ? snapshot.cumulativeUniqueBorrowers -
-        previousSnapshot.cumulativeUniqueBorrowers
-      : snapshot.cumulativeUniqueBorrowers;
-
     snapshot.cumulativeUniqueLiquidators =
       this.pool.cumulativeUniqueLiquidators;
-    snapshot.dailyActiveLiquidators = previousSnapshot
-      ? snapshot.cumulativeUniqueLiquidators -
-        previousSnapshot.cumulativeUniqueLiquidators
-      : snapshot.cumulativeUniqueLiquidators;
-
     snapshot.cumulativeUniqueLiquidatees =
       this.pool.cumulativeUniqueLiquidatees;
-    snapshot.dailyActiveLiquidatees = previousSnapshot
-      ? snapshot.cumulativeUniqueLiquidatees -
-        previousSnapshot.cumulativeUniqueLiquidatees
-      : snapshot.cumulativeUniqueLiquidatees;
 
     snapshot.longPositionCount = this.pool.longPositionCount;
     snapshot.dailyLongPositionCount = previousSnapshot
@@ -529,6 +530,7 @@ export class PoolSnapshot {
         previousSnapshot.cumulativePositionCount
       : snapshot.cumulativePositionCount;
 
+    snapshot.inputTokens = this.pool.inputTokens;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
     snapshot.outputTokenSupply = this.pool.outputTokenSupply;
@@ -536,11 +538,7 @@ export class PoolSnapshot {
     snapshot.stakedOutputTokenAmount = this.pool.stakedOutputTokenAmount;
     snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
-    snapshot.marketSize = this.pool.marketSize;
-    snapshot.marketSkew = this.pool.marketSkew;
-    snapshot.longOpenInterest = this.pool.longOpenInterest;
-    snapshot.shortOpenInterest = this.pool.shortOpenInterest;
-    snapshot.totalOpenInterest = this.pool.totalOpenInterest;
+
     snapshot.save();
   }
 }

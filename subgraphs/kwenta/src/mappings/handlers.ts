@@ -12,32 +12,25 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   dataSource,
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
-import {
-  bigDecimalToBigInt,
-  bigIntToBigDecimal,
-  safeDivide,
-} from "../sdk/util/numbers";
+import { bigIntToBigDecimal } from "../sdk/util/numbers";
 
 import {
   TokenInitializer,
   TokenParams,
 } from "../sdk/protocols/perpfutures/tokens";
 import {
-  BIGDECIMAL_MINUS_ONE,
   BIGINT_MINUS_ONE,
-  LiquidityPoolFeeType,
   PositionSide,
+  BIGINT_ZERO,
+  BIGINT_TEN_TO_EIGHTEENTH,
+  LiquidityPoolFeeType,
 } from "../sdk/util/constants";
-import {
-  MarketAdded as MarketAddedEvent,
-  MarketRemoved,
-} from "../../generated/FuturesMarketManager2/FuturesMarketManager";
+import { MarketAdded as MarketAddedEvent } from "../../generated/FuturesMarketManager2/FuturesMarketManager";
 import {
   FundingRecomputed as FundingRecomputedEvent,
   MarginTransferred as MarginTransferredEvent,
@@ -51,17 +44,20 @@ import {
 } from "../../generated/templates/PerpsV2Market/PerpsV2MarketProxyable";
 import { FuturesV1Market, PerpsV2Market } from "../../generated/templates";
 import { createTokenAmountArray, getFundingRateId } from "./helpers";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { NewAccount as NewSmartMarginAccountEvent } from "../../generated/SmartMarginFactory1/SmartMarginFactory";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 
 class Pricer implements TokenPricer {
-  getTokenPrice(token: Token): BigDecimal {
+  getTokenPrice(token: Token, block: ethereum.Block): BigDecimal {
     const price = getUsdPricePerToken(Address.fromBytes(token.id));
     return price.usdPrice;
   }
 
-  getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
+  getAmountValueUSD(
+    token: Token,
+    amount: BigInt,
+    block: ethereum.Block
+  ): BigDecimal {
     const _amount = bigIntToBigDecimal(amount, token.decimals);
     return getUsdPrice(Address.fromBytes(token.id), _amount);
   }
@@ -112,8 +108,8 @@ export function handleV1MarketAdded(event: MarketAddedEvent): void {
         NetworkConfigs.getSUSDAddress()
       );
       pool.initialize(marketKey, marketKey, [token], null, "chainlink");
-      // todo: fees
     }
+
     // futures v1 market
     FuturesV1Market.create(event.params.market);
   }
@@ -142,7 +138,9 @@ export function handleV2MarketAdded(event: MarketAddedEvent): void {
         NetworkConfigs.getSUSDAddress()
       );
       pool.initialize(marketKey, marketKey, [token], null, "chainlink");
-      // todo: fees
+
+      // keeper dynamic fees
+      pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_LP_FEE, null);
     }
 
     // perps v2 market
@@ -302,8 +300,6 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
       true
     );
 
-    // fetching market size for testing
-
     const position = positionResponse.position;
     const newPositionSize = event.params.size;
     const oldPositionSize = position.getSize();
@@ -330,7 +326,7 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
       fundingAccrued = currentFunding.funding
         .minus(previousFunding.funding)
         .times(oldPositionSize)
-        .div(BigInt.fromI32(10).pow(18));
+        .div(BIGINT_TEN_TO_EIGHTEENTH);
     }
 
     // position closed
@@ -338,7 +334,7 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
       const pnl = event.params.lastPrice
         .minus(oldPositionPrice)
         .times(oldPositionSize)
-        .div(BigInt.fromI32(10).pow(18))
+        .div(BIGINT_TEN_TO_EIGHTEENTH)
         .plus(fundingAccrued)
         .minus(fees);
 
@@ -363,12 +359,12 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
     }
     const volume = event.params.lastPrice
       .times(newPositionSize)
-      .div(BigInt.fromI32(10).pow(18))
+      .div(BIGINT_TEN_TO_EIGHTEENTH)
       .abs();
     pool.addVolumeByToken(token, volume);
   }
   updateOpenInterest(marketAddress, pool, event.params.lastPrice);
-  pool.addRevenueByToken(token, BIGINT_ZERO, fees);
+  pool.addRevenueByToken(token, BIGINT_ZERO, fees, BIGINT_ZERO);
 }
 
 /*

@@ -126,6 +126,11 @@ export namespace RewardTokenType {
 }
 export type RewardTokenType = string;
 
+export namespace ActivityInterval {
+  export const HOURLY = "HOURLY";
+  export const DAILY = "DAILY";
+}
+
 export namespace LendingType {
   export const CDP = "CDP";
   export const POOLED = "POOLED";
@@ -178,6 +183,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);

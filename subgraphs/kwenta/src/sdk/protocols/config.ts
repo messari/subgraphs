@@ -1,5 +1,5 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Versions } from "../../../../../deployment/context/interface";
 
 export interface ProtocolConfigurer {
@@ -40,6 +40,10 @@ export class ProtocolConfig implements ProtocolConfigurer {
 }
 
 export interface TokenPricer {
-  getTokenPrice(token: Token): BigDecimal;
-  getAmountValueUSD(token: Token, amount: BigInt): BigDecimal;
+  getTokenPrice(token: Token, block: ethereum.Block): BigDecimal;
+  getAmountValueUSD(
+    token: Token,
+    amount: BigInt,
+    block: ethereum.Block
+  ): BigDecimal;
 }

@@ -1,10 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 
 import { Configurations } from "../../../../../configurations/configurations/interface";
-import {
-  PROTOCOL_NAME,
-  PROTOCOL_SLUG,
-} from "../../../../../src/common/constants";
+
 import { Network } from "../../../../../src/sdk/util/constants";
 
 export class KwentaOptimismConfigurations implements Configurations {
@@ -12,10 +9,10 @@ export class KwentaOptimismConfigurations implements Configurations {
     return Network.OPTIMISM;
   }
   getProtocolName(): string {
-    return PROTOCOL_NAME;
+    return "Kwenta";
   }
   getProtocolSlug(): string {
-    return PROTOCOL_SLUG;
+    return "kwenta";
   }
   getFactoryAddress(): Address {
     return Address.fromString("0x920cf626a271321c151d027030d5d08af699456b");
