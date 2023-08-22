@@ -1,0 +1,34 @@
+{
+  "network": "bsc",
+  "protocolName": "Level Finance",
+  "protocolSlug": "level",
+  "protocolId": "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874",
+  "poolName": "LevelVault",
+  "poolSymbol": "Vault",
+  "protocolSideRevenuePercent": "0.35",
+  "stakeSideRevenuePercent": "0.2",
+  "supplySideRevenue": "0.45",
+  "priceCachingBlocks": 0,
+  "outputTokenAddress": "0xb5c42f84ab3f786bca9761240546aa9cec1f8821",
+  "VaultAddr": "0xa5abfb56a78d2bd4689b25b8a77fd49bb0675874",
+  "seniorLLpAddress": "0xb5c42f84ab3f786bca9761240546aa9cec1f8821",
+  "levelTokenAddress": "0xb64e280e9d1b5dbec4accedb2257a87b400db149",
+  "VaultStartBlock": 23752485,
+  "deployment": "LEVEL_BSC",
+  "levelStakeAddress": "0x08a12ffedf49fa5f149c73b07e31f99249e40869",
+  "levelStakeStartBlock": 26374411,
+  "isStaking": true,
+  "isCollateralInUSD": false,
+  "levelMastersAddresses": [
+    {
+      "name": "LevelMasterV2",
+      "address": "0x5ae081b6647aef897dec738642089d4bda93c0e7",
+      "startBlock": 24658693
+    },
+    {
+      "name": "LevelMasterV1",
+      "address": "0x1ab33a7454427814a71f128109fe5b498aa21e5d",
+      "startBlock": 24658693
+    }
+  ]
+}

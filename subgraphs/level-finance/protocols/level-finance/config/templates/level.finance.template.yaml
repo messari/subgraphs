@@ -1,0 +1,231 @@
+specVersion: 0.0.5
+
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Pool
+    network: {{network}}
+    source:
+      abi: Pool
+      address: "{{VaultAddr}}"
+      startBlock: {{VaultStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities:
+        - Token
+        - User
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: LpToken
+          file: ./abis/LpToken.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: Staking
+          file: ./abis/Staking.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: IncreasePosition(bytes32,address,address,address,uint256,uint256,uint8,uint256,uint256)
+          handler: handlePositionIncreased
+        - event: IncreasePosition(indexed bytes32,address,address,address,uint256,uint256,uint8,uint256,uint256)
+          handler: handlePositionIncreased
+        - event: DecreasePosition(bytes32,address,address,address,uint256,uint256,uint8,uint256,(uint256,uint256),uint256)
+          handler: handlePositionDecreased
+        - event: DecreasePosition(indexed bytes32,address,address,address,uint256,uint256,uint8,uint256,(uint256,uint256),uint256)
+          handler: handlePositionDecreased
+        - event: DecreasePosition(indexed bytes32,address,address,address,uint256,uint256,uint8,uint256,int256,uint256)
+          handler: handlePositionDecreasedWithoutSignedPnl
+        - event: LiquidatePosition(bytes32,address,address,address,uint8,uint256,uint256,uint256,uint256,(uint256,uint256),uint256)
+          handler: handlePositionLiquidated
+        - event: LiquidatePosition(indexed bytes32,address,address,address,uint8,uint256,uint256,uint256,uint256,(uint256,uint256),uint256)
+          handler: handlePositionLiquidated
+        - event: LiquidatePosition(indexed bytes32,address,address,address,uint8,uint256,uint256,uint256,uint256,int256,uint256)
+          handler: handlePositionLiquidatedWithoutSignedPnl
+        - event: LiquidityAdded(indexed address,indexed address,address,uint256,uint256,uint256)
+          handler: handleLiquidityAdded
+        - event: LiquidityRemoved(indexed address,indexed address,address,uint256,uint256,uint256)
+          handler: handleLiquidityRemoved
+        - event: Swap(address,address,address,uint256,uint256,uint256)
+          handler: handleSwap
+        - event: Swap(indexed address,address,address,uint256,uint256,uint256)
+          handler: handleSwap
+        - event: Swap(indexed address,address,address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSwapWithPrices
+        - event: TokenDelisted(indexed address)
+          handler: handleTokenDelisted
+        - event: TokenWhitelisted(address)
+          handler: handleTokenWhitelisted
+        - event: TokenWhitelisted(indexed address)
+          handler: handleTokenWhitelisted
+{{#isStaking}}
+  - kind: ethereum
+    name: LevelStake
+    source:
+      abi: Staking
+      address: "{{levelStakeAddress}}"
+      startBlock: {{levelStakeStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/staking.ts
+      entities:
+        - LevelDistribution
+      abis:
+        - name: Staking
+          file: ./abis/Staking.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Staked(indexed address,indexed address,uint256)
+          handler: handleStaked
+        - event: Unstaked(indexed address,indexed address,uint256)
+          handler: handleUnstaked
+        - event: RewardsPerSecondSet(uint256)
+          handler: handleRewardPerSecondSet
+    network: {{network}}
+{{/isStaking}}
+{{#levelMastersAddresses}}
+  - kind: ethereum
+    name: {{name}}
+    source:
+      abi: LevelMaster
+      address: "{{address}}"
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/chef.ts
+      entities:
+        - LevelDistribution
+        - ChefConfig
+      abis:
+        - name: LevelMaster
+          file: ./abis/LevelMaster.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleEmergencyWithdraw
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleLogPoolAddition
+    network: {{network}}
+{{/levelMastersAddresses}}
+
