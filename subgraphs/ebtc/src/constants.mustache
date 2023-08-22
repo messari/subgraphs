@@ -1,0 +1,86 @@
+import { BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_HUNDRED,
+  CollateralizationType,
+  LendingType,
+  Network,
+  PermissionType,
+  RiskType,
+} from "./sdk/util/constants";
+import { DataManager, ProtocolData } from "./sdk/manager";
+
+/////////////////////////////
+///// Protocol Specific /////
+/////////////////////////////
+
+export const BTC_ADDRESS = Bytes.fromHexString(
+  "0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05"
+  // TODO: since chainlink does not have a registry on goerli, we get the wbtc
+  // price from uniswap instead. however, for mainnet we have to get the
+  // native btc price from the chainlink registry!
+  //"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+);
+export const ETH_ADDRESS = Bytes.fromHexString(
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+);
+export const EBTC_ADDRESS = Bytes.fromHexString(
+  "{{ eBTCToken.address }}"
+);
+export const STETH_ADDRESS = Bytes.fromHexString(
+  "{{ stethToken.address }}"
+);
+export const CDP_MANAGER = Bytes.fromHexString(
+  "{{ cdpManager.address }}"
+);
+export const ACTIVE_POOL = Bytes.fromHexString(
+  "{{ activePool.address }}"
+);
+export const PRICE_FEED = Bytes.fromHexString(
+  "{{ priceFeed.address }}"
+);
+
+export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
+export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO).times(
+  BIGDECIMAL_HUNDRED
+);
+export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
+export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
+
+///////
+
+export const PROTOCOL = "BadgerDAO";
+export const PROTOCOL_NAME = "eBTC Protocol";
+export const PROTOCOL_SLUG = "ebtc";
+export const PROTOCOL_NETWORK = {{ network.object }};
+export const LENDING_TYPE = LendingType.CDP;
+export const LENDER_PERMISSION_TYPE = PermissionType.PERMISSIONLESS;
+export const BORROWER_PERMISSION_TYPE = PermissionType.PERMISSIONLESS;
+export const POOL_CREATOR_PERMISSION_TYPE = PermissionType.ADMIN; // N/A really; one pool only
+export const COLATERALIZATION_TYPE = CollateralizationType.OVER_COLLATERALIZED;
+export const RISK_TYPE = RiskType.ISOLATED;
+
+export function getProtocolData(): ProtocolData {
+  return new ProtocolData(
+    ACTIVE_POOL,
+    PROTOCOL,
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG,
+    PROTOCOL_NETWORK,
+    LENDING_TYPE,
+    LENDER_PERMISSION_TYPE,
+    BORROWER_PERMISSION_TYPE,
+    POOL_CREATOR_PERMISSION_TYPE,
+    COLATERALIZATION_TYPE,
+    RISK_TYPE
+  );
+}
+
+export function getDataManager(event: ethereum.Event): DataManager {
+  return new DataManager(
+    ACTIVE_POOL, // marketID: Bytes
+    STETH_ADDRESS, // inputToken: Bytes
+    event, // event: ethereum.Event
+    getProtocolData() // protocolData: ProtocolData
+  );
+}

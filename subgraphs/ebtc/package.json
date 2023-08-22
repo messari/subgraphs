@@ -1,0 +1,6 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json src/constants.mustache > src/constants.ts"
+  }
+}
