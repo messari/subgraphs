@@ -4976,7 +4976,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.2",
-          "subgraph": "1.5.1",
+          "subgraph": "1.5.2",
           "methodology": "1.0.0"
         },
         "files": {
