@@ -11,7 +11,7 @@ import { INT_ONE, INT_ZERO } from "./constants";
  *  - Making position snapshots
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan

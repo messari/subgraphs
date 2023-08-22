@@ -52,7 +52,7 @@ import { PositionManager } from "./position";
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan

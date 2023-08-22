@@ -7,7 +7,7 @@ import {
   BIGDECIMAL_ZERO,
   INT_EIGHTTEEN,
   INT_NINE,
-  INT_SIX,
+  INT_ZERO,
   INT_SIXTEEN,
 } from "./constants";
 
@@ -17,7 +17,7 @@ import {
  * use in mappings and get info about the token.
  *
  * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan
@@ -197,7 +197,8 @@ export class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    const staticDefinitions = new Array<StaticTokenDefinition>(INT_SIX);
+    // https://thegraph.com/docs/en/release-notes/assemblyscript-migration-guide/#array-initialization
+    const staticDefinitions = new Array<StaticTokenDefinition>(INT_ZERO);
 
     // Add DGD
     const tokenDGD = new StaticTokenDefinition(
@@ -259,12 +260,11 @@ export class StaticTokenDefinition {
   // Helper for hardcoded tokens
   static fromAddress(tokenAddress: Address): StaticTokenDefinition | null {
     const staticDefinitions = this.getStaticDefinitions();
-    const tokenAddressHex = tokenAddress.toHexString();
 
     // Search the definition using the address
     for (let i = 0; i < staticDefinitions.length; i++) {
       const staticDefinition = staticDefinitions[i];
-      if (staticDefinition.address.toHexString() == tokenAddressHex) {
+      if (staticDefinition.address == tokenAddress) {
         return staticDefinition;
       }
     }

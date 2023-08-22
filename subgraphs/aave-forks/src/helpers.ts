@@ -239,55 +239,59 @@ export function getInterestRateType(
 
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.lt(logIndexMinus5)) {
-      // skip event with logIndex < LogIndexMinus5
-      continue;
-    }
-    if (thisLog.logIndex.equals(logIndexMinus3)) {
-      // break if the logIndex = event.logIndex - 3
-      break;
-    }
+    if (thisLog.topics.length >= INT_THREE) {
+      if (thisLog.logIndex.lt(logIndexMinus5)) {
+        // skip event with logIndex < LogIndexMinus5
+        continue;
+      }
+      if (thisLog.logIndex.equals(logIndexMinus3)) {
+        // break if the logIndex = event.logIndex - 3
+        break;
+      }
 
-    // topics[0] - signature
-    const ADDRESS = "address";
-    const logSignature = thisLog.topics[0];
+      // topics[0] - signature
+      const ADDRESS = "address";
+      const logSignature = thisLog.topics[0];
 
-    if (logSignature.equals(eventSignature)) {
-      const from = ethereum.decode(ADDRESS, thisLog.topics.at(1))!.toAddress();
-      const to = ethereum.decode(ADDRESS, thisLog.topics.at(2))!.toAddress();
+      if (logSignature.equals(eventSignature)) {
+        const from = ethereum
+          .decode(ADDRESS, thisLog.topics.at(1))!
+          .toAddress();
+        const to = ethereum.decode(ADDRESS, thisLog.topics.at(2))!.toAddress();
 
-      if (from.equals(Address.zero()) || to.equals(Address.zero())) {
-        // this is a burn or mint event
-        const tokenAddress = thisLog.address;
-        const token = Token.load(tokenAddress);
-        if (!token) {
-          log.error("[getInterestRateType]token {} not found tx {}-{}", [
-            tokenAddress.toHexString(),
-            event.transaction.hash.toHexString(),
-            event.transactionLogIndex.toString(),
-          ]);
-          return null;
-        }
+        if (from.equals(Address.zero()) || to.equals(Address.zero())) {
+          // this is a burn or mint event
+          const tokenAddress = thisLog.address;
+          const token = Token.load(tokenAddress);
+          if (!token) {
+            log.error("[getInterestRateType]token {} not found tx {}-{}", [
+              tokenAddress.toHexString(),
+              event.transaction.hash.toHexString(),
+              event.transactionLogIndex.toString(),
+            ]);
+            return null;
+          }
 
-        if (token._iavsTokenType == IavsTokenType.STOKEN) {
-          return InterestRateType.STABLE;
-        }
-        if (token._iavsTokenType == IavsTokenType.VTOKEN) {
-          return InterestRateType.VARIABLE;
+          if (token._iavsTokenType == IavsTokenType.STOKEN) {
+            return InterestRateType.STABLE;
+          }
+          if (token._iavsTokenType == IavsTokenType.VTOKEN) {
+            return InterestRateType.VARIABLE;
+          }
         }
       }
-    }
 
-    log.info(
-      "[getInterestRateType]event at logIndex {} signature {} not match the exepected Transfer signature {}. tx {}-{} ",
-      [
-        thisLog.logIndex.toString(),
-        logSignature.toHexString(),
-        eventSignature.toHexString(),
-        event.transaction.hash.toHexString(),
-        event.transactionLogIndex.toString(),
-      ]
-    );
+      log.info(
+        "[getInterestRateType]event at logIndex {} signature {} not match the exepected Transfer signature {}. tx {}-{} ",
+        [
+          thisLog.logIndex.toString(),
+          logSignature.toHexString(),
+          eventSignature.toHexString(),
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString(),
+        ]
+      );
+    }
   }
   return null;
 }
@@ -306,44 +310,49 @@ export function getFlashloanPremiumAmount(
   const ReserveDateUpdatedEventLogIndex = event.logIndex;
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.le(ReserveDateUpdatedEventLogIndex)) {
-      // skip log before ReserveDataUpdated
-      continue;
-    }
-    //FlashLoan Event equals ReserveDateUpdatedEventLogIndex + 2 or 3 (there may be an Approval event)
-    if (
-      thisLog.logIndex.gt(ReserveDateUpdatedEventLogIndex.plus(BIGINT_THREE))
-    ) {
-      // skip if no matched FlashLoan event at ReserveDateUpdatedEventLogIndex+3
-      break;
-    }
-
-    // topics[0] - signature
-    const ADDRESS = "address";
-    const DATA_TYPE_TUPLE = "(address,uint256,uint8,uint256)";
-    const logSignature = thisLog.topics[0];
-    if (thisLog.address == event.address && logSignature == eventSignature) {
-      log.info(
-        "[getFlashloanPremiumAmount]tx={}-{} thisLog.logIndex={} thisLog.topics=(1:{},2:{}),thisLog.data={}",
-        [
-          event.transaction.hash.toHexString(),
-          event.logIndex.toString(),
-          thisLog.logIndex.toString(),
-          thisLog.topics.at(1).toHexString(),
-          thisLog.topics.at(2).toHexString(),
-          thisLog.data.toHexString(),
-        ]
-      );
-      const flashLoanAssetAddress = ethereum
-        .decode(ADDRESS, thisLog.topics.at(2))!
-        .toAddress();
-      if (flashLoanAssetAddress.notEqual(assetAddress)) {
-        //
+    if (thisLog.topics.length >= INT_THREE) {
+      if (thisLog.logIndex.le(ReserveDateUpdatedEventLogIndex)) {
+        // skip log before ReserveDataUpdated
         continue;
       }
-      const decoded = ethereum.decode(DATA_TYPE_TUPLE, thisLog.data)!.toTuple();
-      flashloanPremiumAmount = decoded[3].toBigInt();
-      break;
+      //FlashLoan Event equals ReserveDateUpdatedEventLogIndex + 2 or 3 (there may be an Approval event)
+      if (
+        thisLog.logIndex.gt(ReserveDateUpdatedEventLogIndex.plus(BIGINT_THREE))
+      ) {
+        // skip if no matched FlashLoan event at ReserveDateUpdatedEventLogIndex+3
+        break;
+      }
+
+      // topics[0] - signature
+      const ADDRESS = "address";
+      const DATA_TYPE_TUPLE = "(address,uint256,uint8,uint256)";
+      const logSignature = thisLog.topics[0];
+      if (thisLog.address == event.address && logSignature == eventSignature) {
+        log.info(
+          "[getFlashloanPremiumAmount]tx={}-{} thisLog.logIndex={} thisLog.topics=(1:{},2:{}),thisLog.data={}",
+          [
+            event.transaction.hash.toHexString(),
+            event.logIndex.toString(),
+            thisLog.logIndex.toString(),
+            thisLog.topics.at(1).toHexString(),
+            thisLog.topics.at(2).toHexString(),
+            thisLog.data.toHexString(),
+          ]
+        );
+        const flashLoanAssetAddress = ethereum
+          .decode(ADDRESS, thisLog.topics.at(2))!
+          .toAddress();
+        if (flashLoanAssetAddress.notEqual(assetAddress)) {
+          //
+          continue;
+        }
+        const decoded = ethereum.decode(DATA_TYPE_TUPLE, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        flashloanPremiumAmount = logData[3].toBigInt();
+        break;
+      }
     }
   }
   return flashloanPremiumAmount;
