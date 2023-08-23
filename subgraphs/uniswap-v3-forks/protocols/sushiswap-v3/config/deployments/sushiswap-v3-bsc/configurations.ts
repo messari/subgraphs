@@ -89,4 +89,7 @@ export class SushiswapV3BscConfigurations implements Configurations {
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("1000");
   }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList([]);
+  }
 }

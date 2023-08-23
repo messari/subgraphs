@@ -276,23 +276,24 @@ export function getOrCreateToken(
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
-    const erc20Contract = ERC20.bind(Address.fromString(address));
-    const decimals = erc20Contract.try_decimals();
-    // Using try_cause some values might be missing
-    const name = erc20Contract.try_name();
-    const symbol = erc20Contract.try_symbol();
-    // TODO: add overrides for name and symbol
-    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
-    if (NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
-      token.name = "";
-      token.symbol = "";
-      token.decimals = DEFAULT_DECIMALS;
-      token.save();
+    let name = "";
+    let symbol = "";
+    let decimals = DEFAULT_DECIMALS;
 
-      return token as Token;
+    if (!NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
+      const erc20Contract = ERC20.bind(Address.fromString(address));
+      // TODO: add overrides for name and symbol
+      const nameCall = erc20Contract.try_name();
+      if (!nameCall.reverted) name = nameCall.value;
+      const symbolCall = erc20Contract.try_symbol();
+      if (!symbolCall.reverted) symbol = symbolCall.value;
+      const decimalsCall = erc20Contract.try_decimals();
+      if (!decimalsCall.reverted) decimals = decimalsCall.value;
     }
+
+    token.name = name;
+    token.symbol = symbol;
+    token.decimals = decimals;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token._totalSupply = BIGINT_ZERO;

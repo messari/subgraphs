@@ -6,4 +6,5 @@ export interface Configurations {
   getProtocolSlug(): string;
   getFactoryAddress(): Bytes;
   getUntrackedPairs(): Bytes[];
+  getBrokenERC20Tokens(): Bytes[];
 }
