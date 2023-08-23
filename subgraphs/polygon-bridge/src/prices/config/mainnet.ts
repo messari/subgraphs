@@ -99,14 +99,14 @@ export const HARDCODED_STABLES: Address[] = [
 
 export const IGNORELIST: Address[] = [
   Address.fromString("0xea6b6a4b813d1436a75883fcc789121e4b3f0465"),
-  Address.fromString("0x761D38e5ddf6ccf6Cf7c55759d5210750B5D60F3"),
+  Address.fromString("0x761d38e5ddf6ccf6cf7c55759d5210750b5d60f3"),
   Address.fromString("0xfad45e47083e4607302aa43c65fb3106f1cd7607"),
   Address.fromString("0x9d3ee6b64e69ebe12a4bf0b01d031cb80f556ee4"),
   Address.fromString("0x922ac473a3cc241fd3a0049ed14536452d58d73c"),
-  Address.fromString("0xCae72A7A0Fd9046cf6b165CA54c9e3a3872109E0"),
+  Address.fromString("0xcae72a7a0fd9046cf6b165ca54c9e3a3872109e0"),
   Address.fromString("0x9695e0114e12c0d3a3636fab5a18e6b737529023"),
   Address.fromString("0xcc4ae94372da236e9b113132e0c46c68704246b9"),
-  Address.fromString("0x676CdC3312d0350749bed17CD3eB3B90E5917F42"),
+  Address.fromString("0x676cdc3312d0350749bed17cd3eb3b90e5917f42"),
   Address.fromString("0x591975253e25101f6e6f0383e13e82b7601d8c59"),
   Address.fromString("0x7b6bbbeac6a7f5681ec8e250b9aeb45a42bdc2cf"),
   Address.fromString("0xe17093967e43d37ad615a64cb86ae11826d6e58b"),
@@ -123,9 +123,9 @@ export const IGNORELIST: Address[] = [
   Address.fromString("0xbca3c97837a39099ec3082df97e28ce91be14472"),
   Address.fromString("0x9783b81438c24848f85848f8df31845097341771"),
   Address.fromString("0x4e08f03079c5cd3083ea331ec61bcc87538b7665"),
-  Address.fromString("0x09617F6fD6cF8A71278ec86e23bBab29C04353a7"),
-  Address.fromString("0xFD957F21bd95E723645C07C48a2d8ACB8Ffb3794"),
-  Address.fromString("0x5AA7C403c7dE4B3bb0cc07079a03e389671a4771"),
+  Address.fromString("0x09617f6fd6cf8a71278ec86e23bbab29c04353a7"),
+  Address.fromString("0xfd957f21bd95e723645c07c48a2d8acb8ffb3794"),
+  Address.fromString("0x5aa7c403c7de4b3bb0cc07079a03e389671a4771"),
   Address.fromString("0x31903e333809897ee57af57567f4377a1a78756c"),
 ];
 

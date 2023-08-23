@@ -1,19 +1,9 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  Bytes,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
-
-import { Token } from "../../generated/schema";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
   ExitTokensCall,
   LockTokensCall,
 } from "../../generated/FxERC20Events/ERC20Predicate";
-import { NetworkConfigs } from "../../configurations/configure";
 
 import { SDK } from "../sdk/protocols/bridge";
 import {
@@ -22,7 +12,7 @@ import {
 } from "../sdk/protocols/bridge/enums";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
 import { UNKNOWN_TOKEN_VALUE } from "../prices/common/constants";
-import { conf, Pricer, TokenInit } from "./fx-erc20";
+import { conf, Pricer, TokenInit } from "./fxErc20";
 
 export function handleLockTokens(call: LockTokensCall): void {
   // poolAddress == RootToken Address

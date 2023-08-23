@@ -1,4 +1,3 @@
-import { Address } from "@graphprotocol/graph-ts";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 import {
   PROTOCOL_NAME,
@@ -17,7 +16,7 @@ export class PolygonMainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xA0c68C638235ee32657e8f720a23ceC1bFc77C77";
+    return "0xa0c68c638235ee32657e8f720a23cec1bfc77c77";
   }
   getRewardToken(): string {
     return "";

@@ -8,7 +8,6 @@ import {
 import { chainIDToNetwork } from "./chainIds";
 import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
-import { NetworkConfigs } from "../../../../configurations/configure";
 
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;

@@ -16,7 +16,7 @@ export class PolygonMaticConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x808d7c71ad2ba3FA531b068a2417C63106BC0949";
+    return "0x808d7c71ad2ba3fa531b068a2417c63106bc0949";
   }
   getRewardToken(): string {
     return "";

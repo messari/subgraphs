@@ -22,10 +22,7 @@ import { getUsdPricePerToken, getUsdPrice } from "../prices";
 import { Versions } from "../versions";
 import { ERC20 } from "../../generated/FxERC20Events/ERC20";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
-import {
-  BIGDECIMAL_ZERO,
-  UNKNOWN_TOKEN_VALUE,
-} from "../prices/common/constants";
+import { UNKNOWN_TOKEN_VALUE } from "../prices/common/constants";
 import { ETH_ADDRESS } from "../sdk/util/constants";
 
 export const conf = new BridgeConfig(

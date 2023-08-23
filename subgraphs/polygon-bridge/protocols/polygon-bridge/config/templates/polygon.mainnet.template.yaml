@@ -93,7 +93,7 @@ dataSources:
           handler: handlePredicateRegistered
         - event: TokenMapped(indexed address,indexed address,indexed bytes32)
           handler: handlePOSTokenMapped
-      file: ./src/mappings/rootchain-manager.ts
+      file: ./src/mappings/rootchainManager.ts
   
   - kind: ethereum/contract
     name: FxERC20Events
@@ -179,7 +179,7 @@ dataSources:
           handler: handleFxWithdrawERC20
         - event: TokenMappedERC20(indexed address,indexed address)
           handler: handleTokenMappedERC20
-      file: ./src/mappings/fx-erc20.ts
+      file: ./src/mappings/fxErc20.ts
 
 templates:
   - name: Predicate

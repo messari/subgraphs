@@ -8,7 +8,7 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
-import { conf, Pricer, TokenInit } from "./fx-erc20";
+import { conf, Pricer, TokenInit } from "./fxErc20";
 import { Predicate as PredicateTemplate } from "../../generated/templates";
 import { UNKNOWN_TOKEN_VALUE } from "../prices/common/constants";
 
