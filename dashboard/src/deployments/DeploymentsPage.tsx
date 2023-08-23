@@ -100,9 +100,32 @@ function DeploymentsPage({
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
 
+  const [substreamsBasedSubgraphs, setSubstreamsBasedSubgraphs] = useState<{
+    [type: string]: { [proto: string]: { [network: string]: string } };
+  }>({});
+  const [nonSubstreamsBasedSubgraphs, setNonSubstreamsBasedSubgraphs] = useState<{
+    [type: string]: { [proto: string]: { [network: string]: string } };
+  }>({});
+  const [showSubstreamsBasedSubgraphs, setShowSubstreamsBasedSubgraphs] = useState<boolean>(false);
+
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    let substreamsBasedSubgraphs: any = {};
+    let nonSubstreamsBasedSubgraphs: any = {};
+    Object.keys(protocolsToQuery).forEach((protocolName: string) => {
+      const protocol: { [x: string]: any } = protocolsToQuery[protocolName];
+      if (protocol.base === "substreams") {
+        substreamsBasedSubgraphs[protocolName] = protocolsToQuery[protocolName];
+      } else {
+        nonSubstreamsBasedSubgraphs[protocolName] = protocolsToQuery[protocolName];
+      }
+    });
+    setSubstreamsBasedSubgraphs(substreamsBasedSubgraphs);
+    setNonSubstreamsBasedSubgraphs(nonSubstreamsBasedSubgraphs);
+  }, [protocolsToQuery]);
 
   const navigate = useNavigate();
   window.scrollTo(0, 0);
@@ -289,8 +312,21 @@ function DeploymentsPage({
           >
             Protocols To Develop
           </span>
-          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("version-comparison")}>
+          <span
+            style={{ padding: "0 30px", borderRight: "#6656F8 2px solid" }}
+            className="Menu-Options"
+            onClick={() => navigate("version-comparison")}
+          >
             Version Comparison
+          </span>
+          <span
+            style={{ padding: "0 30px" }}
+            className="Menu-Options"
+            onClick={() => {
+              setShowSubstreamsBasedSubgraphs(!showSubstreamsBasedSubgraphs);
+            }}
+          >
+            Show {showSubstreamsBasedSubgraphs ? "Non" : ""} Substreams Based Subgraphs
           </span>
         </div>
         {devCountTable}
@@ -298,7 +334,7 @@ function DeploymentsPage({
           getData={() => getData()}
           decenDepoIndexingStatus={decenDepoIndexingStatus}
           issuesMapping={issuesMapping}
-          protocolsToQuery={protocolsToQuery}
+          protocolsToQuery={showSubstreamsBasedSubgraphs ? substreamsBasedSubgraphs : nonSubstreamsBasedSubgraphs}
           decenDeposToSubgraphIds={decenDeposToSubgraphIds}
           indexingStatusLoaded={indexingStatusLoaded}
           indexingStatusLoadedPending={indexingStatusLoadedPending}

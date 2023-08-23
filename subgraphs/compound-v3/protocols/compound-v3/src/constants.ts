@@ -97,6 +97,20 @@ export function getProtocolData(): ProtocolData {
       COLATERALIZATION_TYPE,
       RISK_TYPE
     );
+  } else if (equalsIgnoreCase(network, Network.BASE)) {
+    return new ProtocolData(
+      Bytes.fromHexString("0x45939657d1ca34a8fa39a924b71d28fe8431e581"),
+      PROTOCOL,
+      PROTOCOL_NAME,
+      PROTOCOL_SLUG,
+      Network.BASE,
+      LENDING_TYPE,
+      LENDER_PERMISSION_TYPE,
+      BORROWER_PERMISSION_TYPE,
+      POOL_CREATOR_PERMISSION_TYPE,
+      COLATERALIZATION_TYPE,
+      RISK_TYPE
+    );
   }
 
   log.critical("[getProtocolData] Unsupported network: {}", [network]);
@@ -123,6 +137,8 @@ export function getRewardAddress(): Address {
     return Address.fromString("0x45939657d1ca34a8fa39a924b71d28fe8431e581");
   } else if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
     return Address.fromString("0x88730d254a2f7e6ac8388c3198afd694ba9f7fae");
+  } else if (equalsIgnoreCase(network, Network.BASE)) {
+    return Address.fromString("0x123964802e6ababbe1bc9547d72ef1b69b00a6b1");
   }
 
   log.critical("[getRewardAddress] Unsupported network: {}", [network]);

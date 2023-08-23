@@ -208,8 +208,8 @@ export function updateInputTokenBalances(
   const pool = getLiquidityPool(poolAddress);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO], false);
-  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE], false);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
 
   const tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
   const tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);

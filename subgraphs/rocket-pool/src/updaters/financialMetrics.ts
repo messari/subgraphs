@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigInt,
-  BigDecimal,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
@@ -25,62 +19,18 @@ import {
 
 const PROTOCOL_ID = RETH_ADDRESS;
 
-export function updateProtocolAndPoolRewardsTvl(
-  blockNumber: BigInt,
-  blockTimestamp: BigInt,
-  rewardAmount: BigInt
-): void {
-  const pool = getOrCreatePool(blockNumber, blockTimestamp);
-  const protocol = getOrCreateProtocol();
-
-  const inputTokenBalances: BigInt[] = [];
-  inputTokenBalances.push(rewardAmount);
-  inputTokenBalances.push(pool.inputTokenBalances[1]);
-
-  pool.inputTokenBalances = inputTokenBalances;
-
-  // inputToken is ETH, price with ETH
-
-  const rplPriceUSD = getOrCreateToken(
-    Address.fromString(RPL_ADDRESS),
-    blockNumber
-  ).lastPriceUSD!;
-  const ethPriceUSD = getOrCreateToken(
-    Address.fromString(ETH_ADDRESS),
-    blockNumber
-  ).lastPriceUSD!;
-
-  const ethTVLUSD = bigIntToBigDecimal(inputTokenBalances[1]).times(
-    ethPriceUSD
-  );
-  const rplTVLUSD = bigIntToBigDecimal(inputTokenBalances[0]).times(
-    rplPriceUSD
-  );
-
-  pool.inputTokenBalancesUSD = [rplTVLUSD, ethTVLUSD];
-
-  const totalValueLockedUSD = ethTVLUSD.plus(rplTVLUSD);
-  pool.totalValueLockedUSD = totalValueLockedUSD;
-  pool.save();
-
-  // Protocol
-  protocol.totalValueLockedUSD = pool.totalValueLockedUSD;
-  protocol.save();
-}
-
 export function updateProtocolAndPoolTvl(
   blockNumber: BigInt,
   blockTimestamp: BigInt,
-  amount: BigInt
+  rplTVL: BigInt,
+  ethTVL: BigInt
 ): void {
   const pool = getOrCreatePool(blockNumber, blockTimestamp);
   const protocol = getOrCreateProtocol();
 
-  log.error("[updateProtocolAndPooLTvl] amount: {}", [amount.toString()]);
-
   const inputTokenBalances: BigInt[] = [];
-  inputTokenBalances.push(pool.inputTokenBalances[0]);
-  inputTokenBalances.push(amount);
+  inputTokenBalances.push(rplTVL);
+  inputTokenBalances.push(ethTVL);
 
   pool.inputTokenBalances = inputTokenBalances;
 

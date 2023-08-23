@@ -77,6 +77,7 @@ import {
   BIGINT_ZERO,
   Network,
   INT_FOUR,
+  INT_ZERO,
 } from "../../../src/constants";
 import {
   getMarketFromToken,
@@ -753,19 +754,21 @@ function getIsIsolatedFlag(event: ethereum.Event): boolean {
   const eventLogIndex = event.logIndex;
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.gt(eventLogIndex)) {
-      // no IsolationModeTotalDebtUpdated log before Borrow
-      break;
-    }
-    // topics[0] - signature
-    const logSignature = thisLog.topics[0];
-    if (thisLog.address == event.address && logSignature == eventSignature) {
-      log.info(
-        "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
-        [event.transaction.hash.toHexString()]
-      );
-      isIsolated = true;
-      break;
+    if (thisLog.topics.length > INT_ZERO) {
+      if (thisLog.logIndex.gt(eventLogIndex)) {
+        // no IsolationModeTotalDebtUpdated log before Borrow
+        break;
+      }
+      // topics[0] - signature
+      const logSignature = thisLog.topics[0];
+      if (thisLog.address == event.address && logSignature == eventSignature) {
+        log.info(
+          "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
+          [event.transaction.hash.toHexString()]
+        );
+        isIsolated = true;
+        break;
+      }
     }
   }
   return isIsolated;
@@ -791,18 +794,23 @@ function getBalanceTransferAmount(event: ethereum.Event): BigInt {
   );
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.le(eventLogIndex)) {
-      // skip event with logIndex < event.logIndex
-      continue;
-    }
-    // topics[0] - signature
-    const logSignature = thisLog.topics[0];
-    if (thisLog.address == event.address && logSignature == eventSignature) {
-      const UINT256_UINT256 = "(uint256,uint256)";
-      const decoded = ethereum.decode(UINT256_UINT256, thisLog.data)!.toTuple();
-      btAmount = decoded[0].toBigInt();
+    if (thisLog.topics.length > INT_ZERO) {
+      if (thisLog.logIndex.le(eventLogIndex)) {
+        // skip event with logIndex < event.logIndex
+        continue;
+      }
+      // topics[0] - signature
+      const logSignature = thisLog.topics[0];
+      if (thisLog.address == event.address && logSignature == eventSignature) {
+        const UINT256_UINT256 = "(uint256,uint256)";
+        const decoded = ethereum.decode(UINT256_UINT256, thisLog.data);
+        if (!decoded) continue;
 
-      break;
+        const logData = decoded.toTuple();
+        btAmount = logData[0].toBigInt();
+
+        break;
+      }
     }
   }
   return btAmount;
