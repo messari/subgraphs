@@ -32,7 +32,7 @@ export class UniswapV3BaseConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x33128a8fc17869897dce68ed026d694621f6fdfd"),
+      Address.fromString("0x33128a8fc17869897dce68ed026d694621f6fdfd")
     );
   }
   getProtocolFeeOnOff(): string {

@@ -32,7 +32,7 @@ export class SushiswapV3MoonriverConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x2f255d3f3c0a3726c6c99e74566c4b18e36e3ce6"),
+      Address.fromString("0x2f255d3f3c0a3726c6c99e74566c4b18e36e3ce6")
     );
   }
   getProtocolFeeOnOff(): string {

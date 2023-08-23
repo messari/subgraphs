@@ -27,7 +27,7 @@ export class PancakeV3BSCConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865"),
+      Address.fromString("0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865")
     );
   }
   getProtocolFeeOnOff(): string {

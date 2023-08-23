@@ -84,7 +84,7 @@ export function getOrCreateToken(address: string): Token {
 export function getOrCreateLPToken(
   tokenAddress: string,
   token0: Token,
-  token1: Token,
+  token1: Token
 ): Token {
   let token = Token.load(tokenAddress);
   // fetch info if null

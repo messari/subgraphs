@@ -32,7 +32,7 @@ export class SushiswapV3EthereumConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xbaceb8ec6b9355dfc0269c18bac9d6e2bdc29c4f"),
+      Address.fromString("0xbaceb8ec6b9355dfc0269c18bac9d6e2bdc29c4f")
     );
   }
   getProtocolFeeOnOff(): string {

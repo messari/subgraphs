@@ -41,7 +41,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f"),
+      Address.fromString("0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
