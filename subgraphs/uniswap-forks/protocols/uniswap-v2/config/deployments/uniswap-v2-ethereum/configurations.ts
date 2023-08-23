@@ -41,7 +41,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f")
+      Address.fromString("0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f"),
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -208,9 +208,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
     ];
   }
   getBrokenERC20Tokens(): string[] {
-    return [
-      "0x0000000000bF2686748E1C0255036e7617E7E8A5",
-    ];
+    return ["0x0000000000bf2686748e1c0255036e7617e7e8a5"];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND;

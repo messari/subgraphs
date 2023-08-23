@@ -32,7 +32,7 @@ export class UniswapV3OptimismConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x1f98431c8ad98523631ae4a59f267346ea31f984")
+      Address.fromString("0x1f98431c8ad98523631ae4a59f267346ea31f984"),
     );
   }
   getProtocolFeeOnOff(): string {
@@ -89,6 +89,6 @@ export class UniswapV3OptimismConfigurations implements Configurations {
     return BigDecimal.fromString("100000");
   }
   getBrokenERC20Tokens(): Bytes[] {
-    return stringToBytesList(["0x000000000000Be0aB658f92dddAc29d6dF19a3Be"]);
+    return stringToBytesList(["0x000000000000be0ab658f92dddac29d6df19a3be"]);
   }
 }

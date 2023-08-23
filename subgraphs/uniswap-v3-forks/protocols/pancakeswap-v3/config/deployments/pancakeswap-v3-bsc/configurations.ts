@@ -3,6 +3,8 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGDECIMAL_TEN_THOUSAND,
   FeeSwitch,
+  INT_FIVE_HUNDRED,
+  INT_HUNDRED,
   Network,
   RewardIntervalType,
 } from "../../../../../src/common/constants";
@@ -25,16 +27,16 @@ export class PancakeV3BSCConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865")
+      Address.fromString("0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865"),
     );
   }
   getProtocolFeeOnOff(): string {
     return FeeSwitch.ON;
   }
   getInitialProtocolFeeProportion(fee: i64): BigDecimal {
-    if (fee == 100) {
+    if (fee == INT_HUNDRED) {
       return BigDecimal.fromString("0.33");
-    } else if (fee == 500) {
+    } else if (fee == INT_FIVE_HUNDRED) {
       return BigDecimal.fromString("0.34");
     }
     return BigDecimal.fromString("0.32");

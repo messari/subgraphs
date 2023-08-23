@@ -32,7 +32,7 @@ export class SushiswapV3PolygonConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x917933899c6a5f8e37f31e19f92cdbff7e8ff0e2")
+      Address.fromString("0x917933899c6a5f8e37f31e19f92cdbff7e8ff0e2"),
     );
   }
   getProtocolFeeOnOff(): string {

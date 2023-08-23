@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
 import { ERC20 } from "../../../generated/Factory/ERC20";
 import {
@@ -24,7 +24,7 @@ import { getLiquidityPoolAmounts } from "./pool";
 export function getOrCreateToken(
   event: ethereum.Event,
   address: Bytes,
-  getNewPrice: boolean = true
+  getNewPrice: boolean = true,
 ): Token {
   let token = Token.load(address);
   if (!token) {
@@ -47,7 +47,7 @@ export function getOrCreateToken(
     if (
       token.id ==
         Address.fromHexString(
-          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase(),
         ) &&
       NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
     ) {
@@ -92,7 +92,7 @@ export function getOrCreateToken(
 export function getOrCreateLPToken(
   tokenAddress: Bytes,
   token0: Token,
-  token1: Token
+  token1: Token,
 ): Token {
   let token = Token.load(tokenAddress);
   // fetch info if null
@@ -107,7 +107,7 @@ export function getOrCreateLPToken(
 }
 
 export function getOrCreateTokenWhitelist(
-  tokenAddress: Bytes
+  tokenAddress: Bytes,
 ): _TokenWhitelist {
   let tokenTracker = _TokenWhitelist.load(tokenAddress);
   // fetch info if null
@@ -127,7 +127,7 @@ function formatTokenSymbol(tokenSymbol: string): string {
 
 export function getOrCreateTokenWhitelistSymbol(
   tokenSymbol: string,
-  tokenAddress: Bytes
+  tokenAddress: Bytes,
 ): _TokenWhitelistSymbol {
   // Strip and lowercase token symbol
   const formattedTokenSymbol = formatTokenSymbol(tokenSymbol);
@@ -155,14 +155,14 @@ export function isFakeWhitelistToken(token: Token): bool {
 export function updateTokenWhitelists(
   token0: Token,
   token1: Token,
-  poolAddress: Bytes
+  poolAddress: Bytes,
 ): void {
   // update white listed pools
   if (NetworkConfigs.getWhitelistTokens().includes(token0.id)) {
     const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
     const tokenWhitelistSymbol0 = getOrCreateTokenWhitelistSymbol(
       token0.symbol,
-      token0.id
+      token0.id,
     );
 
     const newPools = tokenWhitelist1.whitelistPools;
@@ -176,7 +176,7 @@ export function updateTokenWhitelists(
     const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
     const tokenWhitelistSymbol1 = getOrCreateTokenWhitelistSymbol(
       token1.symbol,
-      token1.id
+      token1.id,
     );
 
     const newPools = tokenWhitelist0.whitelistPools;
@@ -189,7 +189,7 @@ export function updateTokenWhitelists(
 
 export function updateTokenPrices(
   event: ethereum.Event,
-  sqrtPriceX96: BigInt
+  sqrtPriceX96: BigInt,
 ): void {
   const poolAmounts = getLiquidityPoolAmounts(event.address)!;
   const token0 = getOrCreateToken(event, poolAmounts.inputTokens[INT_ZERO]);
@@ -198,7 +198,7 @@ export function updateTokenPrices(
   poolAmounts.tokenPrices = sqrtPriceX96ToTokenPrices(
     sqrtPriceX96,
     token0 as Token,
-    token1 as Token
+    token1 as Token,
   );
   poolAmounts.save();
 }
@@ -208,7 +208,7 @@ function fixTokenFields(token: Token): Token {
   if (
     token.id ==
       Address.fromHexString(
-        "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
+        "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase(),
       ) &&
     NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
   ) {
@@ -220,7 +220,7 @@ function fixTokenFields(token: Token): Token {
   if (
     token.id ==
       Address.fromHexString(
-        "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8".toLowerCase()
+        "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8".toLowerCase(),
       ) &&
     NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
   ) {
@@ -231,7 +231,7 @@ function fixTokenFields(token: Token): Token {
   if (
     token.id ==
       Address.fromHexString(
-        "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9".toLowerCase()
+        "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9".toLowerCase(),
       ) &&
     NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
   ) {
