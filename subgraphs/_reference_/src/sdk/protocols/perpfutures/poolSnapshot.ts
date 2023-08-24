@@ -44,8 +44,8 @@ export class PoolSnapshot {
         "[isInitialized] cannot create snapshots, pool: {} not initialized",
         [this.pool.id.toHexString()]
       );
-      return
-    };
+      return;
+    }
 
     const snapshotDayID =
       this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
