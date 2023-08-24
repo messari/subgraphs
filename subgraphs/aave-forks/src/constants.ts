@@ -28,6 +28,7 @@ export namespace Network {
   export const XDAI = "XDAI"; // aka Gnosis Chain
 
   export const METIS = "andromeda";
+  export const BASE = "base";
 }
 
 export namespace ProtocolType {
