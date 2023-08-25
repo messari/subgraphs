@@ -39,7 +39,13 @@ export class PoolSnapshot {
   }
 
   private takeSnapshots(): void {
-    if (!this.isInitialized()) return;
+    if (!this.isInitialized()) {
+      log.error(
+        "[isInitialized] cannot create snapshots, pool: {} not initialized",
+        [this.pool.id.toHexString()]
+      );
+      return;
+    }
 
     const snapshotDayID =
       this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
@@ -60,11 +66,6 @@ export class PoolSnapshot {
   }
 
   private isInitialized(): boolean {
-    log.error(
-      "[isInitialized] cannot create snapshots, pool: {} not initialized",
-      [this.pool.id.toHexString()]
-    );
-
     return this.pool._lastSnapshotDayID &&
       this.pool._lastSnapshotHourID &&
       this.pool._lastUpdateTimestamp
