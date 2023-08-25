@@ -29,15 +29,21 @@ export function getOrCreateToken(
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
-    const erc20Contract = ERC20.bind(Address.fromBytes(address));
-    const decimals = erc20Contract.try_decimals();
-    // Using try_cause some values might be missing
-    const name = erc20Contract.try_name();
-    const symbol = erc20Contract.try_symbol();
-    // TODO: add overrides for name and symbol
-    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
+    let name = "";
+    let symbol = "";
+    let decimals = DEFAULT_DECIMALS;
+
+    if (!NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
+      const erc20Contract = ERC20.bind(Address.fromBytes(address));
+      // TODO: add overrides for name and symbol
+      const nameCall = erc20Contract.try_name();
+      if (!nameCall.reverted) name = nameCall.value;
+      const symbolCall = erc20Contract.try_symbol();
+      if (!symbolCall.reverted) symbol = symbolCall.value;
+      const decimalsCall = erc20Contract.try_decimals();
+      if (!decimalsCall.reverted) decimals = decimalsCall.value;
+    }
+
     if (
       token.id ==
         Address.fromHexString(
@@ -45,10 +51,14 @@ export function getOrCreateToken(
         ) &&
       NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
     ) {
-      token.name = "WETH";
-      token.symbol = "WETH";
-      token.decimals = DEFAULT_DECIMALS;
+      name = "WETH";
+      symbol = "WETH";
+      decimals = DEFAULT_DECIMALS;
     }
+
+    token.name = name;
+    token.symbol = symbol;
+    token.decimals = decimals;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
 

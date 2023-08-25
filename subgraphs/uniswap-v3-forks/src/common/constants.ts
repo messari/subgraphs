@@ -138,6 +138,9 @@ export const INT_TWO = 2 as i32;
 export const INT_THREE = 3 as i32;
 export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 
+export const INT_HUNDRED = 100 as i64;
+export const INT_FIVE_HUNDRED = 500 as i64;
+
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
