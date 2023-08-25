@@ -24,6 +24,8 @@ enum Network {
   OSMOSIS
   MATIC # aka Polygon
   GNOSIS
+  ANDROMEDA # metis node
+  BASE
 }
 
 enum ProtocolType {

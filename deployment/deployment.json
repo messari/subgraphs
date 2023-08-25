@@ -506,6 +506,28 @@
             "query-id": "JCNWRypm7FYwV8fx5HhzZPSFaMxgkPuw4TnR3Gpi81zk"
           }
         }
+      },
+      "aave-v3-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.1.0"
+        },
+        "files": {
+          "template": "aave.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-base",
+            "query-id": "aave-v3-base"
+          }
+        }
       }
     }
   },
