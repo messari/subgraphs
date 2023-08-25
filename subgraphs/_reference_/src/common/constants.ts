@@ -20,6 +20,7 @@ export namespace Network {
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
   export const AVALANCHE = "AVALANCHE";
+  export const BASE = "BASE";
   export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
