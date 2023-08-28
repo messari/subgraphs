@@ -91,9 +91,8 @@ export function createMasterChefStakingPool(
   masterChefPool.multiplier = constants.BIGINT_ONE;
   masterChefPool.poolAllocPoint = constants.BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
-  const sdk = initializeSDK(event);
-  getOrCreatePool(sdk);
 
+  const sdk = initializeSDK(event);
   const rewardToken = sdk.Tokens.getOrCreateToken(
     constants.LEVEL_TOKEN_ADDRESS
   );

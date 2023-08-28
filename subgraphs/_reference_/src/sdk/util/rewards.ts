@@ -281,6 +281,9 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("13.39");
   } else if (network == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
+  } else if (network == Network.BASE) {
+    // assuming same block rate as OPTIMISM
+    return BigDecimal.fromString("12.5");
   }
 
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
