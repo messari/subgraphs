@@ -152,6 +152,23 @@ class baxaOverride implements OracleConfig {
   }
 }
 
+// https://github.com/messari/subgraphs/issues/2329
+class delperOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.SUSHI_CALCULATIONS,
+    ];
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -260,6 +277,14 @@ export class config implements Configurations {
         ].includes(tokenAddr)
       ) {
         return new baxaOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x077416cc6242b3a7d8e42652b8a6a2599fda4a92"), // DPR
+        ].includes(tokenAddr)
+      ) {
+        return new delperOverride();
       }
     }
 
