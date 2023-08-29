@@ -19,6 +19,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     case Deploy.UNISWAP_V3_BASE: {
       return new UniswapV3BaseConfigurations();
     }
+    case Deploy.UNISWAP_V3_OPTIMISM: {
+      return new UniswapV3BaseConfigurations();
+    }
     case Deploy.SUSHISWAP_V3_BASE: {
       return new SushiswapV3BaseConfigurations();
     }
