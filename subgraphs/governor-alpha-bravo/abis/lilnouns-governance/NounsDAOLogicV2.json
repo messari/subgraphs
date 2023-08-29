@@ -1,4 +1,56 @@
 [
+  { "inputs": [], "name": "AdminOnly", "type": "error" },
+  { "inputs": [], "name": "CantCancelExecutedProposal", "type": "error" },
+  { "inputs": [], "name": "CantVetoExecutedProposal", "type": "error" },
+  { "inputs": [], "name": "InvalidMaxQuorumVotesBPS", "type": "error" },
+  { "inputs": [], "name": "InvalidMinQuorumVotesBPS", "type": "error" },
+  {
+    "inputs": [],
+    "name": "MinQuorumBPSGreaterThanMaxQuorumBPS",
+    "type": "error"
+  },
+  { "inputs": [], "name": "PendingVetoerOnly", "type": "error" },
+  { "inputs": [], "name": "UnsafeUint16Cast", "type": "error" },
+  { "inputs": [], "name": "VetoerBurned", "type": "error" },
+  { "inputs": [], "name": "VetoerOnly", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "oldMaxQuorumVotesBPS",
+        "type": "uint16"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "newMaxQuorumVotesBPS",
+        "type": "uint16"
+      }
+    ],
+    "name": "MaxQuorumVotesBPSSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "oldMinQuorumVotesBPS",
+        "type": "uint16"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "newMinQuorumVotesBPS",
+        "type": "uint16"
+      }
+    ],
+    "name": "MinQuorumVotesBPSSet",
+    "type": "event"
+  },
   {
     "anonymous": false,
     "inputs": [
@@ -54,6 +106,25 @@
       }
     ],
     "name": "NewPendingAdmin",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldPendingVetoer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newPendingVetoer",
+        "type": "address"
+      }
+    ],
+    "name": "NewPendingVetoer",
     "type": "event"
   },
   {
@@ -291,6 +362,25 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint32",
+        "name": "oldQuorumCoefficient",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newQuorumCoefficient",
+        "type": "uint32"
+      }
+    ],
+    "name": "QuorumCoefficientSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "oldQuorumVotesBPS",
         "type": "uint256"
@@ -303,6 +393,31 @@
       }
     ],
     "name": "QuorumVotesBPSSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "refundAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "refundSent",
+        "type": "bool"
+      }
+    ],
+    "name": "RefundableVote",
     "type": "event"
   },
   {
@@ -381,6 +496,25 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "sent",
+        "type": "bool"
+      }
+    ],
+    "name": "Withdraw",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "BALLOT_TYPEHASH",
     "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
@@ -410,6 +544,34 @@
   },
   {
     "inputs": [],
+    "name": "MAX_QUORUM_VOTES_BPS_UPPER_BOUND",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_REFUND_BASE_FEE",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_REFUND_GAS_USED",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_REFUND_PRIORITY_FEE",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "MAX_VOTING_DELAY",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -431,7 +593,14 @@
   },
   {
     "inputs": [],
-    "name": "MIN_QUORUM_VOTES_BPS",
+    "name": "MIN_QUORUM_VOTES_BPS_LOWER_BOUND",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_QUORUM_VOTES_BPS_UPPER_BOUND",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
@@ -452,6 +621,13 @@
   },
   {
     "inputs": [],
+    "name": "REFUND_BASE_GAS",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "_acceptAdmin",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -459,7 +635,63 @@
   },
   {
     "inputs": [],
+    "name": "_acceptVetoer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "_burnVetoPower",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "newMinQuorumVotesBPS",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "newMaxQuorumVotesBPS",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint32",
+        "name": "newQuorumCoefficient",
+        "type": "uint32"
+      }
+    ],
+    "name": "_setDynamicQuorumParams",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "newMaxQuorumVotesBPS",
+        "type": "uint16"
+      }
+    ],
+    "name": "_setMaxQuorumVotesBPS",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "newMinQuorumVotesBPS",
+        "type": "uint16"
+      }
+    ],
+    "name": "_setMinQuorumVotesBPS",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -480,6 +712,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "newPendingVetoer",
+        "type": "address"
+      }
+    ],
+    "name": "_setPendingVetoer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "newProposalThresholdBPS",
         "type": "uint256"
@@ -493,21 +738,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "newQuorumVotesBPS",
-        "type": "uint256"
+        "internalType": "uint32",
+        "name": "newQuorumCoefficient",
+        "type": "uint32"
       }
     ],
-    "name": "_setQuorumVotesBPS",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "newVetoer", "type": "address" }
-    ],
-    "name": "_setVetoer",
+    "name": "_setQuorumCoefficient",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -536,6 +772,16 @@
   },
   {
     "inputs": [],
+    "name": "_withdraw",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "bool", "name": "", "type": "bool" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "admin",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
@@ -546,6 +792,27 @@
       { "internalType": "uint256", "name": "proposalId", "type": "uint256" }
     ],
     "name": "cancel",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "proposalId", "type": "uint256" },
+      { "internalType": "uint8", "name": "support", "type": "uint8" }
+    ],
+    "name": "castRefundableVote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "proposalId", "type": "uint256" },
+      { "internalType": "uint8", "name": "support", "type": "uint8" },
+      { "internalType": "string", "name": "reason", "type": "string" }
+    ],
+    "name": "castRefundableVoteWithReason",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -586,6 +853,38 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256", "name": "againstVotes", "type": "uint256" },
+      { "internalType": "uint256", "name": "totalSupply", "type": "uint256" },
+      {
+        "components": [
+          {
+            "internalType": "uint16",
+            "name": "minQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "maxQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "quorumCoefficient",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct NounsDAOStorageV2.DynamicQuorumParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "dynamicQuorumVotes",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "uint256", "name": "proposalId", "type": "uint256" }
     ],
     "name": "execute",
@@ -609,6 +908,38 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256", "name": "blockNumber_", "type": "uint256" }
+    ],
+    "name": "getDynamicQuorumParamsAt",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint16",
+            "name": "minQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "maxQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "quorumCoefficient",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct NounsDAOStorageV2.DynamicQuorumParams",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "uint256", "name": "proposalId", "type": "uint256" },
       { "internalType": "address", "name": "voter", "type": "address" }
     ],
@@ -620,7 +951,7 @@
           { "internalType": "uint8", "name": "support", "type": "uint8" },
           { "internalType": "uint96", "name": "votes", "type": "uint96" }
         ],
-        "internalType": "struct NounsDAOStorageV1.Receipt",
+        "internalType": "struct NounsDAOStorageV1Adjusted.Receipt",
         "name": "",
         "type": "tuple"
       }
@@ -648,9 +979,26 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "quorumVotesBPS_",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "uint16",
+            "name": "minQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "maxQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "quorumCoefficient",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct NounsDAOStorageV2.DynamicQuorumParams",
+        "name": "dynamicQuorumParams_",
+        "type": "tuple"
       }
     ],
     "name": "initialize",
@@ -661,6 +1009,20 @@
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "latestProposalIds",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxQuorumVotes",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minQuorumVotes",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
@@ -694,6 +1056,13 @@
   },
   {
     "inputs": [],
+    "name": "pendingVetoer",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "proposalCount",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -721,26 +1090,61 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "inputs": [
+      { "internalType": "uint256", "name": "proposalId", "type": "uint256" }
+    ],
     "name": "proposals",
     "outputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "internalType": "address", "name": "proposer", "type": "address" },
       {
-        "internalType": "uint256",
-        "name": "proposalThreshold",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "quorumVotes", "type": "uint256" },
-      { "internalType": "uint256", "name": "eta", "type": "uint256" },
-      { "internalType": "uint256", "name": "startBlock", "type": "uint256" },
-      { "internalType": "uint256", "name": "endBlock", "type": "uint256" },
-      { "internalType": "uint256", "name": "forVotes", "type": "uint256" },
-      { "internalType": "uint256", "name": "againstVotes", "type": "uint256" },
-      { "internalType": "uint256", "name": "abstainVotes", "type": "uint256" },
-      { "internalType": "bool", "name": "canceled", "type": "bool" },
-      { "internalType": "bool", "name": "vetoed", "type": "bool" },
-      { "internalType": "bool", "name": "executed", "type": "bool" }
+        "components": [
+          { "internalType": "uint256", "name": "id", "type": "uint256" },
+          { "internalType": "address", "name": "proposer", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "proposalThreshold",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "quorumVotes",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "eta", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "startBlock",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "endBlock", "type": "uint256" },
+          { "internalType": "uint256", "name": "forVotes", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "againstVotes",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "abstainVotes",
+            "type": "uint256"
+          },
+          { "internalType": "bool", "name": "canceled", "type": "bool" },
+          { "internalType": "bool", "name": "vetoed", "type": "bool" },
+          { "internalType": "bool", "name": "executed", "type": "bool" },
+          {
+            "internalType": "uint256",
+            "name": "totalSupply",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "creationBlock",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct NounsDAOStorageV2.ProposalCondensed",
+        "name": "",
+        "type": "tuple"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -768,7 +1172,40 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "quorumParamsCheckpoints",
+    "outputs": [
+      { "internalType": "uint32", "name": "fromBlock", "type": "uint32" },
+      {
+        "components": [
+          {
+            "internalType": "uint16",
+            "name": "minQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "maxQuorumVotesBPS",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "quorumCoefficient",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct NounsDAOStorageV2.DynamicQuorumParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "proposalId", "type": "uint256" }
+    ],
     "name": "quorumVotes",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -788,7 +1225,7 @@
     "name": "state",
     "outputs": [
       {
-        "internalType": "enum NounsDAOStorageV1.ProposalState",
+        "internalType": "enum NounsDAOStorageV1Adjusted.ProposalState",
         "name": "",
         "type": "uint8"
       }
@@ -838,5 +1275,6 @@
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
-  }
+  },
+  { "stateMutability": "payable", "type": "receive" }
 ]
