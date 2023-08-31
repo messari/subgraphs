@@ -26,7 +26,6 @@ import {
   BIGINT_ZERO,
   RewardTokenType,
 } from "../../util/constants";
-import { bigIntToBigDecimal } from "../../util/numbers";
 import { BridgePoolType, CrosschainTokenType, TransactionType } from "./enums";
 import { PoolSnapshot } from "./poolSnapshot";
 import { Bridge } from "./protocol";

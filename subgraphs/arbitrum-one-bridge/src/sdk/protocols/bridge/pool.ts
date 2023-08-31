@@ -23,7 +23,6 @@ import {
   BIGINT_ZERO,
   RewardTokenType,
 } from "../../util/constants";
-import { bigIntToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,

@@ -11,7 +11,6 @@ import {
 import { TokenManager } from "./tokens";
 import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
-import { exponentToBigDecimal } from "../../util/numbers";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 

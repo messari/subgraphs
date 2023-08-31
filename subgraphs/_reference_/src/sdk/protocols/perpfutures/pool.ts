@@ -10,7 +10,6 @@ import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
-import { exponentToBigDecimal } from "../../util/numbers";
 
 import {
   LiquidityPoolFee,
