@@ -46,7 +46,7 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////// ORACLE CONFIG OVERRIDES /////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-class someOverride implements OracleConfig {
+class SomeOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -137,6 +137,6 @@ export class config implements Configurations {
     tokenAddr: Address | null,
     block: ethereum.Block | null
   ): OracleConfig | null {
-    return new someOverride();
+    return new SomeOverride();
   }
 }

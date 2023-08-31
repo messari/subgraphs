@@ -102,7 +102,7 @@ export const HARDCODED_STABLES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 // https://github.com/messari/subgraphs/issues/2090
-class spellOverride implements OracleConfig {
+class SpellOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -119,7 +119,7 @@ class spellOverride implements OracleConfig {
 }
 
 // https://github.com/messari/subgraphs/issues/726
-class stETHOverride implements OracleConfig {
+class StETHOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -136,7 +136,7 @@ class stETHOverride implements OracleConfig {
 }
 
 // https://github.com/messari/subgraphs/issues/2097
-class baxaOverride implements OracleConfig {
+class BaxaOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -153,7 +153,7 @@ class baxaOverride implements OracleConfig {
 }
 
 // https://github.com/messari/subgraphs/issues/2329
-class delperOverride implements OracleConfig {
+class DelperOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -257,7 +257,7 @@ export class config implements Configurations {
           Address.fromString("0x090185f2135308bad17527004364ebcc2d37e5f6"), // SPELL
         ].includes(tokenAddr)
       ) {
-        return new spellOverride();
+        return new SpellOverride();
       }
       if (
         tokenAddr &&
@@ -268,7 +268,7 @@ export class config implements Configurations {
         block.number.gt(BigInt.fromString("14019699")) &&
         block.number.lt(BigInt.fromString("14941265"))
       ) {
-        return new stETHOverride();
+        return new StETHOverride();
       }
       if (
         tokenAddr &&
@@ -276,7 +276,7 @@ export class config implements Configurations {
           Address.fromString("0x91b08f4a7c1251dfccf5440f8894f8daa10c8de5"), // BAXA
         ].includes(tokenAddr)
       ) {
-        return new baxaOverride();
+        return new BaxaOverride();
       }
       if (
         tokenAddr &&
@@ -284,7 +284,7 @@ export class config implements Configurations {
           Address.fromString("0x077416cc6242b3a7d8e42652b8a6a2599fda4a92"), // DPR
         ].includes(tokenAddr)
       ) {
-        return new delperOverride();
+        return new DelperOverride();
       }
     }
 
