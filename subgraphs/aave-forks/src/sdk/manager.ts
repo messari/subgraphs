@@ -51,7 +51,7 @@ import { PositionManager } from "./position";
  * You can think of this as an abstraction so the developer doesn't
  * need to think about all of the detailed storage changes that occur.
  *
- * Schema Version:  3.1.0
+ * Schema Version:  3.1.1
  * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
@@ -650,7 +650,8 @@ export class DataManager {
     newCollateralBalance: BigInt,
     newBorrowerBalance: BigInt,
     interestType: string | null = null,
-    subtractBorrowerPosition: bool = true
+    subtractBorrowerPosition: bool = true,
+    principal: BigInt | null = null
   ): Liquidate | null {
     const positions: string[] = []; // positions touched by this liquidation
     const liquidatorAccount = new AccountManager(liquidator);
@@ -675,7 +676,8 @@ export class DataManager {
       this.protocol,
       newCollateralBalance,
       TransactionType.LIQUIDATE,
-      this.market.inputTokenPriceUSD
+      this.market.inputTokenPriceUSD,
+      principal
     );
     if (!collateralPositionID) {
       log.error(
@@ -762,7 +764,9 @@ export class DataManager {
     amountUSD: BigDecimal,
     senderNewBalance: BigInt,
     receiverNewBalance: BigInt,
-    interestType: string | null = null
+    interestType: string | null = null,
+    senderPrincipal: BigInt | null = null,
+    receiverPrincipal: BigInt | null = null
   ): Transfer | null {
     const transferrer = new AccountManager(sender);
     if (transferrer.isNewUser()) {
@@ -780,7 +784,8 @@ export class DataManager {
       this.protocol,
       senderNewBalance,
       TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD
+      this.market.inputTokenPriceUSD,
+      senderPrincipal
     );
     const positionID = transferrerPosition.getPositionID();
     if (!positionID) {
@@ -805,7 +810,8 @@ export class DataManager {
       this.protocol,
       receiverNewBalance,
       TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD
+      this.market.inputTokenPriceUSD,
+      receiverPrincipal
     );
 
     const transfer = new Transfer(

@@ -16,7 +16,7 @@ import {
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version:  3.1.0
+ * Schema Version:  3.1.1
  * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
