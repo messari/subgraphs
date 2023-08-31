@@ -4198,7 +4198,7 @@
         }
       },
       "uniswap-v3-swap-optimism": {
-        "network": "base",
+        "network": "optimism",
         "status": "dev",
         "versions": {
           "schema": "4.0.1",
