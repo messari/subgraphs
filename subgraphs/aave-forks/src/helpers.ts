@@ -25,12 +25,15 @@ import {
   ZERO_ADDRESS,
 } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
+import { StableDebtToken } from "../generated/LendingPool/StableDebtToken";
+import { VariableDebtToken } from "../generated/LendingPool/VariableDebtToken";
 import {
   INT_FIVE,
   INT_NINE,
   INT_TEN,
   INT_THREE,
   InterestRateType,
+  PositionSide,
 } from "./sdk/constants";
 
 // returns the market based on any auxillary token
@@ -130,6 +133,58 @@ export function getCollateralBalance(market: Market, account: Address): BigInt {
   }
 
   return balanceResult.value;
+}
+
+export function getPrincipal(
+  market: Market,
+  account: Address,
+  side: string,
+  interestRateType: InterestRateType | null = null
+): BigInt | null {
+  if (side == PositionSide.COLLATERAL) {
+    const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
+    const scaledBalanceResult = aTokenContract.try_scaledBalanceOf(account);
+    if (scaledBalanceResult.reverted) {
+      log.warning(
+        "[getPrincipal]failed to get aToken {} scaledBalance for {}",
+        [market.outputToken!.toHexString(), account.toHexString()]
+      );
+      return null;
+    }
+    return scaledBalanceResult.value;
+  } else if (side == PositionSide.BORROWER && interestRateType) {
+    if (interestRateType == InterestRateType.STABLE) {
+      const stableDebtTokenContract = StableDebtToken.bind(
+        Address.fromBytes(market._sToken!)
+      );
+      const principalBalanceResult =
+        stableDebtTokenContract.try_principalBalanceOf(account);
+      if (principalBalanceResult.reverted) {
+        log.warning(
+          "[getPrincipal]failed to get stableDebtToken {} principalBalance for {}",
+          [market._sToken!.toHexString(), account.toHexString()]
+        );
+        return null;
+      }
+      return principalBalanceResult.value;
+    } else if (interestRateType == InterestRateType.VARIABLE) {
+      const variableDebtTokenContract = VariableDebtToken.bind(
+        Address.fromBytes(market._vToken!)
+      );
+      const scaledBalanceResult =
+        variableDebtTokenContract.try_scaledBalanceOf(account);
+      if (scaledBalanceResult.reverted) {
+        log.warning(
+          "[getPrincipal]failed to get variableDebtToken {} scaledBalance for {}",
+          [market._vToken!.toHexString(), account.toHexString()]
+        );
+        return null;
+      }
+      return scaledBalanceResult.value;
+    }
+  }
+
+  return null;
 }
 
 export function getTreasuryAddress(market: Market): Address {
