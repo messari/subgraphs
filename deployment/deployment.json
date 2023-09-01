@@ -4204,6 +4204,28 @@
             "query-id": "uniswap-v3-swap-base"
           }
         }
+      },
+      "uniswap-v3-swap-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "4.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap.v3.swap.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-swap-optimism",
+            "query-id": "uniswap-v3-swap-optimism"
+          }
+        }
       }
     }
   },
