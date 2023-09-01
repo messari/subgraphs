@@ -141,8 +141,6 @@ export function getPrincipal(
   side: string,
   interestRateType: InterestRateType | null = null
 ): BigInt | null {
-  let principal: BigInt | null = null;
-
   if (side == PositionSide.COLLATERAL) {
     const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
     const scaledBalanceResult = aTokenContract.try_scaledBalanceOf(account);
@@ -151,9 +149,9 @@ export function getPrincipal(
         "[getPrincipal]failed to get aToken {} scaledBalance for {}",
         [market.outputToken!.toHexString(), account.toHexString()]
       );
-    } else {
-      principal = scaledBalanceResult.value;
+      return null;
     }
+    return scaledBalanceResult.value;
   } else if (side == PositionSide.BORROWER && interestRateType) {
     if (interestRateType == InterestRateType.STABLE) {
       const stableDebtTokenContract = StableDebtToken.bind(
@@ -166,9 +164,9 @@ export function getPrincipal(
           "[getPrincipal]failed to get stableDebtToken {} principalBalance for {}",
           [market._sToken!.toHexString(), account.toHexString()]
         );
-      } else {
-        principal = principalBalanceResult.value;
+        return null;
       }
+      return principalBalanceResult.value;
     } else if (interestRateType == InterestRateType.VARIABLE) {
       const variableDebtTokenContract = VariableDebtToken.bind(
         Address.fromBytes(market._vToken!)
@@ -180,13 +178,13 @@ export function getPrincipal(
           "[getPrincipal]failed to get variableDebtToken {} scaledBalance for {}",
           [market._vToken!.toHexString(), account.toHexString()]
         );
-      } else {
-        principal = scaledBalanceResult.value;
+        return null;
       }
+      return scaledBalanceResult.value;
     }
   }
 
-  return principal;
+  return null;
 }
 
 export function getTreasuryAddress(market: Market): Address {
