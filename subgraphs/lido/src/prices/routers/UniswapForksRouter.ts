@@ -255,10 +255,6 @@ function getLpTokenLiquidityUsdc(
 ): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(lpAddress);
 
-  const token0Call = uniSwapPair.try_token0();
-  if (token0Call.reverted) return new CustomPriceType();
-  const token0Address = token0Call.value;
-
   const token1Call = uniSwapPair.try_token1();
   if (token1Call.reverted) return new CustomPriceType();
   const token1Address = token1Call.value;
@@ -267,10 +263,8 @@ function getLpTokenLiquidityUsdc(
   if (reservesCall.reverted) return new CustomPriceType();
   const reserves = reservesCall.value;
 
-  let wethReserves = constants.BIGINT_ZERO;
-  if (token0Address == wethAddress) {
-    wethReserves = reserves.value0;
-  } else if (token1Address == wethAddress) {
+  let wethReserves = reserves.value0;
+  if (token1Address == wethAddress) {
     wethReserves = reserves.value1;
   }
 
@@ -282,13 +276,15 @@ function getLpTokenLiquidityUsdc(
   const wethDecimals = utils.getTokenDecimals(wethAddress);
 
   if (wethReserves.notEqual(constants.BIGINT_ZERO)) {
-    const liquidity = wethReserves
-      .toBigDecimal()
-      .div(constants.BIGINT_TEN.pow(wethDecimals.toI32() as u8).toBigDecimal())
+    const liquidityUSDC = utils
+      .bigIntToBigDecimal(
+        wethReserves,
+        wethDecimals.toI32() - constants.DEFAULT_USDC_DECIMALS
+      )
       .times(wethPrice.usdPrice);
 
     return CustomPriceType.initialize(
-      liquidity,
+      liquidityUSDC,
       constants.DEFAULT_USDC_DECIMALS,
       constants.OracleType.UNISWAP_FORKS_ROUTER
     );

@@ -1,17 +1,16 @@
 {
   "name": "optimism-bridge-v2",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
     "build:subgraph": "graph build"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.44.0",
-    "@graphprotocol/graph-ts": "^0.29.1",
-    "mustache": "^4.2.0"
+    "@graphprotocol/graph-cli": "^0.56.0",
+    "@graphprotocol/graph-ts": "^0.31.0"
   },
   "devDependencies": {
-    "typescript": "^4.9.4",
-    "prettier": "^2.7.1"
+    "typescript": "^5.2.2",
+    "prettier": "^3.0.2"
   }
 }

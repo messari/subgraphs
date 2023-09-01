@@ -1352,7 +1352,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1374,7 +1374,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2626,7 +2626,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.4.0",
-          "subgraph": "1.0.6",
+          "subgraph": "1.0.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -8194,7 +8194,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8215,7 +8215,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "services": {

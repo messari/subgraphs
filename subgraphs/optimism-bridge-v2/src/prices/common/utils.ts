@@ -29,6 +29,15 @@ export function isNullAddress(tokenAddr: Address): boolean {
   return tokenAddr.equals(constants.NULL.TYPE_ADDRESS);
 }
 
+export function bigIntToBigDecimal(
+  quantity: BigInt,
+  decimals: i32 = constants.DEFAULT_DECIMALS.toI32()
+): BigDecimal {
+  return quantity.divDecimal(
+    constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal()
+  );
+}
+
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
   defaultValue: T

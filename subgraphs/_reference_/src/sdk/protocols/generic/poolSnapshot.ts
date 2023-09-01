@@ -11,7 +11,7 @@ import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
  * Schema Version:  2.1.1
- * SDK Version:     1.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @steegecs
  *  - @shashwatS22

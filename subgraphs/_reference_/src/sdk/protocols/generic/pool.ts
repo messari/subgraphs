@@ -11,7 +11,6 @@ import {
 import { TokenManager } from "./tokens";
 import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
-import { exponentToBigDecimal } from "../../util/numbers";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
@@ -20,7 +19,7 @@ import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
  * initialize new pools in the protocol.
  *
  * Schema Version:  2.1.1
- * SDK Version:     1.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @steegecs
  *  - @shashwatS22
@@ -153,17 +152,35 @@ export class Pool {
   }
 
   /**
+   * Utility function to update token price.
+   *
+   * @param token
+   * @returns
+   */
+  setTokenPrice(token: Token): void {
+    if (
+      !token.lastPriceBlockNumber ||
+      (token.lastPriceBlockNumber &&
+        token.lastPriceBlockNumber! < this.protocol.event.block.number)
+    ) {
+      const pricePerToken = this.protocol.getTokenPricer().getTokenPrice(token);
+      token.lastPriceUSD = pricePerToken;
+      token.lastPriceBlockNumber = this.protocol.event.block.number;
+      token.save();
+    }
+  }
+
+  /**
    * Utility function to convert some amount of input token to USD.
    *
+   * @param token
    * @param amount the amount of inputToken to convert to USD
    * @returns The converted amount.
    */
   getInputTokenAmountPrice(token: Token, amount: BigInt): BigDecimal {
-    const price = this.protocol.getTokenPricer().getTokenPrice(token);
-    token.lastPriceUSD = price;
-    token.save();
+    this.setTokenPrice(token);
 
-    return amount.divDecimal(exponentToBigDecimal(token.decimals)).times(price);
+    return this.protocol.getTokenPricer().getAmountValueUSD(token, amount);
   }
 
   /**
