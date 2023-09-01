@@ -10,7 +10,11 @@ import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
-import { exponentToBigDecimal, safeDivide } from "../../util/numbers";
+import {
+  exponentToBigDecimal,
+  poolArraySort,
+  safeDivide,
+} from "../../util/numbers";
 
 import {
   LiquidityPoolFee,
@@ -765,6 +769,20 @@ export class Pool {
     cumulativeClosedInflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
     cumulativeOutflowVolumeByTokenAmount.push(constants.BIGINT_ZERO);
     cumulativeOutflowVolumeByTokenUSD.push(constants.BIGDECIMAL_ZERO);
+
+    poolArraySort(
+      inputTokens,
+      inputTokenBalances,
+      fundingrates,
+      cumulativeVolumeByTokenAmount,
+      cumulativeVolumeByTokenUSD,
+      cumulativeInflowVolumeByTokenAmount,
+      cumulativeInflowVolumeByTokenUSD,
+      cumulativeClosedInflowVolumeByTokenAmount,
+      cumulativeClosedInflowVolumeByTokenUSD,
+      cumulativeOutflowVolumeByTokenAmount,
+      cumulativeOutflowVolumeByTokenUSD
+    );
 
     this.pool.inputTokens = inputTokens;
     this.pool.fundingrate = fundingrates;
