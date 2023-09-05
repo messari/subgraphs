@@ -58,6 +58,12 @@ This is a public endpoint that allows any user of Messari's subgraph to hit one,
 
 The response is a JSON object with that appends new fields onto the object found in [deployment.json](../deployment/deployment.json). The new fields are:
 
+- `status` can either be `dev` or `prod`. This describes the quality of the data in the subgraph.
+  - `dev` means the subgraph is under development and the data has not passed a QA check yet
+  - `prod` means the subgraph has passed a QA check
+
+> This is not a contract that the data is perfect. We have done our best to deliver high quality, tested data. However, there may be hidden errors in the code or data. We are always working to improve our data quality, and appreciate feedback from our users. See [docs/ISSUES.md](./ISSUES.md)
+
 - `health` this array stores information about the subgraphs indexing health
   - This is useful to decide if you can use a subgraph
   - You can find the deployment ID for all deployments and construct the query endpoint
