@@ -59,3 +59,7 @@ Total Revenue = Total Fees
 - Other official and unofficial data sources: https://kwenta.eth.limo/stats/, https://tokenterminal.com/terminal/projects/kwenta
 
 - Documentation: https://docs.kwenta.io/
+
+## Note
+
+We are only tracking v2 markets because v1 markets are deprecated and have almost no liquidity, and the current method to calculate open interest is not supported by v1 markets

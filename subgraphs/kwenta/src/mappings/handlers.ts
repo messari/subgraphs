@@ -28,27 +28,27 @@ import {
   PositionSide,
   BIGINT_ZERO,
   BIGINT_TEN_TO_EIGHTEENTH,
-  LiquidityPoolFeeType,
 } from "../sdk/util/constants";
 import { MarketAdded as MarketAddedEvent } from "../../generated/FuturesMarketManager2/FuturesMarketManager";
 import {
-  FundingRecomputed as FundingRecomputedEvent,
+  PositionLiquidated1 as PositionLiquidatedEvent,
+  PositionModified1 as PositionModifiedEvent,
   MarginTransferred as MarginTransferredEvent,
-  PositionLiquidated as PositionLiquidatedEvent,
-  PositionModified as PositionModifiedEvent,
-} from "../../generated/templates/FuturesV1Market/FuturesMarket";
-import {
-  PerpsV2MarketProxyable,
-  PositionLiquidated1 as PositionLiquidatedV2Event,
-  PositionModified1 as PositionModifiedV2Event,
+  FundingRecomputed as FundingRecomputedEvent,
 } from "../../generated/templates/PerpsV2Market/PerpsV2MarketProxyable";
-import { FuturesV1Market, PerpsV2Market } from "../../generated/templates";
-import { createTokenAmountArray, getFundingRateId } from "./helpers";
+import { PerpsV2Market } from "../../generated/templates";
+import {
+  createTokenAmountArray,
+  getFundingRateId,
+  updateOpenInterest,
+  liquidation,
+} from "./helpers";
 import { NewAccount as NewSmartMarginAccountEvent } from "../../generated/SmartMarginFactory1/SmartMarginFactory";
-import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token, block: ethereum.Block): BigDecimal {
+    log.info("Block: {}", [block.number.toString()]);
     const price = getUsdPricePerToken(Address.fromBytes(token.id));
     return price.usdPrice;
   }
@@ -58,6 +58,7 @@ class Pricer implements TokenPricer {
     amount: BigInt,
     block: ethereum.Block
   ): BigDecimal {
+    log.info("Block: {}", [block.number.toString()]);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
     return getUsdPrice(Address.fromBytes(token.id), _amount);
   }
@@ -86,40 +87,10 @@ const conf = new ProtocolConfig(
 );
 
 /*
-  This function is called when a new v1 market added
-  We just checks if it is a v1 market, and then stores it 
+  This function is called when a new market added
+  We just checks if it is a market, and then stores it 
 */
-export function handleV1MarketAdded(event: MarketAddedEvent): void {
-  const marketKey = event.params.marketKey.toString();
-  const sdk = SDK.initializeFromEvent(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event
-  );
-
-  // check that it's a v1 market before adding
-  if (marketKey.startsWith("s") && !marketKey.endsWith("PERP")) {
-    log.info("New V1 market added: {}", [marketKey]);
-
-    const pool = sdk.Pools.loadPool(event.params.market);
-    if (!pool.isInitialized) {
-      const token = sdk.Tokens.getOrCreateToken(
-        NetworkConfigs.getSUSDAddress()
-      );
-      pool.initialize(marketKey, marketKey, [token], null, "chainlink");
-    }
-
-    // futures v1 market
-    FuturesV1Market.create(event.params.market);
-  }
-}
-
-/*
-  This function is called when a new v2 market added
-  We just checks if it is a v2 market, and then stores it 
-*/
-export function handleV2MarketAdded(event: MarketAddedEvent): void {
+export function handleMarketAdded(event: MarketAddedEvent): void {
   const marketKey = event.params.marketKey.toString();
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -130,7 +101,7 @@ export function handleV2MarketAdded(event: MarketAddedEvent): void {
 
   // check that it's a v1 market before adding
   if (marketKey.endsWith("PERP")) {
-    log.info("New V2 market added: {}", [marketKey]);
+    log.info("New market added: {}", [marketKey]);
 
     const pool = sdk.Pools.loadPool(event.params.market);
     if (!pool.isInitialized) {
@@ -138,9 +109,6 @@ export function handleV2MarketAdded(event: MarketAddedEvent): void {
         NetworkConfigs.getSUSDAddress()
       );
       pool.initialize(marketKey, marketKey, [token], null, "chainlink");
-
-      // keeper dynamic fees
-      pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_LP_FEE, null);
     }
 
     // perps v2 market
@@ -215,8 +183,6 @@ export function handleMarginTransferred(event: MarginTransferredEvent): void {
   // Withdraw
   if (marginDelta.lt(BIGINT_ZERO)) {
     account.withdraw(pool, amounts, BIGINT_ZERO);
-
-    pool.addOutflowVolumeByToken(token, marginDelta.abs());
 
     pool.addInputTokenBalances(
       amounts.map<BigInt>((amount) => amount.times(BIGINT_MINUS_ONE))
@@ -305,6 +271,8 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
     const oldPositionSize = position.getSize();
     const oldPositionPrice = position.getPrice();
 
+    const margin = event.params.margin;
+    const amounts = createTokenAmountArray(pool, [token], [margin]);
     let fundingAccrued = BIGINT_ZERO;
     let currentFundingRate = BIGINT_ZERO;
 
@@ -338,17 +306,24 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
         .plus(fundingAccrued)
         .minus(fees);
 
-      const totalMarginRemaining = event.params.margin;
-      position.setBalanceClosed(token, totalMarginRemaining);
-      position.setCollateralBalanceClosed(token, totalMarginRemaining);
+      account.collateralOut(pool, position.getBytesID(), amounts, BIGINT_ZERO);
+
+      position.setBalanceClosed(token, margin);
+      position.setCollateralBalanceClosed(token, margin);
       position.setRealisedPnlUsdClosed(bigIntToBigDecimal(pnl));
       position.setFundingrateClosed(bigIntToBigDecimal(currentFundingRate));
+      position.addCollateralOutCount();
       position.closePosition();
+
+      pool.addPremiumByToken(token, fees, TransactionType.COLLATERAL_OUT);
+      pool.addOutflowVolumeByToken(token, margin);
     } else {
       const totalMarginRemaining = event.params.margin;
 
       const positionTotalPrice = event.params.lastPrice.times(newPositionSize);
       const leverage = positionTotalPrice.div(totalMarginRemaining);
+
+      account.collateralIn(pool, position.getBytesID(), amounts, BIGINT_ZERO);
 
       position.setBalance(token, totalMarginRemaining);
       position.setCollateralBalance(token, totalMarginRemaining);
@@ -356,6 +331,10 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
       position.setSize(event.params.size);
       position.setFundingIndex(event.params.fundingIndex);
       position.setLeverage(bigIntToBigDecimal(leverage));
+      position.addCollateralInCount();
+
+      pool.addPremiumByToken(token, fees, TransactionType.COLLATERAL_IN);
+      pool.addInflowVolumeByToken(token, margin);
     }
     const volume = event.params.lastPrice
       .times(newPositionSize)
@@ -367,125 +346,25 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
   pool.addRevenueByToken(token, BIGINT_ZERO, fees, BIGINT_ZERO);
 }
 
-/*
-  This function is fired when a position is modified in v2 markets, 
-  everything else similar to v1 market position modified event
-*/
-export function handlePositionModifiedV2(event: PositionModifiedV2Event): void {
-  const v1Params = event.parameters.filter((value) => {
-    return value.name !== "skew";
-  });
-
-  const v1Event = new PositionModifiedEvent(
-    event.address,
-    event.logIndex,
-    event.transactionLogIndex,
-    event.logType,
-    event.block,
-    event.transaction,
-    v1Params,
-    event.receipt
-  );
-  handlePositionModified(v1Event);
-}
-
 /* 
-  This function is fired when a position is liquidated in v1 market
+  This function is fired when a position is liquidated
 */
 export function handlePositionLiquidated(event: PositionLiquidatedEvent): void {
-  liquidation(
-    event,
-    event.params.account,
-    event.params.liquidator,
-    event.params.fee
-  );
-}
-
-/* 
-  This function is fired when a position is liquidated in v2 market
-*/
-export function handlePositionLiquidatedV2(
-  event: PositionLiquidatedV2Event
-): void {
   const totalFee = event.params.flaggerFee
     .plus(event.params.liquidatorFee)
     .plus(event.params.stakersFee);
-
-  liquidation(event, event.params.account, event.params.liquidator, totalFee);
-}
-
-// common liquidation logic
-function liquidation(
-  event: ethereum.Event,
-  sendingAccount: Address,
-  liquidator: Address,
-  totalFees: BigInt
-): void {
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
     new TokenInit(),
     event
   );
-  const pool = sdk.Pools.loadPool(dataSource.address());
-  const smartMarginAccount = _SmartMarginAccount.load(sendingAccount.toHex());
-  const accountAddress = smartMarginAccount
-    ? Address.fromBytes(smartMarginAccount.owner)
-    : sendingAccount;
-
-  const loadAccountResponse = sdk.Accounts.loadAccount(accountAddress);
-  const account = loadAccountResponse.account;
-  if (loadAccountResponse.isNewUser) {
-    const protocol = sdk.Protocol;
-    protocol.addUser();
-    pool.addUser();
-  }
-  const token = sdk.Tokens.getOrCreateToken(NetworkConfigs.getSUSDAddress());
-
-  const position = sdk.Positions.loadLastPosition(pool, account, token, token);
-  if (position != null) {
-    const pnl = position
-      .getRealisedPnlUsd()
-      .minus(bigIntToBigDecimal(totalFees));
-    account.liquidate(
-      pool,
-      Address.fromBytes(token.id),
-      Address.fromBytes(token.id),
-      position.position.collateralBalance,
-      liquidator,
-      accountAddress,
-      position.getBytesID(),
-      pnl
-    );
-    position.addLiquidationCount();
-    position.setBalanceClosed(token, BIGINT_ZERO);
-    position.setCollateralBalanceClosed(token, BIGINT_ZERO);
-    position.setRealisedPnlUsdClosed(pnl);
-    position.closePosition();
-  }
-}
-
-function updateOpenInterest(
-  marketAddress: Address,
-  pool: Pool,
-  lastPrice: BigInt
-): void {
-  const contract = PerpsV2MarketProxyable.bind(marketAddress);
-  const marketSizeCall = contract.try_marketSize();
-  const marketSkewCall = contract.try_marketSkew();
-  let marketSize = BIGINT_ZERO;
-  let marketSkew = BIGINT_ZERO;
-  if (!marketSizeCall.reverted && !marketSkewCall.reverted) {
-    marketSize = marketSizeCall.value;
-    marketSkew = marketSkewCall.value;
-  }
-
-  const shortOpenInterstAmount = marketSize
-    .minus(marketSkew)
-    .div(BigInt.fromI32(2));
-  const longOpenInterstAmount = marketSize
-    .plus(marketSkew)
-    .div(BigInt.fromI32(2));
-  pool.setLongOpenInterest(longOpenInterstAmount, lastPrice);
-  pool.setShortOpenInterest(shortOpenInterstAmount, lastPrice);
+  liquidation(
+    event,
+    event.params.account,
+    event.params.liquidator,
+    totalFee,
+    event.params.stakersFee,
+    sdk
+  );
 }

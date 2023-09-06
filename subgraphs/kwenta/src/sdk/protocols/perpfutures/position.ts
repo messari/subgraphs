@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import { Pool } from "./pool";
 import { Account } from "./account";
@@ -12,8 +12,7 @@ import {
   _PositionCounter,
   Position as PositionSchema,
 } from "../../../../generated/schema";
-import { PositionModified } from "../../../../generated/templates/FuturesV1Market/FuturesMarket";
-
+import { PositionModified1 as PositionModified } from "../../../../generated/templates/PerpsV2Market/PerpsV2MarketProxyable";
 /**
  * This file contains the Position class, which is used to
  * make all of the storage changes that occur in the position and
@@ -68,12 +67,7 @@ export class PositionManager {
       .concat(Bytes.fromUTF8("-"))
       .concatI32(positionCounter.nextCount);
   }
-  loadLastPosition(
-    pool: Pool,
-    account: Account,
-    asset: Token,
-    collateral: Token
-  ): Position | null {
+  loadLastPosition(pool: Pool, account: Account): Position | null {
     const positionId = this.getPositionId(pool, account, true);
     const entity = PositionSchema.load(positionId);
     if (entity != null) {

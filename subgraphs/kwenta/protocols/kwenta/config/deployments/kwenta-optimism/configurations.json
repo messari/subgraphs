@@ -1,7 +1,6 @@
 {
   "deployment": "KWENTA_OPTIMISM",
   "network": "optimism",
-  "marketManagerV1": [],
   "marketManagerV2": [
     {
       "name": "FuturesMarketManager2",

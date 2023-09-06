@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers, @typescript-eslint/no-unused-vars */
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
