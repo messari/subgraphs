@@ -134,6 +134,7 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0xc7d9c108d4e1dd1484d3e2568d7f74bfd763d356"), // SORA Synthetic USD
   Address.fromString("0xd71ecff9342a5ced620049e616c5035f1db98620"), // Synth sEUR
   Address.fromString("0x056fd409e1d7a124bd7017459dfea2f387b6d5cd"), // gUSD
+  Address.fromString("0x5f98805a4e8be255a32880fdec7f6728c6568ba0"), // lUSD
 ];
 
 ///////////////////////////////////////////////////////////////////////////
