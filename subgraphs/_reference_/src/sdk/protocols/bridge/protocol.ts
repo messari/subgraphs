@@ -19,6 +19,17 @@ import { SDK } from ".";
 import { CustomEventType } from "../../util/events";
 
 /**
+ * This file contains the Bridge class, which is used to
+ * make all of the storage changes that occur in a protocol.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.1
+ * Author(s):
+ *  - @jaimehgb
+ *  - @dhruv-chauhan
+ */
+
+/**
  * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
  * safely and conveniently updating the entity. Updating the Bridge entity using this
  * wrapper also takes care of the Financials and Usage snapshots.

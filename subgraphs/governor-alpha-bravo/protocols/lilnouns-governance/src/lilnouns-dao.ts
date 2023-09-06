@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, bigInt } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -8,9 +8,9 @@ import {
   VoteCast,
   VotingDelaySet,
   VotingPeriodSet,
-  NounsDAOLogicV1,
+  NounsDAOLogicV2,
   ProposalCreatedWithRequirements,
-} from "../../../generated/NounsDAOLogicV1/NounsDAOLogicV1";
+} from "../../../generated/NounsDAOLogicV2/NounsDAOLogicV2";
 import {
   _handleProposalCreated,
   _handleProposalCanceled,
@@ -23,6 +23,7 @@ import {
 import { GovernanceFramework, Proposal } from "../../../generated/schema";
 import {
   BIGINT_ONE,
+  BIGINT_ZERO,
   GovernanceFrameworkType,
   NA,
   ProposalState,
@@ -35,7 +36,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  const quorumVotes = getQuorumFromContract(event.address);
+  const quorumVotes = getQuorumFromContract(event.address, event.params.id);
 
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
@@ -103,9 +104,9 @@ function getLatestProposalValues(
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
-    const contract = NounsDAOLogicV1.bind(contractAddress);
+    const contract = NounsDAOLogicV2.bind(contractAddress);
     proposal.state = ProposalState.ACTIVE;
-    const res = contract.try_quorumVotes();
+    const res = contract.try_quorumVotes(bigInt.fromString(proposalId));
     if (!res.reverted) {
       proposal.quorumVotes = res.value;
     } else {
@@ -160,7 +161,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    const contract = NounsDAOLogicV1.bind(Address.fromString(contractAddress));
+    const contract = NounsDAOLogicV2.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = "lilnouns-governance";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_BRAVO;
@@ -179,16 +180,20 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   return governanceFramework;
 }
 
-function getQuorumFromContract(contractAddress: Address): BigInt {
-  const contract = NounsDAOLogicV1.bind(contractAddress);
-  const quorumVotes = contract.quorumVotes();
-
-  // Update quorum at the contract level as well
-  const governanceFramework = getGovernanceFramework(
-    contractAddress.toHexString()
-  );
-  governanceFramework.quorumVotes = quorumVotes;
-  governanceFramework.save();
-
-  return quorumVotes;
+function getQuorumFromContract(
+  contractAddress: Address,
+  proposalId: BigInt
+): BigInt {
+  const contract = NounsDAOLogicV2.bind(contractAddress);
+  const quorumVotes = contract.try_quorumVotes(proposalId);
+  if (!quorumVotes.reverted) {
+    // Update quorum at the contract level as well
+    const governanceFramework = getGovernanceFramework(
+      contractAddress.toHexString()
+    );
+    governanceFramework.quorumVotes = quorumVotes.value;
+    governanceFramework.save();
+    return quorumVotes.value;
+  }
+  return BIGINT_ZERO;
 }

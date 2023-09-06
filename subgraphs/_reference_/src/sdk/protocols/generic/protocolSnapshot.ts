@@ -18,7 +18,7 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
  * daily and hourly snapshots.
  *
  * Schema Version:  2.1.1
- * SDK Version:     1.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @steegecs
  *  - @shashwatS22

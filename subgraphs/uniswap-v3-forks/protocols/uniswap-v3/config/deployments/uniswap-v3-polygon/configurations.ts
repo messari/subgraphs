@@ -92,4 +92,7 @@ export class UniswapV3MaticConfigurations implements Configurations {
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");
   }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList([]);
+  }
 }

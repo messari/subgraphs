@@ -97,9 +97,14 @@ export class UniswapV3MainnetConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList([
+      "0x0df66b8644771fae9400d93e74a509a3546cd13e", // X token
+    ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("200000");
+  }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList([]);
   }
 }

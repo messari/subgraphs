@@ -20,10 +20,7 @@ export function handlePoolAdded(event: PoolAddedEvent): void {
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment
 export function handlePoolRemoved(event: PoolRemovedEvent): void {
   log.debug("poolToken removed: {}", [event.params.poolToken.toHexString()]);
-  removePoolRewardToken(
-    event.params.poolToken.toHexString(),
-    event.block.number
-  );
+  removePoolRewardToken(event.params.poolToken.toHexString());
 }
 
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment

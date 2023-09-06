@@ -3,6 +3,8 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGDECIMAL_TEN_THOUSAND,
   FeeSwitch,
+  INT_FIVE_HUNDRED,
+  INT_HUNDRED,
   Network,
   RewardIntervalType,
 } from "../../../../../src/common/constants";
@@ -32,9 +34,9 @@ export class PancakeV3EthereumConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getInitialProtocolFeeProportion(fee: i64): BigDecimal {
-    if (fee == 100) {
+    if (fee == INT_HUNDRED) {
       return BigDecimal.fromString("0.33");
-    } else if (fee == 500) {
+    } else if (fee == INT_FIVE_HUNDRED) {
       return BigDecimal.fromString("0.34");
     }
     return BigDecimal.fromString("0.32");
@@ -85,5 +87,8 @@ export class PancakeV3EthereumConfigurations implements Configurations {
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("25000");
+  }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList([]);
   }
 }

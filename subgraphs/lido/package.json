@@ -5,8 +5,8 @@
     "codegen": "graph codegen"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.42.4",
-    "@graphprotocol/graph-ts": "0.29.3",
-    "prettier": "^2.7.1"
+    "@graphprotocol/graph-cli": "^0.56.0",
+    "@graphprotocol/graph-ts": "^0.31.0",
+    "prettier": "^3.0.2"
   }
 }

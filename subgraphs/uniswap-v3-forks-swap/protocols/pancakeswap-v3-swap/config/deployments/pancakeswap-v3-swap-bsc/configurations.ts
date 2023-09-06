@@ -21,4 +21,7 @@ export class PancakeV3BSCConfigurations implements Configurations {
   getUntrackedPairs(): Bytes[] {
     return stringToBytesList([]);
   }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList([]);
+  }
 }

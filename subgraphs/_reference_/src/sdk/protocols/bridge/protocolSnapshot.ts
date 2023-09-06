@@ -15,6 +15,18 @@ import {
 } from "../../util/constants";
 import { CustomEventType } from "../../util/events";
 
+/**
+ * This file contains the ProtocolSnapshot, which is used to
+ * make all of the storage changes that occur in the protocol's
+ * daily and hourly snapshots.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.1
+ * Author(s):
+ *  - @jaimehgb
+ *  - @dhruv-chauhan
+ */
+
 const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 

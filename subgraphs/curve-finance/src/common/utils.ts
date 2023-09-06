@@ -19,9 +19,18 @@ import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/E
 import { Pool as LiquidityPoolContract } from "../../generated/templates/PoolTemplate/Pool";
 import { Registry as RegistryContract } from "../../generated/templates/PoolTemplate/Registry";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/Gauge";
+import { AddressProvider as AddressProviderContract } from "../../generated/templates/PoolTemplate/AddressProvider";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
+}
+
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bigDecimal = BigDecimal.fromString("1");
+  for (let i = 0; i < decimals; i++) {
+    bigDecimal = bigDecimal.times(BigDecimal.fromString("10"));
+  }
+  return bigDecimal;
 }
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
@@ -36,14 +45,21 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
     constants.DEFAULT_DECIMALS
   );
 
-  return constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal();
+  return exponentToBigDecimal(decimals.toI32() as u8);
 }
 
 export function getOrCreateTokenFromString(
   tokenAddress: string,
-  block: ethereum.Block
+  block: ethereum.Block,
+  fetchLatestPrice: bool = false,
+  skipPricing: bool = false
 ): Token {
-  return getOrCreateToken(Address.fromString(tokenAddress), block);
+  return getOrCreateToken(
+    Address.fromString(tokenAddress),
+    block,
+    fetchLatestPrice,
+    skipPricing
+  );
 }
 
 export function readValue<T>(
@@ -133,27 +149,51 @@ export function isPoolRegistered(poolAddress: Address): boolean {
   return true;
 }
 
+export function isMainRegistryPool(poolAddress: Address): boolean {
+  const addressProvider = AddressProviderContract.bind(
+    constants.CURVE_ADDRESS_PROVIDER
+  );
+
+  const mainRegistryAddress = readValue<Address>(
+    addressProvider.try_get_registry(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (mainRegistryAddress.equals(constants.NULL.TYPE_ADDRESS)) return false;
+
+  const mainRegistryContract = RegistryContract.bind(mainRegistryAddress);
+  const lpToken = readValue<Address>(
+    mainRegistryContract.try_get_lp_token(poolAddress),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (lpToken.equals(constants.NULL.TYPE_ADDRESS)) return false;
+
+  return true;
+}
+
 export function getLpTokenFromPool(
   poolAddress: Address,
   block: ethereum.Block
 ): Token {
+  let lpToken = constants.HARDCODED_MISSING_OLD_POOLS.get(poolAddress);
+  if (lpToken) return getOrCreateToken(lpToken, block);
+
   const poolContract = LiquidityPoolContract.bind(poolAddress);
 
-  let lpToken = readValue<Address>(
+  lpToken = readValue<Address>(
     poolContract.try_lp_token(),
     constants.NULL.TYPE_ADDRESS
   );
-  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS)) {
+  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
     return getOrCreateToken(lpToken, block);
-  }
 
   lpToken = readValue<Address>(
     poolContract.try_token(),
     constants.NULL.TYPE_ADDRESS
   );
-  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS)) {
+  if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
     return getOrCreateToken(lpToken, block);
-  }
 
   return getOrCreateToken(poolAddress, block);
 }
@@ -182,6 +222,7 @@ export function getPoolFromCoins(
 
   if (coins.length < 2) return null;
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   for (let idx = 0; idx <= 8; idx++) {
     const poolAddress = readValue<Address>(
       registryContract.try_find_pool_for_coins1(
@@ -246,7 +287,11 @@ export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
       []
     );
 
-    if (underlyingCoins.length != 0) return underlyingCoins;
+    if (
+      underlyingCoins.length != 0 &&
+      underlyingCoins[0].notEqual(constants.NULL.TYPE_ADDRESS)
+    )
+      return underlyingCoins;
   }
 
   return underlyingCoins;
@@ -305,9 +350,7 @@ export function getPoolTVLUsingInputTokens(
     const inputToken = getOrCreateTokenFromString(inputTokens[idx], block);
 
     const balanceUSD = balance
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
+      .divDecimal(exponentToBigDecimal(inputToken.decimals as u8))
       .times(inputToken.lastPriceUSD!);
 
     totalValueLockedUSD = totalValueLockedUSD.plus(balanceUSD);
@@ -338,9 +381,7 @@ export function getPoolTokenWeights(
     const inputToken = getOrCreateTokenFromString(inputTokens[idx], block);
 
     const balanceUSD = balance
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
+      .divDecimal(exponentToBigDecimal(inputToken.decimals as u8))
       .times(inputToken.lastPriceUSD!);
     const weight = balanceUSD
       .div(totalValueLockedUSD)
@@ -450,19 +491,49 @@ export function getPoolFromGauge(gaugeAddress: Address): Address {
 }
 
 export function getPoolTVL(
-  outputToken: Token,
-  outputTokenBalance: BigInt
+  pool: LiquidityPool,
+  outputTokenBalance: BigInt,
+  block: ethereum.Block
 ): BigDecimal {
+  const outputToken = getOrCreateTokenFromString(pool.outputToken!, block);
+
+  if (outputToken.lastPriceUSD!.equals(constants.BIGDECIMAL_ZERO))
+    return getPoolTVLUsingInputTokens(
+      pool.inputTokens,
+      pool.inputTokenBalances,
+      block
+    );
+
   const totalValueLockedUSD = outputTokenBalance
-    .divDecimal(
-      constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(exponentToBigDecimal(outputToken.decimals as u8))
     .times(outputToken.lastPriceUSD!);
 
   return totalValueLockedUSD;
 }
 
-export function updateProtocolTotalValueLockedUSD(): void {
+export function getPoolTVLExcludingBasePoolLpToken(
+  pool: LiquidityPool,
+  block: ethereum.Block
+): BigDecimal {
+  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+
+  for (let idx = 0; idx < pool.inputTokens.length; idx++) {
+    const balance = pool.inputTokenBalances[idx];
+    const inputToken = getOrCreateTokenFromString(pool.inputTokens[idx], block);
+
+    if (inputToken.isBasePoolLpToken) continue;
+
+    const balanceUSD = balance
+      .divDecimal(exponentToBigDecimal(inputToken.decimals as u8))
+      .times(inputToken.lastPriceUSD!);
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(balanceUSD);
+  }
+
+  return totalValueLockedUSD;
+}
+
+export function updateProtocolTotalValueLockedUSD(block: ethereum.Block): void {
   const protocol = getOrCreateDexAmmProtocol();
 
   const poolIds = protocol._poolIds;
@@ -470,9 +541,24 @@ export function updateProtocolTotalValueLockedUSD(): void {
 
   for (let poolIdx = 0; poolIdx < poolIds.length; poolIdx++) {
     const pool = LiquidityPool.load(poolIds[poolIdx]);
-
     if (!pool) continue;
-    totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+
+    let poolTVL = pool.totalValueLockedUSD;
+    for (let idx = 0; idx < pool.inputTokens.length; idx++) {
+      const inputToken = getOrCreateTokenFromString(
+        pool.inputTokens[idx],
+        block,
+        false,
+        true
+      );
+
+      if (inputToken.isBasePoolLpToken) {
+        poolTVL = pool._tvlUSDExcludingBasePoolLpTokens;
+        break;
+      }
+    }
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(poolTVL);
   }
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;

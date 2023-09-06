@@ -80,6 +80,8 @@ export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const MAX_BPS = BigInt.fromI32(10000);
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
+export const INT_SIX = 6 as i32;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);

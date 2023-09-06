@@ -2,7 +2,7 @@
   "network": "matic",
   "defaultNetwork": "Network.MATIC",
 
-  "priceCaching": 50000,
+  "priceCaching": 25000,
 
   "poolInfoContract": "0x7544Fe3d184b6B55D6B36c3FCA1157eE0Ba30287",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
@@ -34,7 +34,14 @@
     }
   ],
 
+  "basePoolsLpToken": [
+    {
+      "name": "Curve.fi amDAI/amUSDC/amUSDT",
+      "address": "0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171"
+    }
+  ],
+
   "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": ""
+  "subgraphId": "QmQLDwFhSmTiJ5AuwPLtyqVkSWukc48EoMN71mwmLkPyYW",
+  "graftStartBlock": "27814414"
 }

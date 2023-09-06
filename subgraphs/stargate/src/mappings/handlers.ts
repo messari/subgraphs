@@ -39,20 +39,20 @@ import {
   Swap,
   SwapRemote,
   Pool,
-} from "../../generated/LPStaking/Pool";
+} from "../../generated/LPStaking_0/Pool";
 import { PoolTemplate } from "../../generated/templates";
 import { Token } from "../../generated/schema";
 import {
   Deposit as DepositForBlockRewards,
   LPStaking,
   Withdraw as WithdrawForBlockRewards,
-} from "../../generated/LPStaking/LPStaking";
+} from "../../generated/LPStaking_0/LPStaking";
 import {
   Deposit as DepositForTimeRewards,
   LPStakingTime,
   Withdraw as WithdrawForTimeRewards,
-} from "../../generated/LPStaking/LPStakingTime";
-import { _ERC20 } from "../../generated/LPStaking/_ERC20";
+} from "../../generated/LPStaking_0/LPStakingTime";
+import { _ERC20 } from "../../generated/LPStaking_0/_ERC20";
 
 const conf = new BridgeConfig(
   NetworkConfigs.getFactoryAddress(),

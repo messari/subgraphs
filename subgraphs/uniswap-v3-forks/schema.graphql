@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 4.0.0
+# Version: 4.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -7,6 +7,7 @@ enum Network {
   ARWEAVE_MAINNET
   AURORA
   AVALANCHE
+  BASE
   BOBA
   BSC # aka BNB Chain
   CELO
