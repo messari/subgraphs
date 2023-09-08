@@ -10,7 +10,7 @@ import {
   RewardDataUpdate,
   LiquidityGaugeV4 as GaugeContract,
 } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
-import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
+import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/GaugeRegistry/ArrakisVaultV1";
 import {
   getOrCreateLiquidityGauge,
   removeRewardToken,
