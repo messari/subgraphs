@@ -116,6 +116,24 @@ enum LiquidityPoolFeeType {
 
   " One-time fee charged by the protocol (e.g. GMX charges a fee from certain pools with withdrawing) during withdrawal, in percentages of the withdrawal token "
   WITHDRAWAL_FEE
+
+  " Fee charged by Kwenta from Taker Orders "
+  DYNAMIC_TAKER_FEE
+
+  " Fee charged by Kwenta from Taker Delayed Orders "
+  DYNAMIC_TAKER_DELAYED_FEE
+
+  " Fee charged by Kwenta from Taker Delayed Offchain Orders "
+  DYNAMIC_TAKER_DELAYED_OFFCHAIN_FEE
+
+  " Fee charged by Kwenta from Maker Orders "
+  DYNAMIC_MAKER_FEE
+
+  " Fee charged by Kwenta from Maker Delayed Orders "
+  DYNAMIC_MAKER_DELAYED_FEE
+
+  " Fee charged by Kwenta from Maker Delayed Offchain Orders "
+  DYNAMIC_MAKER_DELAYED_OFFCHAIN_FEE
 }
 
 type LiquidityPoolFee @entity @regularPolling {
@@ -2013,4 +2031,11 @@ type _FundingRate @entity {
 
   "Funding Amount"
   funding: BigInt!
+}
+
+type _MarketKey @entity {
+  "Market Key"
+  id: Bytes!
+
+  market: LiquidityPool!
 }

@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -116,8 +116,36 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
+  export const DYNAMIC_TAKER_FEE = "DYNAMIC_TAKER_FEE";
+  export const DYNAMIC_TAKER_DELAYED_FEE = "DYNAMIC_TAKER_DELAYED_FEE";
+  export const DYNAMIC_TAKER_DELAYED_OFFCHAIN_FEE =
+    "DYNAMIC_TAKER_DELAYED_OFFCHAIN_FEE";
+  export const DYNAMIC_MAKER_FEE = "DYNAMIC_MAKER_FEE";
+  export const DYNAMIC_MAKER_DELAYED_FEE = "DYNAMIC_MAKER_DELAYED_FEE";
+  export const DYNAMIC_MAKER_DELAYED_OFFCHAIN_FEE =
+    "DYNAMIC_MAKER_DELAYED_OFFCHAIN_FEE";
 }
 export type LiquidityPoolFeeType = string;
+
+export const ParameterKeys = new TypedMap<string, LiquidityPoolFeeType>();
+ParameterKeys.set("takerFee", LiquidityPoolFeeType.DYNAMIC_TAKER_FEE);
+ParameterKeys.set(
+  "takerFeeDelayedOrder",
+  LiquidityPoolFeeType.DYNAMIC_TAKER_DELAYED_FEE
+);
+ParameterKeys.set(
+  "takerFeeOffchainDelayedOrder",
+  LiquidityPoolFeeType.DYNAMIC_TAKER_DELAYED_OFFCHAIN_FEE
+);
+ParameterKeys.set("makerFee", LiquidityPoolFeeType.DYNAMIC_MAKER_FEE);
+ParameterKeys.set(
+  "makerFeeDelayedOrder",
+  LiquidityPoolFeeType.DYNAMIC_MAKER_DELAYED_FEE
+);
+ParameterKeys.set(
+  "makerFeeOffchainDelayedOrder",
+  LiquidityPoolFeeType.DYNAMIC_MAKER_DELAYED_OFFCHAIN_FEE
+);
 
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";

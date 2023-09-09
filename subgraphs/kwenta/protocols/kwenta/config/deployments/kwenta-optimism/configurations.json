@@ -25,6 +25,23 @@
       "startBlock": 92005505
     }
   ],
+  "marketSettings": [
+    {
+      "name": "PerpsV2MarketSettings1",
+      "address": "0xd442Dc2Ac1f3cA1C86C8329246e47Ca0C91D0471",
+      "startBlock": 52456606
+    },
+    {
+      "name": "PerpsV2MarketSettings2",
+      "address": "0x09793Aad1518B8d8CC72FDd356479E3CBa7B4Ad1",
+      "startBlock": 71308622
+    },
+    {
+      "name": "PerpsV2MarketSettings3",
+      "address": "0x649F44CAC3276557D03223Dbf6395Af65b11c11c",
+      "startBlock": 86524289
+    }
+  ],
   "graftEnabled": false,
   "subgraphId": "QmfHRGh3tC4yb2bBRn5A6ctytG32Jwfi9eNo76EFjiWyrf",
   "graftStartBlock": 15217959

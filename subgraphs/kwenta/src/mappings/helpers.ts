@@ -12,6 +12,7 @@ import { BIGINT_ZERO } from "../sdk/util/constants";
 import {
   Token,
   _FundingRate,
+  _MarketKey,
   _SmartMarginAccount,
 } from "../../generated/schema";
 import { SDK } from "../sdk/protocols/perpfutures";
@@ -127,4 +128,14 @@ export function updateOpenInterest(
     .div(BigInt.fromI32(2));
   pool.setLongOpenInterest(longOpenInterstAmount, lastPrice);
   pool.setShortOpenInterest(shortOpenInterstAmount, lastPrice);
+}
+
+export function loadMarketKey(marketKey: Bytes, pool: Pool): Bytes {
+  let marketKeyEntity = _MarketKey.load(marketKey);
+  if (marketKeyEntity == null) {
+    marketKeyEntity = new _MarketKey(marketKey);
+  }
+  marketKeyEntity.market = pool.getBytesID();
+  marketKeyEntity.save();
+  return marketKeyEntity.id;
 }

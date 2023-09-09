@@ -6,6 +6,7 @@ import {
   _SmartMarginAccount,
   Token,
   _FundingRate,
+  _MarketKey,
 } from "../../generated/schema";
 import { _ERC20 } from "../../generated/FuturesMarketManager2/_ERC20";
 import {
@@ -28,6 +29,9 @@ import {
   PositionSide,
   BIGINT_ZERO,
   BIGINT_TEN_TO_EIGHTEENTH,
+  LiquidityPoolFeeType,
+  ParameterKeys,
+  BIGDECIMAL_ZERO,
 } from "../sdk/util/constants";
 import { MarketAdded as MarketAddedEvent } from "../../generated/FuturesMarketManager2/FuturesMarketManager";
 import {
@@ -42,8 +46,12 @@ import {
   getFundingRateId,
   updateOpenInterest,
   liquidation,
+  loadMarketKey,
 } from "./helpers";
 import { NewAccount as NewSmartMarginAccountEvent } from "../../generated/SmartMarginFactory1/SmartMarginFactory";
+
+import { ParameterUpdated as ParameterUpdatedEvent } from "../../generated/PerpsV2MarketSettings1/PerpsV2MarketSettings";
+
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
 class Pricer implements TokenPricer {
@@ -91,7 +99,6 @@ const conf = new ProtocolConfig(
   We just checks if it is a market, and then stores it 
 */
 export function handleMarketAdded(event: MarketAddedEvent): void {
-  const marketKey = event.params.marketKey.toString();
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -100,16 +107,36 @@ export function handleMarketAdded(event: MarketAddedEvent): void {
   );
 
   // check that it's a v1 market before adding
-  if (marketKey.endsWith("PERP")) {
-    log.info("New market added: {}", [marketKey]);
-
+  if (event.params.marketKey.toString().endsWith("PERP")) {
     const pool = sdk.Pools.loadPool(event.params.market);
+    const marketKey = loadMarketKey(event.params.marketKey, pool).toString();
+
     if (!pool.isInitialized) {
       const token = sdk.Tokens.getOrCreateToken(
         NetworkConfigs.getSUSDAddress()
       );
       pool.initialize(marketKey, marketKey, [token], null, "chainlink");
     }
+
+    pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_TAKER_FEE, BIGDECIMAL_ZERO);
+    pool.setPoolFee(
+      LiquidityPoolFeeType.DYNAMIC_TAKER_DELAYED_FEE,
+      BIGDECIMAL_ZERO
+    );
+    pool.setPoolFee(
+      LiquidityPoolFeeType.DYNAMIC_TAKER_DELAYED_OFFCHAIN_FEE,
+      BIGDECIMAL_ZERO
+    );
+    pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_MAKER_FEE, null);
+    pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_MAKER_DELAYED_FEE, null);
+    pool.setPoolFee(
+      LiquidityPoolFeeType.DYNAMIC_MAKER_DELAYED_OFFCHAIN_FEE,
+      BIGDECIMAL_ZERO
+    );
+    pool.setPoolFee(
+      LiquidityPoolFeeType.DYNAMIC_MAKER_DELAYED_OFFCHAIN_FEE,
+      BIGDECIMAL_ZERO
+    );
 
     // perps v2 market
     PerpsV2Market.create(event.params.market);
@@ -367,4 +394,23 @@ export function handlePositionLiquidated(event: PositionLiquidatedEvent): void {
     event.params.stakersFee,
     sdk
   );
+}
+
+export function handleParameterUpdated(event: ParameterUpdatedEvent): void {
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const marketKey = _MarketKey.load(event.params.marketKey);
+  if (marketKey != null) {
+    const paramKey = event.params.parameter.toString();
+    const poolFee = ParameterKeys.get(paramKey);
+    if (poolFee != null) {
+      const market = sdk.Pools.loadPool(marketKey.market);
+      market.setPoolFee(poolFee!, bigIntToBigDecimal(event.params.value));
+    }
+  }
 }

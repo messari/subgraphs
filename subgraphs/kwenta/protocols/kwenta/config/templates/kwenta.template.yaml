@@ -91,7 +91,28 @@ dataSources:
       file: ./src/mappings/handlers.ts
   {{/smartMarginFactory}}
 
-  
+  {{#marketSettings}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: PerpsV2MarketSettings
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DerivPerpProtocol
+      abis:
+        - name: PerpsV2MarketSettings
+          file: ./abis/kwenta/PerpsV2MarketSettings.json
+      eventHandlers:
+        - event: 'ParameterUpdated(indexed bytes32,indexed bytes32,uint256)'
+          handler: 'handleParameterUpdated'
+      file: ./src/mappings/handlers.ts
+  {{/marketSettings}}
 templates:
   - kind: ethereum/contract
     name: PerpsV2Market
