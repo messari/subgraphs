@@ -1,3 +1,4 @@
+import { dataSource } from "@graphprotocol/graph-ts";
 import {
   Mint,
   Burn,
@@ -25,6 +26,7 @@ import {
 import {
   BIGINT_THOUSAND,
   BIGINT_ZERO,
+  Network,
   UsageType,
   ZERO_ADDRESS,
 } from "../common/constants";
@@ -41,6 +43,14 @@ export function handleTransfer(event: Transfer): void {
     event.params.to.toHexString() == ZERO_ADDRESS &&
     event.params.value.equals(BIGINT_THOUSAND) &&
     pool.outputTokenSupply! == BIGINT_ZERO
+  ) {
+    return;
+  }
+  // ignore initial liquidity lock up for baseswap BSWAP-ETH pool
+  if (
+    dataSource.network() == Network.BASE &&
+    event.transaction.hash.toHexString() ==
+      "0x8fe53fa234ff89bed2ca6cb2c5528f53a6e5e3df313279d694421f4cef8cc4b2"
   ) {
     return;
   }

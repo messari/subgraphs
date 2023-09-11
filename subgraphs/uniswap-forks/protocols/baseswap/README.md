@@ -8,9 +8,10 @@ When users make a token swap (trade) in the Exchange tab, a trading fee is charg
 
 ## Baseswap Trading Fees & Breakdown
 
-- 0.25% - Trade Fees
+- 0.25% - Trading Fees
+  - 0.17% - Supply Fees
+  - 0.08% - Protocol Fee
 - 0% - LP Reward for Liquidity Providers
-- 0.25% - Protocol Fee
 
 LP providers earn rewards for staking LP tokens
 
@@ -22,7 +23,7 @@ Sum across all Pools: `Liquidity Pool TVL`
 
 ### Total Revenue USD
 
-Sum across all Pools: `Pool Swap Trading Volume * Trading Fee`
+Sum across all Pools: `Pool Swap Trading Volume * Supply Fee`
 
 ### Protocol-Side Revenue USD
 
@@ -32,7 +33,7 @@ Sum across all Pools: `Pool Swap Trading Volume * Protocol Fee`
 
 Portion of the Total Revenue allocated to the Supply-Side (LPs).
 
-Sum across all Pools: `Pool Swap Trading Volume * Trading Fee`
+Sum across all Pools: `Pool Swap Trading Volume * Supply Fee`
 
 ### Total Unique Users
 
