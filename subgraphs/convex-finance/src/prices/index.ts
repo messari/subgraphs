@@ -37,11 +37,11 @@ export function getUsdPricePerToken(
 
   if (
     tokenAddr ==
-    Address.fromString("0xFEEf77d3f69374f66429C91d732A244f074bdf74")
+    Address.fromString("0xfeef77d3f69374f66429c91d732a244f074bdf74")
   ) {
     // Use FXS price for cvxFXS
     tokenAddr = Address.fromString(
-      "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0"
+      "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0"
     );
   }
 
