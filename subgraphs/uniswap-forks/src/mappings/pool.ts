@@ -1,4 +1,3 @@
-import { dataSource } from "@graphprotocol/graph-ts";
 import {
   Mint,
   Burn,
@@ -26,7 +25,6 @@ import {
 import {
   BIGINT_THOUSAND,
   BIGINT_ZERO,
-  Network,
   UsageType,
   ZERO_ADDRESS,
 } from "../common/constants";
