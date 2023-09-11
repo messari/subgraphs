@@ -59,6 +59,8 @@ dataSources:
       abis:
         - name: GaugeRegistry
           file: ./abis/GaugeRegistry.json
+        - name: ArrakisVaultV1
+          file: ./abis/ArrakisVaultV1.json
         - name: LiquidityGaugeV4
           file: ./abis/LiquidityGaugeV4.json
         - name: ERC20

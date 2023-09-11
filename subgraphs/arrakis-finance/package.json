@@ -5,12 +5,10 @@
     "codegen": "graph codegen"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.30.1",
-    "@graphprotocol/graph-ts": "0.27.0"
+    "@graphprotocol/graph-cli": "^0.57.0",
+    "@graphprotocol/graph-ts": "^0.31.0"
   },
   "devDependencies": {
-    "gluegun": "^5.1.2",
-    "mustache": "^4.2.0",
-    "prettier": "^2.7.1"
+    "prettier": "^3.0.3"
   }
 }
