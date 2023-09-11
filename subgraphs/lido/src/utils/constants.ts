@@ -127,6 +127,7 @@ export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
+export const INT_THREE = 3 as i32;
 export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);

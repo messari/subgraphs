@@ -1,4 +1,5 @@
-import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum, Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 
 // Topic0 of ERC20 Transfer event.
 // Transfer(address,address.uint256)
@@ -55,11 +56,24 @@ export class AssetSentLog {
   amount: BigInt;
 
   private constructor(txLog: ethereum.Log) {
-    const decoded = ethereum.decode("(address,uint256)", txLog.data)!.toTuple();
-    this.to = decoded.at(0).toAddress();
     this.asset = ethereum.decode("address", txLog.topics[1])!.toAddress();
-    this.amount = decoded.at(1).toBigInt();
-    this.contractAddr = txLog.address;
+
+    const decoded = ethereum.decode("(address,uint256)", txLog.data);
+    if (decoded) {
+      this.to = decoded.toTuple().at(0).toAddress();
+      this.amount = decoded.toTuple().at(1).toBigInt();
+      this.contractAddr = txLog.address;
+    } else {
+      log.error("failed to decode tx: {} logIdx: {} logData: {}", [
+        txLog.transactionHash.toHexString(),
+        txLog.logIndex.toString(),
+        txLog.data.toHexString(),
+      ]);
+
+      this.to = Address.fromString(ZERO_ADDRESS);
+      this.amount = BIGINT_ZERO;
+      this.contractAddr = Address.fromString(ZERO_ADDRESS);
+    }
   }
 
   static parse(txLog: ethereum.Log): AssetSentLog | null {

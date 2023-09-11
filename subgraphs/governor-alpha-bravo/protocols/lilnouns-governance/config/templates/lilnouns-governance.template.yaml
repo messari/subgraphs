@@ -4,11 +4,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: NounsDAOLogicV1
+    name: NounsDAOLogicV2
     network: {{ network }}
     source:
       address: "{{ governorContractAddress }}"
-      abi: NounsDAOLogicV1
+      abi: NounsDAOLogicV2
       startBlock: {{ governorContractStartBlock }}
     mapping:
       kind: ethereum/events
@@ -21,8 +21,8 @@ dataSources:
         - TokenHolder
         - Delegate
       abis:
-        - name: NounsDAOLogicV1
-          file: ./abis/lilnouns-governance/NounsDAOLogicV1.json
+        - name: NounsDAOLogicV2
+          file: ./abis/lilnouns-governance/NounsDAOLogicV2.json
       eventHandlers:
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled

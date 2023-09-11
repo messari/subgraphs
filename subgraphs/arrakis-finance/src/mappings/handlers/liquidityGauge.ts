@@ -10,6 +10,7 @@ import {
   RewardDataUpdate,
   LiquidityGaugeV4 as GaugeContract,
 } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
+import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/GaugeRegistry/ArrakisVaultV1";
 import {
   getOrCreateLiquidityGauge,
   removeRewardToken,
@@ -23,10 +24,20 @@ import { RewardTokenType } from "../../common/constants";
 import { getOrCreateRewardToken, getOrCreateToken } from "../../common/getters";
 
 export function handleAddGauge(event: AddGauge): void {
+  const vaultAddress = event.params.vault;
+  const vaultContract = VaultV1Contract.bind(vaultAddress);
+  const poolCall = vaultContract.try_pool();
+  if (poolCall.reverted) {
+    log.warning(
+      "[handleAddGauge] Probably not a V1 vault: {}; ignoring creating gauge. V2 is not supported yet.",
+      [vaultAddress.toHexString()]
+    );
+    return;
+  }
+
   const gaugeAddress = event.params.gauge;
   LiquidityGaugeTemplate.create(gaugeAddress);
 
-  const vaultAddress = event.params.vault;
   const gauge = getOrCreateLiquidityGauge(gaugeAddress);
   gauge.vault = vaultAddress.toHexString();
   gauge.save();

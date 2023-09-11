@@ -702,7 +702,7 @@ enum NodeRPLStakeTransactionType {
 }
 
 # Keeps track of the RPL staking transactions for a node.
-type NodeRPLStakeTransaction @entity @transaction {
+type NodeRPLStakeTransaction @entity {
   # Composite key based on transaction hash of the triggered event and its log index.
   id: ID!
 
@@ -792,6 +792,30 @@ type RPLRewardInterval @entity {
 
   # Indicates how long the interval actually lasted.
   intervalDurationActual: BigInt
+
+  # On what block number was this interval created.
+  block: BigInt!
+
+  # At what time was this interval created.
+  blockTime: BigInt!
+}
+
+# Represents an reward interval during which RPL can be claimed by different types of claimers.
+type RPLRewardSubmitted @entity {
+  # Reward Index
+  id: ID!
+
+  rewardIndex: BigInt!
+  executionBlock: BigInt!
+  consensusBlock: BigInt!
+  merkleRoot: Bytes!
+  merkleTreeCID: String!
+  intervalsPassed: BigInt!
+  treasuryRPL: BigInt!
+  trustedNodeRPL: [BigInt!]!
+  nodeRPL: [BigInt!]!
+  nodeETH: [BigInt!]!
+  userETH: BigInt!
 
   # On what block number was this interval created.
   block: BigInt!
@@ -1060,4 +1084,11 @@ type Minipool @entity @regularPolling {
 
   # Block timestamp at which this minipool was marked as finalized.
   finalizedBlockTime: BigInt!
+}
+
+type _RocketContract @entity {
+  id: ID!
+  keccak256: Bytes!
+  latestAddress: Bytes!
+  allAddresses: [Bytes!]!
 }

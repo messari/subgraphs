@@ -27,7 +27,8 @@ export namespace Network {
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
 
-  export const METIS = "andromeda";
+  export const METIS = "ANDROMEDA";
+  export const BASE = "BASE";
 }
 
 export namespace ProtocolType {

@@ -3,8 +3,9 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/LPStaking/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/LPStaking/CurveRegistry";
+import { CurvePool as CurvePoolContract } from "../../../generated/LPStaking_0/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/LPStaking_0/CurveRegistry";
+import { INT_EIGHT, INT_SEVEN } from "../common/constants";
 
 export function isCurveLpToken(lpAddress: Address): bool {
   const poolAddress = getPoolFromLpToken(lpAddress);
@@ -116,7 +117,7 @@ export function getUnderlyingCoinFromPool(poolAddress: Address): Address {
 
 export function getPreferredCoinFromCoins(coins: Address[]): Address {
   let preferredCoinAddress = constants.NULL.TYPE_ADDRESS;
-  for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
+  for (let coinIdx = 0; coinIdx < INT_EIGHT; coinIdx++) {
     const coinAddress = coins[coinIdx];
 
     if (coinAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
@@ -126,7 +127,7 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
     if (
       (preferredCoinAddress.notEqual(constants.NULL.TYPE_ADDRESS) &&
         coinAddress.equals(constants.NULL.TYPE_ADDRESS)) ||
-      coinIdx == 7
+      coinIdx == INT_SEVEN
     ) {
       break;
     }
@@ -261,7 +262,7 @@ export function getPriceUsdc(tokenAddress: Address): CustomPriceType {
     .toBigDecimal();
 
   const coins: Address[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < INT_EIGHT; i++) {
     const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(i)),
       constants.NULL.TYPE_ADDRESS

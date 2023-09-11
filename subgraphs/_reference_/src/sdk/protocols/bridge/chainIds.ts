@@ -2,6 +2,16 @@
 import { BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Network } from "../../util/constants";
 
+/**
+ * This file contains the network to chainId mapping
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.1
+ * Author(s):
+ *  - @jaimehgb
+ *  - @dhruv-chauhan
+ */
+
 export function chainIDToNetwork(chainID: BigInt): Network {
   const network = chainIDs.get(chainID.toU64());
   if (network) {
@@ -100,3 +110,4 @@ setChainID(1313161554, Network.AURORA);
 setChainID(1666600000, Network.HARMONY);
 setChainID(11297108109, Network.PALM);
 setChainID(836542336838601, Network.CURIO);
+setChainID(8453, Network.BASE);

@@ -1,39 +1,69 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, ByteArray, crypto, TypedMap } from "@graphprotocol/graph-ts";
 
 // Used when encountering the ZERO address.
 export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
 export const ZERO_ADDRESS = Address.fromString(ZERO_ADDRESS_STRING);
 
-// RocketPool contract addresses.
-export const ROCKET_TOKEN_RETH_CONTRACT_ADDRESS =
-  "0xae78736Cd615f374D3085123A210448E74Fc6393";
-export const ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS =
-  "0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58";
-export const ROCKET_NODE_STAKING_CONTRACT_ADDRESS =
-  "0x3019227b2b8493e45Bf5d25302139c9a2713BF15";
-export const ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V1 =
-  "0xdc9c66155667578179ED82BD17e725aba9dACd09";
-export const ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V2 =
-  "0xdcd51fc5cd918e0461b9b7fb75967fdfd10dae2f";
-export const ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_ADDRESS =
-  "0x428f0de7a6BF5EcCa29e1c5E8C407B21E8bECD39";
-export const ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_ADDRESS =
-  "0x6af730deB0463b432433318dC8002C0A4e9315e8";
-export const ROCKET_DAO_NODE_TRUSTED_CONTRACT_ADDRESS =
-  "0xb8e783882b11Ff4f6Cef3C501EA0f4b960152cc9";
-export const ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS =
-  "0xd3f500F550F46e504A4D2153127B47e007e11166";
-export const ROCKET_NETWORK_FEES_CONTRACT_ADDRESS =
-  "0x0a882C9059Cc2E97c860b80018C27145884D694b";
-export const ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V1 =
-  "0x6a032A901F17227b4DB52937FB25f2523A529760";
-export const ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V2 =
-  "0x030aEa8378Cc131674D6D655cA26B5A3ef4C63da";
-export const ROCKET_DAO_PROTOCOL_SETTINGS_NODE_CONTRACT_ADDRESS =
-  "0xc82D37221940b6E594d6D26D2c5aF775c3F1f437";
+export namespace RocketContractNames {
+  export const ROCKET_VAULT = "rocketVault";
+  export const ROCKET_TOKEN_RETH = "rocketTokenRETH";
+  export const ROCKET_NETWORK_BALANCES = "rocketNetworkBalances";
+  export const ROCKET_NETWORK_PRICES = "rocketNetworkPrices";
+  export const ROCKET_NODE_MANAGER = "rocketNodeManager";
+  export const ROCKET_NODE_STAKING = "rocketNodeStaking";
+  export const ROCKET_REWARDS_POOL = "rocketRewardsPool";
+  export const ROCKET_MINIPOOL_MANAGER = "rocketMinipoolManager";
+  export const ROCKET_MINIPOOL_QUEUE = "rocketMinipoolQueue";
+  export const ROCKET_MINIPOOL_DELEGATE = "rocketMinipoolDelegate";
+  export const ROCKET_DAO_NODE_TRUSTED_ACTIONS = "rocketDAONodeTrustedActions";
+  export const ROCKET_DEPOSIT_POOL = "rocketDepositPool";
+  export const ROCKET_NODE_DEPOSIT = "rocketNodeDeposit";
+  export const ROCKET_CLAIM_DAO = "rocketClaimDAO";
+  export const ROCKET_CLAIM_NODE = "rocketClaimNode";
+  export const ROCKET_CLAIM_TRUSTED_NODE = "rocketClaimTrustedNode";
+  export const ROCKET_DAO_NODE_TRUSTED = "rocketDAONodeTrusted";
+  export const ROCKET_NETWORK_FEES = "rocketNetworkFees";
+  export const ROCKET_DAO_SETTINGS_MINIPOOL =
+    "rocketDAOProtocolSettingsMinipool";
+  export const ROCKET_DAO_SETTINGS_NODE = "rocketDAOProtocolSettingsNode";
+  export const ROCKET_AUCTION_MANAGER = "rocketAuctionManager";
+}
 
-// RocketPool contract names we need in the mappings. (as referenced in the contract code)
-export const ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_NAME = "rocketClaimDAO";
-export const ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_NAME =
-  "rocketClaimTrustedNode";
-export const ROCKET_NODE_REWARD_CLAIM_CONTRACT_NAME = "rocketClaimNode";
+// https://docs.rocketpool.net/developers/usage/contracts/contracts.html#interacting-with-rocket-pool
+export const KeyToContractName = new TypedMap<ByteArray, string>();
+
+function setKeyToContractName(): void {
+  const contractNames = [
+    RocketContractNames.ROCKET_VAULT,
+    RocketContractNames.ROCKET_TOKEN_RETH,
+    RocketContractNames.ROCKET_NETWORK_BALANCES,
+    RocketContractNames.ROCKET_NETWORK_PRICES,
+    RocketContractNames.ROCKET_NODE_MANAGER,
+    RocketContractNames.ROCKET_NODE_STAKING,
+    RocketContractNames.ROCKET_REWARDS_POOL,
+    RocketContractNames.ROCKET_MINIPOOL_MANAGER,
+    RocketContractNames.ROCKET_MINIPOOL_QUEUE,
+    RocketContractNames.ROCKET_MINIPOOL_DELEGATE,
+    RocketContractNames.ROCKET_DAO_NODE_TRUSTED_ACTIONS,
+    RocketContractNames.ROCKET_DEPOSIT_POOL,
+    RocketContractNames.ROCKET_NODE_DEPOSIT,
+    RocketContractNames.ROCKET_CLAIM_DAO,
+    RocketContractNames.ROCKET_CLAIM_NODE,
+    RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE,
+    RocketContractNames.ROCKET_DAO_NODE_TRUSTED,
+    RocketContractNames.ROCKET_NETWORK_FEES,
+    RocketContractNames.ROCKET_DAO_SETTINGS_MINIPOOL,
+    RocketContractNames.ROCKET_DAO_SETTINGS_NODE,
+    RocketContractNames.ROCKET_AUCTION_MANAGER,
+  ];
+
+  for (let i = 0; i < contractNames.length; i++) {
+    KeyToContractName.set(
+      crypto.keccak256(
+        ByteArray.fromUTF8("contract.address".concat(contractNames[i]))
+      ),
+      contractNames[i]
+    );
+  }
+}
+setKeyToContractName();

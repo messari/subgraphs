@@ -2,8 +2,9 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { UniswapPair as UniswapPairContract } from "../../../generated/LPStaking/UniswapPair";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/LPStaking/UniswapRouter";
+import { UniswapPair as UniswapPairContract } from "../../../generated/LPStaking_0/UniswapPair";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/LPStaking_0/UniswapRouter";
+import { INT_THIRTY } from "../common/constants";
 
 export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   if (tokenAddress.equals(ethAddress)) return false;
@@ -92,7 +93,7 @@ export function getPriceFromRouter(
     }
   }
 
-  const feeBips = BigInt.fromI32(30);
+  const feeBips = BigInt.fromI32(INT_THIRTY);
 
   const amountOutBigDecimal = amountOut
     .times(constants.BIGINT_TEN_THOUSAND)

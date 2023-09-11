@@ -1,24 +1,22 @@
 import { BigInt, Address } from "@graphprotocol/graph-ts";
 import {
+  RewardSnapshot,
   rocketRewardsPool,
   RPLTokensClaimed,
-} from "../../generated/rocketRewardsPool/rocketRewardsPool";
-import { rocketNetworkPrices } from "../../generated/rocketRewardsPool/rocketNetworkPrices";
-import { RPLRewardInterval, Node } from "../../generated/schema";
+} from "../../generated/templates/rocketRewardsPool/rocketRewardsPool";
+import { rocketNetworkPrices } from "../../generated/templates/rocketRewardsPool/rocketNetworkPrices";
+import {
+  RPLRewardInterval,
+  Node,
+  RPLRewardSubmitted,
+} from "../../generated/schema";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import {
   ONE_ETHER_IN_WEI,
   ROCKETPOOL_RPL_REWARD_INTERVAL_ID_PREFIX,
 } from "../constants/generalConstants";
-import {
-  ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS,
-  ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_ADDRESS,
-  ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_NAME,
-  ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_NAME,
-  ROCKET_NODE_REWARD_CLAIM_CONTRACT_NAME,
-  ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_ADDRESS,
-} from "../constants/contractConstants";
+import { RocketContractNames } from "../constants/contractConstants";
 import {
   RPLREWARDCLAIMERTYPE_PDAO,
   RPLREWARDCLAIMERTYPE_ODAO,
@@ -29,6 +27,7 @@ import {
   updateSnapshotsTvl,
   updateTotalRewardsMetrics,
 } from "../updaters/financialMetrics";
+import { getRocketContract } from "../entities/rocketContracts";
 
 /**
  * Occurs when an eligible stakeholder on the protocol claims an RPL reward.
@@ -75,8 +74,11 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // If we don't have an indexed RPL Reward interval,
   // or if the last indexed RPL Reward interval isn't equal to the current one in the smart contracts:
+  const claimIntervalTimeStartCall =
+    rocketRewardPoolContract.try_getClaimIntervalTimeStart();
+  if (claimIntervalTimeStartCall.reverted) return;
   const smartContractCurrentRewardIntervalStartTime =
-    rocketRewardPoolContract.getClaimIntervalTimeStart();
+    claimIntervalTimeStartCall.value;
   let previousActiveIndexedRewardInterval: RPLRewardInterval | null = null;
   let previousActiveIndexedRewardIntervalId: string | null = null;
   if (
@@ -107,12 +109,20 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
     }
 
     // Create a new RPL Reward interval so we can add this first claim to it.
+    const claimIntervalRewardsTotalCall =
+      rocketRewardPoolContract.try_getClaimIntervalRewardsTotal();
+    if (claimIntervalRewardsTotalCall.reverted) return;
+
+    const claimIntervalTimeCall =
+      rocketRewardPoolContract.try_getClaimIntervalTime();
+    if (claimIntervalTimeCall.reverted) return;
+
     activeIndexedRewardInterval =
       rocketPoolEntityFactory.createRPLRewardInterval(
         ROCKETPOOL_RPL_REWARD_INTERVAL_ID_PREFIX +
           generalUtilities.extractIdForEntity(event),
         previousActiveIndexedRewardIntervalId,
-        rocketRewardPoolContract.getClaimIntervalRewardsTotal(),
+        claimIntervalRewardsTotalCall.value,
         getClaimingContractAllowance(RPLREWARDCLAIMERTYPE_PDAO, event.address),
         getClaimingContractAllowance(RPLREWARDCLAIMERTYPE_ODAO, event.address),
         getClaimingContractAllowance(RPLREWARDCLAIMERTYPE_NODE, event.address),
@@ -124,7 +134,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
             )
           : BigInt.fromI32(0),
         smartContractCurrentRewardIntervalStartTime,
-        rocketRewardPoolContract.getClaimIntervalTime(),
+        claimIntervalTimeCall.value,
         event.block.number,
         event.block.timestamp
       );
@@ -140,10 +150,15 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // We need this to determine the current RPL/ETH price based on the smart contracts.
   // If for some reason this fails, something is horribly wrong and we need to stop indexing.
-  const networkPricesContract = rocketNetworkPrices.bind(
-    Address.fromString(ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS)
+  const networkPricesContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_NETWORK_PRICES
   );
-  const rplETHExchangeRate = networkPricesContract.getRPLPrice();
+  const networkPricesContract = rocketNetworkPrices.bind(
+    Address.fromBytes(networkPricesContractEntity.latestAddress)
+  );
+  const rplPriceCall = networkPricesContract.try_getRPLPrice();
+  if (rplPriceCall.reverted) return;
+  const rplETHExchangeRate = rplPriceCall.value;
   let rplRewardETHAmount = BigInt.fromI32(0);
   if (rplETHExchangeRate > BigInt.fromI32(0)) {
     rplRewardETHAmount = event.params.amount
@@ -267,6 +282,33 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   updateSnapshotsTvl(event.block);
 }
 
+export function handleRewardSnapshot(event: RewardSnapshot): void {
+  let _RPLRewardSubmitted = RPLRewardSubmitted.load(
+    event.params.submission.rewardIndex.toString()
+  );
+
+  if (!_RPLRewardSubmitted) {
+    _RPLRewardSubmitted = new RPLRewardSubmitted(
+      event.params.submission.rewardIndex.toString()
+    );
+    _RPLRewardSubmitted.rewardIndex = event.params.submission.rewardIndex;
+    _RPLRewardSubmitted.executionBlock = event.params.submission.executionBlock;
+    _RPLRewardSubmitted.consensusBlock = event.params.submission.consensusBlock;
+    _RPLRewardSubmitted.merkleRoot = event.params.submission.merkleRoot;
+    _RPLRewardSubmitted.merkleTreeCID = event.params.submission.merkleTreeCID;
+    _RPLRewardSubmitted.intervalsPassed =
+      event.params.submission.intervalsPassed;
+    _RPLRewardSubmitted.treasuryRPL = event.params.submission.treasuryRPL;
+    _RPLRewardSubmitted.trustedNodeRPL = event.params.submission.trustedNodeRPL;
+    _RPLRewardSubmitted.nodeRPL = event.params.submission.nodeRPL;
+    _RPLRewardSubmitted.nodeETH = event.params.submission.nodeETH;
+    _RPLRewardSubmitted.userETH = event.params.submission.userETH;
+    _RPLRewardSubmitted.block = event.block.number;
+    _RPLRewardSubmitted.blockTime = event.block.timestamp;
+
+    _RPLRewardSubmitted.save();
+  }
+}
 /**
  * Determine the claimer type for a specific RPL reward claim event.
  */
@@ -279,20 +321,24 @@ function getRplRewardClaimerType(
     return rplRewardClaimerType;
 
   // #1: Could be the PDAO.
+  const claimDaoContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_CLAIM_DAO
+  );
   if (
     claimingContract.toHexString() ==
-    Address.fromString(
-      ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_ADDRESS
-    ).toHexString()
+    Address.fromBytes(claimDaoContractEntity.latestAddress).toHexString()
   ) {
     rplRewardClaimerType = RPLREWARDCLAIMERTYPE_PDAO;
   }
 
   // #2: Could be an oracle node.
+  const claimTrustedNodeContractEntity = getRocketContract(
+    RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE
+  );
   if (
     claimingContract.toHexString() ==
-    Address.fromString(
-      ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_ADDRESS
+    Address.fromBytes(
+      claimTrustedNodeContractEntity.latestAddress
     ).toHexString()
   ) {
     rplRewardClaimerType = RPLREWARDCLAIMERTYPE_ODAO;
@@ -320,17 +366,26 @@ function getClaimingContractAllowance(
   const rocketRewardsContract = rocketRewardsPool.bind(rewardsPoolAddress);
 
   if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_PDAO) {
-    return rocketRewardsContract.getClaimingContractAllowance(
-      ROCKET_DAO_PROTOCOL_REWARD_CLAIM_CONTRACT_NAME
-    );
+    const claimingContractAllowanceCall =
+      rocketRewardsContract.try_getClaimingContractAllowance(
+        RocketContractNames.ROCKET_CLAIM_DAO
+      );
+    if (claimingContractAllowanceCall.reverted) return BigInt.fromI32(0);
+    return claimingContractAllowanceCall.value;
   } else if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_ODAO) {
-    return rocketRewardsContract.getClaimingContractAllowance(
-      ROCKET_DAO_TRUSTED_NODE_REWARD_CLAIM_CONTRACT_NAME
-    );
+    const claimingContractAllowanceCall =
+      rocketRewardsContract.try_getClaimingContractAllowance(
+        RocketContractNames.ROCKET_CLAIM_TRUSTED_NODE
+      );
+    if (claimingContractAllowanceCall.reverted) return BigInt.fromI32(0);
+    return claimingContractAllowanceCall.value;
   } else if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_NODE) {
-    return rocketRewardsContract.getClaimingContractAllowance(
-      ROCKET_NODE_REWARD_CLAIM_CONTRACT_NAME
-    );
+    const claimingContractAllowanceCall =
+      rocketRewardsContract.try_getClaimingContractAllowance(
+        RocketContractNames.ROCKET_CLAIM_NODE
+      );
+    if (claimingContractAllowanceCall.reverted) return BigInt.fromI32(0);
+    return claimingContractAllowanceCall.value;
   } else {
     return BigInt.fromI32(0);
   }

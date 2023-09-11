@@ -1,30 +1,30 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CToken } from "../../../generated/Morpho/CToken";
-import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
-import { Comptroller } from "../../../generated/Morpho/Comptroller";
+import {
+  C_ETH,
+  BASE_UNITS,
+  WRAPPED_ETH,
+  BIGDECIMAL_ONE,
+  DEFAULT_DECIMALS,
+  exponentToBigDecimal,
+} from "../../constants";
 import {
   MarketCreated,
   MorphoCompound,
 } from "../../../generated/Morpho/MorphoCompound";
-import { Market } from "../../../generated/schema";
-import { CToken as CTokenTemplate } from "../../../generated/templates";
-import {
-  BASE_UNITS,
-  BIGDECIMAL_ONE,
-  C_ETH,
-  DEFAULT_DECIMALS,
-  exponentToBigDecimal,
-  WRAPPED_ETH,
-} from "../../constants";
-import { getOrInitMarketList, getOrInitToken } from "../../utils/initializers";
 import { getCompoundProtocol } from "./fetchers";
+import { Market } from "../../../generated/schema";
+import { CToken } from "../../../generated/Morpho/CToken";
+import { updateProtocolAfterNewMarket } from "../../helpers";
+import { Comptroller } from "../../../generated/Morpho/Comptroller";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { CToken as CTokenTemplate } from "../../../generated/templates";
+import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
+import { getOrInitMarketList, getOrInitToken } from "../../utils/initializers";
 
 export function handleMarketCreated(event: MarketCreated): void {
   // Sync protocol creation since MarketCreated is the first event emitted
-  CTokenTemplate.create(event.params._poolToken);
   const protocol = getCompoundProtocol(event.address);
-  protocol.totalPoolCount = protocol.totalPoolCount + 1;
-  protocol.save();
+  CTokenTemplate.create(event.params._poolToken);
+
   const morpho = MorphoCompound.bind(event.address);
   const cToken = CToken.bind(event.params._poolToken);
   const comptroller = Comptroller.bind(morpho.comptroller());
@@ -36,7 +36,9 @@ export function handleMarketCreated(event: MarketCreated): void {
   const usdPrice = priceOracle
     .getUnderlyingPrice(event.params._poolToken)
     .toBigDecimal()
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     .div(exponentToBigDecimal(36 - inputToken.decimals));
+
   const market = new Market(event.params._poolToken);
   market.protocol = event.address;
   market.name = `Morpho ${cToken.name()}`;
@@ -109,6 +111,14 @@ export function handleMarketCreated(event: MarketCreated): void {
 
   market._p2pSupplyIndex = morpho.p2pSupplyIndex(event.params._poolToken);
   market._p2pBorrowIndex = morpho.p2pBorrowIndex(event.params._poolToken);
+  market._p2pSupplyIndexFromRates = morpho.p2pSupplyIndex(
+    event.params._poolToken
+  );
+  market._p2pBorrowIndexFromRates = morpho.p2pBorrowIndex(
+    event.params._poolToken
+  );
+  market._p2pSupplyRate = BigInt.zero();
+  market._p2pBorrowRate = BigInt.zero();
 
   market._lastPoolSupplyIndex = morphoPoolIndexes.getLastSupplyPoolIndex();
   market._lastPoolBorrowIndex = morphoPoolIndexes.getLastBorrowPoolIndex();
@@ -116,12 +126,12 @@ export function handleMarketCreated(event: MarketCreated): void {
 
   market._isP2PDisabled = morpho.p2pDisabled(event.params._poolToken);
 
-  market.reserveFactor = BigInt.fromI32(morphoMarket.getReserveFactor())
-    .toBigDecimal()
-    .div(BASE_UNITS);
-  market._p2pIndexCursor = BigInt.fromI32(morphoMarket.getP2pIndexCursor())
-    .toBigDecimal()
-    .div(BASE_UNITS);
+  const reserveFactor = BigInt.fromI32(morphoMarket.getReserveFactor());
+  const p2pIndexCursor = BigInt.fromI32(morphoMarket.getP2pIndexCursor());
+  market.reserveFactor = reserveFactor.toBigDecimal().div(BASE_UNITS);
+  market._reserveFactor_BI = reserveFactor;
+  market._p2pIndexCursor = p2pIndexCursor.toBigDecimal().div(BASE_UNITS);
+  market._p2pIndexCursor_BI = p2pIndexCursor;
 
   market._totalSupplyOnPool = BigDecimal.zero();
   market._totalBorrowOnPool = BigDecimal.zero();
@@ -175,4 +185,6 @@ export function handleMarketCreated(event: MarketCreated): void {
   list.markets = markets.concat([market.id]);
 
   list.save();
+
+  updateProtocolAfterNewMarket(market.id, protocol.id);
 }

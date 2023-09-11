@@ -2,15 +2,15 @@ import { Versions as VersionsInterface } from "../../../deployment/context/inter
 
 export class VersionsClass implements VersionsInterface {
   getSchemaVersion(): string {
-    return "{{ versions.schema }}";;
+    return "{{ versions.schema }}";
   }
 
   getSubgraphVersion(): string {
-    return "{{ versions.subgraph }}";;
+    return "{{ versions.subgraph }}";
   }
 
   getMethodologyVersion(): string {
-    return "{{ versions.methodology }}";;
+    return "{{ versions.methodology }}";
   }
 }
 

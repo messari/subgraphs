@@ -1,4 +1,5 @@
 import { UniswapV3ArbitrumConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-arbitrum/configurations";
+import { UniswapV3BaseConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-base/configurations";
 import { UniswapV3MainnetConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-ethereum/configurations";
 import { UniswapV3MaticConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-polygon/configurations";
 import { UniswapV3OptimismConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-optimism/configurations";
@@ -39,6 +40,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.UNISWAP_V3_BSC: {
       return new UniswapV3BSCConfigurations();
+    }
+    case Deploy.UNISWAP_V3_BASE: {
+      return new UniswapV3BaseConfigurations();
     }
     case Deploy.PANCAKE_V3_BSC: {
       return new PancakeV3BSCConfigurations();

@@ -33,6 +33,6 @@ export class UniswapV2MainnetConfigurations implements Configurations {
     return "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
   }
   getBrokenERC20Tokens(): string[] {
-    return [];
+    return ["0x0000000000bf2686748e1c0255036e7617e7e8a5"];
   }
 }

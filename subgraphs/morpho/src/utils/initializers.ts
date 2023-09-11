@@ -1,14 +1,14 @@
-import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
-import { ERC20 } from "../../generated/Morpho/ERC20";
 import {
   Token,
-  LendingProtocol,
   Market,
   _MarketList,
   RewardToken,
+  LendingProtocol,
 } from "../../generated/schema";
-import { ProtocolType, getProtocolData } from "../constants";
 import { Versions } from "../versions";
+import { ERC20 } from "../../generated/Morpho/ERC20";
+import { ProtocolType, getProtocolData } from "../constants";
+import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
 
 export const getOrInitToken = (tokenAddress: Bytes): Token => {
   let token = Token.load(tokenAddress);
@@ -101,6 +101,8 @@ export const getOrInitLendingProtocol = (
     // There is no transfer or flashloan event in Morpho.
     protocol.transferCount = 0 as i32;
     protocol.flashloanCount = 0 as i32;
+
+    protocol._marketIds = [];
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();

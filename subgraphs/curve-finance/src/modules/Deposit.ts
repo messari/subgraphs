@@ -101,10 +101,7 @@ export function Deposit(
       block
     );
 
-    const inputTokenDecimals = constants.BIGINT_TEN.pow(
-      inputToken.decimals as u8
-    ).toBigDecimal();
-
+    const inputTokenDecimals = utils.exponentToBigDecimal(inputToken.decimals);
     inputTokenAmounts.push(depositedCoinAmounts[idx]);
     depositAmountUSD = depositAmountUSD.plus(
       depositedCoinAmounts[idx]
@@ -115,9 +112,13 @@ export function Deposit(
 
   pool.inputTokenBalances = utils.getPoolBalances(pool);
   pool.totalValueLockedUSD = utils.getPoolTVL(
-    utils.getOrCreateTokenFromString(pool.outputToken!, block),
-    totalSupplyAfterDeposit
+    pool,
+    totalSupplyAfterDeposit,
+    block
   );
+  pool._tvlUSDExcludingBasePoolLpTokens =
+    utils.getPoolTVLExcludingBasePoolLpToken(pool, block);
+
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
@@ -141,7 +142,7 @@ export function Deposit(
     block
   );
 
-  utils.updateProtocolTotalValueLockedUSD();
+  utils.updateProtocolTotalValueLockedUSD(block);
   UpdateMetricsAfterDeposit(block);
 
   log.info(

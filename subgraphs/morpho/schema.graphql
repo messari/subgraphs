@@ -543,6 +543,7 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   ##### Morpho Specific #####
 
+  ## Morpho Compound and morpho aave v2 specific fields
   _defaultMaxGasForMatchingSupply: BigInt
   _defaultMaxGasForMatchingBorrow: BigInt
   _defaultMaxGasForMatchingWithdraw: BigInt
@@ -551,6 +552,12 @@ type LendingProtocol implements Protocol @entity @regularPolling {
   _maxSortedUsers: BigInt
   _owner: Bytes
   _oracle: Bytes
+
+  ## Morpho Aave v3 specific fields
+  _defaultMaxIterationsWithdraw: BigInt
+  _defaultMaxIterationsRepay: BigInt
+
+  _marketIds: [String!]!
 }
 
 # helper entity to iterate through all markets
@@ -1062,6 +1069,24 @@ type Market @entity @regularPolling {
   " The p2p borrow index, updated at the last update on Morpho"
   _p2pBorrowIndex: BigInt
 
+  " The supply rate in P2P, updated at the last pool update "
+  _p2pSupplyRate: BigInt
+
+  " The borrow rate in P2P, updated at the last pool update "
+  _p2pBorrowRate: BigInt
+
+  " The p2p supply index, updated at the last pool update, by recomputing the P2P rates. Used in monitoring "
+  _p2pSupplyIndexFromRates: BigInt
+
+  " The p2p borrow index, updated at the last pool update, by recomputing the P2P rates. Used in monitoring "
+  _p2pBorrowIndexFromRates: BigInt
+
+  " The cursor where the p2p rate is calculated from, without conversion "
+  _p2pIndexCursor_BI: BigInt
+
+  " The percent of revenue from P2P market that is converted to reserves at the current time. "
+  _reserveFactor_BI: BigInt
+
   " Whether the p2p matching is disabled or not on this market"
   _isP2PDisabled: Boolean
 
@@ -1079,6 +1104,9 @@ type Market @entity @regularPolling {
 
   " The total amount borrowed peer-to-peer"
   _totalBorrowInP2P: BigDecimal
+
+  " The total amount of collateral on the underlying pool"
+  _totalCollateralOnPool: BigDecimal
 
   " The p2pSupplyAmount in scaled units"
   _p2pSupplyAmount: BigInt
@@ -1104,6 +1132,9 @@ type Market @entity @regularPolling {
   " The aggregation of the scaled p2p borrow balances if the p2p balances was on pool"
   _virtualScaledBorrow: BigInt
 
+  " The scaled balance on pool used as collateral"
+  _scaledPoolCollateral: BigInt
+
   " The poolSupplyAmount in scaled units"
   _poolSupplyAmount: BigInt
 
@@ -1118,6 +1149,12 @@ type Market @entity @regularPolling {
 
   " Whether the withdraw is paused or not"
   _isWithdrawPaused: Boolean
+
+  " Whether the withdraw collateral is paused or not"
+  _isWithdrawCollateralPaused: Boolean
+
+  " Whether the supply collateral is paused or not"
+  _isSupplyCollateralPaused: Boolean
 
   " Whether the repay is paused or not"
   _isRepayPaused: Boolean
@@ -1166,6 +1203,9 @@ type Market @entity @regularPolling {
 
   " The number of decimals of the rates and the indexes, WAD or RAY."
   _indexesOffset: Int
+
+  " The idle supply on the Morpho contract"
+  _idleSupply: BigInt
 }
 
 #################################
@@ -2198,4 +2238,6 @@ type UnderlyingTokenMapping @entity {
   id: Bytes!
   aToken: Bytes!
   debtToken: Bytes!
+  aTokenV3: Bytes
+  variableDebtTokenV3: Bytes
 }
