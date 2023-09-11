@@ -46,14 +46,6 @@ export function handleTransfer(event: Transfer): void {
   ) {
     return;
   }
-  // ignore initial liquidity lock up for baseswap BSWAP-ETH pool
-  if (
-    dataSource.network() == Network.BASE &&
-    event.transaction.hash.toHexString() ==
-      "0x8fe53fa234ff89bed2ca6cb2c5528f53a6e5e3df313279d694421f4cef8cc4b2"
-  ) {
-    return;
-  }
   // mints
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     handleTransferMint(
