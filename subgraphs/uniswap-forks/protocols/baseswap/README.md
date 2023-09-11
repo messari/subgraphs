@@ -21,6 +21,10 @@ LP providers earn rewards for staking LP tokens
 
 Sum across all Pools: `Liquidity Pool TVL`
 
+> Note: For WETH/BSWAP, there was an initial liquidity lock up of $410k in the WETH/BSWAP pool as BSWAP token's initial liquidity ([docs](https://base-swap-1.gitbook.io/baseswap/tokenomics/usdbswap-token), [transaction](https://basescan.org/tx/0x8fe53fa234ff89bed2ca6cb2c5528f53a6e5e3df313279d694421f4cef8cc4b2)), which is not counted in pool's liquidity on protocol's UI.
+> However, we feel it should be counted as a regular transfer contributing to pool's liquidity, and will cause mispricing of LP token if not counted.
+> Hence the subgraph will show WETH/BSWAP pool's liquidity greater than the protocol UI by $410k.
+
 ### Total Revenue USD
 
 Sum across all Pools: `Pool Swap Trading Volume * Supply Fee`
