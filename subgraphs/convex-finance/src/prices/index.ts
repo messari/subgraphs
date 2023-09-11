@@ -35,6 +35,27 @@ export function getUsdPricePerToken(
   )
     return new CustomPriceType();
 
+  if (
+    tokenAddr ==
+    Address.fromString("0xFEEf77d3f69374f66429C91d732A244f074bdf74")
+  ) {
+    // Use FXS price for cvxFXS
+    tokenAddr = Address.fromString(
+      "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0"
+    );
+  }
+
+  if (
+    [
+      Address.fromString("0x9848482da3ee3076165ce6497eda906e66bb85c5"), // pETH-ETH-f
+      Address.fromString("0xbe4f3ad6c9458b901c81b734cb22d9eae9ad8b50"), // PALETH-f
+      Address.fromString("0x7ea4ad8c803653498bf6ac1d2debc04dce8fd2ad"), // TOKEETH-f
+      Address.fromString("0xc897b98272aa23714464ea2a0bd5180f1b8c0025"), // msETH-ETH-f
+    ].includes(tokenAddr)
+  ) {
+    return new CustomPriceType();
+  }
+
   // CUSTOM: Forex Oracle
   const forexPrice = getForexUsdRate(tokenAddr);
   if (!forexPrice.reverted) {
@@ -136,13 +157,13 @@ export function getLiquidityBoundPrice(
       .div(amount);
 
     log.warning(
-      "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {}",
+      "[getLiquidityBoundPrice] token: {} (reported price * amount): ({} * {}) bound to available liquidity: {}; new price: {}",
       [
+        tokenAddress.toHexString(),
         tokenPrice.usdPrice.toString(),
         amount.toString(),
-        liquidityBoundPriceUSD.toString(),
-        tokenAddress.toHexString(),
         liquidity.toString(),
+        liquidityBoundPriceUSD.toString(),
       ]
     );
   }

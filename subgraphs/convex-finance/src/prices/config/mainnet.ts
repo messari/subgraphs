@@ -32,9 +32,12 @@ export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
   12370088
 );
 
+// Address Provider: https://etherscan.io/address/0x0000000022d53366457f9d5e68ec105046fc4383
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
   new OracleContract("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c", 11154794),
-  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752),
+  new OracleContract("0x90E00ACe148ca3b23Ac1bC8C240C2a7Dd9c2d7f5", 12195750), // Main Registry
+  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752), // CryptoSwap Registry
+  new OracleContract("0xF98B45FA17DE75FB1aD0e7aFD971b0ca00e379fC", 15732062), // Meta Registry
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -95,6 +98,9 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0xbcca60bb61934080951369a648fb03df4f96263c"), // Aave interest bearing USDC
   Address.fromString("0x6c5024cd4f8a59110119c56f8933403a539555eb"), // Aave interest bearing SUSD
   Address.fromString("0xd71ecff9342a5ced620049e616c5035f1db98620"), // Synth sEUR
+  Address.fromString("0xFC2838a17D8e8B1D5456E0a351B0708a09211147"), // FRAX/USDP
+  Address.fromString("0x5Ca135cB8527d76e932f34B5145575F9d8cbE08E"), // FPI
+  Address.fromString("0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"), // crvUSD
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -102,7 +108,7 @@ export const HARDCODED_STABLES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 // https://github.com/messari/subgraphs/issues/2090
-class spellOverride implements OracleConfig {
+class SpellOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -119,7 +125,7 @@ class spellOverride implements OracleConfig {
 }
 
 // https://github.com/messari/subgraphs/issues/726
-class stETHOverride implements OracleConfig {
+class StETHOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -136,7 +142,7 @@ class stETHOverride implements OracleConfig {
 }
 
 // https://github.com/messari/subgraphs/issues/2097
-class baxaOverride implements OracleConfig {
+class BaxaOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -153,7 +159,7 @@ class baxaOverride implements OracleConfig {
 }
 
 // https://github.com/messari/subgraphs/issues/2290
-class tricryptoOverride implements OracleConfig {
+class CurveFactoryPoolOverride implements OracleConfig {
   oracleCount(): number {
     return constants.INT_ONE;
   }
@@ -164,6 +170,22 @@ class tricryptoOverride implements OracleConfig {
       constants.OracleType.CHAINLINK_FEED,
       constants.OracleType.CURVE_CALCULATIONS,
       constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+class PreferUniswapOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
       constants.OracleType.YEARN_LENS_ORACLE,
     ];
   }
@@ -257,7 +279,7 @@ export class config implements Configurations {
           Address.fromString("0x090185f2135308bad17527004364ebcc2d37e5f6"), // SPELL
         ].includes(tokenAddr)
       ) {
-        return new spellOverride();
+        return new SpellOverride();
       }
       if (
         tokenAddr &&
@@ -268,7 +290,7 @@ export class config implements Configurations {
         block.number.gt(BigInt.fromString("14019699")) &&
         block.number.lt(BigInt.fromString("14941265"))
       ) {
-        return new stETHOverride();
+        return new StETHOverride();
       }
       if (
         tokenAddr &&
@@ -276,16 +298,41 @@ export class config implements Configurations {
           Address.fromString("0x91b08f4a7c1251dfccf5440f8894f8daa10c8de5"), // BAXA
         ].includes(tokenAddr)
       ) {
-        return new baxaOverride();
+        return new BaxaOverride();
       }
       if (
         tokenAddr &&
         [
+          Address.fromString("0xed4064f376cb8d68f770fb1ff088a3d0f3ff5c4d"), // crvCRVETH
+          Address.fromString("0xf985005a3793dba4cce241b3c19ddcd3fe069ff4"), // ALCXFRAXBP-f
+          Address.fromString("0x971add32ea87f10bd192671630be3be8a11b8623"), // cvxcrv-crv-f
+          Address.fromString("0x137469b55d1f15651ba46a89d0588e97dd0b6562"), // BADGERWBTC-f
+          Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"), // KP3RETH-f
+          Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"), // SDTETH-f
+          Address.fromString("0x2889302a794dA87fBF1D6Db415C1492194663D13"), // crvCRVUSDTBTCWSTETH
+          //
           Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
           Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
+          Address.fromString("0x4ebdf703948ddcea3b11f675b4d1fba9d2414a14"), // TriCRV
+          Address.fromString("0xF3A43307DcAFa93275993862Aae628fCB50dC768"), // Factory Crypto Pool: cvxFxs/Fxs
+          Address.fromString("0xb79565c01b7Ae53618d9B847b9443aAf4f9011e7"), // Factory Crypto Pool: LDO/ETH
+          Address.fromString("0x4704aB1fb693ce163F7c9D3A31b3FF4eaF797714"), // Factory Crypto Pool: FPI2Pool
+          Address.fromString("0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"), // Factory Plain Pool: crvUSD/USDT
+          Address.fromString("0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"), // Factory Plain Pool: crvUSD/USDC
         ].includes(tokenAddr)
       ) {
-        return new tricryptoOverride();
+        return new CurveFactoryPoolOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"), // ALCX - Uniswap
+          Address.fromString("0x62B9c7356A2Dc64a1969e19C23e4f579F9810Aa7"), // cvxCRV - maybe Uniswap > Yearn
+          Address.fromString("0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"), // KP3R - Uniswap > Yearn
+          Address.fromString("0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F"), // SDT - Uniswap > Yearn
+        ].includes(tokenAddr)
+      ) {
+        return new PreferUniswapOverride();
       }
     }
 
