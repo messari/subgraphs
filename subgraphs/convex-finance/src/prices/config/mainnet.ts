@@ -326,10 +326,10 @@ export class config implements Configurations {
       if (
         tokenAddr &&
         [
-          Address.fromString("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"), // ALCX - Uniswap
-          Address.fromString("0x62B9c7356A2Dc64a1969e19C23e4f579F9810Aa7"), // cvxCRV - maybe Uniswap > Yearn
-          Address.fromString("0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"), // KP3R - Uniswap > Yearn
-          Address.fromString("0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F"), // SDT - Uniswap > Yearn
+          Address.fromString("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"), // ALCX
+          Address.fromString("0x62B9c7356A2Dc64a1969e19C23e4f579F9810Aa7"), // cvxCRV
+          Address.fromString("0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"), // KP3R
+          Address.fromString("0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F"), // SDT
         ].includes(tokenAddr)
       ) {
         return new PreferUniswapOverride();
