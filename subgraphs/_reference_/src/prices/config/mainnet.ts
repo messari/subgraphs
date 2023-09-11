@@ -32,9 +32,12 @@ export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
   12370088
 );
 
+// Address Provider: https://etherscan.io/address/0x0000000022d53366457f9d5e68ec105046fc4383
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
   new OracleContract("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c", 11154794),
-  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752),
+  new OracleContract("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5", 12195750), // Main Registry
+  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752), // CryptoSwap Registry
+  new OracleContract("0xf98b45fa17de75fb1ad0e7afd971b0ca00e379fc", 15732062), // Meta Registry
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -95,6 +98,9 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0xbcca60bb61934080951369a648fb03df4f96263c"), // Aave interest bearing USDC
   Address.fromString("0x6c5024cd4f8a59110119c56f8933403a539555eb"), // Aave interest bearing SUSD
   Address.fromString("0xd71ecff9342a5ced620049e616c5035f1db98620"), // Synth sEUR
+  Address.fromString("0xfc2838a17d8e8b1d5456e0a351b0708a09211147"), // FRAX/USDP
+  Address.fromString("0x5ca135cb8527d76e932f34b5145575f9d8cbe08e"), // FPI
+  Address.fromString("0xf939e0a03fb07f59a73314e73794be0e57ac1b4e"), // crvUSD
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -165,6 +171,39 @@ class DelperOverride implements OracleConfig {
       constants.OracleType.CURVE_CALCULATIONS,
       constants.OracleType.CURVE_ROUTER,
       constants.OracleType.SUSHI_CALCULATIONS,
+    ];
+  }
+}
+
+// https://github.com/messari/subgraphs/issues/2290
+class CurveFactoryPoolOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+class PreferUniswapOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
     ];
   }
 }
@@ -285,6 +324,40 @@ export class config implements Configurations {
         ].includes(tokenAddr)
       ) {
         return new DelperOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xed4064f376cb8d68f770fb1ff088a3d0f3ff5c4d"), // crvCRVETH
+          Address.fromString("0xf985005a3793dba4cce241b3c19ddcd3fe069ff4"), // ALCXFRAXBP-f
+          Address.fromString("0x971add32ea87f10bd192671630be3be8a11b8623"), // cvxcrv-crv-f
+          Address.fromString("0x137469b55d1f15651ba46a89d0588e97dd0b6562"), // BADGERWBTC-f
+          Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"), // KP3RETH-f
+          Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"), // SDTETH-f
+          Address.fromString("0x2889302a794da87fbf1d6db415c1492194663d13"), // crvCRVUSDTBTCWSTETH
+          //
+          Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
+          Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
+          Address.fromString("0x4ebdf703948ddcea3b11f675b4d1fba9d2414a14"), // TriCRV
+          Address.fromString("0xf3a43307dcafa93275993862aae628fcb50dc768"), // Factory Crypto Pool: cvxFxs/Fxs
+          Address.fromString("0xb79565c01b7ae53618d9b847b9443aaf4f9011e7"), // Factory Crypto Pool: LDO/ETH
+          Address.fromString("0x4704ab1fb693ce163f7c9d3a31b3ff4eaf797714"), // Factory Crypto Pool: FPI2Pool
+          Address.fromString("0x390f3595bca2df7d23783dfd126427cceb997bf4"), // Factory Plain Pool: crvUSD/USDT
+          Address.fromString("0x4dece678ceceb27446b35c672dc7d61f30bad69e"), // Factory Plain Pool: crvUSD/USDC
+        ].includes(tokenAddr)
+      ) {
+        return new CurveFactoryPoolOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"), // ALCX
+          Address.fromString("0x62b9c7356a2dc64a1969e19c23e4f579f9810aa7"), // cvxCRV
+          Address.fromString("0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44"), // KP3R
+          Address.fromString("0x73968b9a57c6e53d41345fd57a6e6ae27d6cdb2f"), // SDT
+        ].includes(tokenAddr)
+      ) {
+        return new PreferUniswapOverride();
       }
     }
 
