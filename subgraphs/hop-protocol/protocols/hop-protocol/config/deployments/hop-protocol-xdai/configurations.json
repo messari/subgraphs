@@ -1,5 +1,5 @@
 {
-  "network": "xdai",
+  "network": "gnosis",
   "isMainnet": false,
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
