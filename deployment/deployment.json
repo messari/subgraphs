@@ -3972,6 +3972,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-polygon",
             "query-id": "uniswap-v3-polygon"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-polygon",
+            "query-id": "BvYimJ6vCLkk63oWZy7WB5cVDTVVMugUAF35RAUZpQXE"
           }
         }
       }
