@@ -59,6 +59,7 @@ import {
   BnBntAddr,
   BntAddr,
   DaiAddr,
+  DaiDecimals,
   EthAddr,
   exponentToBigDecimal,
   exponentToBigInt,
@@ -70,6 +71,10 @@ import {
   RewardTokenType,
   secondsPerDay,
   secondsPerHour,
+  UsdcAddr,
+  UsdcDecimals,
+  UsdtAddr,
+  UsdtDecimals,
   zeroBD,
   zeroBI,
 } from "./constants";
@@ -939,22 +944,32 @@ function getDaiAmount(
 // potential optimization: store price at Token.lastPriceUSD
 function getTokenPriceUSD(token: string, decimals: i32): BigDecimal {
   let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
-  let daiAmountMantissaResult = info.try_tradeOutputBySourceAmount(
-    Address.fromString(token),
-    Address.fromString(DaiAddr),
-    exponentToBigInt(decimals)
-  );
-  if (daiAmountMantissaResult.reverted) {
-    log.warning(
-      "[getTokenPriceUSD] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
-      [token, DaiAddr, exponentToBigInt(decimals).toString()]
+
+  const stables = [
+    [DaiAddr, DaiDecimals],
+    [UsdcAddr, UsdcDecimals],
+    [UsdtAddr, UsdtDecimals],
+  ];
+  for (let i = 0; i < stables.length; i++) {
+    let stableAmountMantissaResult = info.try_tradeOutputBySourceAmount(
+      Address.fromString(token),
+      Address.fromString(stables[i][0]),
+      exponentToBigInt(decimals)
     );
-    return zeroBD;
+
+    if (!stableAmountMantissaResult.reverted) {
+      return stableAmountMantissaResult.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(parseInt(stables[i][1]) as i32));
+    } else {
+      log.warning(
+        "[getTokenPriceUSD] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
+        [token, stables[i][0], exponentToBigInt(decimals).toString()]
+      );
+    }
   }
-  // 18 = dai decimals
-  return daiAmountMantissaResult.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(18));
+
+  return zeroBD;
 }
 
 function getReserveTokenAmount(

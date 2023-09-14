@@ -66,6 +66,11 @@ export let EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export let BntAddr = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";
 export let BnBntAddr = "0xab05cf7c6c3a288cd36326e4f7b8600e7268e344";
 export let DaiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
+export let UsdcAddr = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+export let UsdtAddr = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+export let DaiDecimals = "18";
+export let UsdcDecimals = "6";
+export let UsdtDecimals = "6";
 
 export let secondsPerDay = 24 * 60 * 60;
 export let secondsPerHour = 60 * 60;
