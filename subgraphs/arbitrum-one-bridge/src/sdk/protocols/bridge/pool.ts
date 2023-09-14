@@ -23,7 +23,6 @@ import {
   BIGINT_ZERO,
   RewardTokenType,
 } from "../../util/constants";
-import { bigIntToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,
@@ -336,6 +335,25 @@ export class Pool {
   }
 
   /**
+   * Utility function to update token price.
+   *
+   * @param token
+   * @returns
+   */
+  setTokenPrice(token: Token): void {
+    if (
+      !token.lastPriceBlockNumber ||
+      (token.lastPriceBlockNumber &&
+        token.lastPriceBlockNumber! < this.protocol.event.block.number)
+    ) {
+      const pricePerToken = this.protocol.getTokenPricer().getTokenPrice(token);
+      token.lastPriceUSD = pricePerToken;
+      token.lastPriceBlockNumber = this.protocol.event.block.number;
+      token.save();
+    }
+  }
+
+  /**
    * Utility function to convert some amount of input token to USD.
    *
    * @param amount the amount of inputToken to convert to USD
@@ -343,11 +361,9 @@ export class Pool {
    */
   getInputTokenAmountPrice(amount: BigInt): BigDecimal {
     const token = this.getInputToken();
-    const price = this.protocol.getTokenPricer().getTokenPrice(token);
-    token.lastPriceUSD = price;
-    token.save();
+    this.setTokenPrice(token);
 
-    return bigIntToBigDecimal(amount, token.decimals).times(price);
+    return this.protocol.getTokenPricer().getAmountValueUSD(token, amount);
   }
 
   /**

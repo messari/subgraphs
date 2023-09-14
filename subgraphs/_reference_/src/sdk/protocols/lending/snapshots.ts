@@ -35,8 +35,8 @@ import {
  * You can think of this as an abstraction so the developer doesn't
  * need to think about all of the detailed storage changes that occur.
  *
- * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * Schema Version:  3.1.1
+ * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan

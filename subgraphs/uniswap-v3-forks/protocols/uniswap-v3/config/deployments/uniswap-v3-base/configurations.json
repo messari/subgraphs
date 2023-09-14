@@ -1,0 +1,11 @@
+{
+  "network": "base",
+  "factoryAddress": "0x33128a8fc17869897dce68ed026d694621f6fdfd",
+  "factoryAddressStartBlock": 1371670,
+  "nonFungiblePositionManagerAddress": "0x03a520b32c04bf3beef7beb72e919cf822ed34f1",
+  "nonFungiblePositionManagerAddressStartBlock": 1371704,
+  "deployment": "UNISWAP_V3_BASE",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

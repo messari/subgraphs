@@ -1,7 +1,7 @@
 import { Token } from "../../generated/schema";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenPricer } from "../sdk/protocols/config";
-import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { getUsdPrice } from "../prices";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import {
   Address,
@@ -18,6 +18,7 @@ import {
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { Versions } from "../versions";
 import {
+  BIGDECIMAL_ONE,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
@@ -37,8 +38,7 @@ export class Pricer implements TokenPricer {
       return BIGDECIMAL_ZERO;
     }
 
-    const price = getUsdPricePerToken(Address.fromBytes(token.id), this.block);
-    return price.usdPrice;
+    return getUsdPrice(Address.fromBytes(token.id), BIGDECIMAL_ONE, this.block);
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {

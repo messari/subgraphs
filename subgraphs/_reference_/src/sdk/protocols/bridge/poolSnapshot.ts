@@ -9,6 +9,17 @@ import {
 } from "../../../../generated/schema";
 import { SECONDS_PER_DAY_BI, SECONDS_PER_HOUR_BI } from "../../util/constants";
 
+/**
+ * This file contains the PoolSnapshot, which is used to
+ * make all of the storage changes that occur in the pool daily and hourly snapshots.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.1
+ * Author(s):
+ *  - @jaimehgb
+ *  - @dhruv-chauhan
+ */
+
 export class PoolSnapshot {
   pool: PoolSchema;
   event: CustomEventType;

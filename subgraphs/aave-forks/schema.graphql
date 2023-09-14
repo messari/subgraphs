@@ -24,6 +24,8 @@ enum Network {
   OSMOSIS
   MATIC # aka Polygon
   GNOSIS
+  ANDROMEDA # metis node
+  BASE
 }
 
 enum ProtocolType {
@@ -78,7 +80,7 @@ enum RewardTokenType {
   STAKE
 }
 
-type RewardToken @entity(immutable: true) @regularPolling {
+type RewardToken @entity @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 

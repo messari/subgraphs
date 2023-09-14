@@ -10,7 +10,6 @@ import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
-import { exponentToBigDecimal } from "../../util/numbers";
 
 import {
   LiquidityPoolFee,
@@ -23,7 +22,7 @@ import {
  * initialize new pools in the protocol.
  *
  * Schema Version:  1.3.3
- * SDK Version:     1.1.6
+ * SDK Version:     1.1.7
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -590,17 +589,35 @@ export class Pool {
   }
 
   /**
+   * Utility function to update token price.
+   *
+   * @param token
+   * @returns
+   */
+  setTokenPrice(token: TokenSchema): void {
+    if (
+      !token.lastPriceBlockNumber ||
+      (token.lastPriceBlockNumber &&
+        token.lastPriceBlockNumber! < this.protocol.event.block.number)
+    ) {
+      const pricePerToken = this.protocol.getTokenPricer().getTokenPrice(token);
+      token.lastPriceUSD = pricePerToken;
+      token.lastPriceBlockNumber = this.protocol.event.block.number;
+      token.save();
+    }
+  }
+
+  /**
    * Utility function to convert some amount of input token to USD.
    *
-   * @param amount the amount of inputTokens to convert to USD
+   * @param token
+   * @param amount the amount of inputToken to convert to USD
    * @returns The converted amount.
    */
   getInputTokenAmountPrice(token: TokenSchema, amount: BigInt): BigDecimal {
-    const price = this.protocol.getTokenPricer().getTokenPrice(token);
-    token.lastPriceUSD = price;
-    token.save();
+    this.setTokenPrice(token);
 
-    return amount.divDecimal(exponentToBigDecimal(token.decimals)).times(price);
+    return this.protocol.getTokenPricer().getAmountValueUSD(token, amount);
   }
 
   /**

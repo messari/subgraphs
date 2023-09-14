@@ -2,6 +2,14 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: TroveManager

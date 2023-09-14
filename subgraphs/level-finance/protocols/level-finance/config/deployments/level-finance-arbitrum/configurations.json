@@ -1,0 +1,29 @@
+{
+  "network": "arbitrum-one",
+  "protocolName": "Level Finance",
+  "protocolSlug": "level",
+  "protocolId": "0x32b7bf19cb8b95c27e644183837813d4b595dcc6",
+  "poolName": "LevelVault",
+  "poolSymbol": "Vault",
+  "protocolSideRevenuePercent": "0.35",
+  "stakeSideRevenuePercent": "0.2",
+  "supplySideRevenue": "0.45",
+  "priceCachingBlocks": 0,
+  "outputTokenAddress": "0x5573405636f4b895e511c9c54aafbefa0e7ee458",
+  "VaultAddr": "0x32b7bf19cb8b95c27e644183837813d4b595dcc6",
+  "seniorLLpAddress": "0x5573405636f4b895e511c9c54aafbefa0e7ee458",
+  "levelTokenAddress": "0xb64e280e9d1b5dbec4accedb2257a87b400db149",
+  "VaultStartBlock": 99333260,
+  "deployment": "LEVEL_ARBITRUM",
+  "levelStakeAddress": "0x0000000000000000000000000000000000000000",
+  "levelStakeStartBlock": 0,
+  "isStaking": false,
+  "isCollateralInUSD": true,
+  "levelMastersAddresses": [
+    {
+      "name": "LevelMasterV2",
+      "address": "0x0180dee5df18ebf76642e50faaef426f7b2874f7",
+      "startBlock": 99351230
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import {
   rocketNodeManager,
   NodeRegistered,
   NodeTimezoneLocationSet,
-} from "../../generated/rocketNodeManager/rocketNodeManager";
+} from "../../generated/templates/rocketNodeManager/rocketNodeManager";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
 /**
  * Occurs when a node operator registers his address with the RocketPool protocol.
@@ -126,12 +126,17 @@ function getNodeTimezoneId(
   nodeAddress: string,
   nodeManagerContractAddress: Address
 ): string {
+  let nodeTimezoneStringId = "UNKNOWN";
+
   const rocketNodeManagerContract = rocketNodeManager.bind(
     nodeManagerContractAddress
   );
-  let nodeTimezoneStringId = rocketNodeManagerContract.getNodeTimezoneLocation(
-    Address.fromString(nodeAddress)
-  );
-  if (nodeTimezoneStringId == null) nodeTimezoneStringId = "UNKNOWN";
+  const nodeTimezoneLocationCall =
+    rocketNodeManagerContract.try_getNodeTimezoneLocation(
+      Address.fromString(nodeAddress)
+    );
+  if (!nodeTimezoneLocationCall.reverted)
+    nodeTimezoneStringId = nodeTimezoneLocationCall.value;
+
   return nodeTimezoneStringId;
 }

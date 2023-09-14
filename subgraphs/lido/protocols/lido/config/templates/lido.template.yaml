@@ -18,7 +18,7 @@ dataSources:
       startBlock: 11473216
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token
@@ -79,6 +79,7 @@ dataSources:
           handler: handleSubmit
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+          receipt: true
         - event: ETHDistributed(indexed uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleETHDistributed
       file: ./src/mappings/Lido.ts
@@ -91,7 +92,7 @@ dataSources:
       startBlock: 11473216
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token

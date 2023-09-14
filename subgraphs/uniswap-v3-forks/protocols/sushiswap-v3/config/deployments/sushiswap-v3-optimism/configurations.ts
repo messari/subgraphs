@@ -63,7 +63,7 @@ export class SushiswapV3OptimismConfigurations implements Configurations {
       "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58", // USDT
       "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // DAI
       "0x7170bd6f5ab1ac44a1ba7a0beb5f3f06c2d4a898", // SUSD
-      "0x3eaEb77b03dBc0F6321AE1b72b2E9aDb0F60112B", // SUSHI
+      "0x3eaeb77b03dbc0f6321ae1b72b2e9adb0f60112b", // SUSHI
     ]);
   }
   getStableCoins(): Bytes[] {
@@ -86,5 +86,8 @@ export class SushiswapV3OptimismConfigurations implements Configurations {
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("1000");
+  }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList([]);
   }
 }

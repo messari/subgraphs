@@ -27,6 +27,7 @@ export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
+  export const BASE = "BASE";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
@@ -138,6 +139,7 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_FIVE = 5 as i32;
 
 export const BIGDECIMAL_NEG_ONE = new BigDecimal(BIGINT_NEG_ONE);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);

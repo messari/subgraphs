@@ -117,13 +117,13 @@ export function getLiquidityBoundPrice(
       .div(amount);
 
     log.warning(
-      "[getLiquidityBoundPrice] reported (token price * amount): ({} * {}) bound to: {} for token: {} due to insufficient liquidity: {}",
+      "[getLiquidityBoundPrice] token: {} (reported price * amount): ({} * {}) bound to available liquidity: {}; new price: {}",
       [
+        tokenAddress.toHexString(),
         tokenPrice.usdPrice.toString(),
         amount.toString(),
-        liquidityBoundPriceUSD.toString(),
-        tokenAddress.toHexString(),
         liquidity.toString(),
+        liquidityBoundPriceUSD.toString(),
       ]
     );
   }

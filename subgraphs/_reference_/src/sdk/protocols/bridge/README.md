@@ -1,4 +1,4 @@
-# Bridge SDK
+# Bridge SDK `1.0.1`
 
 ## Setup
 

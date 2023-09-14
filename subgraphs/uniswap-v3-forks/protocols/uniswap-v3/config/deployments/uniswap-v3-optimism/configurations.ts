@@ -88,4 +88,7 @@ export class UniswapV3OptimismConfigurations implements Configurations {
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");
   }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList(["0x000000000000be0ab658f92dddac29d6df19a3be"]);
+  }
 }

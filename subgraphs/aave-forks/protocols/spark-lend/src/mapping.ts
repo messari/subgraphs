@@ -75,7 +75,12 @@ import {
   _handleTransfer,
   _handleWithdraw,
 } from "../../../src/mapping";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, INT_FOUR } from "../../../src/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  INT_FOUR,
+  INT_ZERO,
+} from "../../../src/constants";
 
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
 import {
@@ -631,19 +636,21 @@ function getIsIsolatedFlag(event: ethereum.Event): boolean {
   const eventLogIndex = event.logIndex;
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.gt(eventLogIndex)) {
-      // no IsolationModeTotalDebtUpdated log before Borrow
-      break;
-    }
-    // topics[0] - signature
-    const logSignature = thisLog.topics[0];
-    if (thisLog.address == event.address && logSignature == eventSignature) {
-      log.info(
-        "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
-        [event.transaction.hash.toHexString()]
-      );
-      isIsolated = true;
-      break;
+    if (thisLog.topics.length > INT_ZERO) {
+      if (thisLog.logIndex.gt(eventLogIndex)) {
+        // no IsolationModeTotalDebtUpdated log before Borrow
+        break;
+      }
+      // topics[0] - signature
+      const logSignature = thisLog.topics[0];
+      if (thisLog.address == event.address && logSignature == eventSignature) {
+        log.info(
+          "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
+          [event.transaction.hash.toHexString()]
+        );
+        isIsolated = true;
+        break;
+      }
     }
   }
   return isIsolated;
@@ -660,21 +667,26 @@ function getBalanceTransferAmount(event: ethereum.Event): BigInt {
   const eventLogIndex = event.logIndex;
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    if (thisLog.logIndex.le(eventLogIndex)) {
-      // skip event with logIndex < event.logIndex
-      continue;
-    }
-    // topics[0] - signature
-    const logSignature = thisLog.topics[0];
-    if (thisLog.address == event.address && logSignature == eventSignature) {
-      const UINT256_UINT256 = "(uint256,uint256)";
-      const decoded = ethereum.decode(UINT256_UINT256, thisLog.data)!.toTuple();
-      btAmount = decoded[0].toBigInt();
-      log.info("[handleCollateralTransfer] BalanceTransfer amount= {} tx {}", [
-        btAmount.toString(),
-        event.transaction.hash.toHexString(),
-      ]);
-      break;
+    if (thisLog.topics.length > INT_ZERO) {
+      if (thisLog.logIndex.le(eventLogIndex)) {
+        // skip event with logIndex < event.logIndex
+        continue;
+      }
+      // topics[0] - signature
+      const logSignature = thisLog.topics[0];
+      if (thisLog.address == event.address && logSignature == eventSignature) {
+        const UINT256_UINT256 = "(uint256,uint256)";
+        const decoded = ethereum.decode(UINT256_UINT256, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        btAmount = logData[0].toBigInt();
+        log.info(
+          "[handleCollateralTransfer] BalanceTransfer amount= {} tx {}",
+          [btAmount.toString(), event.transaction.hash.toHexString()]
+        );
+        break;
+      }
     }
   }
   return btAmount;

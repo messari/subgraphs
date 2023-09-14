@@ -29,8 +29,8 @@ import { PositionSide } from "./constants";
  * This file contains the PositionManager class, which is used to
  * make changes to a given position.
  *
- * Schema Version:  3.1.0
- * SDK Version:     1.0.6
+ * Schema Version:  3.1.1
+ * SDK Version:     1.0.7
  * Author(s):
  *  - @dmelotik
  *  - @dhruv-chauhan

@@ -54,6 +54,7 @@ import {
   getFlashloanPremiumAmount,
   calcuateFlashLoanPremiumToLPUSD,
   getTreasuryAddress,
+  getPrincipal,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -705,12 +706,16 @@ export function _handleDeposit(
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
+  const principal = getPrincipal(market, accountID, PositionSide.COLLATERAL);
   manager.createDeposit(
     asset,
     accountID,
     amount,
     amountUSD,
-    newCollateralBalance
+    newCollateralBalance,
+    null,
+    false,
+    principal
   );
   const account = Account.load(accountID);
   if (!account) {
@@ -774,12 +779,15 @@ export function _handleWithdraw(
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const newCollateralBalance = getCollateralBalance(market, accountID);
+  const principal = getPrincipal(market, accountID, PositionSide.COLLATERAL);
   manager.createWithdraw(
     asset,
     accountID,
     amount,
     amountUSD,
-    newCollateralBalance
+    newCollateralBalance,
+    null,
+    principal
   );
 }
 
@@ -808,6 +816,12 @@ export function _handleBorrow(
   const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const newBorrowBalances = getBorrowBalances(market, accountID);
+  const principal = getPrincipal(
+    market,
+    accountID,
+    PositionSide.BORROWER,
+    interestRateType
+  );
 
   manager.createBorrow(
     asset,
@@ -817,7 +831,8 @@ export function _handleBorrow(
     newBorrowBalances[0].plus(newBorrowBalances[1]),
     market.inputTokenPriceUSD,
     interestRateType,
-    isIsolated
+    isIsolated,
+    principal
   );
 }
 
@@ -857,6 +872,13 @@ export function _handleRepay(
     );
   }
 
+  const principal = getPrincipal(
+    market,
+    accountID,
+    PositionSide.BORROWER,
+    interestRateType
+  );
+
   manager.createRepay(
     asset,
     accountID,
@@ -864,7 +886,8 @@ export function _handleRepay(
     amountUSD,
     newBorrowBalances[0].plus(newBorrowBalances[1]),
     market.inputTokenPriceUSD,
-    interestRateType
+    interestRateType,
+    principal
   );
 }
 
@@ -954,6 +977,11 @@ export function _handleLiquidate(
   const debtBalances = getBorrowBalances(debtTokenMarket, liquidatee);
   const totalDebtBalance = debtBalances[0].plus(debtBalances[1]);
   const subtractBorrowerPosition = false;
+  const collateralPrincipal = getPrincipal(
+    market,
+    liquidatee,
+    PositionSide.COLLATERAL
+  );
   const liquidate = manager.createLiquidate(
     collateralAsset,
     debtAsset,
@@ -965,7 +993,8 @@ export function _handleLiquidate(
     collateralBalance,
     totalDebtBalance,
     null,
-    subtractBorrowerPosition
+    subtractBorrowerPosition,
+    collateralPrincipal
   );
   if (!liquidate) {
     return;
@@ -988,12 +1017,19 @@ export function _handleLiquidate(
 
   const vBorrowerPositionBalance = vBorrowerPosition._getPositionBalance();
   if (vBorrowerPositionBalance && vBorrowerPositionBalance.gt(BIGINT_ZERO)) {
+    const vPrincipal = getPrincipal(
+      market,
+      Address.fromBytes(liquidateeAccount.id),
+      PositionSide.BORROWER,
+      InterestRateType.VARIABLE
+    );
     vBorrowerPosition.subtractPosition(
       event,
       protocol,
       debtBalances[1],
       TransactionType.LIQUIDATE,
-      debtTokenMarket.inputTokenPriceUSD
+      debtTokenMarket.inputTokenPriceUSD,
+      vPrincipal
     );
     liquidatedPositions.push(vBorrowerPosition.getPositionID()!);
   }
@@ -1012,12 +1048,19 @@ export function _handleLiquidate(
     sBorrowerPositionBalance &&
     sBorrowerPositionBalance.gt(BIGINT_ZERO)
   ) {
+    const sPrincipal = getPrincipal(
+      market,
+      Address.fromBytes(liquidateeAccount.id),
+      PositionSide.BORROWER,
+      InterestRateType.STABLE
+    );
     sBorrowerPosition.subtractPosition(
       event,
       protocol,
       debtBalances[0],
       TransactionType.LIQUIDATE,
-      debtTokenMarket.inputTokenPriceUSD
+      debtTokenMarket.inputTokenPriceUSD,
+      sPrincipal
     );
     liquidatedPositions.push(sBorrowerPosition.getPositionID()!);
   }
@@ -1122,6 +1165,11 @@ export function _handleMintedToTreasury(
   const amountUSD = tokenManager.getAmountUSD(amount);
   const treasuryAddress = getTreasuryAddress(market);
   const treasuryBalance = getCollateralBalance(market, treasuryAddress);
+  const treasuryPrincipal = getPrincipal(
+    market,
+    treasuryAddress,
+    PositionSide.COLLATERAL
+  );
 
   const manager = new DataManager(
     market.id,
@@ -1136,7 +1184,10 @@ export function _handleMintedToTreasury(
     amount,
     amountUSD,
     BIGINT_ZERO,
-    treasuryBalance
+    treasuryBalance,
+    null,
+    null,
+    treasuryPrincipal
   );
 }
 
@@ -1202,6 +1253,19 @@ export function _handleTransfer(
     interestRateType = null;
   }
 
+  const senderPrincipal = getPrincipal(
+    market,
+    from,
+    positionSide,
+    interestRateType
+  );
+  const receiverPrincipal = getPrincipal(
+    market,
+    to,
+    positionSide,
+    interestRateType
+  );
+
   const amountUSD = tokenManager.getAmountUSD(amount);
   const manager = new DataManager(
     market.id,
@@ -1217,7 +1281,9 @@ export function _handleTransfer(
     amountUSD,
     senderBalanceResult.value,
     receiverBalanceResult.value,
-    interestRateType
+    interestRateType,
+    senderPrincipal,
+    receiverPrincipal
   );
 }
 
@@ -1328,6 +1394,18 @@ export function _handleSwapBorrowRateMode(
   );
   const stableTokenBalance = newBorrowBalances[0];
   const variableTokenBalance = newBorrowBalances[1];
+  const vPrincipal = getPrincipal(
+    market,
+    Address.fromBytes(account.id),
+    PositionSide.BORROWER,
+    InterestRateType.VARIABLE
+  );
+  const sPrincipal = getPrincipal(
+    market,
+    Address.fromBytes(account.id),
+    PositionSide.BORROWER,
+    InterestRateType.STABLE
+  );
   //all open position converted to STABLE
   if (endInterestRateType === InterestRateType.STABLE) {
     vPositionManager.subtractPosition(
@@ -1335,7 +1413,8 @@ export function _handleSwapBorrowRateMode(
       protocol,
       variableTokenBalance,
       TransactionType.SWAP,
-      market.inputTokenPriceUSD
+      market.inputTokenPriceUSD,
+      vPrincipal
     );
     sPositionManager.addPosition(
       event,
@@ -1343,7 +1422,8 @@ export function _handleSwapBorrowRateMode(
       protocol,
       stableTokenBalance,
       TransactionType.SWAP,
-      market.inputTokenPriceUSD
+      market.inputTokenPriceUSD,
+      sPrincipal
     );
   } else {
     //all open position converted to VARIABLE
@@ -1353,14 +1433,16 @@ export function _handleSwapBorrowRateMode(
       protocol,
       variableTokenBalance,
       TransactionType.SWAP,
-      market.inputTokenPriceUSD
+      market.inputTokenPriceUSD,
+      vPrincipal
     );
     sPositionManager.subtractPosition(
       event,
       protocol,
       stableTokenBalance,
       TransactionType.SWAP,
-      market.inputTokenPriceUSD
+      market.inputTokenPriceUSD,
+      sPrincipal
     );
   }
 }

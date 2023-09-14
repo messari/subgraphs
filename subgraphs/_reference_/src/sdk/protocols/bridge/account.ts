@@ -16,6 +16,19 @@ import { BridgePoolType, TransactionType, TransferType } from "./enums";
 import { getUnixDays, getUnixHours } from "../../util/events";
 import { CustomEventType } from "../../util/events";
 
+/**
+ * This file contains the AccountClass, which does
+ * the operations on the Account entity. This includes:
+ *  - Creating a new Account
+ *  - Updating an existing Account
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.1
+ * Author(s):
+ *  - @jaimehgb
+ *  - @dhruv-chauhan
+ */
+
 export class AccountManager {
   protocol: Bridge;
   tokens: TokenManager;

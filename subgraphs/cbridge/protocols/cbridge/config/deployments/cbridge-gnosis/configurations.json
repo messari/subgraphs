@@ -1,5 +1,5 @@
 {
-  "network": "xdai",
+  "network": "gnosis",
   "Bridge": {
     "address": "0x3795C36e7D12A8c252A20C5a7B455f7c57b60283",
     "startBlock": 19926499
