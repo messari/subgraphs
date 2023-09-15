@@ -4,13 +4,7 @@ import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { getOrCreateAccount } from "../common/initializers";
-import {
-  Address,
-  BigInt,
-  Bytes,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, dataSource } from "@graphprotocol/graph-ts";
 import { Pool as PoolContract } from "../../generated/Pool/Pool";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
@@ -38,8 +32,8 @@ export function transaction(
   const poolInputTokens = pool.getInputTokens();
   const idx = pool.getInputTokens().indexOf(token.id);
   const inputTokenBalances = pool.pool.inputTokenBalances;
-  log.warning("[Network] {}", [dataSource.network()]);
-  if (dataSource.network() === "arbitrum-one") {
+
+  if (dataSource.network() == constants.NETWORK_ARBITRUM) {
     const poolContract = PoolContract.bind(
       Address.fromBytes(pool.getBytesID())
     );
