@@ -60,4 +60,5 @@ export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
   Address.fromString("0x10010078a54396f62c96df8532dc2b4847d47ed3"), // Hundred Finance
   Address.fromString("0x48fb253446873234f2febbf9bdeaa72d9d387f94"), // Bancor Governance Token (vBNT)
+  Address.fromString("0x2bbf681cc4eb09218bee85ea2a5d3d13fa40fc0c"), // bb-a-USDT deprecated
 ];

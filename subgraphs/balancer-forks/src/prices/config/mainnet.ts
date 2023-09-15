@@ -96,7 +96,6 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x4fd63966879300cafafbb35d157dc5229278ed23"), // bb-a-USD
   Address.fromString("0x9210f1204b5a24742eba12f710636d76240df3d0"), // bb-a-USDC deprecated
   Address.fromString("0x804cdb9116a10bb78768d3252355a1b18067bf8f"), // bb-a-DAI deprecated
-  Address.fromString("0x2bbf681cc4eb09218bee85ea2a5d3d13fa40fc0c"), // bb-a-USDT deprecated
   Address.fromString("0x652d486b80c461c397b0d95612a404da936f3db3"), // bb-a-USDC old
   Address.fromString("0xa3823e50f20982656557a4a6a9c06ba5467ae908"), // bb-a-DAI old
   Address.fromString("0xe6bcc79f328eec93d4ec8f7ed35534d9ab549faa"), // bb-a-USDT old
