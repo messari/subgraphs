@@ -15,7 +15,7 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { ERC20 } from "../../generated/Booster/ERC20";
 import { Pool as PoolContract } from "../../generated/Booster/Pool";
@@ -102,8 +102,7 @@ export function Deposit(
   const depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     outputTokenContract.try_totalSupply(),
@@ -115,8 +114,7 @@ export function Deposit(
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.pricePerShare = utils
     .readValue<BigInt>(

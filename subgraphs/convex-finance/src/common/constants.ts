@@ -142,14 +142,6 @@ MISSING_POOLS_MAP.set(
   Address.fromString("0x941eb6f616114e4ecaa85377945ea306002612fe")
 );
 MISSING_POOLS_MAP.set(
-  Address.fromString("0xf3a43307dcafa93275993862aae628fcb50dc768"),
-  Address.fromString("0xd658a338613198204dca1143ac3f01a722b5d94a")
-);
-MISSING_POOLS_MAP.set(
-  Address.fromString("0x137469b55d1f15651ba46a89d0588e97dd0b6562"),
-  Address.fromString("0x50f3752289e1456bfa505afd37b241bca23e685d")
-);
-MISSING_POOLS_MAP.set(
   Address.fromString("0xe160364fd8407ffc8b163e278300c6c5d18ff61d"),
   Address.fromString("0xf43b15ab692fde1f9c24a9fce700adcc809d5391")
 );
@@ -168,14 +160,6 @@ MISSING_POOLS_MAP.set(
 MISSING_POOLS_MAP.set(
   Address.fromString("0x401322b9fddba8c0a8d40fbcece1d1752c12316b"),
   Address.fromString("0xfe4a08f22fe65759ba91db2e2cada09b4415b0d7")
-);
-MISSING_POOLS_MAP.set(
-  Address.fromString("0x4704ab1fb693ce163f7c9d3a31b3ff4eaf797714"),
-  Address.fromString("0xf861483fa7e511fbc37487d91b6faa803af5d37c")
-);
-MISSING_POOLS_MAP.set(
-  Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"),
-  Address.fromString("0xfb8814d005c5f32874391e888da6eb2fe7a27902")
 );
 MISSING_POOLS_MAP.set(
   Address.fromString("0x54c8ecf46a81496eeb0608bd3353388b5d7a2a33"),
@@ -202,10 +186,6 @@ MISSING_POOLS_MAP.set(
   Address.fromString("0xef04f337fcb2ea220b6e8db5edbe2d774837581c")
 );
 MISSING_POOLS_MAP.set(
-  Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"),
-  Address.fromString("0x21410232b484136404911780bc32756d5d1a9fa9")
-);
-MISSING_POOLS_MAP.set(
   Address.fromString("0x3660bd168494d61ffdac21e403d0f6356cf90fd7"),
   Address.fromString("0x6ec38b3228251a0c5d491faf66858e2e23d7728b")
 );
@@ -222,14 +202,6 @@ MISSING_POOLS_MAP.set(
   Address.fromString("0x3211c6cbef1429da3d0d58494938299c92ad5860")
 );
 MISSING_POOLS_MAP.set(
-  Address.fromString("0xbe4f3ad6c9458b901c81b734cb22d9eae9ad8b50"),
-  Address.fromString("0x75a6787c7ee60424358b449b539a8b774c9b4862")
-);
-MISSING_POOLS_MAP.set(
   Address.fromString("0x8c524635d52bd7b1bd55e062303177a7d916c046"),
   Address.fromString("0x8c524635d52bd7b1bd55e062303177a7d916c046")
-);
-MISSING_POOLS_MAP.set(
-  Address.fromString("0x7ea4ad8c803653498bf6ac1d2debc04dce8fd2ad"),
-  Address.fromString("0xe0e970a99bc4f53804d8145bebbc7ebc9422ba7f")
 );
