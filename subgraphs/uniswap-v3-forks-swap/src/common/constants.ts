@@ -12,8 +12,8 @@ export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BASE = "BASE";
   export const BSC = "BSC"; // aka BNB Chain
+  export const BASE = "BASE";
   export const CELO = "CELO";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
@@ -138,6 +138,9 @@ export const INT_TWO = 2 as i32;
 export const INT_THREE = 3 as i32;
 export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 
+export const INT_HUNDRED = 100 as i64;
+export const INT_FIVE_HUNDRED = 500 as i64;
+
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
@@ -146,3 +149,7 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
+
+export const MOST_RECENT_TRANSACTION = "MOST_RECENT_TRANSACTION";
+
+export const TICK_BASE = BigDecimal.fromString("1.0001");
