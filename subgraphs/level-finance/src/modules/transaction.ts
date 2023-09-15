@@ -4,7 +4,14 @@ import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { getOrCreateAccount } from "../common/initializers";
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  Bytes,
+  dataSource,
+  log,
+} from "@graphprotocol/graph-ts";
+import { Pool as PoolContract } from "../../generated/Pool/Pool";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
 export function transaction(
@@ -19,7 +26,7 @@ export function transaction(
 ): void {
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-  if (!token._isWhitelisted) return;
+  if (token._isWhitelisted === false) return;
 
   if (transactionType === TransactionType.DEPOSIT) {
     utils.checkAndUpdateInputTokens(pool, token, amount);
@@ -31,11 +38,23 @@ export function transaction(
   const poolInputTokens = pool.getInputTokens();
   const idx = pool.getInputTokens().indexOf(token.id);
   const inputTokenBalances = pool.pool.inputTokenBalances;
-  if (transactionType === TransactionType.DEPOSIT) {
-    inputTokenBalances[idx] = inputTokenBalances[idx].plus(amount);
-  }
-  if (transactionType === TransactionType.WITHDRAW) {
-    inputTokenBalances[idx] = inputTokenBalances[idx].minus(amount);
+  log.warning("[Network] {}", [dataSource.network()]);
+  if (dataSource.network() === "arbitrum-one") {
+    const poolContract = PoolContract.bind(
+      Address.fromBytes(pool.getBytesID())
+    );
+    const tokenBalance = utils.readValue(
+      poolContract.try_poolBalances(Address.fromBytes(token.id)),
+      constants.BIGINT_ZERO
+    );
+    inputTokenBalances[idx] = tokenBalance;
+  } else {
+    if (transactionType === TransactionType.DEPOSIT) {
+      inputTokenBalances[idx] = inputTokenBalances[idx].plus(amount);
+    }
+    if (transactionType === TransactionType.WITHDRAW) {
+      inputTokenBalances[idx] = inputTokenBalances[idx].minus(amount);
+    }
   }
   const amountsArray = new Array<BigInt>(poolInputTokens.length).fill(
     constants.BIGINT_ZERO
