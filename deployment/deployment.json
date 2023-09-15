@@ -2614,7 +2614,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.4.1",
+          "subgraph": "1.4.2",
           "methodology": "1.0.1"
         },
         "files": {

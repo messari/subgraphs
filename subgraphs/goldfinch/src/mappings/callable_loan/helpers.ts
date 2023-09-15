@@ -101,7 +101,11 @@ export function updatePoolTokensRedeemable(callableLoan: CallableLoan): void {
   );
   const poolTokenIds = callableLoan.tokens;
   for (let i = 0; i < poolTokenIds.length; i++) {
-    const poolToken = assert(PoolToken.load(poolTokenIds[i]));
+    const poolToken = PoolToken.load(poolTokenIds[i]);
+    if (!poolToken) {
+      continue;
+    }
+
     const availableToWithdrawResult =
       callableLoanContract.try_availableToWithdraw(
         BigInt.fromString(poolToken.id)
