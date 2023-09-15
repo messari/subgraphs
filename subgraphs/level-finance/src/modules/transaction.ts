@@ -20,7 +20,7 @@ export function transaction(
 ): void {
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-  if (!token._isWhitelisted) return;
+  if (token._isWhitelisted === false) return;
 
   if (transactionType === TransactionType.DEPOSIT) {
     utils.checkAndUpdateInputTokens(pool, token, amount);
