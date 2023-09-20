@@ -95,6 +95,21 @@ export function createSwap(
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
 
+  if (
+    token0.decimals < -6143 ||
+    token0.decimals > 6144 ||
+    token0.decimals < -6143 ||
+    token1.decimals > 6144
+  ) {
+    // If decimals for any of the input tokens are not in range [-6143, 6144]. Ignore it.
+    // https://github.com/messari/subgraphs/issues/2375
+    log.error(
+      "Decimals for token(s) out of range - Invalid Swap: token0: {} token1: {}",
+      [token0.id, token1.id]
+    );
+    return;
+  }
+
   // totals for volume updates
   const amount0 = amount0In.minus(amount0Out);
   const amount1 = amount1In.minus(amount1Out);
