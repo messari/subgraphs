@@ -11,6 +11,8 @@ import {
   BIGDECIMAL_FIFTY_PERCENT,
   BIGINT_NEG_ONE,
   BIGINT_ZERO,
+  EXPONENT_MIN,
+  EXPONENT_MAX,
 } from "./constants";
 import {
   getLiquidityPool,
@@ -96,10 +98,10 @@ export function createSwap(
   const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   if (
-    token0.decimals < -6143 ||
-    token0.decimals > 6144 ||
-    token0.decimals < -6143 ||
-    token1.decimals > 6144
+    token0.decimals < EXPONENT_MIN ||
+    token0.decimals > EXPONENT_MAX ||
+    token0.decimals < EXPONENT_MIN ||
+    token1.decimals > EXPONENT_MAX
   ) {
     // If decimals for any of the input tokens are not in range [-6143, 6144]. Ignore it.
     // https://github.com/messari/subgraphs/issues/2375
