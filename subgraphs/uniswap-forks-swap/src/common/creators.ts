@@ -11,6 +11,8 @@ import {
   BIGDECIMAL_FIFTY_PERCENT,
   BIGINT_NEG_ONE,
   BIGINT_ZERO,
+  EXPONENT_MIN,
+  EXPONENT_MAX,
 } from "./constants";
 import {
   getLiquidityPool,
@@ -94,6 +96,21 @@ export function createSwap(
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
+
+  if (
+    token0.decimals < EXPONENT_MIN ||
+    token0.decimals > EXPONENT_MAX ||
+    token0.decimals < EXPONENT_MIN ||
+    token1.decimals > EXPONENT_MAX
+  ) {
+    // If decimals for any of the input tokens are not in range [-6143, 6144]. Ignore it.
+    // https://github.com/messari/subgraphs/issues/2375
+    log.error(
+      "Decimals for token(s) out of range - Invalid Swap: token0: {} token1: {}",
+      [token0.id, token1.id]
+    );
+    return;
+  }
 
   // totals for volume updates
   const amount0 = amount0In.minus(amount0Out);
