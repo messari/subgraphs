@@ -13,15 +13,15 @@ This script will function as a service continually querying deployed subgraphs a
 ### Check groups
 
 - Indexing status
-    - Get list of valid current deployments
-    - Get list of valid pending deployments
-    - Combine two lists above into index failed depos and index success depos
-    - Use index success list for validating subgraph data
-    - send alerts for depos that have indexing errors
+  - Get list of valid current deployments
+  - Get list of valid pending deployments
+  - Combine two lists above into index failed depos and index success depos
+  - Use index success list for validating subgraph data
+  - send alerts for depos that have indexing errors
 - protocol level data
-    - Separated into TS data validation and non TS data validation
+  - Separated into TS data validation and non TS data validation
 - pool level data
-    - Separated into TS data validation and non TS data validation
+  - Separated into TS data validation and non TS data validation
 
 ### Discord Alerts
 

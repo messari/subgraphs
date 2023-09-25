@@ -28,7 +28,7 @@ export async function generateProtocolToBaseMap(data) {
     Object.keys(data).forEach((protocolName) => {
       const protocol = data[protocolName];
       protocolToBaseMap[protocolName] = protocol.base;
-    })
+    });
   }
   return protocolToBaseMap;
 }
@@ -50,10 +50,13 @@ export async function generateDecenEndpoints(data) {
           }
           const decenObj = depoData?.services["decentralized-network"];
           if (!!decenObj) {
-            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (decenObj?.["query-id"]);
+            hostedEndpointToDecenNetwork[
+              "https://api.thegraph.com/subgraphs/name/messari/" +
+                hostedServiceId
+            ] = decenObj?.["query-id"];
           }
         });
-      })
+      });
     }
   } catch (err) {
     errorNotification("ERROR LOCATION 1 " + err.message);
@@ -73,7 +76,11 @@ export async function generateEndpoints(data) {
         if (!Object.keys(subgraphEndpoints).includes(protocol.schema)) {
           subgraphEndpoints[protocol.schema] = {};
         }
-        if (!Object.keys(subgraphEndpoints[protocol.schema]).includes(protocolName)) {
+        if (
+          !Object.keys(subgraphEndpoints[protocol.schema]).includes(
+            protocolName
+          )
+        ) {
           subgraphEndpoints[protocol.schema][protocolName] = {};
         }
         Object.values(protocol.deployments).forEach((depoData) => {
@@ -81,7 +88,9 @@ export async function generateEndpoints(data) {
           if (!!depoData?.services["hosted-service"]) {
             hostedServiceId = depoData?.services["hosted-service"]?.slug;
           }
-          subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId;
+          subgraphEndpoints[protocol.schema][protocolName][depoData.network] =
+            "https://api.thegraph.com/subgraphs/name/messari/" +
+            hostedServiceId;
         });
       });
     }
@@ -89,53 +98,64 @@ export async function generateEndpoints(data) {
   } catch (err) {
     errorNotification("ERROR LOCATION 1 " + err.message);
   }
-};
+}
 
 export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
   if (!process.env.GRAPH_API_KEY) {
     return {};
   }
-  const decenQueries = Object.values(hostedEndpointToDecenNetwork).map((decenNetwork) => {
-    if (!decenNetwork) {
-      return null;
-    }
-    const endpoint = "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenNetwork
-    const string = `query MyQuery {
+  const decenQueries = Object.values(hostedEndpointToDecenNetwork).map(
+    (decenNetwork) => {
+      if (!decenNetwork) {
+        return null;
+      }
+      const endpoint =
+        "https://gateway.thegraph.com/api/" +
+        process.env.GRAPH_API_KEY +
+        "/subgraphs/id/" +
+        decenNetwork;
+      const string = `query MyQuery {
       _meta {
           deployment
       }
   }`;
 
-    return axios.post(
-      endpoint,
-      { query: string },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      }
-    )
-  });
+      return axios.post(
+        endpoint,
+        { query: string },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+    }
+  );
 
   const decenSubgraphHashToIndexingObj = {};
   const decenDeploymentMapping = {};
   const decenErrorObj = {};
   await Promise.allSettled(decenQueries)
-    .then(
-      (response) => {
-        response.forEach((metaData) => {
-          if (metaData?.value?.data?.data?._meta?.deployment) {
-            decenDeploymentMapping[metaData?.value?.data?.data?._meta?.deployment] = metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1];
-          } else {
-            decenErrorObj[metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1]] = metaData?.value?.data?.errors?.message;
-          }
-        })
-      })
+    .then((response) => {
+      response.forEach((metaData) => {
+        if (metaData?.value?.data?.data?._meta?.deployment) {
+          decenDeploymentMapping[
+            metaData?.value?.data?.data?._meta?.deployment
+          ] = metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1];
+        } else {
+          decenErrorObj[
+            metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1]
+          ] = metaData?.value?.data?.errors?.message;
+        }
+      });
+    })
     .catch((err) => errorNotification("ERROR LOCATION 16 " + err.message));
 
   if (Object.keys(decenDeploymentMapping)?.length > 0) {
-    const indexingQuery = `query Status { indexingStatuses(subgraphs: ${JSON.stringify(Object.keys(decenDeploymentMapping))} ) { 
+    const indexingQuery = `query Status { indexingStatuses(subgraphs: ${JSON.stringify(
+      Object.keys(decenDeploymentMapping)
+    )} ) { 
       subgraph
       synced
       fatalError {
@@ -161,32 +181,48 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
 
     let res = {};
     try {
-      res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery });
+      res = await axios.post("https://api.thegraph.com/index-node/graphql", {
+        query: indexingQuery,
+      });
     } catch (err) {
-      postAlert('ERROR QUERYING INDEX STATUS - ' + err.message);
+      postAlert("ERROR QUERYING INDEX STATUS - " + err.message);
     }
     try {
-      res?.data?.data?.indexingStatuses?.forEach(obj => {
-        let indexedPercentage = ((obj?.chains[0]?.latestBlock?.number - obj?.chains[0]?.earliestBlock?.number) / (obj?.chains[0]?.chainHeadBlock?.number - obj?.chains[0]?.earliestBlock?.number)) || 0;
+      res?.data?.data?.indexingStatuses?.forEach((obj) => {
+        let indexedPercentage =
+          (obj?.chains[0]?.latestBlock?.number -
+            obj?.chains[0]?.earliestBlock?.number) /
+            (obj?.chains[0]?.chainHeadBlock?.number -
+              obj?.chains[0]?.earliestBlock?.number) || 0;
         indexedPercentage = indexedPercentage * 100;
         if (indexedPercentage > 99.5) {
           indexedPercentage = 100;
         }
         if (obj?.fatalError) {
-          decenSubgraphHashToIndexingObj[decenDeploymentMapping[obj?.subgraph]] = {
-            endpoint: "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj?.subgraph],
+          decenSubgraphHashToIndexingObj[
+            decenDeploymentMapping[obj?.subgraph]
+          ] = {
+            endpoint:
+              "https://gateway.thegraph.com/api/" +
+              process.env.GRAPH_API_KEY +
+              "/subgraphs/id/" +
+              decenDeploymentMapping[obj?.subgraph],
             hash: obj?.subgraph,
             indexingErrorMessage: obj?.fatalError?.message,
             indexingErrorBlock: obj?.chains[0]?.latestBlock?.number,
-            indexingPercentage: indexedPercentage.toFixed(2)
+            indexingPercentage: indexedPercentage.toFixed(2),
           };
         }
       });
     } catch (err) {
-      postAlert('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
+      postAlert("ERROR HANDLING INDEXING STATUS RESPONSE - " + err.message);
     }
   } else {
-    postAlert('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
+    postAlert(
+      "ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - " +
+        Object.values(decenErrorObj).join(" | ").slice(0, 500) +
+        "..."
+    );
   }
   return decenSubgraphHashToIndexingObj;
 }
@@ -196,7 +232,8 @@ export async function indexStatusFlow(deployments) {
     const generateIndexStatus = await generateIndexStatusQuery(deployments);
     deployments = JSON.parse(JSON.stringify(generateIndexStatus.deployments));
 
-    const indexingStatusQueriesArray = generateIndexStatus.indexingStatusQueries;
+    const indexingStatusQueriesArray =
+      generateIndexStatus.indexingStatusQueries;
     const indexData = await getIndexingStatusData(indexingStatusQueriesArray);
     Object.keys(indexData).forEach((indexDataName) => {
       const realNameString = indexDataName.split("_").join("-");
@@ -211,20 +248,28 @@ export async function indexStatusFlow(deployments) {
         deployments[realNameString].hash = indexData[indexDataName]?.subgraph;
       }
 
-      let indexedPercentage = ((indexData[indexDataName]?.chains[0]?.latestBlock?.number - indexData[indexDataName]?.chains[0]?.earliestBlock?.number) / (indexData[indexDataName]?.chains[0]?.chainHeadBlock?.number - indexData[indexDataName]?.chains[0]?.earliestBlock?.number)) || 0;
+      let indexedPercentage =
+        (indexData[indexDataName]?.chains[0]?.latestBlock?.number -
+          indexData[indexDataName]?.chains[0]?.earliestBlock?.number) /
+          (indexData[indexDataName]?.chains[0]?.chainHeadBlock?.number -
+            indexData[indexDataName]?.chains[0]?.earliestBlock?.number) || 0;
       indexedPercentage = indexedPercentage * 100;
       if (indexedPercentage > 99.5) {
         indexedPercentage = 100;
       }
-      deployments[realNameString].indexedPercentage = indexedPercentage.toFixed(2);
+      deployments[realNameString].indexedPercentage =
+        indexedPercentage.toFixed(2);
 
       if (!!indexData[indexDataName]?.fatalError) {
-        deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number || 0;
-        deployments[realNameString].indexingErrorMessage = indexData[indexDataName]?.fatalError?.message || "ERROR";
+        deployments[realNameString].indexingError =
+          indexData[indexDataName]?.fatalError?.block?.number || 0;
+        deployments[realNameString].indexingErrorMessage =
+          indexData[indexDataName]?.fatalError?.message || "ERROR";
       }
 
       if (
-        !indexData[indexDataName] || parseFloat(deployments[realNameString]?.indexedPercentage) < 10
+        !indexData[indexDataName] ||
+        parseFloat(deployments[realNameString]?.indexedPercentage) < 10
       ) {
         delete deployments[realNameString];
       }
@@ -238,28 +283,28 @@ export async function indexStatusFlow(deployments) {
 export async function getIndexingStatusData(indexingStatusQueriesArray) {
   try {
     const indexingStatusQueries = indexingStatusQueriesArray.map((query) => {
-      return axios.post("https://api.thegraph.com/index-node/graphql", { query: query });
+      return axios.post("https://api.thegraph.com/index-node/graphql", {
+        query: query,
+      });
     });
     let indexData = [];
     await Promise.all(indexingStatusQueries)
       .then((response) => {
-        return (indexData = response.map(
-          (resultData) => {
-            return (resultData.data.data);
-          }
-        ))
+        return (indexData = response.map((resultData) => {
+          return resultData.data.data;
+        }));
       })
       .catch((err) => {
-        errorNotification("ERROR LOCATION 3 " + err)
+        errorNotification("ERROR LOCATION 3 " + err);
       });
 
     let dataObjectToReturn = {};
-    indexData.forEach(dataset => {
+    indexData.forEach((dataset) => {
       dataObjectToReturn = { ...dataObjectToReturn, ...dataset };
     });
     return dataObjectToReturn;
   } catch (err) {
-    errorNotification("ERROR LOCATION 4 " + err.message)
+    errorNotification("ERROR LOCATION 4 " + err.message);
   }
 }
 
@@ -268,31 +313,34 @@ export async function generateIndexStatusQuery(deployments) {
   const fullPendingQueryArray = ["query Status {"];
 
   try {
-
     Object.keys(deployments).forEach((name) => {
       fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += `        
               ${name
-          .split("-")
-          .join(
-            "_"
-          )}: indexingStatusForCurrentVersion(subgraphName: "messari/${name}") {
+                .split("-")
+                .join(
+                  "_"
+                )}: indexingStatusForCurrentVersion(subgraphName: "messari/${name}") {
                 ${queryContents}
               }
           `;
       fullPendingQueryArray[fullPendingQueryArray.length - 1] += `        
             ${name
-          .split("-")
-          .join(
-            "_"
-          )}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${name}") {
+              .split("-")
+              .join(
+                "_"
+              )}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${name}") {
               ${queryContents}
             }
         `;
-      if (fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 80000) {
+      if (
+        fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 80000
+      ) {
         fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
         fullCurrentQueryArray.push(" query Status {");
       }
-      if (fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 80000) {
+      if (
+        fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 80000
+      ) {
         fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
         fullPendingQueryArray.push(" query Status {");
       }
@@ -300,10 +348,14 @@ export async function generateIndexStatusQuery(deployments) {
     fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
     fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
     const currentStateDepos = JSON.parse(JSON.stringify(deployments));
-    Object.keys(currentStateDepos).filter(name => !name.includes('DECEN')).forEach((name) => {
-      deployments[name + "-pending"] = JSON.parse(JSON.stringify({ ...deployments[name] }));
-      deployments[name + "-pending"].pending = true;
-    });
+    Object.keys(currentStateDepos)
+      .filter((name) => !name.includes("DECEN"))
+      .forEach((name) => {
+        deployments[name + "-pending"] = JSON.parse(
+          JSON.stringify({ ...deployments[name] })
+        );
+        deployments[name + "-pending"].pending = true;
+      });
     const indexingStatusQueries = [
       ...fullCurrentQueryArray,
       ...fullPendingQueryArray,
