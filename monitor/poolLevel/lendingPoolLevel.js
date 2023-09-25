@@ -1,4 +1,9 @@
 import axios from "axios";
+import {
+  ONE_HUNDRED_THOUSAND,
+  TEN_BILLION,
+  ONE_HUNDRED_BILLION,
+} from "../util.js";
 
 export const lendingPoolLevel = async (deployments) => {
   const endpointsList = [];
@@ -88,7 +93,7 @@ export const lendingPoolLevel = async (deployments) => {
       if (
         !(
           parseFloat(instance[currentIssueField]) > 0 &&
-          parseFloat(instance[currentIssueField]) < 100000000000
+          parseFloat(instance[currentIssueField]) < ONE_HUNDRED_BILLION
         ) &&
         !issuesArrays[currentIssueField]?.includes(instance.id)
       ) {
@@ -101,7 +106,7 @@ export const lendingPoolLevel = async (deployments) => {
       if (
         !(
           parseFloat(instance[currentIssueField]) >= 0 &&
-          parseFloat(instance[currentIssueField]) <= 10000000000
+          parseFloat(instance[currentIssueField]) <= TEN_BILLION
         ) &&
         !issuesArrays[currentIssueField]?.includes(instance.id)
       ) {
@@ -114,7 +119,7 @@ export const lendingPoolLevel = async (deployments) => {
       if (
         !(
           parseFloat(instance[currentIssueField]) >= 0 &&
-          parseFloat(instance[currentIssueField]) <= 10000000000
+          parseFloat(instance[currentIssueField]) <= TEN_BILLION
         ) &&
         !issuesArrays[currentIssueField]?.includes(instance.id)
       ) {
@@ -200,7 +205,7 @@ export const lendingPoolLevel = async (deployments) => {
       if (
         !(
           parseFloat(instance[currentIssueField]) > 0 &&
-          parseFloat(instance[currentIssueField]) < 100000000000
+          parseFloat(instance[currentIssueField]) < ONE_HUNDRED_BILLION
         ) &&
         !issuesArrays[currentIssueField]?.includes(instance.id)
       ) {
@@ -223,7 +228,7 @@ export const lendingPoolLevel = async (deployments) => {
       if (
         !(
           parseFloat(instance[currentIssueField]) >= 0 &&
-          parseFloat(instance[currentIssueField]) <= 100000
+          parseFloat(instance[currentIssueField]) <= ONE_HUNDRED_THOUSAND
         ) &&
         !issuesArrays[currentIssueField]?.includes(instance.id)
       ) {

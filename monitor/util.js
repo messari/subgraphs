@@ -60,3 +60,10 @@ export const indexingErrorEmbedSchema = {
   ],
   footer: { text: monitorVersion },
 };
+
+export const ONE_HUNDRED_THOUSAND = 100000;
+export const FIVE_HUNDRED_THOUSAND = 500000;
+export const ONE_HUNDRED_MILLION = 100000000;
+export const ONE_BILLION = 1000000000;
+export const TEN_BILLION = 10000000000;
+export const ONE_HUNDRED_BILLION = 100000000000;

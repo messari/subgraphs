@@ -1,6 +1,13 @@
 import axios from "axios";
 import { errorNotification } from "./messageDiscord.js";
-import { formatIntToFixed2, ProtocolTypeEntityName } from "./util.js";
+import {
+  formatIntToFixed2,
+  ProtocolTypeEntityName,
+  FIVE_HUNDRED_THOUSAND,
+  ONE_HUNDRED_MILLION,
+  ONE_BILLION,
+  ONE_HUNDRED_BILLION,
+} from "./util.js";
 
 export const protocolLevel = async (deployments) => {
   const endpointsList = [];
@@ -223,7 +230,8 @@ export const protocolLevel = async (deployments) => {
 
     if (
       !(
-        data.totalValueLockedUSD >= 0 && data.totalValueLockedUSD < 10000000000
+        data.totalValueLockedUSD >= 0 &&
+        data.totalValueLockedUSD < ONE_HUNDRED_BILLION
       ) &&
       deployment.protocolType === "dex-amm" &&
       !issuesArrays.totalValueLockedUSD.includes(
@@ -238,11 +246,11 @@ export const protocolLevel = async (deployments) => {
     if (
       (!(
         data.cumulativeSupplySideRevenueUSD >= 0 &&
-        data.cumulativeSupplySideRevenueUSD <= 100000000000
+        data.cumulativeSupplySideRevenueUSD <= ONE_HUNDRED_BILLION
       ) ||
         !(
           data.cumulativeProtocolSideRevenueUSD >= 0 &&
-          data.cumulativeProtocolSideRevenueUSD <= 100000000000
+          data.cumulativeProtocolSideRevenueUSD <= ONE_HUNDRED_BILLION
         )) &&
       !issuesArrays.cumulativeRevenueFactors
     ) {
@@ -293,7 +301,7 @@ export const protocolLevel = async (deployments) => {
       dataFields.includes("cumulativeUniqueUsers") &&
       !(
         parseFloat(data.cumulativeUniqueUsers) >= 0 &&
-        parseFloat(data.cumulativeUniqueUsers) < 100000000
+        parseFloat(data.cumulativeUniqueUsers) < ONE_HUNDRED_MILLION
       ) &&
       !issuesArrays.cumulativeUniqueUsers.includes(data.cumulativeUniqueUsers)
     ) {
@@ -304,7 +312,7 @@ export const protocolLevel = async (deployments) => {
       dataFields.includes("totalPoolCount") &&
       !(
         parseFloat(data.totalPoolCount) >= 0 &&
-        parseFloat(data.totalPoolCount) < 500000
+        parseFloat(data.totalPoolCount) < FIVE_HUNDRED_THOUSAND
       ) &&
       !issuesArrays.totalPoolCount.includes(data.totalPoolCount)
     ) {
@@ -338,7 +346,7 @@ export const protocolLevel = async (deployments) => {
       dataFields.includes("openPositionCount") &&
       !(
         parseFloat(data.openPositionCount) >= 0 &&
-        parseFloat(data.openPositionCount) < 1000000000
+        parseFloat(data.openPositionCount) < ONE_BILLION
       ) &&
       !issuesArrays.openPositionCount.includes(data.openPositionCount)
     ) {
@@ -362,7 +370,7 @@ export const protocolLevel = async (deployments) => {
       dataFields.includes("totalDepositBalanceUSD") &&
       !(
         parseFloat(data.totalDepositBalanceUSD) >= 0 &&
-        parseFloat(data.totalDepositBalanceUSD) < 100000000000
+        parseFloat(data.totalDepositBalanceUSD) < ONE_HUNDRED_BILLION
       ) &&
       !issuesArrays.totalDepositBalanceUSD.includes(
         "$" + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD))
