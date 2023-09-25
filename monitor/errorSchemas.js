@@ -5,7 +5,7 @@ import {
   ONE_BILLION,
   TEN_BILLION,
   ONE_HUNDRED_BILLION,
-} from "./util";
+} from "./util.js";
 
 export const protocolErrorMessages = {
   totalValueLockedUSD: `This field on 'Protocol' entity has a value below $0 or above $${ONE_HUNDRED_BILLION.toLocaleString(
