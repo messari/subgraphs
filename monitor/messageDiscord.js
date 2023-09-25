@@ -368,21 +368,24 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
                 }
             }
             let errorsOnDeployment = false;
-            Object.entries(depo.protocolErrors).forEach(([errorType, errorArray], idx) => {
-                if (issuesSet?.includes(errorType)) {
-                    return;
-                }
-                const protocolRows = [];
-                if (errorArray.length > 0) {
-                    if (errorsOnDeployment === false) {
-                        errorsOnDeployment = true;
+            if (protocol.split("-").pop() !== "swap") {
+                // ignore posting protocol errors for swap-only subgraphs
+                Object.entries(depo.protocolErrors).forEach(([errorType, errorArray], idx) => {
+                    if (issuesSet?.includes(errorType)) {
+                        return;
                     }
-                    errorArray.forEach((error) => {
-                        protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`${ProtocolTypeEntityName[depo.protocolType]}`).split('Value').join(error), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
-                    });
-                }
-                protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows];
-            });
+                    const protocolRows = [];
+                    if (errorArray.length > 0) {
+                        if (errorsOnDeployment === false) {
+                            errorsOnDeployment = true;
+                        }
+                        errorArray.forEach((error) => {
+                            protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`${ProtocolTypeEntityName[depo.protocolType]}`).split('Value').join(error), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
+                        });
+                    }
+                    protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows];
+                });
+            }
             if (protocolErrorEmbed.fields.length >= 3) {
                 protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
                 embedObjects.push(protocolErrorEmbed);
