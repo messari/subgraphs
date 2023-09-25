@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LogNote, Etch } from "../../../generated/DSChief/DSChief";
 import { VoteDelegate } from "../../../generated/DSChief/VoteDelegate";
