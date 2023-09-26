@@ -4289,9 +4289,9 @@
     "deployments": {
       "uniswap-v3-swap-base": {
         "network": "base",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "4.0.1",
+          "schema": "4.0.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -4311,9 +4311,9 @@
       },
       "uniswap-v3-swap-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "4.0.1",
+          "schema": "4.0.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -4341,9 +4341,9 @@
     "deployments": {
       "pancakeswap-v3-swap-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "4.0.1",
+          "schema": "4.0.0",
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
@@ -4363,7 +4363,7 @@
       },
       "pancakeswap-v3-swap-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "4.0.1",
           "subgraph": "1.0.1",
@@ -4393,9 +4393,9 @@
     "deployments": {
       "sushiswap-v3-swap-base": {
         "network": "base",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "4.0.1",
+          "schema": "4.0.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -4881,7 +4881,7 @@
     "deployments": {
       "quickswap-swap-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.2",
           "subgraph": "1.0.1",
@@ -5459,7 +5459,7 @@
     "deployments": {
       "uniswap-v2-swap-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.2",
           "subgraph": "1.0.2",
@@ -5523,7 +5523,7 @@
     "deployments": {
       "pancakeswap-v2-swap-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.2",
           "subgraph": "1.0.1",
@@ -5553,7 +5553,7 @@
     "deployments": {
       "baseswap-swap-base": {
         "network": "base",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.2",
           "subgraph": "1.0.0",

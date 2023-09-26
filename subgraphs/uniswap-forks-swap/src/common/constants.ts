@@ -105,3 +105,6 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 );
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+export const EXPONENT_MIN = -6143;
+export const EXPONENT_MAX = 6144;
