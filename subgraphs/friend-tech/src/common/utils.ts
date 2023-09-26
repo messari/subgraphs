@@ -7,7 +7,7 @@ export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
   if (index == -1 || index > x.length) {
     index = x.length;
   }
-  let retval = new Array<T>();
+  const retval = new Array<T>();
   let i = 0;
   while (i < index) {
     retval.push(x[i]);

@@ -18,9 +18,9 @@ export class FriendTechBaseConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0xCF205808Ed36593aa40a44F10c7f7C2F67d4A4d4");
+    return Address.fromString("0xcf205808ed36593aa40a44f10c7f7c2f67d4a4d4");
   }
   getTreasuryAddress(): Address {
-    return Address.fromString("0xdd9176eA3E7559D6B68b537eF555D3e89403f742");
+    return Address.fromString("0xdd9176ea3e7559d6b68b537ef555d3e89403f742");
   }
 }

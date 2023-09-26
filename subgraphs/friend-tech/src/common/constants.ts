@@ -61,7 +61,7 @@ export namespace TradeType {
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const ETH_DECIMALS = 18;
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -99,4 +99,4 @@ export const SECONDS_PER_DAY = 60 * 60 * 24;
 ////////////////////////
 
 export const CHAINLINK_AGGREGATOR_ETH_USD =
-  "0x57d2d46Fc7ff2A7142d479F2f59e1E3F95447077";
+  "0x57d2d46fc7ff2a7142d479f2f59e1e3f95447077";
