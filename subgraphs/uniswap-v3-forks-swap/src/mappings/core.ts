@@ -33,4 +33,5 @@ export function handleSwap(event: SwapEvent): void {
     BigInt.fromI32(event.params.tick)
   );
   dexEventHandler.updateAndSaveLiquidityPoolEntity();
+  dexEventHandler.updateAndSaveAccountEntity();
 }

@@ -10,8 +10,10 @@ import { sumBigIntListByIndex } from "./utils";
 import { getLiquidityPool } from "./entities/pool";
 import { getOrCreateProtocol } from "./entities/protocol";
 import { getOrCreateToken } from "./entities/token";
+import { getOrCreateAccount } from "./entities/account";
 
 import {
+  Account,
   DexAmmProtocol,
   LiquidityPool,
   Swap,
@@ -29,6 +31,7 @@ export class RawDeltas {
 export class DexEventHandler {
   event: ethereum.Event;
   eventType: i32;
+  account: Account;
   protocol: DexAmmProtocol;
   pool: LiquidityPool;
   poolTokens: Token[];
@@ -41,6 +44,7 @@ export class DexEventHandler {
   constructor(event: ethereum.Event, pool: LiquidityPool, deltas: RawDeltas) {
     this.event = event;
     this.eventType = EventType.UNKNOWN;
+    this.account = getOrCreateAccount(event.transaction.from);
     this.protocol = getOrCreateProtocol();
     this.pool = pool;
     this.poolTokens = getTokens(pool);
@@ -118,6 +122,11 @@ export class DexEventHandler {
     this.pool.lastUpdateTimestamp = this.event.block.timestamp;
 
     this.pool.save();
+  }
+
+  updateAndSaveAccountEntity(): void {
+    this.account.swapCount += INT_ONE;
+    this.account.save();
   }
 }
 
