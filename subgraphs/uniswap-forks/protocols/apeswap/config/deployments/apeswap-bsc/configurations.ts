@@ -116,6 +116,7 @@ export class ApeswapBscConfigurations implements Configurations {
     return [
       "0x87bade473ea0513d4aa7085484aeaa6cb6ebe7e3", // Mor Stablecoin
       "0x7e7d3556310830581815b1aa1bbbc9e5d7097580", // NFTGirl
+      "0xD9A88f9b7101046786490bAF433f0f6aB3D753E2", // BBQ
     ];
   }
   getBrokenERC20Tokens(): string[] {

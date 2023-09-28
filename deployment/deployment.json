@@ -4742,7 +4742,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.2",
-          "subgraph": "1.2.1",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4764,7 +4764,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.2",
-          "subgraph": "1.1.14",
+          "subgraph": "1.1.15",
           "methodology": "1.0.0"
         },
         "files": {
