@@ -30,6 +30,7 @@ export namespace Network {
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const ZKSYNC_ERA = "ZKSYNC_ERA";
 }
 
 export namespace ProtocolType {
@@ -77,6 +78,8 @@ export namespace PositionSide {
   export const LENDER = "LENDER";
   export const BORROWER = "BORROWER";
 }
+
+export const UNKNOWN = "UNKNOWN";
 
 ////////////////////////
 ///// Type Helpers /////
