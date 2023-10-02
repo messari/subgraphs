@@ -6,7 +6,7 @@
     {
       "name": "Vault",
       "address": "0x89c527764f03BCb7dC469707B23b79C1D7Beb780",
-      "startBlock": 	12168822,
+      "startBlock": 	7290251,
       "abi": "Vault",
       "depositHandler": "handleLockIn",
       "withdrawHandler": "handleOTVWithdraw"

@@ -226,9 +226,9 @@ export class Bridge {
    */
   addSupplySideRevenueUSD(rev: BigDecimal): void {
     this.protocol.cumulativeTotalRevenueUSD =
-      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
+      this.protocol.cumulativeTotalRevenueUSD.plus(rev).plus(rev);
     this.protocol.cumulativeSupplySideRevenueUSD =
-      this.protocol.cumulativeSupplySideRevenueUSD.plus(rev);
+      this.protocol.cumulativeSupplySideRevenueUSD.plus(rev).plus(rev);
     this.save();
   }
 
@@ -240,9 +240,9 @@ export class Bridge {
    */
   addProtocolSideRevenueUSD(rev: BigDecimal): void {
     this.protocol.cumulativeTotalRevenueUSD =
-      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
+      this.protocol.cumulativeTotalRevenueUSD.plus(rev).plus(rev);
     this.protocol.cumulativeProtocolSideRevenueUSD =
-      this.protocol.cumulativeProtocolSideRevenueUSD.plus(rev);
+      this.protocol.cumulativeProtocolSideRevenueUSD.plus(rev).plus(rev);
     this.save();
   }
 

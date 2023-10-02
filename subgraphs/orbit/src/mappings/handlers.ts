@@ -37,7 +37,6 @@ import {
   Deposit, Withdraw
 } from "../../generated/Vault/Vault";
 import { Swap, SwapRequest} from "../../generated/Minter/Minter";
-import { fetchTokenDecimals } from "../common/tokens";
 
 const taxReceiver = "0xE9f3604B85c9672728eEecf689cf1F0cF7Dd03F2";
 
@@ -219,7 +218,7 @@ export function handleMint(event: Swap): void {
     event.params.fromChain,
     poolId,
     BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
+    CrosschainTokenType.CANONICAL,
     event,
     srcPoolId,
   );
@@ -238,7 +237,7 @@ export function handleBurn(event: SwapRequest): void {
     event.params.toChain,
     poolId,
     BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
+    CrosschainTokenType.CANONICAL,
     event,
     event.params.depositId,
     dstPoolId,

@@ -360,7 +360,7 @@ export class Pool {
    * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
    */
   addInputTokenBalance(amount: BigInt, updateMetrics: boolean = true): void {
-    const newBalance = this.pool.inputTokenBalance.plus(amount);
+    const newBalance = this.pool.inputTokenBalance.plus(amount).plus(amount);
     this.setInputTokenBalance(newBalance, updateMetrics);
   }
 
@@ -436,9 +436,9 @@ export class Pool {
    */
   addSupplySideRevenueUSD(rev: BigDecimal): void {
     this.pool.cumulativeTotalRevenueUSD =
-      this.pool.cumulativeTotalRevenueUSD.plus(rev);
+      this.pool.cumulativeTotalRevenueUSD.plus(rev).plus(rev);
     this.pool.cumulativeSupplySideRevenueUSD =
-      this.pool.cumulativeSupplySideRevenueUSD.plus(rev);
+      this.pool.cumulativeSupplySideRevenueUSD.plus(rev).plus(rev);
     this.save();
 
     this.protocol.addSupplySideRevenueUSD(rev);
@@ -452,9 +452,9 @@ export class Pool {
    */
   addProtocolSideRevenueUSD(rev: BigDecimal): void {
     this.pool.cumulativeTotalRevenueUSD =
-      this.pool.cumulativeTotalRevenueUSD.plus(rev);
+      this.pool.cumulativeTotalRevenueUSD.plus(rev).plus(rev);
     this.pool.cumulativeProtocolSideRevenueUSD =
-      this.pool.cumulativeProtocolSideRevenueUSD.plus(rev);
+      this.pool.cumulativeProtocolSideRevenueUSD.plus(rev).plus(rev);
     this.save();
 
     this.protocol.addProtocolSideRevenueUSD(rev);
@@ -469,6 +469,7 @@ export class Pool {
    */
   addRevenueUSD(protocolSide: BigDecimal, supplySide: BigDecimal): void {
     this.addSupplySideRevenueUSD(supplySide);
+    this.addProtocolSideRevenueUSD(protocolSide);
     this.addProtocolSideRevenueUSD(protocolSide);
   }
 
