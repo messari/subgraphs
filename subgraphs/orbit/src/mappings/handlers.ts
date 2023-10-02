@@ -276,9 +276,7 @@ function _handleTransferIn(
     token
   );
   pool.addDestinationToken(crossToken);
-  // log.debug("Made it {}: hti 1 abc with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(receiver))
-  // log.debug("Made it {}: hti 2 with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
   if (sender.byteLength != 20) {
     sender = receiver
   }
@@ -302,7 +300,6 @@ function _handleTransferOut(
     log.warning("dstPoolId is null for transaction: {} and chain: {}", [event.transaction.hash.toHexString(), toChain]);
     return;
   }
-  // log.debug("Made it here 1.5: {}", [event.transaction.hash.toHexString()]);
   const sdk = _getSDK(event)!;
   const pool = sdk.Pools.loadPool(
     poolId,
@@ -311,34 +308,26 @@ function _handleTransferOut(
     token.toHexString()
   );
 
-  // log.debug("Made it here 2: {}", [event.transaction.hash.toHexString()]);
-  const context = dataSource.context();
-  // log.debug("Made it here abc: {}", [event.transaction.hash.toHexString()]);
   const account = sdk.Accounts.loadAccount(Address.fromBytes(sender))
   if (receiver.byteLength != 20) {
     receiver = sender
   }
-  // // If Receiver is taxReceiver, this is the tax fee
+  // If Receiver is taxReceiver, this is the tax fee
   if (receiver.byteLength == 20 && Address.fromBytes(receiver) == Address.fromString(taxReceiver)) {
-    log.debug("Made it here 3: {}", [event.transaction.hash.toHexString()]);
     pool.addRevenueNative(amount, BIGINT_ZERO);
     return;
   }
 
-  // log.debug("Made it here 4: {}", [event.transaction.hash.toHexString()]);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(toChain),
     dstPoolId,
     crosschainTokenType,
     token
   );
-  // log.debug("Made it here 5: {}", [event.transaction.hash.toHexString()]);
   pool.addDestinationToken(crossToken);
-  log.debug("Made it {}: hto only 1 with sender: {} {}, receiver: {} {}", [event.transaction.hash.toHexString(), sender.toHexString(), sender.byteLength.toString(), receiver.toHexString(), receiver.byteLength.toString()]);
   if (sender.byteLength == 20 && receiver.byteLength == 20) {
     account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(receiver), amount);
   }
-  // log.debug("Made it here 6: {}", [event.transaction.hash.toHexString()]);
 }
 
 
