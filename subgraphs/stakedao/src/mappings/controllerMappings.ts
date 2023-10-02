@@ -47,6 +47,11 @@ export function handleSetVault(call: SetVaultCall): void {
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;
 
+  vault.depositLimit = constants.BIGINT_ZERO;
+  vault.fees = [];
+  vault._rewardTokensIds = [];
+  vault._strategy = constants.ZERO_ADDRESS_STRING;
+
   VaultTemplate.create(vaultAddress);
   vault.save();
 
@@ -56,11 +61,11 @@ export function handleSetVault(call: SetVaultCall): void {
     inputTokenAddress
   );
 
-  let protocol = getOrCreateYieldAggregator();
-  
-  let vaultIds = protocol._vaultIds;
-  vaultIds.push(vaultAddress.toHexString())
-  
+  const protocol = getOrCreateYieldAggregator();
+
+  const vaultIds = protocol._vaultIds;
+  vaultIds.push(vaultAddress.toHexString());
+
   protocol._vaultIds = vaultIds;
   protocol.totalPoolCount += 1;
   protocol.save();
@@ -77,7 +82,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   const inputTokenAddress = call.inputs._token;
   const newStrategyAddress = call.inputs._strategy;
 
-  let controller = ControllerContract.bind(controllerAddress);
+  const controller = ControllerContract.bind(controllerAddress);
   const vaultAddress = utils.readValue<Address>(
     controller.try_vaults(inputTokenAddress),
     constants.ZERO_ADDRESS

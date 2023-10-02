@@ -80,17 +80,17 @@ export class SpookyswapFantomConfigurations implements Configurations {
   getWhitelistTokens(): string[] {
     return [
       "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83", // WFTM
-      "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
-      "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
+      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e", // DAI
+      "0x04068da6c83afcfa0e13ba15a6696662335d5b75", // USDC
       "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fUSDT
-      "0x74b23882a30290451A17c44f4F05243b6b58C76d", // WETH
-      "0x321162Cd933E2Be498Cd2267a90534A804051b11", // WBTC
+      "0x74b23882a30290451a17c44f4f05243b6b58c76d", // WETH
+      "0x321162cd933e2be498cd2267a90534a804051b11", // WBTC
     ];
   }
   getStableCoins(): string[] {
     return [
-      "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
-      "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
+      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e", // DAI
+      "0x04068da6c83afcfa0e13ba15a6696662335d5b75", // USDC
       "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fUSDT
     ];
   }

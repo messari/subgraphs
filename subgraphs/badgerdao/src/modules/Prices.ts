@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
+import { getOrCreateToken } from "../common/initializers";
+import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 
 export function getPricePerShare(vaultAddress: Address): BigDecimal {
@@ -19,7 +19,8 @@ export function getPricePerShare(vaultAddress: Address): BigDecimal {
 
 export function getPriceOfOutputTokens(
   vaultAddress: Address,
-  amount: BigInt
+  amount: BigDecimal,
+  block: ethereum.Block
 ): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
 
@@ -28,16 +29,15 @@ export function getPriceOfOutputTokens(
     constants.NULL.TYPE_ADDRESS
   );
 
-  const virtualPrice = getPriceUsdcRecommended(tokenAddress);
-  const vaultTokenDecimals = utils.getTokenDecimals(vaultAddress);
+  const token = getOrCreateToken(tokenAddress, block);
   const pricePerShare = getPricePerShare(vaultAddress);
+  const vaultTokenDecimals = utils.getTokenDecimals(vaultAddress);
 
   const price = pricePerShare
-    .times(amount.toBigDecimal())
+    .times(amount)
     .div(vaultTokenDecimals)
     .div(vaultTokenDecimals)
-    .times(virtualPrice.usdPrice)
-    .div(virtualPrice.decimalsBaseTen);
+    .times(token.lastPriceUSD!);
 
   return price;
 }

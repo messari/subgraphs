@@ -15,6 +15,10 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
 
 export const PRICE_LIB_VERSION = "1.1.0";
 
+export const INT_SEVEN = 7;
+export const INT_EIGHT = 8;
+export const INT_THIRTY = 30;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);

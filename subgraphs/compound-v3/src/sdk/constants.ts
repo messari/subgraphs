@@ -31,6 +31,7 @@ export namespace Network {
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const BASE = "BASE";
 }
 
 export namespace ProtocolType {
@@ -147,6 +148,10 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_SIX = 6 as i32;
+export const INT_NINE = 9 as i32;
+export const INT_SIXTEEN = 16 as i32;
+export const INT_EIGHTTEEN = 18 as i32;
 
 export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);
@@ -221,9 +226,15 @@ export function BDChangeDecimals(
 // insert value into arr at index
 export function insert<Type>(
   arr: Array<Type>,
-  index: i32,
-  value: Type
+  value: Type,
+  index: i32 = -1
 ): Array<Type> {
+  if (arr.length == 0) {
+    return [value];
+  }
+  if (index == -1 || index > arr.length) {
+    index = arr.length;
+  }
   const result: Type[] = [];
   for (let i = 0; i < index; i++) {
     result.push(arr[i]);

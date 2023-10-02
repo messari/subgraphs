@@ -42,7 +42,7 @@ export function getOrCreateToken(
   if (price.reverted) {
     token.lastPriceUSD = BIGDECIMAL_ZERO;
   } else {
-    token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+    token.lastPriceUSD = price.usdPrice;
   }
   token.lastPriceBlockNumber = blockNumber;
   token.save();

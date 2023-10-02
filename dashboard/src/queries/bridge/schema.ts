@@ -46,6 +46,7 @@ export const schema100 = (): Schema => {
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -79,7 +80,8 @@ export const schema100 = (): Schema => {
       totalPoolRouteCount: "Int!",
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!"
+      totalSupportedTokenCount: "Int!",
+      blockNumber: "BigInt!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -111,6 +113,7 @@ export const schema100 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -140,6 +143,7 @@ export const schema100 = (): Schema => {
       cumulativeMessageReceivedCount: "Int!",
       hourlyMessageReceivedCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     poolHourlySnapshots: {
       id: "ID!",
@@ -171,6 +175,7 @@ export const schema100 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -204,11 +209,10 @@ export const schema100 = (): Schema => {
     let options = "";
     let fields = eventsFields.join(", ");
     if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
+      fields += ", amount, amountUSD, pool{id}";
       options = ", where: {pool: $poolId}";
     }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
     if (event === "bridgeTransfers" || event === "bridgeMessages") {
       fields += ", fromChainID, toChainID, crossTransactionID";
     } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
@@ -252,10 +256,10 @@ export const schema100 = (): Schema => {
     totalPoolRouteCount: "Int!",
     totalCanonicalRouteCount: "Int!",
     totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
+    totalSupportedTokenCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -438,6 +442,7 @@ export const schema110 = (): Schema => {
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -471,7 +476,8 @@ export const schema110 = (): Schema => {
       totalPoolRouteCount: "Int!",
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!"
+      totalSupportedTokenCount: "Int!",
+      blockNumber: "BigInt!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -503,6 +509,7 @@ export const schema110 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -532,6 +539,7 @@ export const schema110 = (): Schema => {
       cumulativeMessageReceivedCount: "Int!",
       hourlyMessageReceivedCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     poolHourlySnapshots: {
       id: "ID!",
@@ -563,6 +571,7 @@ export const schema110 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -596,11 +605,10 @@ export const schema110 = (): Schema => {
     let options = "";
     let fields = eventsFields.join(", ");
     if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
+      fields += ", amount, amountUSD, pool{id}";
       options = ", where: {pool: $poolId}";
     }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
     if (event === "bridgeTransfers" || event === "bridgeMessages") {
       fields += ", fromChainID, toChainID, crossTransactionID";
     } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
@@ -644,10 +652,10 @@ export const schema110 = (): Schema => {
     totalPoolRouteCount: "Int!",
     totalCanonicalRouteCount: "Int!",
     totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
+    totalSupportedTokenCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -841,6 +849,7 @@ export const schema120 = (): Schema => {
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
@@ -874,7 +883,8 @@ export const schema120 = (): Schema => {
       totalPoolRouteCount: "Int!",
       totalCanonicalRouteCount: "Int!",
       totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!"
+      totalSupportedTokenCount: "Int!",
+      blockNumber: "BigInt!",
     },
     poolDailySnapshots: {
       id: "ID!",
@@ -907,6 +917,7 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
@@ -936,6 +947,7 @@ export const schema120 = (): Schema => {
       cumulativeMessageReceivedCount: "Int!",
       hourlyMessageReceivedCount: "Int!",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
     poolHourlySnapshots: {
       id: "ID!",
@@ -968,6 +980,7 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       mintSupply: "BigInt",
       timestamp: "BigInt!",
+      blockNumber: "BigInt!",
     },
   };
 
@@ -1001,11 +1014,10 @@ export const schema120 = (): Schema => {
     let options = "";
     let fields = eventsFields.join(", ");
     if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
+      fields += ", amount, amountUSD, pool{id}";
       options = ", where: {pool: $poolId}";
     }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
     if (event === "bridgeTransfers" || event === "bridgeMessages") {
       fields += ", fromChainID, toChainID, crossTransactionID";
     } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
@@ -1051,10 +1063,10 @@ export const schema120 = (): Schema => {
     totalPoolRouteCount: "Int!",
     totalCanonicalRouteCount: "Int!",
     totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
+    totalSupportedTokenCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {

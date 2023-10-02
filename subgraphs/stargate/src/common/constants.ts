@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers, rulesdir/no-checksum-addresses */
 import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 import { Network } from "../sdk/util/constants";
@@ -201,3 +202,14 @@ metisPoolIDsToToken.set(
   Address.fromString("0x2b60473a7C41Deb80EDdaafD5560e963440eb632")
 );
 crossPoolTokens.set(Network.METIS, metisPoolIDsToToken);
+
+export const basePoolIDsToToken = new TypedMap<BigInt, Address>();
+basePoolIDsToToken.set(
+  BigInt.fromI32(1),
+  Address.fromString("0x4c80E24119CFB836cdF0a6b53dc23F04F7e652CA")
+);
+basePoolIDsToToken.set(
+  BigInt.fromI32(13),
+  Address.fromString("0x28fc411f9e1c480AD312b3d9C60c22b965015c6B")
+);
+crossPoolTokens.set(Network.BASE, basePoolIDsToToken);

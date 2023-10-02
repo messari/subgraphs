@@ -31,10 +31,13 @@ import {
   DelegateChange,
 } from "../generated/schema";
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   return value.divDecimal(
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     BigInt.fromI32(10)
       .pow(<u8>decimals)
       .toBigDecimal()
@@ -145,6 +148,10 @@ export function getProposal(id: string): Proposal {
   return proposal as Proposal;
 }
 
+export function isNewDelegate(address: string): boolean {
+  return address != ZERO_ADDRESS && Delegate.load(address) == null;
+}
+
 export function getOrCreateDelegate(address: string): Delegate {
   let delegate = Delegate.load(address);
   if (!delegate) {
@@ -156,14 +163,7 @@ export function getOrCreateDelegate(address: string): Delegate {
     delegate.tokenHoldersRepresentedAmount = 0;
     delegate.numberVotes = 0;
     delegate.save();
-
-    if (address != ZERO_ADDRESS) {
-      const governance = getGovernance();
-      governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
-      governance.save();
-    }
   }
-
   return delegate as Delegate;
 }
 
@@ -275,13 +275,20 @@ export function _handleProposalCreated(
     "1220" + ipfsHash.toHexString().slice(2)
   ).toBase58();
   const data = ipfs.cat(hash);
-  const proposalData = json.try_fromBytes(data as Bytes);
-  let descriptionJSON: JSONValue | null = null;
-  if (proposalData.isOk && proposalData.value.kind == JSONValueKind.OBJECT) {
-    const jsonData = proposalData.value.toObject();
-    descriptionJSON = jsonData.get("description");
-    if (descriptionJSON) {
-      description = descriptionJSON.toString();
+  if (data) {
+    const proposalData = json.try_fromBytes(data as Bytes);
+    let descriptionJSON: JSONValue | null = null;
+    if (proposalData.isOk) {
+      // proposalData is either a JSON object or a raw string
+      if (proposalData.value.kind == JSONValueKind.OBJECT) {
+        const jsonData = proposalData.value.toObject();
+        descriptionJSON = jsonData.get("description");
+        if (descriptionJSON) {
+          description = descriptionJSON.toString();
+        }
+      }
+    } else {
+      description = data.toString();
     }
   }
   proposal.description = description;

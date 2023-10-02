@@ -7,4 +7,5 @@ export namespace Deploy {
   export const STARGATE_OPTIMISM = 5;
   export const STARGATE_FANTOM = 6;
   export const STARGATE_METIS = 7;
+  export const STARGATE_BASE = 8;
 }

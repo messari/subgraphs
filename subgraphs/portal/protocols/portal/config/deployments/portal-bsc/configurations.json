@@ -1,0 +1,17 @@
+{
+  "deployment": "PORTAL_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "core": {
+    "address": "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B",
+    "startBlock": 9745450
+  },
+  "tokenBridge": {
+    "address": "0xB6F6D86a8f9879A9c87f643768d9efc38c1Da6E7",
+    "startBlock": 11313001
+  },
+  "supportsCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

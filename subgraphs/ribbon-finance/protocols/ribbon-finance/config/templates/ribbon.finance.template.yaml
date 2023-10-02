@@ -32,8 +32,8 @@ dataSources:
           file: ./abis/RibbonThetaVaultWithSwap.json
         - name: RibbonVaultPauser
           file: ./abis/RibbonVaultPauser.json
-        - name: Otoken
-          file: ./abis/Otoken.json
+        - name: OToken
+          file: ./abis/OToken.json
         - name: OptionTokenV1
           file: ./abis/OptionTokenV1.json
         - name: OptionsPremiumPricer

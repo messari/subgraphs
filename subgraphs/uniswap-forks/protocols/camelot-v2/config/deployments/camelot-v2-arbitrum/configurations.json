@@ -1,0 +1,15 @@
+{
+  "deployment": "CAMELOT_V2_ARBITRUM",
+  "network": "arbitrum-one",
+  "factory": {
+    "address": "0x6EcCab422D763aC031210895C81787E87B43A652",
+    "startBlock": 35061163
+  },
+  "master": {
+    "address": "0x55401A4F396b3655f66bf6948A1A4DC61Dfc21f4",
+    "startBlock": 39338993
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Transfer } from "../../generated/rocketTokenRETH/rocketTokenRETH";
-import { rocketTokenRETH } from "../../generated/rocketTokenRETH/rocketTokenRETH";
+import { Transfer } from "../../generated/templates/rocketTokenRETH/rocketTokenRETH";
+import { rocketTokenRETH } from "../../generated/templates/rocketTokenRETH/rocketTokenRETH";
 import { Staker } from "../../generated/schema";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { stakerUtilities } from "../checkpoints/stakerUtilities";

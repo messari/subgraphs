@@ -75,8 +75,8 @@ export function createLiquidityPool(
   const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
-  const token0 = getOrCreateToken(token0Address);
-  const token1 = getOrCreateToken(token1Address);
+  const token0 = getOrCreateToken(event, token0Address);
+  const token1 = getOrCreateToken(event, token1Address);
   const LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
 
   updateTokenWhitelists(token0, token1, poolAddress);
@@ -136,24 +136,21 @@ export function createLiquidityPool(
 
 // Add reward token to liquidity pool from HoneyFarm add contract call (PoolAdded event)
 export function createPoolRewardToken(
-  poolAddress: string,
-  blockNumber: BigInt
+  event: ethereum.Event,
+  poolAddress: string
 ): void {
-  const pool = getLiquidityPool(poolAddress, blockNumber);
+  const pool = getLiquidityPool(poolAddress);
 
   pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    getOrCreateRewardToken(event, NetworkConfigs.getRewardToken()).id,
   ];
 
   pool.save();
 }
 
 // Remove reward token from liquidity pool from HoneyFarm set contract call (PoolRemoved event)
-export function removePoolRewardToken(
-  poolAddress: string,
-  blockNumber: BigInt
-): void {
-  const pool = getLiquidityPool(poolAddress, blockNumber);
+export function removePoolRewardToken(poolAddress: string): void {
+  const pool = getLiquidityPool(poolAddress);
 
   pool.rewardTokens = [];
 

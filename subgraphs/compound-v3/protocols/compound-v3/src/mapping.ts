@@ -63,8 +63,9 @@ import {
   USDC_COMET_WETH_MARKET_ID,
   WETH_COMET_ADDRESS,
   getRewardAddress,
-  POLYGON_COMP_ORACLE_ADDRESS,
   equalsIgnoreCase,
+  getCOMPChainlinkFeed,
+  NORMALIZE_DECIMALS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { Market, Token } from "../../../generated/schema";
@@ -106,6 +107,12 @@ export function handleCometDeployed(event: CometDeployed): void {
       protocolData
     );
 
+    if (!manager.isNewMarket()) {
+      return;
+    }
+
+    manager.updateBorrowIndex(BASE_INDEX_SCALE);
+    manager.updateSupplyIndex(BASE_INDEX_SCALE);
     const market = manager.getMarket();
     market.canBorrowFrom = true;
 
@@ -122,7 +129,6 @@ export function handleCometDeployed(event: CometDeployed): void {
     market._baseTrackingBorrowSpeed = BIGINT_ZERO;
     market._baseTrackingSupplySpeed = BIGINT_ZERO;
     market.canBorrowFrom = true;
-    market._baseBorrowIndex = BASE_INDEX_SCALE;
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
@@ -156,14 +162,17 @@ export function handleCometDeployed(event: CometDeployed): void {
     market.canUseAsCollateral = true;
     market.maximumLTV = bigIntToBigDecimal(
       tryAssetInfo.value.borrowCollateralFactor,
-      16
+      NORMALIZE_DECIMALS
     );
     market.liquidationThreshold = bigIntToBigDecimal(
       tryAssetInfo.value.liquidateCollateralFactor,
-      16
+      NORMALIZE_DECIMALS
     );
     market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-      bigIntToBigDecimal(tryAssetInfo.value.liquidationFactor, 16)
+      bigIntToBigDecimal(
+        tryAssetInfo.value.liquidationFactor,
+        NORMALIZE_DECIMALS
+      )
     );
     market.supplyCap = tryAssetInfo.value.supplyCap;
     market.relation = event.params.cometProxy;
@@ -197,14 +206,17 @@ export function handleAddAsset(event: AddAsset): void {
   market.canUseAsCollateral = true;
   market.maximumLTV = bigIntToBigDecimal(
     event.params.assetConfig.borrowCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationThreshold = bigIntToBigDecimal(
     event.params.assetConfig.liquidateCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-    bigIntToBigDecimal(event.params.assetConfig.liquidationFactor, 16)
+    bigIntToBigDecimal(
+      event.params.assetConfig.liquidationFactor,
+      NORMALIZE_DECIMALS
+    )
   );
   market.supplyCap = event.params.assetConfig.supplyCap;
   market.relation = event.params.cometProxy;
@@ -331,14 +343,17 @@ export function handleUpdateAsset(event: UpdateAsset): void {
   market.canUseAsCollateral = true;
   market.maximumLTV = bigIntToBigDecimal(
     event.params.newAssetConfig.borrowCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationThreshold = bigIntToBigDecimal(
     event.params.newAssetConfig.liquidateCollateralFactor,
-    16
+    NORMALIZE_DECIMALS
   );
   market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-    bigIntToBigDecimal(event.params.newAssetConfig.liquidationFactor, 16)
+    bigIntToBigDecimal(
+      event.params.newAssetConfig.liquidationFactor,
+      NORMALIZE_DECIMALS
+    )
   );
   market.supplyCap = event.params.newAssetConfig.supplyCap;
   market.save();
@@ -359,7 +374,10 @@ export function handleUpdateAssetBorrowCollateralFactor(
   );
   const market = manager.getMarket();
 
-  market.maximumLTV = bigIntToBigDecimal(event.params.newBorrowCF, 16);
+  market.maximumLTV = bigIntToBigDecimal(
+    event.params.newBorrowCF,
+    NORMALIZE_DECIMALS
+  );
   market.save();
 }
 
@@ -380,7 +398,7 @@ export function handleUpdateAssetLiquidateCollateralFactor(
 
   market.liquidationThreshold = bigIntToBigDecimal(
     event.params.newLiquidateCF,
-    16
+    NORMALIZE_DECIMALS
   );
   market.save();
 }
@@ -401,7 +419,7 @@ export function handleUpdateAssetLiquidationFactor(
   const market = manager.getMarket();
 
   market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
-    bigIntToBigDecimal(event.params.newLiquidationFactor, 16)
+    bigIntToBigDecimal(event.params.newLiquidationFactor, NORMALIZE_DECIMALS)
   );
   market.save();
 }
@@ -480,7 +498,7 @@ export function handleSupply(event: Supply): void {
       PositionSide.BORROWER,
       accountActorID
     );
-  } else if (mintAmount.le(amount)) {
+  } else if (mintAmount.ge(amount)) {
     // deposit only
     createBaseTokenTransactions(
       cometContract,
@@ -677,7 +695,8 @@ export function handleTransfer(event: Transfer): void {
   const fromAddress = ethereum
     .decode("address", supplyLog.topics.at(1))!
     .toAddress();
-  if (fromAddress != ZERO_ADDRESS) {
+  if (fromAddress != ZERO_ADDRESS || event.address != supplyLog.address) {
+    // must be a transfer from the same comet
     // not apart of transferBase() since from address is not null
     return;
   }
@@ -713,7 +732,8 @@ export function handleTransfer(event: Transfer): void {
       .div(exponentToBigDecimal(token.decimals))
       .times(token.lastPriceUSD!),
     newBalance,
-    InterestRateType.VARIABLE
+    InterestRateType.VARIABLE,
+    getPrincipal(event.params.from, cometContract)
   );
 
   amount = ethereum.decode("uint256", supplyLog.data)!.toBigInt();
@@ -735,7 +755,8 @@ export function handleTransfer(event: Transfer): void {
       .div(exponentToBigDecimal(token.decimals))
       .times(token.lastPriceUSD!),
     newBalance,
-    InterestRateType.VARIABLE
+    InterestRateType.VARIABLE,
+    getPrincipal(toAddress, cometContract)
   );
 }
 
@@ -846,7 +867,8 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     baseMarket.getProtocol(),
     baseAssetBorrowBalance,
     TransactionType.LIQUIDATE,
-    priceUSD
+    priceUSD,
+    getPrincipal(borrower, cometContract)
   );
   const positionID = liquidateePosition.getPositionID();
   if (!positionID) return;
@@ -869,6 +891,7 @@ function createBaseTokenTransactions(
   positionSide: string,
   accountActorID: Bytes
 ): void {
+  const principal = getPrincipal(accountID, comet);
   const newBalance = getUserBalance(comet, accountID, null, positionSide);
   if (transactionType == TransactionType.DEPOSIT) {
     const deposit = market.createDeposit(
@@ -877,7 +900,8 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -889,7 +913,8 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     if (withdraw) {
       withdraw.accountActor = accountActorID;
@@ -904,7 +929,8 @@ function createBaseTokenTransactions(
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
       token.lastPriceUSD!,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     borrow.accountActor = accountActorID;
     borrow.save();
@@ -917,7 +943,8 @@ function createBaseTokenTransactions(
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
       token.lastPriceUSD!,
-      InterestRateType.VARIABLE
+      InterestRateType.VARIABLE,
+      principal
     );
     if (repay) {
       repay.accountActor = accountActorID;
@@ -990,12 +1017,20 @@ function updateRewards(
     );
   }
 
+  if (tryRewardConfig.value.value0 == ZERO_ADDRESS) {
+    log.warning("[updateRewards] Reward token address is zero address", []);
+    return;
+  }
+
   const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
 
   // Update price for reward token using Chainlink oracle on Polygon
-  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+  if (
+    equalsIgnoreCase(dataSource.network(), Network.MATIC) ||
+    equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE)
+  ) {
     const chainlinkContract = Chainlink.bind(
-      Address.fromString(POLYGON_COMP_ORACLE_ADDRESS)
+      getCOMPChainlinkFeed(dataSource.network())
     );
     const tryPrice = chainlinkContract.try_latestAnswer();
     if (tryPrice.reverted) {
@@ -1077,14 +1112,6 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     return;
   }
 
-  const totalBorrowBase = tryTotalsBasic.value.totalBorrowBase;
-  const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
-
-  const baseBorrowIndexDiff = newBaseBorrowIndex.minus(
-    market._baseBorrowIndex!
-  );
-  market._baseBorrowIndex = newBaseBorrowIndex;
-
   // the reserve factor is dynamic and is essentially
   // the spread between supply and borrow interest rates
   // reserveFactor = (borrowRate - supplyRate) / borrowRate
@@ -1101,6 +1128,23 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const reserveFactor = borrowRate.minus(supplyRate).div(borrowRate);
   market.reserveFactor = reserveFactor;
   market.save();
+
+  const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
+  if (
+    newBaseBorrowIndex.lt(market.borrowIndex!) ||
+    newBaseBorrowIndex == BASE_INDEX_SCALE
+  ) {
+    log.error(
+      "[updateRevenue] New base borrow index is less than old on market {}",
+      [market.id.toHexString()]
+    );
+    return;
+  }
+  const totalBorrowBase = tryTotalsBasic.value.totalBorrowBase;
+  const baseBorrowIndexDiff = newBaseBorrowIndex.minus(market.borrowIndex!);
+
+  dataManager.updateBorrowIndex(newBaseBorrowIndex);
+  dataManager.updateSupplyIndex(tryTotalsBasic.value.baseSupplyIndex);
 
   const totalRevenueDeltaUSD = baseBorrowIndexDiff
     .toBigDecimal()
@@ -1279,4 +1323,19 @@ function findTransfer(event: ethereum.Event): ethereum.Log | null {
   }
 
   return null;
+}
+
+//
+//
+// Get the Position Principal
+function getPrincipal(account: Address, cometContract: Comet): BigInt {
+  const tryUserBasic = cometContract.try_userBasic(account);
+  if (tryUserBasic.reverted) {
+    log.error("[getPrincipal] Could not get userBasic({})", [
+      account.toHexString(),
+    ]);
+    return BIGINT_ZERO;
+  }
+
+  return tryUserBasic.value.getPrincipal();
 }

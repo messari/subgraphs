@@ -3,7 +3,7 @@ import {
   ActionLeave,
   ActionKick,
   ActionChallengeDecided,
-} from "../../generated/rocketDAONodeTrustedActions/rocketDAONodeTrustedActions";
+} from "../../generated/templates/rocketDAONodeTrustedActions/rocketDAONodeTrustedActions";
 import { Node } from "../../generated/schema";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { updateUsageMetrics } from "../updaters/usageMetrics";

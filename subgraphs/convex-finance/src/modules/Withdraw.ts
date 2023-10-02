@@ -15,7 +15,7 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { ERC20 } from "../../generated/Booster/ERC20";
 import { Pool as PoolContract } from "../../generated/Booster/Pool";
@@ -24,10 +24,11 @@ export function createWithdrawTransaction(
   vault: VaultStore,
   amount: BigInt,
   amountUSD: BigDecimal,
+  withdrawnTo: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -35,10 +36,11 @@ export function createWithdrawTransaction(
     withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
     withdrawTransaction.vault = vault.id;
-    withdrawTransaction.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
+    withdrawTransaction.protocol =
+      constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
-    withdrawTransaction.from = transaction.from.toHexString();
+    withdrawTransaction.to = withdrawnTo.toHexString();
+    withdrawTransaction.from = vault.id;
 
     withdrawTransaction.hash = transaction.hash.toHexString();
     withdrawTransaction.logIndex = transaction.index.toI32();
@@ -75,6 +77,7 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
 export function withdraw(
   vault: VaultStore,
   withdrawAmount: BigInt,
+  withdrawnTo: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
@@ -84,24 +87,22 @@ export function withdraw(
     Address.fromString(vault.outputToken!)
   );
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress, block);
   let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
   if (constants.MISSING_POOLS_MAP.get(inputTokenAddress)) {
-    const poolTokenAddress = constants.MISSING_POOLS_MAP.get(
-      inputTokenAddress
-    )!;
+    const poolTokenAddress =
+      constants.MISSING_POOLS_MAP.get(inputTokenAddress)!;
 
     inputTokenPrice = getUsdPricePerToken(poolTokenAddress, block);
     inputTokenDecimals = utils.getTokenDecimals(poolTokenAddress);
   }
 
-  let withdrawAmountUSD = withdrawAmount
+  const withdrawAmountUSD = withdrawAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     outputTokenContract.try_totalSupply(),
@@ -113,8 +114,7 @@ export function withdraw(
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice.usdPrice);
 
   vault.pricePerShare = utils
     .readValue<BigInt>(
@@ -127,6 +127,7 @@ export function withdraw(
     vault,
     withdrawAmount,
     withdrawAmountUSD,
+    withdrawnTo,
     transaction,
     block
   );

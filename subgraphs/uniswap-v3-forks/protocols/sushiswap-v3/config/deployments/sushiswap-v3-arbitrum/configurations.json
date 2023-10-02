@@ -1,0 +1,11 @@
+{
+  "network": "arbitrum-one",
+  "factoryAddress": "0x1af415a1eba07a4986a52b6f2e7de7003d82231e",
+  "factoryAddressStartBlock": 75998697,
+  "nonFungiblePositionManagerAddress": "0xf0cbce1942a68beb3d1b73f0dd86c8dcc363ef49",
+  "nonFungiblePositionManagerAddressStartBlock": 76057451,
+  "deployment": "SUSHISWAP_V3_ARBITRUM",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

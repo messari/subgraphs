@@ -1,5 +1,7 @@
 # Network Subgraph
 
+> ALERT: Network subgraphs are deprecated as of May 18, 2023. The subgraphs in this directory should all build, but do not expect any deployments to be supported after this date.
+
 This subgraph and schema will gather a standard set of network data metrics that matter.
 
 ## About the Schema

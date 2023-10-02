@@ -40,12 +40,12 @@ export class SushiswapMaticConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+        toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
       )
     );
   }
@@ -77,10 +77,10 @@ export class SushiswapMaticConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619");
+    return toLowerCase("0x7ceb23fd6bc0add59e62ac25578270cff1b9f619");
   }
   getRewardToken(): string {
-    return toLowerCase("0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a");
+    return toLowerCase("0x0b3f868e0be5597d5db7feb59e1cadbb0fdda50a");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
@@ -90,15 +90,13 @@ export class SushiswapMaticConfigurations implements Configurations {
       "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
       "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
       "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6", // wBTC
-      "0x4e78011ce80ee02d2c3e649fb657e45898257815", // Klima
-      "0x2f800db0fdb5223b3c3f354886d907a671414a7f", // BCT
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
-      "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
-      "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
+      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
+      "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
+      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
     ]);
   }
   getStableOraclePools(): string[] {
@@ -112,7 +110,9 @@ export class SushiswapMaticConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x43284543540a29de091f0a1526ac033da423e0e6", // SafePoly Token
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

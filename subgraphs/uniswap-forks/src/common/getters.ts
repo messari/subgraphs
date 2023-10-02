@@ -1,7 +1,7 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
-import { TokenABI } from "../../generated/Factory/TokenABI";
+import { TokenABI as ERC20 } from "../../generated/Factory/TokenABI";
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -27,8 +27,9 @@ import {
   RewardTokenType,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  BIGINT_TEN,
 } from "./constants";
-import { createPoolFees } from "./creators";
+import { findUSDPricePerToken } from "../price/price";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
@@ -56,13 +57,8 @@ export function getOrCreateProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getLiquidityPool(
-  poolAddress: string,
-  blockNumber: BigInt
-): LiquidityPool {
+export function getLiquidityPool(poolAddress: string): LiquidityPool {
   const pool = LiquidityPool.load(poolAddress)!;
-  pool.fees = createPoolFees(poolAddress, blockNumber);
-  pool.save();
   return pool;
 }
 
@@ -272,33 +268,54 @@ export function getOrCreateFinancialsDailySnapshot(
   return financialMetrics;
 }
 
-export function getOrCreateToken(address: string): Token {
+export function getOrCreateToken(
+  event: ethereum.Event,
+  address: string,
+  getNewPrice: boolean = true
+): Token {
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
+    let name = "";
+    let symbol = "";
+    let decimals = DEFAULT_DECIMALS;
 
+    if (!NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
+      const erc20Contract = ERC20.bind(Address.fromString(address));
+      // TODO: add overrides for name and symbol
+      const nameCall = erc20Contract.try_name();
+      if (!nameCall.reverted) name = nameCall.value;
+      const symbolCall = erc20Contract.try_symbol();
+      if (!symbolCall.reverted) symbol = symbolCall.value;
+      const decimalsCall = erc20Contract.try_decimals();
+      if (!decimalsCall.reverted) decimals = decimalsCall.value;
+    }
+
+    token.name = name;
+    token.symbol = symbol;
+    token.decimals = decimals;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
-    if (NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
-      token.name = "";
-      token.symbol = "";
-      token.decimals = DEFAULT_DECIMALS;
-      token.save();
-
-      return token as Token;
-    }
-    const erc20Contract = TokenABI.bind(Address.fromString(address));
-    const decimals = erc20Contract.try_decimals();
-    // Using try_cause some values might be missing
-    const name = erc20Contract.try_name();
-    const symbol = erc20Contract.try_symbol();
-    // TODO: add overrides for name and symbol
-    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
 
     token.save();
   }
+
+  if (
+    token.lastPriceBlockNumber! &&
+    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
+    getNewPrice
+  ) {
+    const newPrice = findUSDPricePerToken(event, token);
+
+    token.lastPriceUSD = newPrice;
+    token.lastPriceBlockNumber = event.block.number;
+    token.save();
+  }
+
   return token as Token;
 }
 
@@ -316,15 +333,22 @@ export function getOrCreateLPToken(
     token.decimals = DEFAULT_DECIMALS;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
     token.save();
   }
   return token;
 }
 
-export function getOrCreateRewardToken(address: string): RewardToken {
+export function getOrCreateRewardToken(
+  event: ethereum.Event,
+  address: string
+): RewardToken {
   let rewardToken = RewardToken.load(address);
   if (rewardToken == null) {
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(event, address);
     rewardToken = new RewardToken(RewardTokenType.DEPOSIT + "-" + address);
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;

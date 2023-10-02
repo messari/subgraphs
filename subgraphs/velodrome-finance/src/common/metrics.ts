@@ -1,6 +1,5 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount } from "../../generated/schema";
-import { Fees } from "../../generated/templates/Pair/Pair";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+
 import {
   INT_ONE,
   SECONDS_PER_DAY,
@@ -8,8 +7,6 @@ import {
   UsageType,
 } from "./constants";
 import {
-  getLiquidityPool,
-  getOrCreateDex,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
@@ -19,11 +16,22 @@ import {
 } from "./getters";
 import { applyDecimals } from "./utils/numbers";
 
-// Update FinancialsDailySnapshots entity
-export function updateFinancials(event: ethereum.Event): void {
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+import {
+  Account,
+  ActiveAccount,
+  DexAmmProtocol,
+  LiquidityPool,
+} from "../../generated/schema";
 
-  let protocol = getOrCreateDex();
+// Update FinancialsDailySnapshots entity
+export function updateFinancials(
+  protocol: DexAmmProtocol,
+  event: ethereum.Event
+): void {
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(
+    protocol,
+    event
+  );
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetricsDaily.blockNumber = event.block.number;
@@ -40,30 +48,37 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetricsDaily.save();
 }
 
-export function updateRevenue(event: Fees): void {
-  let protocol = getOrCreateDex();
-  let pool = getLiquidityPool(event.address);
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
-    event.address,
+export function updateRevenue(
+  protocol: DexAmmProtocol,
+  pool: LiquidityPool,
+  amount0: BigInt,
+  amount1: BigInt,
+  event: ethereum.Event
+): void {
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    protocol,
+    event
+  );
+  const poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+    pool,
     event.block
   );
-  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
-    event.address,
+  const poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+    pool,
     event.block
   );
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
+  const token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
+  const token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
 
-  let amount0USD = applyDecimals(event.params.amount0, token0.decimals).times(
+  const amount0USD = applyDecimals(amount0, token0.decimals).times(
     token0.lastPriceUSD!
   );
-  let amount1USD = applyDecimals(event.params.amount1, token1.decimals).times(
+  const amount1USD = applyDecimals(amount1, token1.decimals).times(
     token1.lastPriceUSD!
   );
 
-  let protocolSideRevenue = amount0USD.plus(amount1USD);
+  const protocolSideRevenue = amount0USD.plus(amount1USD);
   // no need to calculate supply side, as all fees are protocol side.
 
   //Update pool cumulatives
@@ -130,16 +145,21 @@ export function updateRevenue(event: Fees): void {
 
 // Update usage metrics entities
 export function updateUsageMetrics(
-  event: ethereum.Event,
+  protocol: DexAmmProtocol,
   fromAddress: Address,
-  usageType: string
+  usageType: string,
+  event: ethereum.Event
 ): void {
-  let from = fromAddress.toHexString();
+  const from = fromAddress.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
-
-  let protocol = getOrCreateDex();
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
+    protocol,
+    event
+  );
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(
+    protocol,
+    event
+  );
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
@@ -162,14 +182,14 @@ export function updateUsageMetrics(
   }
 
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = "daily".concat(from).concat("-").concat(dayId);
+  const dailyActiveAccountId = "daily".concat(from).concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -177,7 +197,10 @@ export function updateUsageMetrics(
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = "hourly".concat(from).concat("-").concat(hourId);
+  const hourlyActiveAccountId = "hourly"
+    .concat(from)
+    .concat("-")
+    .concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -202,20 +225,12 @@ export function updateUsageMetrics(
 
 // Update Pool Snapshots entities
 export function updatePoolMetrics(
-  poolAddress: Address,
+  pool: LiquidityPool,
   block: ethereum.Block
 ): void {
   // get or create pool metrics
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(
-    poolAddress,
-    block
-  );
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(
-    poolAddress,
-    block
-  );
-
-  let pool = getLiquidityPool(poolAddress);
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(pool, block);
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(pool, block);
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;

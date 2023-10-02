@@ -59,10 +59,14 @@ import {
   BnBntAddr,
   BntAddr,
   DaiAddr,
+  DaiDecimals,
   EthAddr,
   exponentToBigDecimal,
   exponentToBigInt,
   hundredBD,
+  INT_EIGHTEEN,
+  INT_SIX,
+  INT_TEN,
   LiquidityPoolFeeType,
   Network,
   oneBD,
@@ -70,15 +74,19 @@ import {
   RewardTokenType,
   secondsPerDay,
   secondsPerHour,
+  UsdcAddr,
+  UsdcDecimals,
+  UsdtAddr,
+  UsdtDecimals,
   zeroBD,
   zeroBI,
 } from "./constants";
 import { Versions } from "./versions";
 
-let withdrawFeeIdx = 0;
-let tradingFeeIdx = 1;
-let protocolFeeIdx = 2;
-let lpFeeIdx = 3;
+const withdrawFeeIdx = 0;
+const tradingFeeIdx = 1;
+const protocolFeeIdx = 2;
+const lpFeeIdx = 3;
 
 enum EventType {
   Swap,
@@ -87,10 +95,10 @@ enum EventType {
 }
 
 export function handlePoolTokenCreated(event: PoolTokenCreated): void {
-  let poolTokenAddress = event.params.poolToken;
-  let reserveTokenAddress = event.params.token;
+  const poolTokenAddress = event.params.poolToken;
+  const reserveTokenAddress = event.params.token;
 
-  let poolTokenID = poolTokenAddress.toHexString();
+  const poolTokenID = poolTokenAddress.toHexString();
   let poolToken = Token.load(poolTokenID);
   if (poolToken != null) {
     log.warning("[handlePoolTokenCreated] pool token {} already exists", [
@@ -101,9 +109,9 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
 
   // pool token
   poolToken = new Token(poolTokenID);
-  let poolTokenContract = PoolToken.bind(poolTokenAddress);
+  const poolTokenContract = PoolToken.bind(poolTokenAddress);
 
-  let poolTokenNameResult = poolTokenContract.try_name();
+  const poolTokenNameResult = poolTokenContract.try_name();
   if (poolTokenNameResult.reverted) {
     log.warning("[handlePoolTokenCreated] try_name on {} reverted", [
       poolTokenID,
@@ -113,7 +121,7 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
     poolToken.name = poolTokenNameResult.value;
   }
 
-  let poolTokenSymbolResult = poolTokenContract.try_symbol();
+  const poolTokenSymbolResult = poolTokenContract.try_symbol();
   if (poolTokenSymbolResult.reverted) {
     log.warning("[handlePoolTokenCreated] try_symbol on {} reverted", [
       poolTokenID,
@@ -123,7 +131,7 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
     poolToken.symbol = poolTokenSymbolResult.value;
   }
 
-  let poolTokenDecimalsResult = poolTokenContract.try_decimals();
+  const poolTokenDecimalsResult = poolTokenContract.try_decimals();
   if (poolTokenDecimalsResult.reverted) {
     log.warning("[handlePoolTokenCreated] try_decimals on {} reverted", [
       poolTokenID,
@@ -136,18 +144,18 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
   poolToken.save();
 
   // reserve token
-  let reserveTokenID = reserveTokenAddress.toHexString();
-  let reserveToken = new Token(reserveTokenID);
+  const reserveTokenID = reserveTokenAddress.toHexString();
+  const reserveToken = new Token(reserveTokenID);
   reserveToken._poolToken = poolTokenID;
 
   if (reserveTokenAddress == Address.fromString(EthAddr)) {
     reserveToken.name = "Ether";
     reserveToken.symbol = "ETH";
-    reserveToken.decimals = 18;
+    reserveToken.decimals = INT_EIGHTEEN;
   } else {
-    let tokenContract = ERC20.bind(Address.fromString(reserveTokenID));
+    const tokenContract = ERC20.bind(Address.fromString(reserveTokenID));
 
-    let tokenNameResult = tokenContract.try_name();
+    const tokenNameResult = tokenContract.try_name();
     if (tokenNameResult.reverted) {
       log.warning("[handlePoolTokenCreated] try_name on {} reverted", [
         reserveTokenID,
@@ -157,7 +165,7 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
       reserveToken.name = tokenNameResult.value;
     }
 
-    let tokenSymbolResult = tokenContract.try_symbol();
+    const tokenSymbolResult = tokenContract.try_symbol();
     if (tokenSymbolResult.reverted) {
       log.warning("[handlePoolTokenCreated] try_symbol on {} reverted", [
         reserveTokenID,
@@ -167,7 +175,7 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
       reserveToken.symbol = tokenSymbolResult.value;
     }
 
-    let tokenDecimalsResult = tokenContract.try_decimals();
+    const tokenDecimalsResult = tokenContract.try_decimals();
     if (tokenDecimalsResult.reverted) {
       log.warning("[handlePoolTokenCreated] try_decimals on {} reverted", [
         reserveTokenID,
@@ -179,19 +187,19 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
   }
   reserveToken.save();
 
-  let liquidityPool = createLiquidityPool(
+  const liquidityPool = createLiquidityPool(
     reserveToken,
     poolToken,
     event.block.timestamp,
     event.block.number
   );
 
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.warning("[handlePoolTokenCreated] protocol not found", []);
     return;
   }
-  let poolIDs = protocol._poolIDs;
+  const poolIDs = protocol._poolIDs;
   poolIDs.push(liquidityPool.id);
   protocol._poolIDs = poolIDs;
   protocol.totalPoolCount = poolIDs.length;
@@ -205,10 +213,10 @@ export function handlePoolCollectionAdded(event: PoolCollectionAdded): void {
 export function handleDefaultTradingFeePPMUpdated(
   event: DefaultTradingFeePPMUpdated
 ): void {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   protocol._defaultTradingFeeRate = event.params.newFeePPM
     .toBigDecimal()
-    .div(exponentToBigDecimal(6));
+    .div(exponentToBigDecimal(INT_SIX));
   protocol.save();
 
   for (let i = 0; i < protocol._poolIDs.length; i++) {
@@ -217,8 +225,8 @@ export function handleDefaultTradingFeePPMUpdated(
 }
 
 export function handleTradingFeePPMUpdated(event: TradingFeePPMUpdated): void {
-  let reserveTokenID = event.params.pool.toHexString();
-  let reserveToken = Token.load(reserveTokenID);
+  const reserveTokenID = event.params.pool.toHexString();
+  const reserveToken = Token.load(reserveTokenID);
   if (!reserveToken) {
     log.warning("[handleTradingFeePPMUpdated] reserve token {} not found", [
       reserveTokenID,
@@ -234,8 +242,8 @@ export function handleTradingFeePPMUpdated(event: TradingFeePPMUpdated): void {
     return;
   }
 
-  let liquidityPoolID = reserveToken._poolToken!;
-  let liquidityPool = LiquidityPool.load(liquidityPoolID);
+  const liquidityPoolID = reserveToken._poolToken!;
+  const liquidityPool = LiquidityPool.load(liquidityPoolID);
   if (!liquidityPool) {
     log.warning("[handleTradingFeePPMUpdated] liquidity pool {} not found", [
       liquidityPoolID,
@@ -245,17 +253,17 @@ export function handleTradingFeePPMUpdated(event: TradingFeePPMUpdated): void {
 
   liquidityPool._tradingFeeRate = event.params.newFeePPM
     .toBigDecimal()
-    .div(exponentToBigDecimal(6));
+    .div(exponentToBigDecimal(INT_SIX));
   liquidityPool.save();
 
   updateLiquidityPoolFees(liquidityPoolID);
 }
 
 export function handleNetworkFeePPMUpdated(event: NetworkFeePPMUpdated): void {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   protocol._networkFeeRate = event.params.newFeePPM
     .toBigDecimal()
-    .div(exponentToBigDecimal(6));
+    .div(exponentToBigDecimal(INT_SIX));
   protocol.save();
 
   for (let i = 0; i < protocol._poolIDs.length; i++) {
@@ -266,10 +274,10 @@ export function handleNetworkFeePPMUpdated(event: NetworkFeePPMUpdated): void {
 export function handleWithdrawalFeePPMUpdated(
   event: WithdrawalFeePPMUpdated
 ): void {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   protocol._withdrawalFeeRate = event.params.newFeePPM
     .toBigDecimal()
-    .div(exponentToBigDecimal(6));
+    .div(exponentToBigDecimal(INT_SIX));
   protocol.save();
 
   for (let i = 0; i < protocol._poolIDs.length; i++) {
@@ -278,16 +286,16 @@ export function handleWithdrawalFeePPMUpdated(
 }
 
 export function handleTokensTraded(event: TokensTraded): void {
-  let sourceTokenID = event.params.sourceToken.toHexString();
-  let targetTokenID = event.params.targetToken.toHexString();
-  let sourceToken = Token.load(sourceTokenID);
+  const sourceTokenID = event.params.sourceToken.toHexString();
+  const targetTokenID = event.params.targetToken.toHexString();
+  const sourceToken = Token.load(sourceTokenID);
   if (!sourceToken) {
     log.warning("[handleTokensTraded] source token {} not found", [
       sourceTokenID,
     ]);
     return;
   }
-  let targetToken = Token.load(targetTokenID);
+  const targetToken = Token.load(targetTokenID);
   if (!targetToken) {
     log.warning("[handleTokensTraded] target token {} not found", [
       targetTokenID,
@@ -301,7 +309,7 @@ export function handleTokensTraded(event: TokensTraded): void {
     ]);
     return;
   }
-  let swap = new Swap(
+  const swap = new Swap(
     "swap-"
       .concat(event.transaction.hash.toHexString())
       .concat("-")
@@ -316,21 +324,21 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.to = sourceToken._poolToken!;
   swap.tokenIn = sourceTokenID;
   swap.amountIn = event.params.sourceAmount;
-  let amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
+  const amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
   swap.amountInUSD = amountInUSD;
   swap.tokenOut = targetTokenID;
   swap.amountOut = event.params.targetAmount;
   swap.amountOutUSD = getDaiAmount(targetToken.id, event.params.targetAmount);
   swap.pool = sourceToken._poolToken!;
   swap._tradingFeeAmount = event.params.targetFeeAmount;
-  let tradingFeeAmountUSD = getDaiAmount(
+  const tradingFeeAmountUSD = getDaiAmount(
     targetToken.id,
     event.params.targetFeeAmount
   );
   swap._tradingFeeAmountUSD = tradingFeeAmountUSD;
   swap.save();
 
-  let liquidityPool = LiquidityPool.load(sourceToken._poolToken!);
+  const liquidityPool = LiquidityPool.load(sourceToken._poolToken!);
   if (!liquidityPool) {
     log.warning("[handleTokensTraded] liquidity pool {} not found", [
       sourceToken._poolToken!,
@@ -338,9 +346,11 @@ export function handleTokensTraded(event: TokensTraded): void {
     return;
   }
 
-  let protocol = getOrCreateProtocol();
-  let protocolSideRevenue = tradingFeeAmountUSD.times(protocol._networkFeeRate);
-  let supplySideRevenue = tradingFeeAmountUSD.minus(protocolSideRevenue);
+  const protocol = getOrCreateProtocol();
+  const protocolSideRevenue = tradingFeeAmountUSD.times(
+    protocol._networkFeeRate
+  );
+  const supplySideRevenue = tradingFeeAmountUSD.minus(protocolSideRevenue);
   liquidityPool.cumulativeTotalRevenueUSD =
     liquidityPool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
   liquidityPool.cumulativeProtocolSideRevenueUSD =
@@ -354,8 +364,8 @@ export function handleTokensTraded(event: TokensTraded): void {
 
   // update reward emission
   if (liquidityPool._latestRewardProgramID.gt(zeroBI)) {
-    let programID = liquidityPool._latestRewardProgramID.toString();
-    let rewardProgram = RewardProgram.load(programID);
+    const programID = liquidityPool._latestRewardProgramID.toString();
+    const rewardProgram = RewardProgram.load(programID);
     if (!rewardProgram) {
       log.warning(
         "[_handleTotalLiquidityUpdated] reward program {} not found",
@@ -366,10 +376,10 @@ export function handleTokensTraded(event: TokensTraded): void {
       rewardProgram.endTime.ge(event.block.timestamp) &&
       rewardProgram.enabled
     ) {
-      let rewardAmountInDay = rewardProgram.rewardsRate.times(
+      const rewardAmountInDay = rewardProgram.rewardsRate.times(
         BigInt.fromI32(secondsPerDay)
       );
-      let rewardAmountUSD = getDaiAmount(BntAddr, rewardAmountInDay);
+      const rewardAmountUSD = getDaiAmount(BntAddr, rewardAmountInDay);
       liquidityPool.rewardTokenEmissionsAmount = [rewardAmountInDay];
       liquidityPool.rewardTokenEmissionsUSD = [rewardAmountUSD];
     }
@@ -407,8 +417,8 @@ export function handleTokensTraded(event: TokensTraded): void {
 }
 
 export function handleTokensDeposited(event: TokensDeposited): void {
-  let reserveTokenID = event.params.token.toHexString();
-  let reserveToken = Token.load(reserveTokenID);
+  const reserveTokenID = event.params.token.toHexString();
+  const reserveToken = Token.load(reserveTokenID);
   if (!reserveToken) {
     log.warning("[handleTokensDeposited] reserve token {} not found", [
       reserveTokenID,
@@ -423,7 +433,7 @@ export function handleTokensDeposited(event: TokensDeposited): void {
     return;
   }
 
-  let poolToken = Token.load(reserveToken._poolToken!);
+  const poolToken = Token.load(reserveToken._poolToken!);
   if (!poolToken) {
     log.warning("[handleTokensDeposited] pool token {} not found", [
       reserveToken._poolToken!,
@@ -442,12 +452,12 @@ export function handleTokensDeposited(event: TokensDeposited): void {
 }
 
 export function handleBNTDeposited(event: BNTDeposited): void {
-  let bntToken = Token.load(BntAddr);
+  const bntToken = Token.load(BntAddr);
   if (!bntToken) {
     log.warning("[handleBNTDeposited] BNT token {} not found", [BntAddr]);
     return;
   }
-  let bnBntToken = Token.load(BnBntAddr);
+  const bnBntToken = Token.load(BnBntAddr);
   if (!bnBntToken) {
     log.warning("[handleBNTDeposited] bnBNT token {} not found", [BnBntAddr]);
     return;
@@ -464,15 +474,15 @@ export function handleBNTDeposited(event: BNTDeposited): void {
 }
 
 export function handleTokensWithdrawn(event: TokensWithdrawn): void {
-  let reserveTokenID = event.params.token.toHexString();
-  let reserveToken = Token.load(reserveTokenID);
+  const reserveTokenID = event.params.token.toHexString();
+  const reserveToken = Token.load(reserveTokenID);
   if (!reserveToken) {
     log.warning("[handleTokensWithdrawn] reserve token {} not found", [
       reserveTokenID,
     ]);
     return;
   }
-  let poolToken = Token.load(reserveToken._poolToken!);
+  const poolToken = Token.load(reserveToken._poolToken!);
   if (!poolToken) {
     log.warning("[handleTokensWithdrawn] pool token {} not found", [
       reserveToken._poolToken!,
@@ -492,12 +502,12 @@ export function handleTokensWithdrawn(event: TokensWithdrawn): void {
 }
 
 export function handleBNTWithdrawn(event: BNTWithdrawn): void {
-  let bntToken = Token.load(BntAddr);
+  const bntToken = Token.load(BntAddr);
   if (!bntToken) {
     log.warning("[handleBNTWithdrawn] BNT token {} not found", [BntAddr]);
     return;
   }
-  let bnBntToken = Token.load(BnBntAddr);
+  const bnBntToken = Token.load(BnBntAddr);
   if (!bnBntToken) {
     log.warning("[handleBNTWithdrawn] bnBNT token {} not found", [BnBntAddr]);
     return;
@@ -517,8 +527,8 @@ export function handleBNTWithdrawn(event: BNTWithdrawn): void {
 export function handleTotalLiquidityUpdated(
   event: TotalLiquidityUpdated
 ): void {
-  let tokenAddress = event.params.pool.toHexString();
-  let token = Token.load(tokenAddress);
+  const tokenAddress = event.params.pool.toHexString();
+  const token = Token.load(tokenAddress);
   if (!token) {
     log.warning("[handleTotalLiquidityUpdated] reserve token {} not found", [
       tokenAddress,
@@ -534,7 +544,7 @@ export function handleTotalLiquidityUpdated(
     return;
   }
 
-  let poolToken = Token.load(token._poolToken!);
+  const poolToken = Token.load(token._poolToken!);
   if (!poolToken) {
     log.warning("[handleTotalLiquidityUpdated] pool token {} not found", [
       token._poolToken!,
@@ -542,7 +552,7 @@ export function handleTotalLiquidityUpdated(
     return;
   }
 
-  let liquidityPool = LiquidityPool.load(token._poolToken!);
+  const liquidityPool = LiquidityPool.load(token._poolToken!);
   if (!liquidityPool) {
     log.warning("[handleTotalLiquidityUpdated] liquidity pool {} not found", [
       token._poolToken!,
@@ -562,7 +572,7 @@ export function handleTotalLiquidityUpdated(
 export function handleBNTTotalLiquidityUpdated(
   event: BNTTotalLiquidityUpdated
 ): void {
-  let bnBntToken = Token.load(BnBntAddr);
+  const bnBntToken = Token.load(BnBntAddr);
   if (!bnBntToken) {
     log.warning("[handleBNTTotalLiquidityUpdated] bnBNT token {} not found", [
       BnBntAddr,
@@ -570,7 +580,7 @@ export function handleBNTTotalLiquidityUpdated(
     return;
   }
 
-  let bnBntLiquidityPool = LiquidityPool.load(BnBntAddr);
+  const bnBntLiquidityPool = LiquidityPool.load(BnBntAddr);
   if (!bnBntLiquidityPool) {
     log.warning(
       "[handleBNTTotalLiquidityUpdated] bnBNT liquidity pool {} not found",
@@ -590,8 +600,8 @@ export function handleBNTTotalLiquidityUpdated(
 
 // currently each pool only has 1 reward program
 export function handleProgramCreated(event: ProgramCreated): void {
-  let reserveTokenId = event.params.pool.toHexString();
-  let reserveToken = Token.load(reserveTokenId);
+  const reserveTokenId = event.params.pool.toHexString();
+  const reserveToken = Token.load(reserveTokenId);
   if (!reserveToken) {
     log.warning("[handleProgramCreated] reserve token {} not found", [
       reserveTokenId,
@@ -605,7 +615,7 @@ export function handleProgramCreated(event: ProgramCreated): void {
     return;
   }
 
-  let liquidityPool = LiquidityPool.load(reserveToken._poolToken!);
+  const liquidityPool = LiquidityPool.load(reserveToken._poolToken!);
   if (!liquidityPool) {
     log.warning("[handleProgramCreated] liquidity pool {} not found", [
       reserveToken._poolToken!,
@@ -613,8 +623,8 @@ export function handleProgramCreated(event: ProgramCreated): void {
     return;
   }
 
-  let rewardProgramID = event.params.programId.toString();
-  let rewardProgram = new RewardProgram(rewardProgramID);
+  const rewardProgramID = event.params.programId.toString();
+  const rewardProgram = new RewardProgram(rewardProgramID);
   rewardProgram.pool = liquidityPool.id;
   rewardProgram.enabled = true;
   rewardProgram.totalRewards = event.params.totalRewards;
@@ -630,8 +640,8 @@ export function handleProgramCreated(event: ProgramCreated): void {
 }
 
 export function handleProgramTerminated(event: ProgramTerminated): void {
-  let programID = event.params.programId.toString();
-  let rewardProgram = RewardProgram.load(programID);
+  const programID = event.params.programId.toString();
+  const rewardProgram = RewardProgram.load(programID);
   if (!rewardProgram) {
     log.warning("[handleProgramTerminated] reward program {} not found", [
       programID,
@@ -644,8 +654,8 @@ export function handleProgramTerminated(event: ProgramTerminated): void {
 }
 
 export function handleProgramEnabled(event: ProgramEnabled): void {
-  let programID = event.params.programId.toString();
-  let rewardProgram = RewardProgram.load(programID);
+  const programID = event.params.programId.toString();
+  const rewardProgram = RewardProgram.load(programID);
   if (!rewardProgram) {
     log.warning("[handleProgramTerminated] reward program {} not found", [
       programID,
@@ -693,45 +703,45 @@ function createLiquidityPool(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): LiquidityPool {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
 
   // init fees
-  let withdrawalFee = new LiquidityPoolFee(
+  const withdrawalFee = new LiquidityPoolFee(
     LiquidityPoolFeeType.WITHDRAWAL_FEE.concat("-").concat(poolToken.id)
   );
   withdrawalFee.feePercentage = zeroBD;
   withdrawalFee.feeType = LiquidityPoolFeeType.WITHDRAWAL_FEE;
   withdrawalFee.save();
 
-  let tradingFee = new LiquidityPoolFee(
+  const tradingFee = new LiquidityPoolFee(
     LiquidityPoolFeeType.DYNAMIC_TRADING_FEE.concat("-").concat(poolToken.id)
   );
   tradingFee.feePercentage = zeroBD;
   tradingFee.feeType = LiquidityPoolFeeType.DYNAMIC_TRADING_FEE;
   tradingFee.save();
 
-  let protocolFee = new LiquidityPoolFee(
+  const protocolFee = new LiquidityPoolFee(
     LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE.concat("-").concat(poolToken.id)
   );
   protocolFee.feePercentage = zeroBD;
   protocolFee.feeType = LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE;
   protocolFee.save();
 
-  let lpFee = new LiquidityPoolFee(
+  const lpFee = new LiquidityPoolFee(
     LiquidityPoolFeeType.DYNAMIC_LP_FEE.concat("-").concat(poolToken.id)
   );
   lpFee.feePercentage = zeroBD;
   lpFee.feeType = LiquidityPoolFeeType.DYNAMIC_LP_FEE;
   lpFee.save();
 
-  let rewardToken = new RewardToken(
+  const rewardToken = new RewardToken(
     RewardTokenType.DEPOSIT.concat("-").concat(BntAddr)
   );
   rewardToken.token = BnBntAddr;
   rewardToken.type = RewardTokenType.DEPOSIT;
   rewardToken.save();
 
-  let liquidityPool = new LiquidityPool(poolToken.id);
+  const liquidityPool = new LiquidityPool(poolToken.id);
   liquidityPool.protocol = protocol.id;
   liquidityPool.name = poolToken.name;
   liquidityPool.symbol = poolToken.symbol;
@@ -778,7 +788,7 @@ function _handleTokensDeposited(
   poolToken: Token,
   poolTokenAmount: BigInt
 ): void {
-  let deposit = new Deposit(
+  const deposit = new Deposit(
     "deposit-"
       .concat(event.transaction.hash.toHexString())
       .concat("-")
@@ -822,7 +832,7 @@ function _handleTokensWithdrawn(
   poolTokenAmount: BigInt,
   withdrawalFeeAmount: BigInt
 ): void {
-  let withdraw = new Withdraw(
+  const withdraw = new Withdraw(
     "withdraw-"
       .concat(event.transaction.hash.toHexString())
       .concat("-")
@@ -842,14 +852,14 @@ function _handleTokensWithdrawn(
   withdraw.amountUSD = getDaiAmount(reserveToken.id, reserveTokenAmount);
   withdraw.pool = poolToken.id;
   withdraw._withdrawalFeeAmount = withdrawalFeeAmount;
-  let withdrawalFeeAmountUSD = getDaiAmount(
+  const withdrawalFeeAmountUSD = getDaiAmount(
     reserveToken.id,
     withdrawalFeeAmount
   );
   withdraw._withdrawalFeeAmountUSD = withdrawalFeeAmountUSD;
   withdraw.save();
 
-  let liquidityPool = LiquidityPool.load(poolToken.id);
+  const liquidityPool = LiquidityPool.load(poolToken.id);
   if (!liquidityPool) {
     log.warning("[handleTokensWithdrawn] liquidity pool {} not found", [
       poolToken.id,
@@ -889,8 +899,8 @@ function _handleTotalLiquidityUpdated(
   poolTokenSupply: BigInt,
   poolTokenDecimals: i32
 ): void {
-  let prevTotalValueLockedUSD = liquidityPool.totalValueLockedUSD;
-  let currTotalValueLockedUSD = getDaiAmount(reserveTokenID, stakedBalance);
+  const prevTotalValueLockedUSD = liquidityPool.totalValueLockedUSD;
+  const currTotalValueLockedUSD = getDaiAmount(reserveTokenID, stakedBalance);
 
   liquidityPool.inputTokenBalances = [stakedBalance];
   liquidityPool.totalValueLockedUSD = currTotalValueLockedUSD;
@@ -899,12 +909,12 @@ function _handleTotalLiquidityUpdated(
     reserveTokenID,
     getReserveTokenAmount(
       reserveTokenID,
-      BigInt.fromI32(10).pow(poolTokenDecimals as u8) // 1 share of pool token
+      BigInt.fromI32(INT_TEN).pow(poolTokenDecimals as u8) // 1 share of pool token
     )
   );
   liquidityPool.save();
 
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.warning("[_handleTotalLiquidityUpdated] protocol not found", []);
     return;
@@ -920,17 +930,19 @@ function getDaiAmount(
   sourceAmountMantissa: BigInt
 ): BigDecimal {
   if (sourceTokenID == DaiAddr) {
-    return sourceAmountMantissa.toBigDecimal().div(exponentToBigDecimal(18));
+    return sourceAmountMantissa
+      .toBigDecimal()
+      .div(exponentToBigDecimal(INT_EIGHTEEN));
   }
-  let sourceToken = Token.load(sourceTokenID);
+  const sourceToken = Token.load(sourceTokenID);
   if (!sourceToken) {
     log.warning("[getDaiAmount] token {} not found", [sourceTokenID]);
     return zeroBD;
   }
-  let sourceAmount = sourceAmountMantissa
+  const sourceAmount = sourceAmountMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(sourceToken.decimals));
-  let priceUSD = getTokenPriceUSD(sourceTokenID, sourceToken.decimals);
+  const priceUSD = getTokenPriceUSD(sourceTokenID, sourceToken.decimals);
   return sourceAmount.times(priceUSD);
 }
 
@@ -938,31 +950,45 @@ function getDaiAmount(
 // by calling tradeOutputBySourceAmount method in BancorNetworkInfo
 // potential optimization: store price at Token.lastPriceUSD
 function getTokenPriceUSD(token: string, decimals: i32): BigDecimal {
-  let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
-  let daiAmountMantissaResult = info.try_tradeOutputBySourceAmount(
-    Address.fromString(token),
-    Address.fromString(DaiAddr),
-    exponentToBigInt(decimals)
+  const info = BancorNetworkInfo.bind(
+    Address.fromString(BancorNetworkInfoAddr)
   );
-  if (daiAmountMantissaResult.reverted) {
-    log.warning(
-      "[getTokenPriceUSD] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
-      [token, DaiAddr, exponentToBigInt(decimals).toString()]
+
+  const stables = [
+    [DaiAddr, DaiDecimals],
+    [UsdcAddr, UsdcDecimals],
+    [UsdtAddr, UsdtDecimals],
+  ];
+  for (let i = 0; i < stables.length; i++) {
+    const stableAmountMantissaResult = info.try_tradeOutputBySourceAmount(
+      Address.fromString(token),
+      Address.fromString(stables[i][0]),
+      exponentToBigInt(decimals)
     );
-    return zeroBD;
+
+    if (!stableAmountMantissaResult.reverted) {
+      return stableAmountMantissaResult.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(parseInt(stables[i][1]) as i32));
+    } else {
+      log.warning(
+        "[getTokenPriceUSD] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
+        [token, stables[i][0], exponentToBigInt(decimals).toString()]
+      );
+    }
   }
-  // 18 = dai decimals
-  return daiAmountMantissaResult.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(18));
+
+  return zeroBD;
 }
 
 function getReserveTokenAmount(
   reserveTokenID: string,
   poolTokenAmount: BigInt
 ): BigInt {
-  let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
-  let reserveTokenAmountResult = info.try_poolTokenToUnderlying(
+  const info = BancorNetworkInfo.bind(
+    Address.fromString(BancorNetworkInfoAddr)
+  );
+  const reserveTokenAmountResult = info.try_poolTokenToUnderlying(
     Address.fromString(reserveTokenID),
     poolTokenAmount
   );
@@ -982,7 +1008,7 @@ function snapshotUsage(
   accountID: string,
   eventType: EventType
 ): void {
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.error("[snapshotUsage] Protocol not found, this SHOULD NOT happen", []);
     return;
@@ -999,7 +1025,7 @@ function snapshotUsage(
   //
   // daily snapshot
   //
-  let dailySnapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
+  const dailySnapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
   let dailySnapshot = UsageMetricsDailySnapshot.load(dailySnapshotID);
   if (!dailySnapshot) {
     dailySnapshot = new UsageMetricsDailySnapshot(dailySnapshotID);
@@ -1014,7 +1040,7 @@ function snapshotUsage(
     dailySnapshot.blockNumber = blockNumber;
     dailySnapshot.timestamp = blockTimestamp;
   }
-  let dailyAccountID = accountID.concat("-").concat(dailySnapshotID);
+  const dailyAccountID = accountID.concat("-").concat(dailySnapshotID);
   let dailyActiveAccount = ActiveAccount.load(dailyAccountID);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyAccountID);
@@ -1044,7 +1070,7 @@ function snapshotUsage(
   //
   // hourly snapshot
   //
-  let hourlySnapshotID = (blockTimestamp.toI32() / secondsPerHour).toString();
+  const hourlySnapshotID = (blockTimestamp.toI32() / secondsPerHour).toString();
   let hourlySnapshot = UsageMetricsHourlySnapshot.load(hourlySnapshotID);
   if (!hourlySnapshot) {
     hourlySnapshot = new UsageMetricsHourlySnapshot(hourlySnapshotID);
@@ -1058,7 +1084,7 @@ function snapshotUsage(
     hourlySnapshot.blockNumber = blockNumber;
     hourlySnapshot.timestamp = blockTimestamp;
   }
-  let hourlyAccountID = accountID.concat("-").concat(hourlySnapshotID);
+  const hourlyAccountID = accountID.concat("-").concat(hourlySnapshotID);
   let hourlyActiveAccount = ActiveAccount.load(hourlyAccountID);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyAccountID);
@@ -1090,7 +1116,7 @@ function snapshotLiquidityPool(
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
-  let liquidityPool = LiquidityPool.load(liquidityPoolID);
+  const liquidityPool = LiquidityPool.load(liquidityPoolID);
   if (!liquidityPool) {
     log.warning("[snapshotLiquidityPool] liquidity pool {} not found", [
       liquidityPoolID,
@@ -1101,7 +1127,7 @@ function snapshotLiquidityPool(
   //
   // daily snapshot
   //
-  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     liquidityPoolID,
     blockTimestamp,
     blockNumber
@@ -1128,7 +1154,7 @@ function snapshotLiquidityPool(
   //
   // hourly snapshot
   //
-  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     liquidityPoolID,
     blockTimestamp,
     blockNumber
@@ -1165,7 +1191,7 @@ function updateLiquidityPoolSnapshotVolume(
   //
   // daily snapshot
   //
-  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     liquidityPoolID,
     blockTimestamp,
     blockNumber
@@ -1182,7 +1208,7 @@ function updateLiquidityPoolSnapshotVolume(
   //
   // hourly snapshot
   //
-  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     liquidityPoolID,
     blockTimestamp,
     blockNumber
@@ -1204,13 +1230,13 @@ function updateLiquidityPoolSnapshotRevenue(
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
-  let protocolSideRevenue = revenue.times(networkFeeRate);
-  let supplySideRevenue = revenue.minus(protocolSideRevenue);
+  const protocolSideRevenue = revenue.times(networkFeeRate);
+  const supplySideRevenue = revenue.minus(protocolSideRevenue);
 
   //
   // daily snapshot
   //
-  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     liquidityPoolID,
     blockTimestamp,
     blockNumber
@@ -1226,7 +1252,7 @@ function updateLiquidityPoolSnapshotRevenue(
   //
   // hourly snapshot
   //
-  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     liquidityPoolID,
     blockTimestamp,
     blockNumber
@@ -1241,7 +1267,7 @@ function updateLiquidityPoolSnapshotRevenue(
 }
 
 function updateProtocolRevenue(): void {
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.warning("[updateProtocolRevenue] protocol not found", []);
     return;
@@ -1252,7 +1278,7 @@ function updateProtocolRevenue(): void {
   let cumulativeSupplySideRevenueUSD = zeroBD;
 
   for (let i = 0; i < protocol._poolIDs.length; i++) {
-    let liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
+    const liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
     if (!liquidityPool) {
       log.warning("[updateProtocolRevenue] liqudity pool {} not found", [
         protocol._poolIDs[i],
@@ -1278,7 +1304,7 @@ function updateProtocolRevenue(): void {
 }
 
 function updateProtocolVolume(): void {
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.warning("[updateProtocolVolume] protocol not found", []);
     return;
@@ -1287,7 +1313,7 @@ function updateProtocolVolume(): void {
   let cumulativeVolumeUSD = zeroBD;
 
   for (let i = 0; i < protocol._poolIDs.length; i++) {
-    let liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
+    const liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
     if (!liquidityPool) {
       log.warning("[updateProtocolVolume] liqudity pool {} not found", [
         protocol._poolIDs[i],
@@ -1305,13 +1331,13 @@ function updateProtocolVolume(): void {
 }
 
 function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.warning("[snapshotFinancials] protocol not found", []);
     return;
   }
 
-  let snapshot = getOrCreateFinancialsDailySnapshot(blockTimestamp);
+  const snapshot = getOrCreateFinancialsDailySnapshot(blockTimestamp);
 
   snapshot.timestamp = blockTimestamp;
   snapshot.blockNumber = blockNumber;
@@ -1329,7 +1355,7 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
   let dailySupplySideRevenueUSD = zeroBD;
 
   for (let i = 0; i < protocol._poolIDs.length; i++) {
-    let liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
+    const liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
     if (!liquidityPool) {
       log.warning("[snapshotFinancials] liqudity pool {} not found", [
         protocol._poolIDs[i],
@@ -1337,11 +1363,11 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
       return;
     }
 
-    let liquidityPoolDailySnapshotID = getLiquidityPoolDailySnapshotID(
+    const liquidityPoolDailySnapshotID = getLiquidityPoolDailySnapshotID(
       liquidityPool.id,
       blockTimestamp.toI32()
     );
-    let liquidityPoolDailySnapshot = LiquidityPoolDailySnapshot.load(
+    const liquidityPoolDailySnapshot = LiquidityPoolDailySnapshot.load(
       liquidityPoolDailySnapshotID
     );
     if (!liquidityPoolDailySnapshot) {
@@ -1372,7 +1398,7 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
   snapshot.save();
 
   // protocol controlled value usd = bnt_amount * bnt_price
-  let bntLiquidityPool = LiquidityPool.load(BnBntAddr);
+  const bntLiquidityPool = LiquidityPool.load(BnBntAddr);
   if (!bntLiquidityPool) {
     log.warning("[snapshotFinancials] bnBNT liquidity pool not found", []);
     return;
@@ -1385,7 +1411,7 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
     return;
   }
 
-  let bntAmount = getReserveTokenAmount(
+  const bntAmount = getReserveTokenAmount(
     BntAddr,
     bntLiquidityPool.outputTokenSupply!
   );
@@ -1396,7 +1422,7 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
 function getOrCreateFinancialsDailySnapshot(
   blockTimestamp: BigInt
 ): FinancialsDailySnapshot {
-  let snapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
+  const snapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
   let snapshot = FinancialsDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new FinancialsDailySnapshot(snapshotID);
@@ -1425,7 +1451,7 @@ function getOrCreateLiquidityPoolDailySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): LiquidityPoolDailySnapshot {
-  let snapshotID = getLiquidityPoolDailySnapshotID(
+  const snapshotID = getLiquidityPoolDailySnapshotID(
     liquidityPoolID,
     blockTimestamp.toI32()
   );
@@ -1466,7 +1492,7 @@ function getOrCreateLiquidityPoolHourlySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): LiquidityPoolHourlySnapshot {
-  let snapshotID = getLiquidityPoolHourlySnapshotID(
+  const snapshotID = getLiquidityPoolHourlySnapshotID(
     liquidityPoolID,
     blockTimestamp.toI32()
   );
@@ -1521,12 +1547,12 @@ function getLiquidityPoolHourlySnapshotID(
 }
 
 function updateLiquidityPoolFees(liquidityPoolID: string): void {
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  const protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
     log.warning("[updateLiquidityPoolFees] protocol not found", []);
     return;
   }
-  let liquidityPool = LiquidityPool.load(liquidityPoolID);
+  const liquidityPool = LiquidityPool.load(liquidityPoolID);
   if (!liquidityPool) {
     log.warning("[updateLiquidityPoolFees] liquidity pool {} not found", [
       liquidityPoolID,
@@ -1534,7 +1560,7 @@ function updateLiquidityPoolFees(liquidityPoolID: string): void {
     return;
   }
 
-  let withdrawFee = LiquidityPoolFee.load(liquidityPool.fees[withdrawFeeIdx]);
+  const withdrawFee = LiquidityPoolFee.load(liquidityPool.fees[withdrawFeeIdx]);
   if (!withdrawFee) {
     log.warning("[updateLiquidityPoolFees] fee {} not found", [
       liquidityPool.fees[withdrawFeeIdx],
@@ -1544,7 +1570,7 @@ function updateLiquidityPoolFees(liquidityPoolID: string): void {
     withdrawFee.save();
   }
 
-  let tradingFee = LiquidityPoolFee.load(liquidityPool.fees[tradingFeeIdx]);
+  const tradingFee = LiquidityPoolFee.load(liquidityPool.fees[tradingFeeIdx]);
   if (!tradingFee) {
     log.warning("[updateLiquidityPoolFees] fee {} not found", [
       liquidityPool.fees[tradingFeeIdx],
@@ -1554,7 +1580,7 @@ function updateLiquidityPoolFees(liquidityPoolID: string): void {
     tradingFee.save();
   }
 
-  let protocolFee = LiquidityPoolFee.load(liquidityPool.fees[protocolFeeIdx]);
+  const protocolFee = LiquidityPoolFee.load(liquidityPool.fees[protocolFeeIdx]);
   if (!protocolFee) {
     log.warning("[updateLiquidityPoolFees] fee {} not found", [
       liquidityPool.fees[protocolFeeIdx],
@@ -1566,7 +1592,7 @@ function updateLiquidityPoolFees(liquidityPoolID: string): void {
     protocolFee.save();
   }
 
-  let lpFee = LiquidityPoolFee.load(liquidityPool.fees[lpFeeIdx]);
+  const lpFee = LiquidityPoolFee.load(liquidityPool.fees[lpFeeIdx]);
   if (!lpFee) {
     log.warning("[updateLiquidityPoolFees] fee {} not found", [
       liquidityPool.fees[lpFeeIdx],

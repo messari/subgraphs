@@ -4,7 +4,7 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import { getTotalFees } from "../modules/Fees";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import {
@@ -21,12 +21,12 @@ export function handleRewardAdded(event: RewardAdded): void {
 
   const crvRewardPoolAddress = event.address;
 
-  let crvRewardTokenAddress = constants.CRV_TOKEN_ADDRESS;
-  let crvRewardTokenPrice = getUsdPricePerToken(
+  const crvRewardTokenAddress = constants.CRV_TOKEN_ADDRESS;
+  const crvRewardTokenPrice = getUsdPricePerToken(
     crvRewardTokenAddress,
     event.block
   );
-  let crvRewardTokenDecimals = utils.getTokenDecimals(crvRewardTokenAddress);
+  const crvRewardTokenDecimals = utils.getTokenDecimals(crvRewardTokenAddress);
 
   const vault = getOrCreateVault(poolId, event.block);
   if (!vault) return;
@@ -37,55 +37,52 @@ export function handleRewardAdded(event: RewardAdded): void {
     event.block
   );
 
-  let beforeHistoricalRewards = rewardPoolInfo.historicalRewards;
-  let afterHistoricalRewards = getHistoricalRewards(crvRewardPoolAddress);
+  const beforeHistoricalRewards = rewardPoolInfo.historicalRewards;
+  const afterHistoricalRewards = getHistoricalRewards(crvRewardPoolAddress);
 
-  let rewardsEarned = afterHistoricalRewards.minus(beforeHistoricalRewards);
+  const rewardsEarned = afterHistoricalRewards.minus(beforeHistoricalRewards);
 
-  let cvxRewardTokenAddress = constants.CONVEX_TOKEN_ADDRESS;
-  let cvxRewardTokenPrice = getUsdPricePerToken(
+  const cvxRewardTokenAddress = constants.CONVEX_TOKEN_ADDRESS;
+  const cvxRewardTokenPrice = getUsdPricePerToken(
     cvxRewardTokenAddress,
     event.block
   );
-  let cvxRewardTokenDecimals = utils.getTokenDecimals(cvxRewardTokenAddress);
+  const cvxRewardTokenDecimals = utils.getTokenDecimals(cvxRewardTokenAddress);
 
-  let cvxRewardsEarned = utils.getConvexTokenMintAmount(rewardsEarned);
-  let cvxRewardEarnedUsd = cvxRewardsEarned
+  const cvxRewardsEarned = utils.getConvexTokenMintAmount(rewardsEarned);
+  const cvxRewardEarnedUsd = cvxRewardsEarned
     .div(cvxRewardTokenDecimals)
     .times(cvxRewardTokenPrice.usdPrice)
-    .div(cvxRewardTokenPrice.decimalsBaseTen)
     .truncate(1);
 
-  let totalFeesConvex = getTotalFees();
-  let totalRewardsEarned = rewardsEarned
+  const totalFeesConvex = getTotalFees();
+  const totalRewardsEarned = rewardsEarned
     .toBigDecimal()
     .div(constants.BIGDECIMAL_ONE.minus(totalFeesConvex.totalFees()))
     .truncate(0);
 
-  let lockFee = totalRewardsEarned.times(totalFeesConvex.lockIncentive); // incentive to crv stakers
-  let callFee = totalRewardsEarned.times(totalFeesConvex.callIncentive); // incentive to users who spend gas to make calls
-  let stakerFee = totalRewardsEarned.times(totalFeesConvex.stakerIncentive); // incentive to native token stakers
-  let platformFee = totalRewardsEarned.times(totalFeesConvex.platformFee); // possible fee to build treasury
+  const lockFee = totalRewardsEarned.times(totalFeesConvex.lockIncentive); // incentive to crv stakers
+  const callFee = totalRewardsEarned.times(totalFeesConvex.callIncentive); // incentive to users who spend gas to make calls
+  const stakerFee = totalRewardsEarned.times(totalFeesConvex.stakerIncentive); // incentive to native token stakers
+  const platformFee = totalRewardsEarned.times(totalFeesConvex.platformFee); // possible fee to build treasury
 
-  let supplySideRevenue = rewardsEarned
+  const supplySideRevenue = rewardsEarned
     .toBigDecimal()
     .plus(lockFee)
     .div(crvRewardTokenDecimals)
     .truncate(0);
   const supplySideRevenueUSD = supplySideRevenue
     .times(crvRewardTokenPrice.usdPrice)
-    .div(crvRewardTokenPrice.decimalsBaseTen)
     .plus(cvxRewardEarnedUsd)
     .truncate(1);
 
-  let protocolSideRevenue = stakerFee
+  const protocolSideRevenue = stakerFee
     .plus(callFee)
     .plus(platformFee)
     .div(crvRewardTokenDecimals)
     .truncate(0);
   const protocolSideRevenueUSD = protocolSideRevenue
     .times(crvRewardTokenPrice.usdPrice)
-    .div(crvRewardTokenPrice.decimalsBaseTen)
     .truncate(1);
 
   rewardPoolInfo.historicalRewards = afterHistoricalRewards;

@@ -1,27 +1,24 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/templates/Strategy/CalculationsCurve";
 
-export function getCalculationsCurveContract(
-  contractAddress: Address
-): CalculationsCurveContract | null {
-  if (utils.isNullAddress(contractAddress)) return null;
-
-  return CalculationsCurveContract.bind(contractAddress);
-}
-
-export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
+export function getTokenPriceUSDC(
+  tokenAddr: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
   const config = utils.getConfig();
+  const contractAddress = utils.getContract(config.curveCalculations(), block);
 
-  if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
+  if (
+    !contractAddress ||
+    config.curveCalculationsBlacklist().includes(tokenAddr)
+  )
     return new CustomPriceType();
 
-  const calculationCurveContract = getCalculationsCurveContract(
-    config.curveCalculations()
-  );
-  if (!calculationCurveContract) return new CustomPriceType();
+  const calculationCurveContract =
+    CalculationsCurveContract.bind(contractAddress);
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
@@ -32,6 +29,7 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.DEFAULT_USDC_DECIMALS,
+    constants.OracleType.CURVE_CALCULATIONS
   );
 }

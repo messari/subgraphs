@@ -1,0 +1,25 @@
+{
+  "deployment": "ACROSS_V2_ETHEREUM",
+  "HubPool": [{}],
+  "AcceleratingDistributor": [{}],
+  "SpokePool": [
+    {
+      "chain": "Ethereum",
+      "network": "mainnet",
+      "address": "0x4d9079bb4165aeb4084c526a32695dcfd2f77381",
+      "startBlock": 14819486,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,uint256,uint256,uint64,uint64,uint64,uint32,address,indexed address,indexed address,address,bool)",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,uint256,uint64,indexed uint32,uint32,indexed address,address,indexed address)",
+      "name": "SpokePool1"
+    },
+    {
+      "chain": "Ethereum",
+      "network": "mainnet",
+      "address": "0x5c7bcd6e7de5423a257d81b442095a1a6ced35c5",
+      "startBlock": 17117454,
+      "filledRelayEvent": "FilledRelay(uint256,uint256,uint256,uint256,indexed uint256,uint256,int64,int64,indexed uint32,address,address,indexed address,address,bytes,(address,bytes,int64,bool,int256))",
+      "fundsDepositedEvent": "FundsDeposited(uint256,uint256,indexed uint256,int64,indexed uint32,uint32,address,address,indexed address,bytes)",
+      "name": "SpokePool2"
+    }
+  ]
+}

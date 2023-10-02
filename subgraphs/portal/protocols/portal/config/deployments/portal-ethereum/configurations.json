@@ -1,0 +1,17 @@
+{
+  "deployment": "PORTAL_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "core": {
+    "address": "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B",
+    "startBlock": 12959638
+  },
+  "tokenBridge": {
+    "address": "0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
+    "startBlock": 13217349
+  },
+  "supportsCallHandlers": true,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

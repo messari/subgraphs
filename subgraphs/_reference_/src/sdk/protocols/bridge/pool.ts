@@ -23,7 +23,6 @@ import {
   BIGINT_ZERO,
   RewardTokenType,
 } from "../../util/constants";
-import { bigIntToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,
@@ -33,6 +32,17 @@ import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
 import { CustomEventType } from "../../util/events";
+
+/**
+ * This file contains the PoolManager, which is used to
+ * initialize new pools in the protocol.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.1
+ * Author(s):
+ *  - @jaimehgb
+ *  - @dhruv-chauhan
+ */
 
 type onCreatePoolCallback<T> = (
   event: CustomEventType,
@@ -336,6 +346,25 @@ export class Pool {
   }
 
   /**
+   * Utility function to update token price.
+   *
+   * @param token
+   * @returns
+   */
+  setTokenPrice(token: Token): void {
+    if (
+      !token.lastPriceBlockNumber ||
+      (token.lastPriceBlockNumber &&
+        token.lastPriceBlockNumber! < this.protocol.event.block.number)
+    ) {
+      const pricePerToken = this.protocol.getTokenPricer().getTokenPrice(token);
+      token.lastPriceUSD = pricePerToken;
+      token.lastPriceBlockNumber = this.protocol.event.block.number;
+      token.save();
+    }
+  }
+
+  /**
    * Utility function to convert some amount of input token to USD.
    *
    * @param amount the amount of inputToken to convert to USD
@@ -343,11 +372,9 @@ export class Pool {
    */
   getInputTokenAmountPrice(amount: BigInt): BigDecimal {
     const token = this.getInputToken();
-    const price = this.protocol.getTokenPricer().getTokenPrice(token);
-    token.lastPriceUSD = price;
-    token.save();
+    this.setTokenPrice(token);
 
-    return bigIntToBigDecimal(amount, token.decimals).times(price);
+    return this.protocol.getTokenPricer().getAmountValueUSD(token, amount);
   }
 
   /**
@@ -376,6 +403,7 @@ export class Pool {
     this.pool.inputTokenBalance = newBalance;
     if (updateMetrics) {
       this.refreshTotalValueLocked();
+      this.refreshNetValueExportedUSD();
     }
   }
 
@@ -488,7 +516,7 @@ export class Pool {
    */
   addMintSupply(amount: BigInt): void {
     this.pool.mintSupply = this.pool.mintSupply!.plus(amount);
-    this.save();
+    this.refreshNetValueExportedUSD();
   }
 
   /**
@@ -641,7 +669,6 @@ export class Pool {
         amount = amount.times(BIGINT_MINUS_ONE);
       }
       this.addMintSupply(amount);
-      this.refreshNetValueExportedUSD();
     } else if (
       this.pool.type == BridgePoolType.LIQUIDITY ||
       this.pool.type == BridgePoolType.LOCK_RELEASE
@@ -651,7 +678,6 @@ export class Pool {
         amount = amount.times(BIGINT_MINUS_ONE);
       }
       this.addInputTokenBalance(amount);
-      this.refreshNetValueExportedUSD();
     }
   }
 

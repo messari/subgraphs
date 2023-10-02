@@ -1,32 +1,33 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { AaveOracleContract } from "../../../generated/RouterV6/AaveOracleContract";
+import { CustomPriceType, OracleContract } from "../common/types";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { AaveOracleContract } from "../../../generated/Router-0/AaveOracleContract";
 
-export function getAaveOracleContract(network: string): AaveOracleContract {
-  return AaveOracleContract.bind(
-    constants.AAVE_ORACLE_CONTRACT_ADDRESS.get(network)
-  );
+export function getAaveOracleContract(
+  contract: OracleContract,
+  block: ethereum.Block | null = null
+): AaveOracleContract | null {
+  if (
+    (block && contract.startBlock.gt(block.number)) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return AaveOracleContract.bind(contract.address);
 }
 
-export function getTokenPriceFromAaveOracle(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
-  network: string
+  block: ethereum.Block | null = null
 ): CustomPriceType {
-  const aaveOracleContract = getAaveOracleContract(network);
+  const config = utils.getConfig();
 
-  if (
-    constants.AAVE_ORACLE_CONTRACT_ADDRESS.get(network).equals(
-      constants.ZERO_ADDRESS
-    )
-  ) {
+  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
 
-  if (!aaveOracleContract) {
-    return new CustomPriceType();
-  }
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle(), block);
+  if (!aaveOracleContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
@@ -37,6 +38,7 @@ export function getTokenPriceFromAaveOracle(
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.USDC_DECIMALS_MAP.get(network)!.toI32() as u8
+    constants.AAVE_ORACLE_DECIMALS,
+    constants.OracleType.AAVE_ORACLE
   );
 }

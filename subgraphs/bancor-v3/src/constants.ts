@@ -60,20 +60,30 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
-export let BancorNetworkAddr = "0xeEF417e1D5CC832e619ae18D2F140De2999dD4fB";
-export let BancorNetworkInfoAddr = "0x8E303D296851B320e6a697bAcB979d13c9D6E760";
-export let EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-export let BntAddr = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";
-export let BnBntAddr = "0xab05cf7c6c3a288cd36326e4f7b8600e7268e344";
-export let DaiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
+// eslint-disable-next-line rulesdir/no-checksum-addresses
+export const BancorNetworkAddr = "0xeEF417e1D5CC832e619ae18D2F140De2999dD4fB";
+export const BancorNetworkInfoAddr =
+  "0x8e303d296851b320e6a697bacb979d13c9d6e760";
+export const EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+export const BntAddr = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";
+export const BnBntAddr = "0xab05cf7c6c3a288cd36326e4f7b8600e7268e344";
+export const DaiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
+export const UsdcAddr = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+export const UsdtAddr = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+export const DaiDecimals = "18";
+export const UsdcDecimals = "6";
+export const UsdtDecimals = "6";
 
-export let secondsPerDay = 24 * 60 * 60;
-export let secondsPerHour = 60 * 60;
+export const secondsPerDay = 24 * 60 * 60;
+export const secondsPerHour = 60 * 60;
 
-export let zeroBD = BigDecimal.zero();
-export let zeroBI = BigInt.zero();
-export let oneBD = new BigDecimal(BigInt.fromI32(1));
-export let hundredBD = new BigDecimal(BigInt.fromI32(100));
+export const zeroBD = BigDecimal.zero();
+export const zeroBI = BigInt.zero();
+export const oneBD = new BigDecimal(BigInt.fromI32(1));
+export const hundredBD = new BigDecimal(BigInt.fromI32(100));
+export const INT_SIX = 6;
+export const INT_TEN = 10;
+export const INT_EIGHTEEN = 18;
 
 export function exponentToBigDecimal(n: i32): BigDecimal {
   return exponentToBigInt(n).toBigDecimal();

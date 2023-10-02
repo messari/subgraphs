@@ -83,9 +83,12 @@ export class UniswapV3OptimismConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList(["0xb5df6b8f7ebec28858b267fc2ddc59cc8aca7a8d"]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");
+  }
+  getBrokenERC20Tokens(): Bytes[] {
+    return stringToBytesList(["0x000000000000be0ab658f92dddac29d6df19a3be"]);
   }
 }
