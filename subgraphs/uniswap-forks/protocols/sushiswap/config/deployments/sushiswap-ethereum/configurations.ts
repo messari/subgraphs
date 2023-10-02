@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
-  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -41,12 +41,12 @@ export class SushiswapMainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac");
+    return toLowerCase("0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac")
+        toLowerCase("0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac")
       )
     );
   }
@@ -78,10 +78,10 @@ export class SushiswapMainnetConfigurations implements Configurations {
     return MASTERCHEFV2_SUSHI_PER_BLOCK;
   }
   getReferenceToken(): string {
-    return toLowerCase("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+    return toLowerCase("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
   }
   getRewardToken(): string {
-    return toLowerCase("0x6B3595068778DD592e39A122f4f5a5cF09C90fE2");
+    return toLowerCase("0x6b3595068778dd592e39a122f4f5a5cf09c90fe2");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
@@ -119,9 +119,9 @@ export class SushiswapMainnetConfigurations implements Configurations {
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
-      "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
-      "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
+      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+      "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
+      "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT
     ]);
   }
   getStableOraclePools(): string[] {
@@ -144,6 +144,16 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0xe9f84de264e91529af07fa2c746e934397810334", // Sake Token
       "0x1337def16f9b486faed0293eb623dc8395dfe46a", // Armor Token
       "0x4b4d2e899658fb59b1d518b68fe836b100ee8958", // MIS
+      "0xa487bf43cf3b10dffc97a9a744cbb7036965d3b9", // Deri
+      "0x948a9bb69d1d1202c160d26804aefff0634a492e", // Stable Yield Credit
+      "0x46ecb116aba95a7c3365a1b159efc3254e86819a", // Doggo
+      "0xea14af7ba0103c4d60ced5f6e6829148a613f0f3", // PHB
+      "0xbbda19aabab9ad3ffef43976b18c922e30cf41c5", // Covfefe
+      "0xc7924bf912ebc9b92e3627aed01f816629c7e400", // QAZ
+      "0x948a9bb69d1d1202c160d26804aefff0634a492e", // Stable Yield Credit
+      "0x53a1e9912323b8016424d6287286e3b6de263f76", // PUTIN
+      "0x81ee56e81224378a81d4cfc9135916383248d9eb", // AIRI
+      "0x4f8726a494a7a155d2ef9ea840acdd7f4069059c", // Plasma
     ];
   }
   getBrokenERC20Tokens(): string[] {
@@ -153,6 +163,6 @@ export class SushiswapMainnetConfigurations implements Configurations {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
   }
 }

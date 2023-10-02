@@ -1,0 +1,140 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graft}}
+features:
+  - grafting
+graft:
+  base: {{base}}
+  block: {{block}}
+{{/graft}}
+dataSources:
+  {{#factory}}
+  - kind: ethereum
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: PoolFactory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - YieldAggregator
+      abis:
+        - name: PoolFactory
+          file: ./abis/PoolFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: PoolCreated(indexed address,indexed address,indexed bool,address,uint256)
+          handler: handlePoolCreated
+        - event: SetCustomFee(indexed address,uint256)
+          handler: handleSetCustomFee
+      file: ./protocols/velodrome-finance-v2/src/mappings/poolFactory.ts
+  {{/factory}}
+  {{#voter}}
+  - kind: ethereum
+    name: VoterV2
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: VoterV2
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - YieldAggregator
+      abis:
+        - name: VoterV2
+          file: ./abis/VoterV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: GaugeCreated(indexed address,indexed address,indexed address,address,address,address,address,address)
+          handler: handleGaugeCreated
+        - event: GaugeKilled(indexed address)
+          handler: handleGaugeKilled
+        - event: GaugeRevived(indexed address)
+          handler: handleGaugeRevived
+        - event: DistributeReward(indexed address,indexed address,uint256)
+          handler: handleDistributeReward
+      file: ./protocols/velodrome-finance-v2/src/mappings/rewards.ts
+  {{/voter}}
+templates:
+  - name: Pool
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/velodrome-finance-v2/src/mappings/pool.ts
+      entities:
+        - YieldAggregator
+        - Pool
+      abis:
+        - name: PoolFactory
+          file: ./abis/PoolFactory.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Fees(indexed address,uint256,uint256)
+          handler: handleFees
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,indexed address,uint256,uint256)
+          handler: handleBurn
+        - event: Swap(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleSwap
+        - event: Sync(uint256,uint256)
+          handler: handleSync
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+  - name: Gauge
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: Gauge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/velodrome-finance-v2/src/mappings/rewards.ts
+      entities:
+        - YieldAggregator
+        - Pool
+      abis:
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw

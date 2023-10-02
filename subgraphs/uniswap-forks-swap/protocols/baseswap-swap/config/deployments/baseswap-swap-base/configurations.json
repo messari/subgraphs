@@ -1,0 +1,11 @@
+{
+  "deployment": "BASESWAP_BASE",
+  "network": "base",
+  "factory": {
+    "address": "0xFDa619b6d20975be80A10332cD39b9a4b0FAa8BB",
+    "startBlock": 2059124
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

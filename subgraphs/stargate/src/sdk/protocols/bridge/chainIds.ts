@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Network } from "../../util/constants";
 
@@ -40,3 +41,7 @@ setChainID(11, Network.OPTIMISM);
 setChainID(111, Network.OPTIMISM);
 setChainID(12, Network.FANTOM);
 setChainID(112, Network.FANTOM);
+setChainID(51, Network.METIS);
+setChainID(151, Network.METIS);
+setChainID(84, Network.BASE);
+setChainID(184, Network.BASE);

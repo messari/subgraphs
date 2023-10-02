@@ -46,9 +46,13 @@ dataSources:
           file: ./abis/ERC20.json
         - name: FixedLeverageRatioStrategy
           file: ./abis/FixedLeverageRatioStrategy.json
+        - name: CallableLoan
+          file: ./abis/CallableLoan.json
       eventHandlers:
         - event: PoolCreated(indexed address,indexed address)
           handler: handlePoolCreated
+        - event: CallableLoanCreated(indexed address,indexed address)
+          handler: handleCallableLoanCreated
 
   - kind: ethereum/contract
     name: SeniorPool
@@ -515,7 +519,7 @@ templates:
       entities:
         - User
         - TranchedPool
-        - TranchedPoolToken
+        - PoolToken
         - Transaction
         - Zap
       abis:
@@ -537,6 +541,8 @@ templates:
           file: ./abis/Zapper.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Schedule
+          file: ./abis/Schedule.json
       eventHandlers:
         - event: CreditLineMigrated(indexed address,indexed address)
           handler: handleCreditLineMigrated
@@ -562,3 +568,51 @@ templates:
           handler: handleSharePriceUpdated
         - event: ReserveFundsCollected(indexed address,uint256)
           handler: handleReserveFundsCollected
+
+  - name: CallableLoan
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: CallableLoan
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/callable_loan/callable_loan.ts
+      entities:
+        - CallableLoan
+        - PoolToken
+      abis:
+        - name: CallableLoan
+          file: ./abis/CallableLoan.json
+        - name: Schedule
+          file: ./abis/Schedule.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: CreditLine
+          file: ./abis/CreditLine.json
+        - name: PoolTokens
+          file: ./abis/PoolTokens.json
+      eventHandlers:
+        - event: CallRequestSubmitted(indexed uint256,indexed uint256,indexed uint256,uint256)
+          handler: handleCallRequestSubmitted
+        - event: DepositMade(indexed address,indexed uint256,indexed uint256,uint256)
+          handler: handleDepositMade
+        # - event: DepositsLocked(indexed address)
+        - event: DrawdownMade(indexed address,uint256)
+          handler: handleDrawdownMade
+        - event: DrawdownsPaused(indexed address)
+          handler: handleDrawdownsPaused
+        - event: DrawdownsUnpaused(indexed address)
+          handler: handleDrawdownsUnpaused
+        # - event: EmergencyShutdown(indexed address)
+        # - event: Paused(address)
+        - event: PaymentApplied(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handlePaymentApplied
+        # - event: ReserveFundsCollected(indexed address,uint256)
+        # - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+        # - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+        # - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+        # - event: Unpaused(address)
+        - event: WithdrawalMade(indexed address,indexed uint256,indexed uint256,uint256,uint256)
+          handler: handleWithdrawalMade

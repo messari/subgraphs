@@ -19,4 +19,5 @@ export interface Configurations {
   getUntrackedPairs(): Bytes[];
   getUntrackedTokens(): Bytes[];
   getMinimumLiquidityThreshold(): BigDecimal;
+  getBrokenERC20Tokens(): Bytes[];
 }

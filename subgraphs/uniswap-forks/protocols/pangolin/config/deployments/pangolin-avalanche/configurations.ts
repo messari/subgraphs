@@ -37,11 +37,11 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xefa94DE7a4656D787667C749f7E1223D71E9FD88";
+    return "0xefa94de7a4656d787667c749f7e1223d71e9fd88";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xefa94DE7a4656D787667C749f7E1223D71E9FD88")
+      Address.fromString("0xefa94de7a4656d787667c749f7e1223d71e9fd88")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,11 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-
-////////////////////
-///// Versions /////
-////////////////////
-
-export const PROTOCOL_NAME = "Velodrome Finance";
-export const PROTOCOL_SLUG = "velodrome-finance";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -111,9 +104,9 @@ export namespace TransferType {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export const UNISWAP_V2_FACTORY = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
 
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
@@ -132,6 +125,8 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_SEVEN = BigInt.fromI32(7);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
@@ -144,6 +139,10 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_SIX = 6 as i32;
+export const INT_NINE = 9 as i32;
+export const INT_SIXTEEN = 16 as i32;
+export const INT_EIGHTEEN = 18 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -178,7 +177,5 @@ export const USDC_ADDRESS = "0x7f5c764cbc14f9669b88837ca1490cca17c31607";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const FACTORY_ADDRESS = "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746";
-export const VELO_ADDRESS = "0x3c8b650257cfb5f272f799f5e2b4e65093a11a05";
 export const FEE_CHECK_INTERVAL_BLOCKS = BigInt.fromI32(900); // ~ 1 block every 2 seconds on optimism. 900 blocks ~ 30 mins.
 export const MINIMUM_LIQUIDITY_USD = BIGDECIMAL_THOUSAND;

@@ -3,7 +3,7 @@ import {
   getOrCreateRewardToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
@@ -24,15 +24,15 @@ export function updateConvexRewardToken(
   crvRewardPerDay: BigInt,
   block: ethereum.Block
 ): void {
-  let cvxRewardRate = utils.getConvexTokenMintAmount(crvRewardPerDay);
+  const cvxRewardRate = utils.getConvexTokenMintAmount(crvRewardPerDay);
 
-  let cvxRewardRatePerDay = getRewardsPerDay(
+  const cvxRewardRatePerDay = getRewardsPerDay(
     block.timestamp,
     block.number,
     cvxRewardRate,
     constants.RewardIntervalType.TIMESTAMP
   );
-  let cvxRewardPerDay = BigInt.fromString(
+  const cvxRewardPerDay = BigInt.fromString(
     cvxRewardRatePerDay.truncate(0).toString()
   );
 
@@ -56,12 +56,12 @@ export function updateRewardToken(
 ): void {
   const rewardsContract = RewardPoolContract.bind(poolRewardsAddress);
 
-  let rewardToken = utils.readValue<Address>(
+  const rewardToken = utils.readValue<Address>(
     rewardsContract.try_rewardToken(),
     constants.NULL.TYPE_ADDRESS
   );
 
-  let rewardRate = utils.readValue<BigInt>(
+  const rewardRate = utils.readValue<BigInt>(
     rewardsContract.try_rewardRate(),
     constants.BIGINT_ZERO
   );
@@ -70,13 +70,13 @@ export function updateRewardToken(
     updateConvexRewardToken(poolId, rewardRate, block);
   }
 
-  let rewardRatePerDay = getRewardsPerDay(
+  const rewardRatePerDay = getRewardsPerDay(
     block.timestamp,
     block.number,
     rewardRate.toBigDecimal(),
     constants.RewardIntervalType.TIMESTAMP
   );
-  let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+  const rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
   updateRewardTokenEmissions(poolId, rewardToken, rewardPerDay, block);
 
@@ -96,36 +96,36 @@ export function updateExtraRewardTokens(
 ): void {
   const rewardsContract = RewardPoolContract.bind(poolRewardsAddress);
 
-  let extraRewardTokensLength = utils.readValue<BigInt>(
+  const extraRewardTokensLength = utils.readValue<BigInt>(
     rewardsContract.try_extraRewardsLength(),
     constants.BIGINT_ZERO
   );
 
   for (let i = 0; i < extraRewardTokensLength.toI32(); i += 1) {
-    let extraRewardPoolAddress = utils.readValue<Address>(
+    const extraRewardPoolAddress = utils.readValue<Address>(
       rewardsContract.try_extraRewards(BigInt.fromI32(i)),
       constants.NULL.TYPE_ADDRESS
     );
 
     const extraRewardContract = RewardPoolContract.bind(extraRewardPoolAddress);
 
-    let extraRewardTokenAddress = utils.readValue<Address>(
+    const extraRewardTokenAddress = utils.readValue<Address>(
       extraRewardContract.try_rewardToken(),
       constants.NULL.TYPE_ADDRESS
     );
-    let extraTokenRewardRate = utils.readValue<BigInt>(
+    const extraTokenRewardRate = utils.readValue<BigInt>(
       extraRewardContract.try_rewardRate(),
       constants.BIGINT_ZERO
     );
 
-    let rewardRatePerDay = getRewardsPerDay(
+    const rewardRatePerDay = getRewardsPerDay(
       block.timestamp,
       block.number,
       extraTokenRewardRate.toBigDecimal(),
       constants.RewardIntervalType.TIMESTAMP
     );
 
-    let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+    const rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
     updateRewardTokenEmissions(
       poolId,
@@ -160,7 +160,7 @@ export function updateRewardTokenEmissions(
     vault.rewardTokens = [];
   }
 
-  let rewardTokens = vault.rewardTokens!;
+  const rewardTokens = vault.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
     vault.rewardTokens = rewardTokens;
@@ -171,12 +171,12 @@ export function updateRewardTokenEmissions(
   if (!vault.rewardTokenEmissionsAmount) {
     vault.rewardTokenEmissionsAmount = [];
   }
-  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
 
   if (!vault.rewardTokenEmissionsUSD) {
     vault.rewardTokenEmissionsUSD = [];
   }
-  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+  const rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress, block);
   const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
@@ -185,8 +185,7 @@ export function updateRewardTokenEmissions(
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .toBigDecimal()
     .div(rewardTokenDecimals)
-    .times(rewardTokenPrice.usdPrice)
-    .div(rewardTokenPrice.decimalsBaseTen);
+    .times(rewardTokenPrice.usdPrice);
 
   vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;

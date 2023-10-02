@@ -6,6 +6,7 @@ import { StargateArbitrumConfigurations } from "../../protocols/stargate/config/
 import { StargateOptimismConfigurations } from "../../protocols/stargate/config/deployments/stargate-optimism/configurations";
 import { StargateFantomConfigurations } from "../../protocols/stargate/config/deployments/stargate-fantom/configurations";
 import { StargateMetisConfigurations } from "../../protocols/stargate/config/deployments/stargate-metis/configurations";
+import { StargateBaseConfigurations } from "../../protocols/stargate/config/deployments/stargate-base/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -35,6 +36,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.STARGATE_METIS: {
       return new StargateMetisConfigurations();
+    }
+    case Deploy.STARGATE_BASE: {
+      return new StargateBaseConfigurations();
     }
     default: {
       log.critical(

@@ -1,0 +1,10 @@
+{
+  "network": "matic",
+  "ssov": [
+    {
+      "name": "BasicWeeklyCalls",
+      "address": "0x4ee9fe9500e7c4fe849add9b14beec5ec5b7d955",
+      "startBlock": 39663736
+    }
+  ]
+}

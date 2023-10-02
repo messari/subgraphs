@@ -92,9 +92,11 @@ export function handleReward(
         getPoolRewardsPerSecond.value.value3;
 
       rewardTokenIds.push(
-        getOrCreateRewardToken(rewardTokenAddresses[index].toHexString()).id
+        getOrCreateRewardToken(event, rewardTokenAddresses[index].toHexString())
+          .id
       );
       const rewardToken = getOrCreateToken(
+        event,
         rewardTokenAddresses[index].toHexString()
       );
       const rewardTokenRateBigDecimal =

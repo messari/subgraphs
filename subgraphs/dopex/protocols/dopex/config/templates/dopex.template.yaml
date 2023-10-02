@@ -1,0 +1,75 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+#These ssov are not generated in a factory mode, so they must be listed here one by one.
+  {{#ssov}}
+  - kind: ethereum/contract
+    name:  {{ name }}
+    network:  {{ network }}
+    source:
+      address:  "{{ address }}"
+      abi: Ssov
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+
+        - name: Ssov
+          file: ./abis/SsovV3.json
+        - name: SsovV3OptionsToken
+          file: ./abis/SsovV3OptionsToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: StakingStrategyV1
+          file: ./abis/StakingStrategyV1.json
+        - name: StakingStrategyV2
+          file: ./abis/StakingStrategyV2.json
+      eventHandlers:
+        - event: Deposit(uint256,indexed address,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(uint256,uint256,uint256[],indexed address,indexed address)
+          handler: handleWithdraw
+        - event: Purchase(uint256,uint256,uint256,uint256,uint256,indexed address,indexed address)
+          handler: handlePurchase
+        - event: Settle(uint256,uint256,uint256,uint256,uint256,indexed address,indexed address)
+          handler: handleSettle
+        - event: Bootstrap(uint256,uint256[])
+          handler: handleBootstrap
+      file: ./src/mappings/ssov.ts
+  {{/ssov}}

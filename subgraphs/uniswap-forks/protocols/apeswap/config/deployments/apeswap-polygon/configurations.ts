@@ -41,7 +41,7 @@ export class ApeswapMaticConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xCf083Be4164828f00cAE704EC15a36D711491284")
+      Address.fromString("0xcf083be4164828f00cae704ec15a36d711491284")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -53,7 +53,7 @@ export const TablePoolOverview = ({
         type: "number",
         width: 180,
         renderCell: (params: any) => {
-          let value = Number(params?.value)
+          let value = Number(params?.value);
           value = Number(formatIntToFixed2(value));
           const cellStyle = { ...tableCellTruncate };
           cellStyle.width = "100%";
@@ -122,10 +122,7 @@ export const TablePoolOverview = ({
           }
           return (
             <Tooltip title={params.value}>
-              <span
-                onClick={onClick}
-                style={tableCellTruncate}
-              >
+              <span onClick={onClick} style={tableCellTruncate}>
                 {poolIdStr}
               </span>
             </Tooltip>
@@ -219,7 +216,8 @@ export const TablePoolOverview = ({
       };
       if (
         Number(pool.totalValueLockedUSD) > 1000000000000 &&
-        issues.filter((iss: { [x: string]: any }) => iss.fieldName === `#${idx + 1 + skipAmt} - ${pool.name || "N/A"}`).length === 0
+        issues.filter((iss: { [x: string]: any }) => iss.fieldName === `#${idx + 1 + skipAmt} - ${pool.name || "N/A"}`)
+          .length === 0
       ) {
         issues.push({
           type: "TVL+",
@@ -241,7 +239,8 @@ export const TablePoolOverview = ({
         const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
         if (
           tokenFieldDiff !== 0 &&
-          issues.filter((iss: { [x: string]: any }) => iss.type === "TOK" && iss.fieldName.includes(pool.name)).length === 0
+          issues.filter((iss: { [x: string]: any }) => iss.type === "TOK" && iss.fieldName.includes(pool.name))
+            .length === 0
         ) {
           if (pool.rewardTokens?.length > pool.rewardTokenEmissionsUSD?.length) {
             issues.push({
@@ -264,17 +263,23 @@ export const TablePoolOverview = ({
         let rewardFactorsStr = "N/A";
         let rewardAPRs: string[] = pool?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
           let apr = 0;
-          if (protocolType === "LENDING" && (pool.rewardTokens[idx]?.type?.includes("BORROW") || pool.rewardTokens[idx]?.token?.type?.includes("BORROW"))) {
+          if (
+            protocolType === "LENDING" &&
+            (pool.rewardTokens[idx]?.type?.includes("BORROW") ||
+              pool.rewardTokens[idx]?.token?.type?.includes("BORROW"))
+          ) {
             if (
               !Number(pool.totalBorrowBalanceUSD) &&
               issues.filter(
-                (iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
+                (iss: { [x: string]: any }) =>
+                  iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               ).length === 0
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || "#" + idx + 1 + skipAmt
-                  } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
+                message: `${
+                  pool.name || "#" + idx + 1 + skipAmt
+                } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + idx + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               });
@@ -296,11 +301,13 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || "#" + idx + 1 + skipAmt
-                  } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                message: `${
+                  pool.name || "#" + idx + 1 + skipAmt
+                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || "#" + idx + 1 + skipAmt
-                  } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                fieldName: `${
+                  pool.name || "#" + idx + 1 + skipAmt
+                } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
@@ -399,7 +406,6 @@ export const TablePoolOverview = ({
           returnObj.dailyVolumeUSD = pool?.dailyVolumeUSD;
           returnObj.dailySupplySideRevenueUSD = pool?.dailySupplySideRevenueUSD;
           if (pool?.fees?.length > 0 && !pool?.dailySupplySideRevenueUSD) {
-
             // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
             const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
               return fee.feeType === "FIXED_LP_FEE" || fee.feeType === "DYNAMIC_LP_FEE";
@@ -411,7 +417,9 @@ export const TablePoolOverview = ({
             if (
               feePercentage < 1 &&
               feePercentage !== 0 &&
-              issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} LP Fee`).length === 0
+              issues.filter(
+                (iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} LP Fee`,
+              ).length === 0
             ) {
               issues.push({
                 type: "RATEDEC",
@@ -428,7 +436,9 @@ export const TablePoolOverview = ({
             if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
               value = 0;
               if (
-                issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`).length === 0
+                issues.filter(
+                  (iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
+                ).length === 0
               ) {
                 issues.push({
                   type: "NAN",
@@ -440,7 +450,9 @@ export const TablePoolOverview = ({
             }
             if (
               value < 0 &&
-              issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`).length === 0
+              issues.filter(
+                (iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
+              ).length === 0
             ) {
               issues.push({
                 type: "RATENEG",
@@ -461,7 +473,9 @@ export const TablePoolOverview = ({
             if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
               value = 0;
               if (
-                issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`).length === 0
+                issues.filter(
+                  (iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
+                ).length === 0
               ) {
                 issues.push({
                   type: "NAN",
@@ -480,7 +494,9 @@ export const TablePoolOverview = ({
                   iss.message ===
                   `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
               ).length === 0 &&
-              issues.filter((iss: { [x: string]: any }) => iss.message === `${pool.name} Base yield could not be calculated.`).length === 0 &&
+              issues.filter(
+                (iss: { [x: string]: any }) => iss.message === `${pool.name} Base yield could not be calculated.`,
+              ).length === 0 &&
               (Object.keys(pool?.fees)?.length === 0 || !pool?.fees)
             ) {
               issues.push({
@@ -495,7 +511,9 @@ export const TablePoolOverview = ({
                   iss.message ===
                   `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
               ).length === 0 &&
-              issues.filter((iss: { [x: string]: any }) => iss.message === `${pool.name} Base yield could not be calculated.`).length === 0
+              issues.filter(
+                (iss: { [x: string]: any }) => iss.message === `${pool.name} Base yield could not be calculated.`,
+              ).length === 0
             ) {
               issues.push({
                 type: "val",

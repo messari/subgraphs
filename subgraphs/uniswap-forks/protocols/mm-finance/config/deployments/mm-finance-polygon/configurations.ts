@@ -74,7 +74,7 @@ export class MMFinanceMaticConfigurations implements Configurations {
     return "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"; // WMATIC
   }
   getRewardToken(): string {
-    return "0x22a31bD4cB694433B6de19e0aCC2899E553e9481"; // MMFToken
+    return "0x22a31bd4cb694433b6de19e0acc2899e553e9481"; // MMFToken
   }
   getWhitelistTokens(): string[] {
     return [
@@ -102,7 +102,9 @@ export class MMFinanceMaticConfigurations implements Configurations {
     return [];
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x21e0401aacfcec454b0da7faab7e8a000ce28480", // MM Finance Test Token
+    ];
   }
   getBrokenERC20Tokens(): string[] {
     return [];

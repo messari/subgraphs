@@ -34,10 +34,7 @@ import { getLiquidityPool } from "../common/getters";
 // The transfers are either occur as a part of the Mint or Burn event process.
 // The tokens being transferred in these events are the LP tokens from the liquidity pool that emitted this event.
 export function handleTransfer(event: Transfer): void {
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // ignore initial transfers for first adds
   if (
@@ -82,12 +79,12 @@ export function handleTransfer(event: Transfer): void {
 // Gives information about the rebalancing of tokens used to update tvl, balances, and token pricing
 export function handleSync(event: Sync): void {
   updateInputTokenBalances(
+    event,
     event.address.toHexString(),
     event.params.reserve0,
-    event.params.reserve1,
-    event.block.number
+    event.params.reserve1
   );
-  updateTvlAndTokenPrices(event.address.toHexString(), event.block.number);
+  updateTvlAndTokenPrices(event, event.address.toHexString());
 }
 
 // Handle a mint event emitted from a pool contract. Considered a deposit into the given liquidity pool.

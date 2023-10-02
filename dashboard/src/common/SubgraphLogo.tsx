@@ -32,12 +32,12 @@ const subgraphLogoMap: Record<string, string> = {
   curve: "https://assets.coingecko.com/coins/images/12124/small/Curve.png?1597369484",
   "mm-finance": "https://assets.coingecko.com/coins/images/22273/small/MMF200X200.png?1650448869",
   "ellipsis-finance": "https://assets.coingecko.com/coins/images/25444/small/ellipsis-light_%281%29.png?1651786591",
-  "gamma": "https://storage.googleapis.com/subgraph-images/1654636003709gamma.jpg",
+  gamma: "https://storage.googleapis.com/subgraph-images/1654636003709gamma.jpg",
   badgerdao: "https://storage.googleapis.com/subgraph-images/1651427188757badger.png",
   rari: "https://assets.coingecko.com/coins/images/12900/small/Rari_Logo_Transparent.png?1613978014",
-  "vesper": "https://storage.googleapis.com/subgraph-images/1657324907963vesper.jpg",
+  vesper: "https://storage.googleapis.com/subgraph-images/1657324907963vesper.jpg",
   "inverse-finance": "https://assets.coingecko.com/coins/images/14205/small/inverse_finance.jpg?1614921871",
-  "convex": "https://assets.coingecko.com/coins/images/15585/small/convex.png?1621256328",
+  convex: "https://assets.coingecko.com/coins/images/15585/small/convex.png?1621256328",
   aurigami: "https://assets.coingecko.com/coins/images/24074/small/EbB5N8IN_400x400.jpg?1646230298",
   "arrakis-finance": "https://storage.googleapis.com/subgraph-images/1657591665211arrakis.jpg",
   "cream-finance": "https://assets.coingecko.com/coins/images/11976/small/Cream.png?1596593418",
@@ -54,16 +54,16 @@ const subgraphLogoMap: Record<string, string> = {
   ubeswap: "https://assets.coingecko.com/coins/images/15317/small/ubeswap.png?1620395836",
   tectonic: "https://assets.coingecko.com/coins/images/21982/small/TONIC_logo.png?1640575290",
   "maple-finance": "https://assets.coingecko.com/coins/images/14097/small/Maple_Logo_Mark_Maple_Orange.png?1653381382",
-  "cosmos": "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
+  cosmos: "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
   near: "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
-  "trisolaris": "https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197",
-  "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
+  trisolaris: "https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197",
+  arweave: "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
   "rocket-pool": "https://assets.coingecko.com/coins/images/2090/small/rocket_pool_%28RPL%29.png?1637662441",
   "tornado-cash": "https://assets.coingecko.com/coins/images/13496/small/ZINt8NSB_400x400.jpg?1609193407",
-  "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
-  "truefi": "https://assets.coingecko.com/coins/images/13180/small/truefi_glyph_color.png?1617610941",
-  "radiant": "https://assets.coingecko.com/coins/images/26536/small/Radiant-Logo-200x200.png?1658715865",
-  "velodrome": "https://assets.coingecko.com/coins/images/25783/small/velo.png?1653817876"
+  graph: "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
+  truefi: "https://assets.coingecko.com/coins/images/13180/small/truefi_glyph_color.png?1617610941",
+  radiant: "https://assets.coingecko.com/coins/images/26536/small/Radiant-Logo-200x200.png?1658715865",
+  velodrome: "https://assets.coingecko.com/coins/images/25783/small/velo.png?1653817876",
 };
 
 // used for protocols with multiple versions
@@ -82,12 +82,12 @@ const subgraphMap: Record<string, string> = {
   "compound-v2": "compound",
   "compound-v3": "compound",
   "yearn-v2": "yearn",
-  "stakedao": "stake-dao",
+  stakedao: "stake-dao",
   "curve-finance": "curve",
   "vesper-finance": "vesper",
   "gamma-strategies": "gamma",
   "convex-finance": "convex",
-  "graph-protocol": "graph"
+  "graph-protocol": "graph",
 };
 
 interface SubgraphLogoProps {

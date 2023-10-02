@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Token, RewardToken } from "../../generated/schema";
-import { _ERC20 } from "../../generated/rocketTokenRETH/_ERC20";
+import { _ERC20 } from "../../generated/rocketStorage/_ERC20";
 import { getUsdPricePerToken } from "../prices";
 import {
   BIGDECIMAL_ZERO,

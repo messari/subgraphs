@@ -1,0 +1,14 @@
+{
+  "network": "optimism",
+  "factory": {
+    "address": "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a",
+    "startBlock": 105896804
+  },
+  "voter": {
+    "address": "0x41C914ee0c7E1A5edCD0295623e6dC557B5aBf3C",
+    "startBlock": 105896851
+  },
+  "graft": false,
+  "base": "",
+  "block": 0
+}

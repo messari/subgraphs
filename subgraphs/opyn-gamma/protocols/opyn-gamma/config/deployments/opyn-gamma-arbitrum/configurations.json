@@ -1,0 +1,19 @@
+{
+  "deployment": "OPYN_ARBITRUM",
+  "network": "arbitrum-one",
+  "Controller": {
+    "address": "0xee30f92cc9bf896679567d1acd551f0e179756fc",
+    "startBlock": 1286633
+  },
+  "OTokenFactory": {
+    "address": "0x4d3a52a0e98144caf46ac226d83e8f144b5c654d",
+    "startBlock": 1263909
+  },
+  "MarginPool": {
+    "address": "0x63d8d20606c048b9b79a30ea45ca6787f8aeb051",
+    "startBlock": 1286544
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

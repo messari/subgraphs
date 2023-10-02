@@ -32,11 +32,8 @@ import {
   UsageType,
 } from "./constants";
 import { convertTokenToDecimal, percToDec } from "./utils/utils";
-import {
-  findUSDPricePerToken,
-  updateNativeTokenPriceInUSD,
-} from "../price/price";
 import { NetworkConfigs } from "../../configurations/configure";
+import { createPoolFees } from "./creators";
 
 // Update FinancialsDailySnapshots entity
 // Updated on Swap, Burn, and Mint events.
@@ -133,10 +130,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -206,16 +200,16 @@ export function updateTokenWhitelists(
 
 // Upate token balances based on reserves emitted from the Sync event.
 export function updateInputTokenBalances(
+  event: ethereum.Event,
   poolAddress: string,
   reserve0: BigInt,
-  reserve1: BigInt,
-  blockNumber: BigInt
+  reserve1: BigInt
 ): void {
-  const pool = getLiquidityPool(poolAddress, blockNumber);
+  const pool = getLiquidityPool(poolAddress);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
 
   const tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
   const tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);
@@ -229,20 +223,15 @@ export function updateInputTokenBalances(
 
 // Update tvl an token prices in the Sync event.
 export function updateTvlAndTokenPrices(
-  poolAddress: string,
-  blockNumber: BigInt
+  event: ethereum.Event,
+  poolAddress: string
 ): void {
-  const pool = getLiquidityPool(poolAddress, blockNumber);
+  const pool = getLiquidityPool(poolAddress);
 
   const protocol = getOrCreateProtocol();
 
-  const token0 = getOrCreateToken(pool.inputTokens[0]);
-  const token1 = getOrCreateToken(pool.inputTokens[1]);
-
-  const nativeToken = updateNativeTokenPriceInUSD();
-
-  token0.lastPriceUSD = findUSDPricePerToken(token0, nativeToken, blockNumber);
-  token1.lastPriceUSD = findUSDPricePerToken(token1, nativeToken, blockNumber);
+  const token0 = getOrCreateToken(event, pool.inputTokens[0]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[1]);
 
   // Subtract the old pool tvl
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
@@ -283,7 +272,6 @@ export function updateTvlAndTokenPrices(
   protocol.save();
   token0.save();
   token1.save();
-  nativeToken.save();
 }
 
 // Update the volume and fees from financial metrics snapshot, pool metrics snapshot, protocol, and pool entities.
@@ -299,6 +287,9 @@ export function updateVolumeAndFees(
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+
+  // Ensure fees are up to date
+  pool.fees = createPoolFees(pool.id, event.block.number);
   const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
   const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 

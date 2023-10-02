@@ -1,0 +1,36 @@
+{
+  "deployment": "MULTICHAIN_OPTIMISM",
+  "network": "optimism",
+  "file": "./src/mappings/handlers.ts",
+  "bridgeConfig": [
+    {
+      "name": "BridgeV2-0",
+      "address": "0xc1be9a4d5d45beeacae296a7bd5fadbfc14602c4",
+      "abi": "anyToken",
+      "startBlock": 4539733
+    }
+  ],
+  "routerConfig": [
+    {
+      "name": "Router-0",
+      "address": "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+      "abi": "Router",
+      "startBlock": 3627880
+    },
+    {
+      "name": "Router-1",
+      "address": "0xdc42728b0ea910349ed3c6e1c9dc06b5fb591f98",
+      "abi": "Router",
+      "startBlock": 6142619
+    },
+    {
+      "name": "Router-2",
+      "address": "0xf480f38c366daac4305dc484b2ad7a496ff00cea",
+      "abi": "Router",
+      "startBlock": 8604870
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

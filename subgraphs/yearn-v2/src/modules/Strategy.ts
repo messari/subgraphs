@@ -21,24 +21,24 @@ function getSharesMinted(
   to: Address,
   event: ethereum.Event
 ): BigInt {
-  let receipt = event.receipt;
+  const receipt = event.receipt;
   if (!receipt) return constants.BIGINT_ZERO;
 
-  let logs = event.receipt!.logs;
+  const logs = event.receipt!.logs;
   if (!logs) return constants.BIGINT_ZERO;
 
   for (let i = 0; i < logs.length; ++i) {
-    let currentLog = logs.at(i);
-    let topic_signature = currentLog.topics.at(0);
+    const currentLog = logs.at(i);
+    const topic_signature = currentLog.topics.at(0);
     if (
       crypto
         .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
         .equals(topic_signature)
     ) {
-      let _from = ethereum
+      const _from = ethereum
         .decode("address", currentLog.topics.at(1))!
         .toAddress();
-      let _to = ethereum
+      const _to = ethereum
         .decode("address", currentLog.topics.at(2))!
         .toAddress();
 
@@ -47,7 +47,7 @@ function getSharesMinted(
         _to.equals(to) &&
         currentLog.address.equals(eventAdress)
       ) {
-        let data_value = ethereum.decode("uint256", currentLog.data);
+        const data_value = ethereum.decode("uint256", currentLog.data);
         if (!data_value) {
           return constants.BIGINT_ZERO;
         }
@@ -73,7 +73,7 @@ export function strategyReported(
     constants.NULL.TYPE_ADDRESS
   );
 
-  const vaultVersion = utils.readValue<String>(
+  const vaultVersion = utils.readValue<string>(
     vaultContract.try_apiVersion(),
     constants.VaultVersions.v0_4_3
   );
@@ -83,7 +83,7 @@ export function strategyReported(
     return;
   }
 
-  let sharesMintedToTreasury = getSharesMinted(
+  const sharesMintedToTreasury = getSharesMinted(
     vaultAddress,
     vaultAddress,
     constants.YEARN_TREASURY_VAULT,
@@ -110,27 +110,27 @@ export function strategyReported(
     );
   }
 
-  let inputToken = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputToken);
-  let inputTokenDecimals = utils.getTokenDecimals(inputToken);
+  const inputToken = Address.fromString(vault.inputToken);
+  const inputTokenPrice = getUsdPricePerToken(inputToken);
+  const inputTokenDecimals = utils.getTokenDecimals(inputToken);
 
-  let totalGainUSD = gain
+  const totalGainUSD = gain
     .divDecimal(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  let outputTokenPriceUSD = getPriceOfOutputTokens(
+  const outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
     inputToken,
     inputTokenDecimals
   );
-  let outputTokenDecimals = utils.getTokenDecimals(vaultAddress);
+  const outputTokenDecimals = utils.getTokenDecimals(vaultAddress);
 
-  let strategistRewardUSD = sharesMintedToStrategist
+  const strategistRewardUSD = sharesMintedToStrategist
     .divDecimal(outputTokenDecimals)
     .times(outputTokenPriceUSD);
 
-  let protocolFees = sharesMintedToTreasury
+  const protocolFees = sharesMintedToTreasury
     .divDecimal(outputTokenDecimals)
     .times(outputTokenPriceUSD);
 

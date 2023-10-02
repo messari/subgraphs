@@ -66,7 +66,7 @@ export function handleAdd(event: Add): void {
   masterChefV3Pool.poolAllocPoint = event.params.allocPoint;
 
   if (event.params.rewarder.toHexString() != ZERO_ADDRESS) {
-    setPoolRewarder(event.params.rewarder, masterChefV3Pool);
+    setPoolRewarder(event, event.params.rewarder, masterChefV3Pool);
   }
   masterChefV3Pool.save();
 }
@@ -85,7 +85,7 @@ export function handleSet(event: Set): void {
   masterChefV3Pool.poolAllocPoint = event.params.allocPoint;
 
   if (event.params.overwrite) {
-    setPoolRewarder(event.params.rewarder, masterChefV3Pool);
+    setPoolRewarder(event, event.params.rewarder, masterChefV3Pool);
   }
 
   masterChefV3Pool.save();

@@ -41,12 +41,12 @@ export class SushiswapFuseConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0x43eA90e2b786728520e4f930d2A71a477BF2737C");
+    return toLowerCase("0x43ea90e2b786728520e4f930d2a71a477bf2737c");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0x43eA90e2b786728520e4f930d2A71a477BF2737C")
+        toLowerCase("0x43ea90e2b786728520e4f930d2a71a477bf2737c")
       )
     );
   }
@@ -78,10 +78,10 @@ export class SushiswapFuseConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0xa722c13135930332Eb3d749B2F0906559D2C5b99");
+    return toLowerCase("0xa722c13135930332eb3d749b2f0906559d2c5b99");
   }
   getRewardToken(): string {
-    return toLowerCase("0x90708b20ccC1eb95a4FA7C8b18Fd2C22a0Ff9E78");
+    return toLowerCase("0x90708b20ccc1eb95a4fa7c8b18fd2c22a0ff9e78");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
@@ -96,9 +96,9 @@ export class SushiswapFuseConfigurations implements Configurations {
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5", // USDC
-      "0x94Ba7A27c7A95863d1bdC7645AC2951E0cca06bA", // DAI
-      "0xFaDbBF8Ce7D5b7041bE672561bbA99f79c532e10", // USDT
+      "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5", // USDC
+      "0x94ba7a27c7a95863d1bdc7645ac2951e0cca06ba", // DAI
+      "0xfadbbf8ce7d5b7041be672561bba99f79c532e10", // USDT
       "0x249be57637d8b013ad64785404b24aebae9b098b", // fUSD
     ]);
   }

@@ -35,7 +35,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity @regularPolling {
   " Smart contract address of the token "
   id: ID!
 
@@ -63,7 +63,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity @regularPolling {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -88,7 +88,7 @@ enum VaultFeeType {
   MANAGEMENT_FEE
 }
 
-type VaultFee @entity {
+type VaultFee @entity @regularPolling {
   " { Vault fee type }-{ Vault address } "
   id: ID!
 
@@ -165,7 +165,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type YieldAggregator implements Protocol @entity {
+type YieldAggregator implements Protocol @entity @regularPolling {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
@@ -238,7 +238,7 @@ type YieldAggregator implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -270,7 +270,7 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: ID!
 
@@ -299,7 +299,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -341,7 +341,7 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Metadata #####
 ###############################
 
-type Vault @entity {
+type Vault @entity @regularPolling {
   " Smart contract address of the vault "
   id: ID!
 
@@ -437,7 +437,7 @@ type Vault @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type VaultDailySnapshot @entity {
+type VaultDailySnapshot @entity @dailySnapshot {
   " { Smart contract address of the vault }-{ # of days since Unix epoch time } "
   id: ID!
 
@@ -496,7 +496,7 @@ type VaultDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type VaultHourlySnapshot @entity {
+type VaultHourlySnapshot @entity @hourlySnapshot {
   " { Smart contract address of the vault }-{ # of hours since Unix epoch time } "
   id: ID!
 
@@ -593,7 +593,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity {
+type Deposit implements Event @entity @transaction {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -631,7 +631,7 @@ type Deposit implements Event @entity {
   vault: Vault!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw implements Event @entity @transaction {
   " { Transaction hash }-{ Log index }"
   id: ID!
 
@@ -671,7 +671,7 @@ type Withdraw implements Event @entity {
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity {
+type Account @entity @regularPolling {
   " Address of the account "
   id: ID!
 }

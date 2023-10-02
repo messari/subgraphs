@@ -7,10 +7,10 @@
     "codegen": "graph codegen"
   },
   "dependencies": {
-    "@graphprotocol/graph-ts": "0.27.0"
+    "@graphprotocol/graph-ts": "^0.31.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.30.1",
-    "prettier": "^2.6.2"
+    "@graphprotocol/graph-cli": "^0.58.0",
+    "prettier": "^3.0.3"
   }
 }
