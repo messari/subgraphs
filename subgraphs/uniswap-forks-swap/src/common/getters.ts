@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { NetworkConfigs } from "../../configurations/configure";
 import { Versions } from "../versions";
@@ -7,6 +7,7 @@ import {
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   INT_ZERO,
+  MAX_INT32,
   ProtocolType,
 } from "./constants";
 
@@ -62,7 +63,10 @@ export function getOrCreateToken(address: string): Token {
       const symbolCall = erc20Contract.try_symbol();
       if (!symbolCall.reverted) symbol = symbolCall.value;
       const decimalsCall = erc20Contract.try_decimals();
-      if (!decimalsCall.reverted) decimals = decimalsCall.value;
+      if (!decimalsCall.reverted)
+        decimals = BigInt.fromString(decimalsCall.value.toString()).isI32()
+          ? decimalsCall.value
+          : MAX_INT32.toI32();
     }
 
     token.name = name;
