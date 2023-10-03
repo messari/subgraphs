@@ -15,22 +15,19 @@ import {
 import { getUsdPricePerEth } from "./prices";
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
-import { AccountResponse, ActiveAccountResponse } from "./types";
+import { AccountResponse } from "./types";
 import { getDaysSinceEpoch } from "./utils";
 
 import {
   _Account,
-  _ActiveAccount,
   Connection,
   ConnectionDailySnapshot,
-  FinancialsDailySnapshot,
   Protocol,
   Subject,
   SubjectDailySnapshot,
   Token,
   Trader,
   TraderDailySnapshot,
-  UsageMetricsDailySnapshot,
 } from "../../generated/schema";
 
 export function getOrCreateProtocol(): Protocol {
@@ -71,8 +68,7 @@ export function getOrCreateProtocol(): Protocol {
     protocol.cumulativeSellCount = INT_ZERO;
     protocol.cumulativeTradesCount = INT_ZERO;
 
-    protocol.lastSnapshotDayID = INT_ZERO;
-    protocol.lastUpdateTimestamp = BIGINT_ZERO;
+    protocol._lastDailySnapshotTimestamp = BIGINT_ZERO;
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
@@ -226,121 +222,6 @@ export function getOrCreateAccount(accountAddress: Address): AccountResponse {
     account.save();
   }
   return { account, isNewAccount };
-}
-
-export function getOrCreateActiveAccount(
-  accountAddress: Address,
-  day: i32
-): ActiveAccountResponse {
-  let isNewActiveAccount = false;
-  const id = Bytes.empty()
-    .concat(accountAddress)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(day));
-
-  let activeAccount = _ActiveAccount.load(id);
-  if (!activeAccount) {
-    isNewActiveAccount = true;
-    activeAccount = new _ActiveAccount(id);
-    activeAccount.isActiveBuyer = false;
-    activeAccount.isActiveSeller = false;
-    activeAccount.isActiveSubject = false;
-    activeAccount.save();
-  }
-  return { activeAccount, isNewActiveAccount };
-}
-
-export function getOrCreateUsageMetricsDailySnapshot(
-  event: ethereum.Event
-): UsageMetricsDailySnapshot {
-  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
-
-  let snapshot = UsageMetricsDailySnapshot.load(Bytes.fromI32(day));
-
-  if (!snapshot) {
-    snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
-
-    snapshot.day = day;
-    snapshot.protocol = NetworkConfigs.getFactoryAddress();
-
-    snapshot.dailyActiveBuyers = INT_ZERO;
-    snapshot.cumulativeUniqueBuyers = INT_ZERO;
-    snapshot.dailyActiveSellers = INT_ZERO;
-    snapshot.cumulativeUniqueSellers = INT_ZERO;
-    snapshot.dailyActiveTraders = INT_ZERO;
-    snapshot.cumulativeUniqueTraders = INT_ZERO;
-    snapshot.dailyActiveSubjects = INT_ZERO;
-    snapshot.cumulativeUniqueSubjects = INT_ZERO;
-    snapshot.dailyActiveUsers = INT_ZERO;
-    snapshot.cumulativeUniqueUsers = INT_ZERO;
-
-    snapshot.dailyBuyCount = INT_ZERO;
-    snapshot.cumulativeBuyCount = INT_ZERO;
-    snapshot.dailySellCount = INT_ZERO;
-    snapshot.cumulativeSellCount = INT_ZERO;
-    snapshot.dailyTradesCount = INT_ZERO;
-    snapshot.cumulativeTradesCount = INT_ZERO;
-
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-
-    snapshot.save();
-  }
-  return snapshot;
-}
-
-export function getOrCreateFinancialsDailySnapshot(
-  event: ethereum.Event
-): FinancialsDailySnapshot {
-  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
-
-  let snapshot = FinancialsDailySnapshot.load(Bytes.fromI32(day));
-
-  if (!snapshot) {
-    snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
-
-    snapshot.day = day;
-    snapshot.protocol = NetworkConfigs.getFactoryAddress();
-
-    snapshot.totalValueLockedETH = BIGINT_ZERO;
-    snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
-
-    snapshot.dailySupplySideRevenueETH = BIGINT_ZERO;
-    snapshot.cumulativeSupplySideRevenueETH = BIGINT_ZERO;
-    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyProtocolSideRevenueETH = BIGINT_ZERO;
-    snapshot.cumulativeProtocolSideRevenueETH = BIGINT_ZERO;
-    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTotalRevenueETH = BIGINT_ZERO;
-    snapshot.cumulativeTotalRevenueETH = BIGINT_ZERO;
-    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-    snapshot.dailyBuyVolumeETH = BIGINT_ZERO;
-    snapshot.cumulativeBuyVolumeETH = BIGINT_ZERO;
-    snapshot.dailyBuyVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.cumulativeBuyVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailySellVolumeETH = BIGINT_ZERO;
-    snapshot.cumulativeSellVolumeETH = BIGINT_ZERO;
-    snapshot.dailySellVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.cumulativeSellVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTotalVolumeETH = BIGINT_ZERO;
-    snapshot.cumulativeTotalVolumeETH = BIGINT_ZERO;
-    snapshot.dailyTotalVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.cumulativeTotalVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyNetVolumeETH = BIGINT_ZERO;
-    snapshot.netVolumeETH = BIGINT_ZERO;
-    snapshot.dailyNetVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.netVolumeUSD = BIGDECIMAL_ZERO;
-
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-
-    snapshot.save();
-  }
-  return snapshot;
 }
 
 export function getOrCreateTraderDailySnapshot(

@@ -1,3 +1,5 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 import {
   updateConnections,
   updateRevenue,
@@ -8,12 +10,13 @@ import {
 } from "../common/metrics";
 import {
   updateConnectionDailySnapshot,
-  updateFinancialsDailySnapshot,
+  updateProtocolSnapshots,
   updateSubjectDailySnapshot,
   updateTraderDailySnapshot,
-  updateUsageMetricsDailySnapshot,
 } from "../common/snapshots";
 import { createEvent } from "../common/events";
+import { getOrCreateProtocol } from "../common/getters";
+import { SECONDS_PER_DAY } from "../common/constants";
 
 import { Trade } from "../../generated/Shares/Shares";
 
@@ -38,14 +41,7 @@ export function handleTrade(event: Trade): void {
   updateConnections(trader, subject, shares, sharePriceETH, isBuy, event);
   updateSubjectPrice(subject, supply, tradeAmountETH, event);
 
-  updateUsageMetricsDailySnapshot(trader, subject, isBuy, event);
-  updateFinancialsDailySnapshot(
-    sharePriceETH,
-    subjectFeeETH,
-    protocolFeeETH,
-    isBuy,
-    event
-  );
+  updateProtocolSnapshots(event);
   updateTraderDailySnapshot(trader, sharePriceETH, isBuy, event);
   updateSubjectDailySnapshot(
     subject,

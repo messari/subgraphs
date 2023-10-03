@@ -1,6 +1,6 @@
 import { Address, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-import { getUsdPriceForEthAmount } from "./utils";
+import { getUsdPriceForEthAmount } from "./prices";
 import { TradeType, ZERO_ADDRESS } from "./constants";
 import { NetworkConfigs } from "../../configurations/configure";
 

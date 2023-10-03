@@ -159,18 +159,15 @@ type Protocol @entity @regularPolling {
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
-  " Day ID of the most recent daily snapshot "
-  lastSnapshotDayID: Int!
-
-  " Timestamp of the last time this entity was updated "
-  lastUpdateTimestamp: BigInt!
+  " Helper field for taking daily snapshots "
+  _lastDailySnapshotTimestamp: BigInt!
 }
 
 ###############################
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity @dailySnapshot(immutable: true) {
+type UsageMetricsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -235,7 +232,7 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot(immutable: true) {
   blockNumber: BigInt!
 }
 
-type FinancialsDailySnapshot @entity @dailySnapshot(immutable: true) {
+type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -446,7 +443,7 @@ type Connection @entity @regularPolling {
 ####### User Timeseries #######
 ###############################
 
-type TraderDailySnapshot @entity @dailySnapshot(immutable: true) {
+type TraderDailySnapshot @entity @dailySnapshot {
   " {ID is # of days since Unix epoch time}-{Trader ID} "
   id: Bytes!
 
@@ -519,7 +516,7 @@ type TraderDailySnapshot @entity @dailySnapshot(immutable: true) {
   blockNumber: BigInt!
 }
 
-type SubjectDailySnapshot @entity @dailySnapshot(immutable: true) {
+type SubjectDailySnapshot @entity @dailySnapshot {
   " {ID is # of days since Unix epoch time}-{Subject ID} "
   id: Bytes!
 
@@ -607,7 +604,7 @@ type SubjectDailySnapshot @entity @dailySnapshot(immutable: true) {
   blockNumber: BigInt!
 }
 
-type ConnectionDailySnapshot @entity @regularPolling(immutable: true) {
+type ConnectionDailySnapshot @entity @regularPolling {
   " {Day ID}-{Trader ID}-{Subject ID} "
   id: Bytes!
 
@@ -776,13 +773,4 @@ type _Account @entity @regularPolling {
   isBuyer: Boolean!
   isSeller: Boolean!
   isSubject: Boolean!
-}
-
-# Helper entity for calculating daily active users
-type _ActiveAccount @entity @regularPolling {
-  " { Address of the Account }-{ Days since Unix epoch } "
-  id: Bytes!
-  isActiveBuyer: Boolean!
-  isActiveSeller: Boolean!
-  isActiveSubject: Boolean!
 }

@@ -8,7 +8,8 @@ import {
   getOrCreateConnection,
 } from "./getters";
 import { INT_ONE } from "./constants";
-import { addToArrayAtIndex, getUsdPriceForEthAmount } from "./utils";
+import { addToArrayAtIndex } from "./utils";
+import { getUsdPriceForEthAmount } from "./prices";
 
 export function updateTVL(
   amountETH: BigInt,

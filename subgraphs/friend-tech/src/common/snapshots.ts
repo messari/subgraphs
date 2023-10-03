@@ -1,141 +1,104 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import {
-  getOrCreateActiveAccount,
   getOrCreateConnection,
   getOrCreateConnectionDailySnapshot,
-  getOrCreateFinancialsDailySnapshot,
   getOrCreateProtocol,
   getOrCreateSubject,
   getOrCreateSubjectDailySnapshot,
   getOrCreateTrader,
   getOrCreateTraderDailySnapshot,
-  getOrCreateUsageMetricsDailySnapshot,
 } from "./getters";
-import { INT_ONE } from "./constants";
-import {
-  addToArrayAtIndex,
-  getDaysSinceEpoch,
-  getUsdPriceForEthAmount,
-} from "./utils";
+import { INT_ONE, SECONDS_PER_DAY } from "./constants";
+import { addToArrayAtIndex, getDaysSinceEpoch } from "./utils";
+import { getUsdPriceForEthAmount } from "./prices";
 
-export function updateUsageMetricsDailySnapshot(
-  traderAddress: Address,
-  subjectAddress: Address,
-  isBuy: boolean,
+import {
+  FinancialsDailySnapshot,
+  Protocol,
+  UsageMetricsDailySnapshot,
+} from "../../generated/schema";
+
+export function takeUsageMetricsDailySnapshot(
+  protocol: Protocol,
   event: ethereum.Event
 ): void {
-  const protocol = getOrCreateProtocol();
-  const snapshot = getOrCreateUsageMetricsDailySnapshot(event);
-
   const day = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
 
-  const activeSubject = getOrCreateActiveAccount(subjectAddress, day);
-  if (activeSubject.isNewActiveAccount) {
-    snapshot.dailyActiveUsers += INT_ONE;
-  }
-  if (!activeSubject.activeAccount.isActiveSubject) {
-    snapshot.dailyActiveSubjects += INT_ONE;
-    activeSubject.activeAccount.isActiveSubject = true;
-  }
-  activeSubject.activeAccount.save();
-
-  const activeTrader = getOrCreateActiveAccount(traderAddress, day);
-  if (activeTrader.isNewActiveAccount) {
-    snapshot.dailyActiveUsers += INT_ONE;
-  }
-  if (
-    !activeTrader.activeAccount.isActiveBuyer &&
-    !activeTrader.activeAccount.isActiveSeller
-  ) {
-    snapshot.dailyActiveTraders += INT_ONE;
-  }
-  if (isBuy) {
-    if (!activeTrader.activeAccount.isActiveBuyer) {
-      snapshot.dailyActiveBuyers += INT_ONE;
-      activeTrader.activeAccount.isActiveBuyer = true;
-    }
-    snapshot.dailyBuyCount += INT_ONE;
-  } else {
-    if (!activeTrader.activeAccount.isActiveSeller) {
-      snapshot.dailyActiveSellers += INT_ONE;
-      activeTrader.activeAccount.isActiveSeller = true;
-    }
-    snapshot.dailySellCount += INT_ONE;
-  }
-  activeTrader.activeAccount.save();
-
-  snapshot.dailyTradesCount += INT_ONE;
+  snapshot.day = day;
+  snapshot.protocol = protocol.id;
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
 
   snapshot.cumulativeUniqueBuyers = protocol.cumulativeUniqueBuyers;
   snapshot.cumulativeUniqueSellers = protocol.cumulativeUniqueSellers;
   snapshot.cumulativeUniqueTraders = protocol.cumulativeUniqueTraders;
   snapshot.cumulativeUniqueSubjects = protocol.cumulativeUniqueSubjects;
   snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-
   snapshot.cumulativeBuyCount = protocol.cumulativeBuyCount;
   snapshot.cumulativeSellCount = protocol.cumulativeSellCount;
   snapshot.cumulativeTradesCount = protocol.cumulativeTradesCount;
 
-  snapshot.blockNumber = event.block.number;
-  snapshot.timestamp = event.block.timestamp;
+  let activeBuyersDelta = snapshot.cumulativeUniqueBuyers;
+  let activeSellersDelta = snapshot.cumulativeUniqueSellers;
+  let activeTradersDelta = snapshot.cumulativeUniqueTraders;
+  let activeSubjectsDelta = snapshot.cumulativeUniqueSubjects;
+  let activeUsersDelta = snapshot.cumulativeUniqueUsers;
+  let buyCountDelta = snapshot.cumulativeBuyCount;
+  let sellCountDelta = snapshot.cumulativeSellCount;
+  let tradesCountDelta = snapshot.cumulativeTradesCount;
 
-  protocol.lastSnapshotDayID = day;
-  protocol.lastUpdateTimestamp = event.block.timestamp;
+  const previousDay = getDaysSinceEpoch(
+    protocol._lastDailySnapshotTimestamp!.toI32()
+  );
+  const previousSnapshot = UsageMetricsDailySnapshot.load(
+    Bytes.fromI32(previousDay)
+  );
+  if (previousSnapshot) {
+    activeBuyersDelta =
+      snapshot.cumulativeUniqueBuyers - previousSnapshot.cumulativeUniqueBuyers;
+    activeSellersDelta =
+      snapshot.cumulativeUniqueSellers -
+      previousSnapshot.cumulativeUniqueSellers;
+    activeTradersDelta =
+      snapshot.cumulativeUniqueTraders -
+      previousSnapshot.cumulativeUniqueTraders;
+    activeSubjectsDelta =
+      snapshot.cumulativeUniqueSubjects -
+      previousSnapshot.cumulativeUniqueSubjects;
+    activeUsersDelta =
+      snapshot.cumulativeUniqueUsers - previousSnapshot.cumulativeUniqueUsers;
+    buyCountDelta =
+      snapshot.cumulativeBuyCount - previousSnapshot.cumulativeBuyCount;
+    sellCountDelta =
+      snapshot.cumulativeSellCount - previousSnapshot.cumulativeSellCount;
+    tradesCountDelta =
+      snapshot.cumulativeTradesCount - previousSnapshot.cumulativeTradesCount;
+  }
+  snapshot.dailyActiveBuyers = activeBuyersDelta;
+  snapshot.dailyActiveSellers = activeSellersDelta;
+  snapshot.dailyActiveTraders = activeTradersDelta;
+  snapshot.dailyActiveSubjects = activeSubjectsDelta;
+  snapshot.dailyActiveUsers = activeUsersDelta;
+  snapshot.dailyBuyCount = buyCountDelta;
+  snapshot.dailySellCount = sellCountDelta;
+  snapshot.dailyTradesCount = tradesCountDelta;
 
   snapshot.save();
-  protocol.save();
 }
 
-export function updateFinancialsDailySnapshot(
-  amountETH: BigInt,
-  subjectFeeETH: BigInt,
-  protocolFeeETH: BigInt,
-  isBuy: boolean,
+export function takeFinancialsDailySnapshot(
+  protocol: Protocol,
   event: ethereum.Event
 ): void {
-  const protocol = getOrCreateProtocol();
-  const snapshot = getOrCreateFinancialsDailySnapshot(event);
+  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
 
-  const amountUSD = getUsdPriceForEthAmount(amountETH, event);
-  const subjectFeeUSD = getUsdPriceForEthAmount(subjectFeeETH, event);
-  const protocolFeeUSD = getUsdPriceForEthAmount(protocolFeeETH, event);
-
-  snapshot.dailySupplySideRevenueETH =
-    snapshot.dailySupplySideRevenueETH.plus(subjectFeeETH);
-  snapshot.dailySupplySideRevenueUSD =
-    snapshot.dailySupplySideRevenueUSD.plus(subjectFeeUSD);
-  snapshot.dailyProtocolSideRevenueETH =
-    snapshot.dailyProtocolSideRevenueETH.plus(protocolFeeETH);
-  snapshot.dailyProtocolSideRevenueUSD =
-    snapshot.dailyProtocolSideRevenueUSD.plus(protocolFeeUSD);
-  snapshot.dailyTotalRevenueETH = snapshot.dailyTotalRevenueETH.plus(
-    subjectFeeETH.plus(protocolFeeETH)
-  );
-  snapshot.dailyTotalRevenueUSD = snapshot.dailyTotalRevenueUSD.plus(
-    subjectFeeUSD.plus(protocolFeeUSD)
-  );
-
-  if (isBuy) {
-    snapshot.dailyBuyVolumeETH = snapshot.dailyBuyVolumeETH.plus(amountETH);
-    snapshot.dailyBuyVolumeUSD = snapshot.dailyBuyVolumeUSD.plus(amountUSD);
-  } else {
-    snapshot.dailySellVolumeETH = snapshot.dailySellVolumeETH.plus(amountETH);
-    snapshot.dailySellVolumeUSD = snapshot.dailySellVolumeUSD.plus(amountUSD);
-  }
-
-  snapshot.dailyTotalVolumeETH = snapshot.dailyBuyVolumeETH.plus(
-    snapshot.dailySellVolumeETH
-  );
-  snapshot.dailyTotalVolumeUSD = snapshot.dailyBuyVolumeUSD.plus(
-    snapshot.dailySellVolumeUSD
-  );
-  snapshot.dailyNetVolumeETH = snapshot.dailyBuyVolumeETH.minus(
-    snapshot.dailySellVolumeETH
-  );
-  snapshot.dailyNetVolumeUSD = snapshot.dailyBuyVolumeUSD.minus(
-    snapshot.dailySellVolumeUSD
-  );
+  snapshot.day = day;
+  snapshot.protocol = protocol.id;
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
 
   snapshot.totalValueLockedETH = protocol.totalValueLockedETH;
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
@@ -158,10 +121,104 @@ export function updateFinancialsDailySnapshot(
   snapshot.netVolumeETH = protocol.netVolumeETH;
   snapshot.netVolumeUSD = protocol.netVolumeUSD;
 
-  snapshot.blockNumber = event.block.number;
-  snapshot.timestamp = event.block.timestamp;
+  let supplySideRevenueETHDelta = snapshot.cumulativeSupplySideRevenueETH;
+  let supplySideRevenueUSDDelta = snapshot.cumulativeSupplySideRevenueUSD;
+  let protocolSideRevenueETHDelta = snapshot.cumulativeProtocolSideRevenueETH;
+  let protocolSideRevenueUSDDelta = snapshot.cumulativeProtocolSideRevenueUSD;
+  let totalRevenueETHDelta = snapshot.cumulativeTotalRevenueETH;
+  let totalRevenueUSDDelta = snapshot.cumulativeTotalRevenueUSD;
+  let buyVolumeETHDelta = snapshot.cumulativeBuyVolumeETH;
+  let buyVolumeUSDDelta = snapshot.cumulativeBuyVolumeUSD;
+  let sellVolumeETHDelta = snapshot.cumulativeSellVolumeETH;
+  let sellVolumeUSDDelta = snapshot.cumulativeSellVolumeUSD;
+  let totalVolumeETHDelta = snapshot.cumulativeTotalVolumeETH;
+  let totalVolumeUSDDelta = snapshot.cumulativeTotalVolumeUSD;
+  let netVolumeETHDelta = snapshot.netVolumeETH;
+  let netVolumeUSDDelta = snapshot.netVolumeUSD;
+
+  const previousDay = getDaysSinceEpoch(
+    protocol._lastDailySnapshotTimestamp!.toI32()
+  );
+  const previousSnapshot = FinancialsDailySnapshot.load(
+    Bytes.fromI32(previousDay)
+  );
+  if (previousSnapshot) {
+    supplySideRevenueETHDelta = snapshot.cumulativeSupplySideRevenueETH.minus(
+      previousSnapshot.cumulativeSupplySideRevenueETH
+    );
+    supplySideRevenueUSDDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
+      previousSnapshot.cumulativeSupplySideRevenueUSD
+    );
+    protocolSideRevenueETHDelta =
+      snapshot.cumulativeProtocolSideRevenueETH.minus(
+        previousSnapshot.cumulativeProtocolSideRevenueETH
+      );
+    protocolSideRevenueUSDDelta =
+      snapshot.cumulativeProtocolSideRevenueUSD.minus(
+        previousSnapshot.cumulativeProtocolSideRevenueUSD
+      );
+    totalRevenueETHDelta = snapshot.cumulativeTotalRevenueETH.minus(
+      previousSnapshot.cumulativeTotalRevenueETH
+    );
+    totalRevenueUSDDelta = snapshot.cumulativeTotalRevenueUSD.minus(
+      previousSnapshot.cumulativeTotalRevenueUSD
+    );
+    buyVolumeETHDelta = snapshot.cumulativeBuyVolumeETH.minus(
+      previousSnapshot.cumulativeBuyVolumeETH
+    );
+    buyVolumeUSDDelta = snapshot.cumulativeBuyVolumeUSD.minus(
+      previousSnapshot.cumulativeBuyVolumeUSD
+    );
+    sellVolumeETHDelta = snapshot.cumulativeSellVolumeETH.minus(
+      previousSnapshot.cumulativeSellVolumeETH
+    );
+    sellVolumeUSDDelta = snapshot.cumulativeSellVolumeUSD.minus(
+      previousSnapshot.cumulativeSellVolumeUSD
+    );
+    totalVolumeETHDelta = snapshot.cumulativeTotalVolumeETH.minus(
+      previousSnapshot.cumulativeTotalVolumeETH
+    );
+    totalVolumeUSDDelta = snapshot.cumulativeTotalVolumeUSD.minus(
+      previousSnapshot.cumulativeTotalVolumeUSD
+    );
+    netVolumeETHDelta = snapshot.netVolumeETH.minus(
+      previousSnapshot.netVolumeETH
+    );
+    netVolumeUSDDelta = snapshot.netVolumeUSD.minus(
+      previousSnapshot.netVolumeUSD
+    );
+  }
+  snapshot.dailySupplySideRevenueETH = supplySideRevenueETHDelta;
+  snapshot.dailySupplySideRevenueUSD = supplySideRevenueUSDDelta;
+  snapshot.dailyProtocolSideRevenueETH = protocolSideRevenueETHDelta;
+  snapshot.dailyProtocolSideRevenueUSD = protocolSideRevenueUSDDelta;
+  snapshot.dailyTotalRevenueETH = totalRevenueETHDelta;
+  snapshot.dailyTotalRevenueUSD = totalRevenueUSDDelta;
+  snapshot.dailyBuyVolumeETH = buyVolumeETHDelta;
+  snapshot.dailyBuyVolumeUSD = buyVolumeUSDDelta;
+  snapshot.dailySellVolumeETH = sellVolumeETHDelta;
+  snapshot.dailySellVolumeUSD = sellVolumeUSDDelta;
+  snapshot.dailyTotalVolumeETH = totalVolumeETHDelta;
+  snapshot.dailyTotalVolumeUSD = totalVolumeUSDDelta;
+  snapshot.dailyNetVolumeETH = netVolumeETHDelta;
+  snapshot.dailyNetVolumeUSD = netVolumeUSDDelta;
 
   snapshot.save();
+}
+
+export function updateProtocolSnapshots(event: ethereum.Event): void {
+  const protocol = getOrCreateProtocol();
+  if (
+    protocol._lastDailySnapshotTimestamp
+      .plus(BigInt.fromI32(SECONDS_PER_DAY))
+      .lt(event.block.timestamp)
+  ) {
+    takeUsageMetricsDailySnapshot(protocol, event);
+    takeFinancialsDailySnapshot(protocol, event);
+
+    protocol._lastDailySnapshotTimestamp = event.block.timestamp;
+    protocol.save();
+  }
 }
 
 export function updateTraderDailySnapshot(
@@ -290,12 +347,6 @@ export function updateConnectionDailySnapshot(
   isBuy: boolean,
   event: ethereum.Event
 ): void {
-  const traderSnapshot = getOrCreateTraderDailySnapshot(traderAddress, event);
-  const subjectSnapshot = getOrCreateSubjectDailySnapshot(
-    subjectAddress,
-    event
-  );
-
   const connection = getOrCreateConnection(
     traderAddress,
     subjectAddress,
@@ -351,6 +402,7 @@ export function updateConnectionDailySnapshot(
 
   snapshot.save();
 
+  const traderSnapshot = getOrCreateTraderDailySnapshot(traderAddress, event);
   if (!traderSnapshot.connections.includes(snapshot.id)) {
     traderSnapshot.connections = addToArrayAtIndex(
       traderSnapshot.connections,
@@ -359,6 +411,10 @@ export function updateConnectionDailySnapshot(
   }
   traderSnapshot.save();
 
+  const subjectSnapshot = getOrCreateSubjectDailySnapshot(
+    subjectAddress,
+    event
+  );
   if (!subjectSnapshot.connections.includes(snapshot.id)) {
     subjectSnapshot.connections = addToArrayAtIndex(
       subjectSnapshot.connections,

@@ -1,10 +1,12 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import {
   BIGDECIMAL_ZERO,
   BIGINT_TEN,
   CHAINLINK_AGGREGATOR_ETH_USD,
+  ETH_DECIMALS,
 } from "./constants";
+import { getOrCreateEthToken } from "./getters";
 
 import { ChainLinkAggregator } from "../../generated/Shares/ChainLinkAggregator";
 
@@ -25,4 +27,16 @@ export function getUsdPricePerEth(): BigDecimal {
   return latestAnswerCall.value
     .toBigDecimal()
     .div(BIGINT_TEN.pow(decimalsCall.value as u8).toBigDecimal());
+}
+
+export function getUsdPriceForEthAmount(
+  amount: BigInt,
+  event: ethereum.Event
+): BigDecimal {
+  const eth = getOrCreateEthToken(event);
+
+  return amount
+    .toBigDecimal()
+    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
+    .times(eth.lastPriceUSD!);
 }
