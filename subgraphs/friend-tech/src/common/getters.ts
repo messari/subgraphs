@@ -11,7 +11,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   ProtocolType,
-  TradeType,
 } from "./constants";
 import { getUsdPricePerEth } from "./prices";
 import { Versions } from "../versions";
@@ -111,11 +110,9 @@ export function getOrCreateTrader(
   traderAddress: Address,
   event: ethereum.Event
 ): Trader {
-  let isNewTrader = false;
   let trader = Trader.load(traderAddress);
 
   if (!trader) {
-    isNewTrader = true;
     trader = new Trader(traderAddress);
 
     trader.cumulativeBuyVolumeETH = BIGINT_ZERO;
