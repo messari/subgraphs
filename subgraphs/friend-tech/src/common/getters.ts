@@ -13,19 +13,15 @@ import {
   ProtocolType,
   TradeType,
 } from "./constants";
-import { getEthPriceUSD } from "./prices";
+import { getUsdPricePerEth } from "./prices";
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
-import { SubjectResponse, TraderResponse } from "./types";
+import { AccountResponse, ActiveAccountResponse } from "./types";
 import { getDaysSinceEpoch } from "./utils";
 
 import {
   _Account,
   _ActiveAccount,
-  _ActiveSubject,
-  _ActiveTrader,
-  _ActiveTraderOfType,
-  _TraderOfType,
   Connection,
   ConnectionDailySnapshot,
   FinancialsDailySnapshot,
@@ -102,7 +98,7 @@ export function getOrCreateEthToken(event: ethereum.Event): Token {
   }
 
   if (!token.lastPriceUSD || token.lastPriceBlockNumber! < event.block.number) {
-    const priceUSD = getEthPriceUSD();
+    const priceUSD = getUsdPricePerEth();
 
     token.lastPriceUSD = priceUSD;
     token.lastPriceBlockNumber = event.block.number;
@@ -114,7 +110,7 @@ export function getOrCreateEthToken(event: ethereum.Event): Token {
 export function getOrCreateTrader(
   traderAddress: Address,
   event: ethereum.Event
-): TraderResponse {
+): Trader {
   let isNewTrader = false;
   let trader = Trader.load(traderAddress);
 
@@ -141,36 +137,16 @@ export function getOrCreateTrader(
 
     trader.save();
   }
-  return { trader, isNewTrader };
-}
-
-export function getOrCreateActiveTrader(
-  traderAddress: Address,
-  day: i32
-): boolean {
-  const id = Bytes.empty()
-    .concat(traderAddress)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(day));
-
-  let trader = _ActiveTrader.load(id);
-  if (!trader) {
-    trader = new _ActiveTrader(id);
-    trader.save();
-    return true;
-  }
-  return false;
+  return trader;
 }
 
 export function getOrCreateSubject(
   subjectAddress: Address,
   event: ethereum.Event
-): SubjectResponse {
-  let isNewSubject = false;
+): Subject {
   let subject = Subject.load(subjectAddress);
 
   if (!subject) {
-    isNewSubject = true;
     subject = new Subject(subjectAddress);
 
     subject.cumulativeRevenueETH = BIGINT_ZERO;
@@ -198,25 +174,7 @@ export function getOrCreateSubject(
 
     subject.save();
   }
-  return { subject, isNewSubject };
-}
-
-export function getOrCreateActiveSubject(
-  subjectAddress: Address,
-  day: i32
-): boolean {
-  const id = Bytes.empty()
-    .concat(subjectAddress)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(day));
-
-  let subject = _ActiveSubject.load(id);
-  if (!subject) {
-    subject = new _ActiveSubject(id);
-    subject.save();
-    return true;
-  }
-  return false;
+  return subject;
 }
 
 export function getOrCreateConnection(
@@ -259,73 +217,40 @@ export function getOrCreateConnection(
   return connection;
 }
 
-export function getOrCreateAccount(accountAddress: Address): boolean {
+export function getOrCreateAccount(accountAddress: Address): AccountResponse {
+  let isNewAccount = false;
   let account = _Account.load(accountAddress);
   if (!account) {
+    isNewAccount = true;
     account = new _Account(accountAddress);
+    account.isBuyer = false;
+    account.isSeller = false;
+    account.isSubject = false;
     account.save();
-    return true;
   }
-  return false;
+  return { account, isNewAccount };
 }
 
 export function getOrCreateActiveAccount(
   accountAddress: Address,
   day: i32
-): boolean {
+): ActiveAccountResponse {
+  let isNewActiveAccount = false;
   const id = Bytes.empty()
     .concat(accountAddress)
     .concat(Bytes.fromUTF8("-"))
     .concat(Bytes.fromI32(day));
 
-  let account = _ActiveAccount.load(id);
-  if (!account) {
-    account = new _ActiveAccount(id);
-    account.save();
-    return true;
+  let activeAccount = _ActiveAccount.load(id);
+  if (!activeAccount) {
+    isNewActiveAccount = true;
+    activeAccount = new _ActiveAccount(id);
+    activeAccount.isActiveBuyer = false;
+    activeAccount.isActiveSeller = false;
+    activeAccount.isActiveSubject = false;
+    activeAccount.save();
   }
-  return false;
-}
-
-export function getOrCreateTraderOfType(
-  traderAddress: Address,
-  isBuy: boolean
-): boolean {
-  const tradeType = isBuy ? TradeType.BUY : TradeType.SELL;
-  const id = Bytes.empty()
-    .concat(Bytes.fromUTF8(tradeType))
-    .concat(Bytes.fromUTF8("-"))
-    .concat(traderAddress);
-
-  let trader = _TraderOfType.load(id);
-  if (!trader) {
-    trader = new _TraderOfType(id);
-    trader.save();
-    return true;
-  }
-  return false;
-}
-
-export function getOrCreateActiveTraderOfType(
-  traderAddress: Address,
-  isBuy: boolean,
-  day: i32
-): boolean {
-  const tradeType = isBuy ? TradeType.BUY : TradeType.SELL;
-  const id = Bytes.empty()
-    .concat(Bytes.fromUTF8(tradeType))
-    .concat(Bytes.fromUTF8("-"))
-    .concat(traderAddress)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(day));
-
-  let trader = _ActiveTraderOfType.load(id);
-  if (!trader) {
-    trader = new _ActiveTraderOfType(id);
-    trader.save();
-    return true;
-  }
-  return false;
+  return { activeAccount, isNewActiveAccount };
 }
 
 export function getOrCreateUsageMetricsDailySnapshot(

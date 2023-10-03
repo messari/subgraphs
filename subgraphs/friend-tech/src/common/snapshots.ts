@@ -2,12 +2,8 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import {
   getOrCreateActiveAccount,
-  getOrCreateActiveSubject,
-  getOrCreateActiveTrader,
-  getOrCreateActiveTraderOfType,
   getOrCreateConnection,
   getOrCreateConnectionDailySnapshot,
-  getOrCreateEthToken,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateProtocol,
   getOrCreateSubject,
@@ -16,8 +12,12 @@ import {
   getOrCreateTraderDailySnapshot,
   getOrCreateUsageMetricsDailySnapshot,
 } from "./getters";
-import { BIGINT_TEN, ETH_DECIMALS, INT_ONE } from "./constants";
-import { getDaysSinceEpoch } from "./utils";
+import { INT_ONE } from "./constants";
+import {
+  addToArrayAtIndex,
+  getDaysSinceEpoch,
+  getUsdPriceForEthAmount,
+} from "./utils";
 
 export function updateUsageMetricsDailySnapshot(
   traderAddress: Address,
@@ -30,32 +30,40 @@ export function updateUsageMetricsDailySnapshot(
 
   const day = getDaysSinceEpoch(event.block.timestamp.toI32());
 
-  const isActiveTrader = getOrCreateActiveTrader(traderAddress, day);
-  const isActiveAccountForTrader = getOrCreateActiveAccount(traderAddress, day);
-  const isActiveTraderOfType = getOrCreateActiveTraderOfType(
-    traderAddress,
-    isBuy,
-    day
-  );
+  const activeSubject = getOrCreateActiveAccount(subjectAddress, day);
+  if (activeSubject.isNewActiveAccount) {
+    snapshot.dailyActiveUsers += INT_ONE;
+  }
+  if (!activeSubject.activeAccount.isActiveSubject) {
+    snapshot.dailyActiveSubjects += INT_ONE;
+    activeSubject.activeAccount.isActiveSubject = true;
+  }
+  activeSubject.activeAccount.save();
 
-  const isActiveSubject = getOrCreateActiveSubject(subjectAddress, day);
-  const isActiveAccountForSubject = getOrCreateActiveAccount(
-    subjectAddress,
-    day
-  );
-
-  if (isActiveTrader) snapshot.dailyActiveTraders += INT_ONE;
-  if (isActiveAccountForTrader) snapshot.dailyActiveUsers += INT_ONE;
-  if (isActiveSubject) snapshot.dailyActiveSubjects += INT_ONE;
-  if (isActiveAccountForSubject) snapshot.dailyActiveUsers += INT_ONE;
-
+  const activeTrader = getOrCreateActiveAccount(traderAddress, day);
+  if (activeTrader.isNewActiveAccount) {
+    snapshot.dailyActiveUsers += INT_ONE;
+  }
+  if (
+    !activeTrader.activeAccount.isActiveBuyer &&
+    !activeTrader.activeAccount.isActiveSeller
+  ) {
+    snapshot.dailyActiveTraders += INT_ONE;
+  }
   if (isBuy) {
-    if (isActiveTraderOfType) snapshot.dailyActiveBuyers += INT_ONE;
+    if (!activeTrader.activeAccount.isActiveBuyer) {
+      snapshot.dailyActiveBuyers += INT_ONE;
+      activeTrader.activeAccount.isActiveBuyer = true;
+    }
     snapshot.dailyBuyCount += INT_ONE;
   } else {
-    if (isActiveTraderOfType) snapshot.dailyActiveSellers += INT_ONE;
+    if (!activeTrader.activeAccount.isActiveSeller) {
+      snapshot.dailyActiveSellers += INT_ONE;
+      activeTrader.activeAccount.isActiveSeller = true;
+    }
     snapshot.dailySellCount += INT_ONE;
   }
+  activeTrader.activeAccount.save();
 
   snapshot.dailyTradesCount += INT_ONE;
 
@@ -89,19 +97,9 @@ export function updateFinancialsDailySnapshot(
   const protocol = getOrCreateProtocol();
   const snapshot = getOrCreateFinancialsDailySnapshot(event);
 
-  const eth = getOrCreateEthToken(event);
-  const amountUSD = amountETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
-  const subjectFeeUSD = subjectFeeETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
-  const protocolFeeUSD = protocolFeeETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
+  const amountUSD = getUsdPriceForEthAmount(amountETH, event);
+  const subjectFeeUSD = getUsdPriceForEthAmount(subjectFeeETH, event);
+  const protocolFeeUSD = getUsdPriceForEthAmount(protocolFeeETH, event);
 
   snapshot.dailySupplySideRevenueETH =
     snapshot.dailySupplySideRevenueETH.plus(subjectFeeETH);
@@ -172,14 +170,9 @@ export function updateTraderDailySnapshot(
   isBuy: boolean,
   event: ethereum.Event
 ): void {
-  const trader = getOrCreateTrader(traderAddress, event).trader;
+  const trader = getOrCreateTrader(traderAddress, event);
   const snapshot = getOrCreateTraderDailySnapshot(traderAddress, event);
-
-  const eth = getOrCreateEthToken(event);
-  const amountUSD = amountETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
+  const amountUSD = getUsdPriceForEthAmount(amountETH, event);
 
   if (isBuy) {
     snapshot.dailyBuyVolumeETH = snapshot.dailyBuyVolumeETH.plus(amountETH);
@@ -232,18 +225,11 @@ export function updateSubjectDailySnapshot(
   isBuy: boolean,
   event: ethereum.Event
 ): void {
-  const subject = getOrCreateSubject(subjectAddress, event).subject;
+  const subject = getOrCreateSubject(subjectAddress, event);
   const snapshot = getOrCreateSubjectDailySnapshot(subjectAddress, event);
 
-  const eth = getOrCreateEthToken(event);
-  const amountUSD = amountETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
-  const subjectFeeUSD = subjectFeeETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
+  const amountUSD = getUsdPriceForEthAmount(amountETH, event);
+  const subjectFeeUSD = getUsdPriceForEthAmount(subjectFeeETH, event);
 
   snapshot.dailyRevenueETH = snapshot.dailyRevenueETH.plus(subjectFeeETH);
   snapshot.dailyRevenueUSD = snapshot.dailyRevenueUSD.plus(subjectFeeUSD);
@@ -304,6 +290,12 @@ export function updateConnectionDailySnapshot(
   isBuy: boolean,
   event: ethereum.Event
 ): void {
+  const traderSnapshot = getOrCreateTraderDailySnapshot(traderAddress, event);
+  const subjectSnapshot = getOrCreateSubjectDailySnapshot(
+    subjectAddress,
+    event
+  );
+
   const connection = getOrCreateConnection(
     traderAddress,
     subjectAddress,
@@ -314,12 +306,7 @@ export function updateConnectionDailySnapshot(
     subjectAddress,
     event
   );
-
-  const eth = getOrCreateEthToken(event);
-  const amountUSD = amountETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
+  const amountUSD = getUsdPriceForEthAmount(amountETH, event);
 
   if (isBuy) {
     snapshot.dailyBuyVolumeETH = snapshot.dailyBuyVolumeETH.plus(amountETH);
@@ -363,4 +350,20 @@ export function updateConnectionDailySnapshot(
   snapshot.createdTimestamp = event.block.timestamp;
 
   snapshot.save();
+
+  if (!traderSnapshot.connections.includes(snapshot.id)) {
+    traderSnapshot.connections = addToArrayAtIndex(
+      traderSnapshot.connections,
+      snapshot.id
+    );
+  }
+  traderSnapshot.save();
+
+  if (!subjectSnapshot.connections.includes(snapshot.id)) {
+    subjectSnapshot.connections = addToArrayAtIndex(
+      subjectSnapshot.connections,
+      snapshot.id
+    );
+  }
+  subjectSnapshot.save();
 }

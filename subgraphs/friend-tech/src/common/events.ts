@@ -1,7 +1,7 @@
 import { Address, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-import { getOrCreateEthToken } from "./getters";
-import { BIGINT_TEN, ETH_DECIMALS, TradeType, ZERO_ADDRESS } from "./constants";
+import { getUsdPriceForEthAmount } from "./utils";
+import { TradeType, ZERO_ADDRESS } from "./constants";
 import { NetworkConfigs } from "../../configurations/configure";
 
 import { Trade } from "../../generated/schema";
@@ -35,23 +35,10 @@ export function createEvent(
   tradeEvent.type = isBuy ? TradeType.BUY : TradeType.SELL;
   tradeEvent.shares = shares;
 
-  const eth = getOrCreateEthToken(event);
-  const sharePriceUSD = sharePriceETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
-  const protocolFeeUSD = protocolFeeETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
-  const subjectFeeUSD = subjectFeeETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
-  const tradeAmountUSD = tradeAmountETH
-    .toBigDecimal()
-    .div(BIGINT_TEN.pow(ETH_DECIMALS as u8).toBigDecimal())
-    .times(eth.lastPriceUSD!);
+  const sharePriceUSD = getUsdPriceForEthAmount(sharePriceETH, event);
+  const protocolFeeUSD = getUsdPriceForEthAmount(protocolFeeETH, event);
+  const subjectFeeUSD = getUsdPriceForEthAmount(subjectFeeETH, event);
+  const tradeAmountUSD = getUsdPriceForEthAmount(tradeAmountETH, event);
 
   tradeEvent.sharePriceETH = sharePriceETH;
   tradeEvent.sharePriceUSD = sharePriceUSD;

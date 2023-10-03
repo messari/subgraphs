@@ -8,7 +8,7 @@ import {
 
 import { ChainLinkAggregator } from "../../generated/Shares/ChainLinkAggregator";
 
-export function getEthPriceUSD(): BigDecimal {
+export function getUsdPricePerEth(): BigDecimal {
   const chainLinkAggregator = ChainLinkAggregator.bind(
     Address.fromString(CHAINLINK_AGGREGATOR_ETH_USD)
   );

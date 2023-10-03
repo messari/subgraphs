@@ -170,7 +170,7 @@ type Protocol @entity @regularPolling {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity @dailySnapshot {
+type UsageMetricsDailySnapshot @entity @dailySnapshot(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -235,7 +235,7 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   blockNumber: BigInt!
 }
 
-type FinancialsDailySnapshot @entity @dailySnapshot {
+type FinancialsDailySnapshot @entity @dailySnapshot(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -446,7 +446,7 @@ type Connection @entity @regularPolling {
 ####### User Timeseries #######
 ###############################
 
-type TraderDailySnapshot @entity @dailySnapshot {
+type TraderDailySnapshot @entity @dailySnapshot(immutable: true) {
   " {ID is # of days since Unix epoch time}-{Trader ID} "
   id: Bytes!
 
@@ -519,7 +519,7 @@ type TraderDailySnapshot @entity @dailySnapshot {
   blockNumber: BigInt!
 }
 
-type SubjectDailySnapshot @entity @dailySnapshot {
+type SubjectDailySnapshot @entity @dailySnapshot(immutable: true) {
   " {ID is # of days since Unix epoch time}-{Subject ID} "
   id: Bytes!
 
@@ -607,7 +607,7 @@ type SubjectDailySnapshot @entity @dailySnapshot {
   blockNumber: BigInt!
 }
 
-type ConnectionDailySnapshot @entity @regularPolling {
+type ConnectionDailySnapshot @entity @regularPolling(immutable: true) {
   " {Day ID}-{Trader ID}-{Subject ID} "
   id: Bytes!
 
@@ -773,34 +773,16 @@ type Trade implements Event @entity(immutable: true) @transaction {
 type _Account @entity @regularPolling {
   " Address of the Account "
   id: Bytes!
+  isBuyer: Boolean!
+  isSeller: Boolean!
+  isSubject: Boolean!
 }
 
 # Helper entity for calculating daily active users
 type _ActiveAccount @entity @regularPolling {
   " { Address of the Account }-{ Days since Unix epoch } "
   id: Bytes!
-}
-
-# Helper entity for calculating daily active traders
-type _ActiveTrader @entity @regularPolling {
-  " { Address of the Trader }-{ Days since Unix epoch } "
-  id: Bytes!
-}
-
-# Helper entity for calculating daily active subjects
-type _ActiveSubject @entity @regularPolling {
-  " { Address of the Subject }-{ Days since Unix epoch } "
-  id: Bytes!
-}
-
-# Helps to accumulate total unique buyers / sellers
-type _TraderOfType @entity @regularPolling {
-  " { Trade Type }-{ Address of the Trader } "
-  id: Bytes!
-}
-
-# Helper entity for calculating daily active buyers / sellers
-type _ActiveTraderOfType @entity @regularPolling {
-  " { Trade Type }-{ Address of the Trader }-{ Days since Unix epoch } "
-  id: Bytes!
+  isActiveBuyer: Boolean!
+  isActiveSeller: Boolean!
+  isActiveSubject: Boolean!
 }

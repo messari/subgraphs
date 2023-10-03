@@ -1,11 +1,11 @@
-import { Subject, Trader } from "../../generated/schema";
+import { _Account, _ActiveAccount } from "../../generated/schema";
 
-export class TraderResponse {
-  trader: Trader;
-  isNewTrader: boolean;
+export class AccountResponse {
+  account: _Account;
+  isNewAccount: boolean;
 }
 
-export class SubjectResponse {
-  subject: Subject;
-  isNewSubject: boolean;
+export class ActiveAccountResponse {
+  activeAccount: _ActiveAccount;
+  isNewActiveAccount: boolean;
 }
