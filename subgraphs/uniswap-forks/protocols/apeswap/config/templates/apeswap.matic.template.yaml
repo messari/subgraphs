@@ -2,6 +2,8 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 {{#graftEnabled}}
+features:
+  - grafting
 description: ...
 graft:
   base: {{subgraphId}} # Subgraph ID of base subgraph

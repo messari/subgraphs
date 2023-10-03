@@ -94,6 +94,9 @@ export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const BIGDECIMAL_FIFTY_PERCENT = new BigDecimal(BIGINT_FIFTY);
+export const MAX_INT32 = BigInt.fromI32(2)
+  .times(BigInt.fromI32(31))
+  .minus(BIGINT_ONE);
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;

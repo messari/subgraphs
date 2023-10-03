@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LogNote, Etch } from "../../../generated/DSChief/DSChief";
 import { VoteDelegate } from "../../../generated/DSChief/VoteDelegate";
@@ -187,7 +189,7 @@ export function handleLift(event: LogNote): void {
   const spellID = Address.fromString(event.params.foo.toHexString().slice(26));
 
   const spell = Spell.load(spellID.toHexString());
-  if (!spell) return;
+  if (!spell || spell.state != SpellState.ACTIVE) return;
   spell.state = SpellState.LIFTED;
   spell.liftedTxnHash = event.transaction.hash.toHexString();
   spell.liftedBlock = event.block.number;

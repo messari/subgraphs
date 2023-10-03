@@ -110,7 +110,7 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
         return null;
       }
       const endpoint =
-        "https://gateway.thegraph.com/api/" +
+        "https://gateway-arbitrum.network.thegraph.com/api/" +
         process.env.GRAPH_API_KEY +
         "/subgraphs/id/" +
         decenNetwork;
@@ -203,7 +203,7 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
             decenDeploymentMapping[obj?.subgraph]
           ] = {
             endpoint:
-              "https://gateway.thegraph.com/api/" +
+              "https://gateway-arbitrum.network.thegraph.com/api/" +
               process.env.GRAPH_API_KEY +
               "/subgraphs/id/" +
               decenDeploymentMapping[obj?.subgraph],
