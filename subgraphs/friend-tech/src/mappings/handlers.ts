@@ -1,5 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
-
 import {
   updateConnections,
   updateRevenue,
@@ -15,8 +13,6 @@ import {
   updateTraderDailySnapshot,
 } from "../common/snapshots";
 import { createEvent } from "../common/events";
-import { getOrCreateProtocol } from "../common/getters";
-import { SECONDS_PER_DAY } from "../common/constants";
 
 import { Trade } from "../../generated/Shares/Shares";
 
