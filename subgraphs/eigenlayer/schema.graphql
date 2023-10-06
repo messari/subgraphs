@@ -1,0 +1,565 @@
+# Subgraph Schema: Non-Standard
+# Version: 1.0.0
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
+
+enum Network {
+  ARBITRUM_ONE
+  ARWEAVE_MAINNET
+  AURORA
+  AVALANCHE
+  BASE
+  BOBA
+  BSC # aka BNB Chain
+  CELO
+  COSMOS
+  CRONOS
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  HARMONY
+  JUNO
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  OSMOSIS
+  MATIC # aka Polygon
+  GNOSIS
+}
+
+enum ProtocolType {
+  EXCHANGE
+  LENDING
+  YIELD
+  BRIDGE
+  GENERIC
+  SOCIAL
+  RESTAKING
+  # Will add more
+}
+
+enum PoolType {
+  EIGEN_POD
+  STRATEGY
+}
+
+type Token @entity @regularPolling {
+  " Smart contract address of the token "
+  id: Bytes!
+
+  " Name of the token, mirrored from the smart contract "
+  name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
+  symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
+  decimals: Int!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
+}
+
+#############################
+##### Protocol Metadata #####
+#############################
+
+type Protocol @entity @regularPolling {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: Bytes!
+
+  " Name of the protocol, including version. e.g. Uniswap v3 "
+  name: String!
+
+  " Slug of protocol, including version. e.g. uniswap-v3 "
+  slug: String!
+
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
+  " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
+  methodologyVersion: String!
+
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
+
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
+  type: ProtocolType!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedETH: BigInt!
+  totalValueLockedUSD: BigDecimal!
+
+  " Cumulative value of staked eth deposited "
+  cumulativeDepositVolumeETH: BigInt!
+  cumulativeDepositVolumeUSD: BigDecimal!
+
+  " Cumulative value of restaked eth withdrawn "
+  cumulativeWithdrawalVolumeETH: BigInt!
+  cumulativeWithdrawalVolumeUSD: BigDecimal!
+
+  " Volume deposited plus volume withdrawn "
+  cumulativeTotalVolumeETH: BigInt!
+  cumulativeTotalVolumeUSD: BigDecimal!
+
+  " Volume deposited minus volume withdrawn "
+  netVolumeETH: BigInt!
+  netVolumeUSD: BigDecimal!
+
+  ##### Usage Data #####
+
+  " Number of cumulative unique addresses that deposited staked eth "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of cumulative unique addresses that withdrew restaked eth "
+  cumulativeUniqueWithdrawers: Int!
+
+  " Number of cumulative unique addresses that interacted with the protocol "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of deposits "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawals "
+  cumulativeWithdrawalCount: Int!
+
+  " Total number of transactions "
+  cumulativeTransactionCount: Int!
+
+  ##### Pools #####
+
+  " Total number of EigenPods "
+  totalEigenPodCount: Int!
+
+  " Total number of Strategies "
+  totalStrategyCount: Int!
+
+  " Total number of (EigenPods plus Strategies) "
+  totalPoolCount: Int!
+
+  " All pools that belong to this protocol "
+  pools: [Pool!]! @derivedFrom(field: "protocol")
+
+  ##### Snapshots #####
+
+  " Daily usage metrics for this protocol "
+  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  " Daily financial metrics for this protocol "
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  " Helper field for taking daily snapshots "
+  _lastDailySnapshotTimestamp: BigInt!
+}
+
+###############################
+##### Protocol Timeseries #####
+###############################
+
+type UsageMetricsDailySnapshot @entity @dailySnapshot {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: Protocol!
+
+  " Number of daily unique addresses that deposited staked eth "
+  dailyActiveDepositors: Int!
+
+  " Number of cumulative unique addresses that deposited staked eth "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of daily unique addresses that withdrew restaked eth "
+  dailyActiveWithdrawers: Int!
+
+  " Number of cumulative unique addresses that withdrew restaked eth "
+  cumulativeUniqueWithdrawers: Int!
+
+  " Number of daily unique addresses that interacted with the protocol "
+  dailyActiveUsers: Int!
+
+  " Number of cumulative unique addresses that interacted with the protocol "
+  cumulativeUniqueUsers: Int!
+
+  " Number of daily deposits "
+  dailyDepositCount: Int!
+
+  " Total number of deposits "
+  cumulativeDepositCount: Int!
+
+  " Number of daily withdrawals "
+  dailyWithdrawalCount: Int!
+
+  " Total number of withdrawals "
+  cumulativeWithdrawalCount: Int!
+
+  " Number of daily transactions "
+  dailyTransactionCount: Int!
+
+  " Total number of transactions "
+  cumulativeTransactionCount: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
+}
+
+type FinancialsDailySnapshot @entity @dailySnapshot {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: Protocol!
+
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedETH: BigInt!
+  totalValueLockedUSD: BigDecimal!
+
+  " Daily value of staked eth deposited "
+  dailyDepositVolumeETH: BigInt!
+  dailyDepositVolumeUSD: BigDecimal!
+
+  " Cumulative value of staked eth deposited "
+  cumulativeDepositVolumeETH: BigInt!
+  cumulativeDepositVolumeUSD: BigDecimal!
+
+  " Daily value of restaked eth withdrawn "
+  dailyWithdrawalVolumeETH: BigInt!
+  dailyWithdrawalVolumeUSD: BigDecimal!
+
+  " Cumulative value of restaked eth withdrawn "
+  cumulativeWithdrawalVolumeETH: BigInt!
+  cumulativeWithdrawalVolumeUSD: BigDecimal!
+
+  " Daily volume deposited minus daily volume withdrawn "
+  dailyTotalVolumeETH: BigInt!
+  dailyTotalVolumeUSD: BigDecimal!
+
+  " Volume deposited plus volume withdrawn "
+  cumulativeTotalVolumeETH: BigInt!
+  cumulativeTotalVolumeUSD: BigDecimal!
+
+  " Daily volume deposited minus daily volume withdrawn "
+  dailyNetVolumeETH: BigInt!
+  dailyNetVolumeUSD: BigDecimal!
+
+  " Volume deposited minus volume withdrawn "
+  netVolumeETH: BigInt!
+  netVolumeUSD: BigDecimal!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
+}
+
+###########################
+##### Pool-Level Data #####
+###########################
+
+type Pool @entity @regularPolling {
+  " Smart contract address of the pool "
+  id: Bytes!
+
+  " The protocol this pool belongs to "
+  protocol: Protocol!
+
+  " Name of the pool  "
+  name: String
+
+  " Symbol of liquidity pool "
+  symbol: String
+
+  " Type of pool (EIGENPOD / STRATEGY)"
+  type: PoolType!
+
+  " Token that can be deposited to and withdrawn from this pool "
+  inputToken: Token!
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of the pool "
+  totalValueLockedETH: BigInt!
+  totalValueLockedUSD: BigDecimal!
+
+  " Cumulative value of staked eth deposited "
+  cumulativeDepositVolumeETH: BigInt!
+  cumulativeDepositVolumeUSD: BigDecimal!
+
+  " Cumulative value of restaked eth withdrawn "
+  cumulativeWithdrawalVolumeETH: BigInt!
+  cumulativeWithdrawalVolumeUSD: BigDecimal!
+
+  " Volume deposited plus volume withdrawn "
+  cumulativeTotalVolumeETH: BigInt!
+  cumulativeTotalVolumeUSD: BigDecimal!
+
+  " Volume deposited minus volume withdrawn "
+  netVolumeETH: BigInt!
+  netVolumeUSD: BigDecimal!
+
+  ##### Usage Data #####
+
+  " Number of cumulative unique addresses that deposited staked eth "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of cumulative unique addresses that withdrew restaked eth "
+  cumulativeUniqueWithdrawers: Int!
+
+  " Number of cumulative unique addresses that interacted with the pool "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of deposits "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawals "
+  cumulativeWithdrawalCount: Int!
+
+  " Total number of transactions "
+  cumulativeTransactionCount: Int!
+
+  ##### Stakers #####
+
+  " Total number of stakers "
+  totalStakerCount: Int!
+
+  " All stakers that have restaked in this pool "
+  stakers: [Staker!]! @derivedFrom(field: "pool")
+
+  ##### Snapshots #####
+
+  " Pool daily snapshots "
+  dailySnapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
+
+  " Helper field for taking daily snapshots "
+  _lastDailySnapshotTimestamp: BigInt
+}
+
+###############################
+####### Pool Timeseries #######
+###############################
+
+type PoolDailySnapshot @entity @regularPolling {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
+
+  " The pool this snapshot belongs to "
+  pool: Pool!
+
+  " The protocol this snapshot belongs to "
+  protocol: Protocol!
+
+  " Current TVL (Total Value Locked) of the pool "
+  totalValueLockedETH: BigInt!
+  totalValueLockedUSD: BigDecimal!
+
+  " Daily value of staked eth deposited "
+  dailyDepositVolumeETH: BigInt!
+  dailyDepositVolumeUSD: BigDecimal!
+
+  " Cumulative value of staked eth deposited "
+  cumulativeDepositVolumeETH: BigInt!
+  cumulativeDepositVolumeUSD: BigDecimal!
+
+  " Daily value of restaked eth withdrawn "
+  dailyWithdrawalVolumeETH: BigInt!
+  dailyWithdrawalVolumeUSD: BigDecimal!
+
+  " Cumulative value of restaked eth withdrawn "
+  cumulativeWithdrawalVolumeETH: BigInt!
+  cumulativeWithdrawalVolumeUSD: BigDecimal!
+
+  " Daily volume deposited minus daily volume withdrawn "
+  dailyTotalVolumeETH: BigInt!
+  dailyTotalVolumeUSD: BigDecimal!
+
+  " Volume deposited plus volume withdrawn "
+  cumulativeTotalVolumeETH: BigInt!
+  cumulativeTotalVolumeUSD: BigDecimal!
+
+  " Daily volume deposited minus daily volume withdrawn "
+  dailyNetVolumeETH: BigInt!
+  dailyNetVolumeUSD: BigDecimal!
+
+  " Volume deposited minus volume withdrawn "
+  netVolumeETH: BigInt!
+  netVolumeUSD: BigDecimal!
+
+  ##### Usage Data #####
+
+  " Number of daily unique addresses that deposited staked eth "
+  dailyActiveDepositors: Int!
+
+  " Number of cumulative unique addresses that deposited staked eth "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of daily unique addresses that withdrew restaked eth "
+  dailyActiveWithdrawers: Int!
+
+  " Number of cumulative unique addresses that withdrew restaked eth "
+  cumulativeUniqueWithdrawers: Int!
+
+  " Number of daily unique addresses that interacted with the protocol "
+  dailyActiveUsers: Int!
+
+  " Number of cumulative unique addresses that interacted with the pool "
+  cumulativeUniqueUsers: Int!
+
+  " Number of daily deposits "
+  dailyDepositCount: Int!
+
+  " Total number of deposits "
+  cumulativeDepositCount: Int!
+
+  " Number of daily withdrawals "
+  dailyWithdrawalCount: Int!
+
+  " Total number of withdrawals "
+  cumulativeWithdrawalCount: Int!
+
+  " Number of daily transactions "
+  dailyTransactionCount: Int!
+
+  " Total number of transactions "
+  cumulativeTransactionCount: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
+}
+
+##################################
+##### Transaction-Level Data #####
+##################################
+
+interface Event {
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: Protocol!
+
+  " Address that received the tokens "
+  to: Bytes!
+
+  " Address that sent the tokens "
+  from: Bytes!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+type Deposit implements Event @entity(immutable: true) @transaction {
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: Protocol!
+
+  " Address that received the tokens "
+  to: Bytes!
+
+  " Address that sent the tokens "
+  from: Bytes!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+type Withdraw implements Event @entity(immutable: true) @transaction {
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: Protocol!
+
+  " Address that received the tokens "
+  to: Bytes!
+
+  " Address that sent the tokens "
+  from: Bytes!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+###########################
+##### User-Level Data #####
+###########################
+
+type Staker @entity @regularPolling {
+  " Address of the staker "
+  id: Bytes!
+
+  " All pools the staker has restaked in. "
+  pools: [Pool!]! @derivedFrom(field: "account")
+
+  " Amount of restaked tokens in the pools. The ordering should be the same as the pool's id. "
+  restakeAmount: [BigInt!]!
+  restakeValueUSD: [BigDecimal!]!
+
+  " Total value restaked by the staker. "
+  totalValueRestaked: [BigInt!]!
+  totalValueRestakedUSD: [BigDecimal!]!
+
+  " All deposit events for this account. "
+  deposits: [Deposit!]! @derivedFrom(field: "account")
+
+  " All withdraw events for this account. "
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
+}
