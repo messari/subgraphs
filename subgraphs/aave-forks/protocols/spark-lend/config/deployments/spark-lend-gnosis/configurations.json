@@ -1,0 +1,22 @@
+{
+  "network": "gnosis",
+  "factory": {
+    "startBlock": "29817453",
+    "address": "0xA98DaCB3fC964A6A0d2ce3B77294241585EAbA6d"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "29817457",
+    "address": "0x2Fc8823E1b967D474b47Ae0aD041c2ED562ab588"
+  },
+  "lendingPool": {
+    "startBlock": "29817457",
+    "address": "0x2Dae5307c5E3FD1CF5A72Cb6F698f915860607e0"
+  },
+  "RewardsController": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": "29817457"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}
