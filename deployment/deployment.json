@@ -3676,8 +3676,8 @@
             "query-id": "radiant-arbitrum"
           },
           "decentralized-network": {
-            "slug": "radiant-arbitrum",
-            "query-id": "8PUSqUn6dSkoxJb3LDLmdKHzbHFn1cz7XjbSob5uiR4v"
+            "slug": "radiant-capital-arbitrum",
+            "query-id": "5HTkKJNSm72tUGakwj8yroDGHxc6fBhmLaA5oJepZGL3"
           }
         }
       }
@@ -5322,6 +5322,10 @@
           "hosted-service": {
             "slug": "trader-joe-avalanche",
             "query-id": "trader-joe-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "trader-joe-avalanche",
+            "query-id": "H2VGe2tYavUEosSjomHwxbvCKy3LaNaW8Kjw2KhhHs1K"
           }
         }
       }
