@@ -3666,10 +3666,6 @@
           "hosted-service": {
             "slug": "spark-lend-gnosis",
             "query-id": "spark-lend-gnosis"
-          },
-          "decentralized-network": {
-            "slug": "not-deployed",
-            "query-id": "not-deployed"
           }
         }
       }
