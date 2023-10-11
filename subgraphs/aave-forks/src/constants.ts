@@ -25,7 +25,7 @@ export namespace Network {
   export const OPTIMISM = "OPTIMISM";
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
-  export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const GNOSIS = "GNOSIS"; // aka xDAI
 
   export const METIS = "ANDROMEDA";
   export const BASE = "BASE";

@@ -3646,6 +3646,28 @@
             "query-id": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
           }
         }
+      },
+      "spark-lend-gnosis": {
+        "network": "gnosis",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "2.0.5",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spark.lend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spark-lend-gnosis",
+            "query-id": "spark-lend-gnosis"
+          }
+        }
       }
     }
   },
