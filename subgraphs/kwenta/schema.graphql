@@ -2015,7 +2015,7 @@ type _PositionCounter @entity {
 # Smart Margin Account
 type _SmartMarginAccount @entity {
   "Account Unique ID"
-  id: ID!
+  id: Bytes!
 
   "Owner of the Smart Margin Account"
   owner: Account!

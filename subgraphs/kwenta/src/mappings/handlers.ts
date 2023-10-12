@@ -152,7 +152,7 @@ export function handleNewAccountSmartMargin(
 ): void {
   // create a new entity to store the cross-margin account owner
   const smAccountAddress = event.params.account as Address;
-  let smartMarginAccount = _SmartMarginAccount.load(smAccountAddress.toHex());
+  let smartMarginAccount = _SmartMarginAccount.load(smAccountAddress);
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -160,7 +160,7 @@ export function handleNewAccountSmartMargin(
     event
   );
   if (smartMarginAccount == null) {
-    smartMarginAccount = new _SmartMarginAccount(smAccountAddress.toHex());
+    smartMarginAccount = new _SmartMarginAccount(smAccountAddress);
 
     const loadAccountResponse = sdk.Accounts.loadAccount(event.params.creator);
     if (loadAccountResponse.isNewUser) {
@@ -260,7 +260,7 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
   const isClose = event.params.size.isZero();
   const sendingAccount = event.params.account;
 
-  const smartMarginAccount = _SmartMarginAccount.load(sendingAccount.toHex());
+  const smartMarginAccount = _SmartMarginAccount.load(sendingAccount);
 
   const accountAddress = smartMarginAccount
     ? Address.fromBytes(smartMarginAccount.owner)

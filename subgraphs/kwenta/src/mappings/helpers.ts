@@ -57,7 +57,7 @@ export function liquidation(
   sdk: SDK
 ): void {
   const pool = sdk.Pools.loadPool(dataSource.address());
-  const smartMarginAccount = _SmartMarginAccount.load(sendingAccount.toHex());
+  const smartMarginAccount = _SmartMarginAccount.load(sendingAccount);
   const accountAddress = smartMarginAccount
     ? Address.fromBytes(smartMarginAccount.owner)
     : sendingAccount;
