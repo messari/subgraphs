@@ -33,7 +33,7 @@ import { getOrCreateTranche } from "../../../common/initializers";
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
- *  - @dmelotik
+ *  - @melotik
  */
 
 export class PoolManager {
