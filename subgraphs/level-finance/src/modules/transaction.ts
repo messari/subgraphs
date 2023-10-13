@@ -33,21 +33,23 @@ export function transaction(
   const idx = pool.getInputTokens().indexOf(token.id);
   const inputTokenBalances = pool.pool.inputTokenBalances;
   const network = dataSource.network();
+  const poolContract = PoolContract.bind(Address.fromBytes(pool.getBytesID()));
   if (utils.equalsIgnoreCase(network, constants.Network.ARBITRUM_ONE)) {
-    const poolContract = PoolContract.bind(
-      Address.fromBytes(pool.getBytesID())
-    );
     const tokenBalance = utils.readValue(
       poolContract.try_poolBalances(Address.fromBytes(token.id)),
       constants.BIGINT_ZERO
     );
     inputTokenBalances[idx] = tokenBalance;
   } else {
-    if (transactionType === TransactionType.DEPOSIT) {
-      inputTokenBalances[idx] = inputTokenBalances[idx].plus(amount);
-    }
-    if (transactionType === TransactionType.WITHDRAW) {
-      inputTokenBalances[idx] = inputTokenBalances[idx].minus(amount);
+    const poolTokenResult = poolContract.try_poolTokens(
+      Address.fromBytes(token.id)
+    );
+    if (!poolTokenResult.reverted) {
+      let tokenBalance = poolTokenResult.value.getPoolBalance();
+      if (!tokenBalance) {
+        tokenBalance = constants.BIGINT_ZERO;
+      }
+      inputTokenBalances[idx] = tokenBalance;
     }
   }
   const amountsArray = new Array<BigInt>(poolInputTokens.length).fill(
