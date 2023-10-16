@@ -36,7 +36,7 @@ export const DashboardHeader = ({
             Back to Deployments
           </Link>
         </Box>
-        <a href="https://github.com/messari/subgraphs" target="_blank" style={{ color: "white" }} rel="noreferrer">
+        <a href={process.env.REACT_APP_MESSAR_REPO_URL!} target="_blank" style={{ color: "white" }} rel="noreferrer">
           powered by Messari Subgraphs
         </a>
       </BackBanner>

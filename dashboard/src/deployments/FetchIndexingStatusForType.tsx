@@ -9,7 +9,7 @@ interface FetchIndexingStatusForTypeProps {
 }
 
 function FetchIndexingStatusForType({ slugs, setDeployments }: FetchIndexingStatusForTypeProps) {
-  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
+  const clientIndexing = useMemo(() => NewClient(process.env.REACT_APP_GRAPH_BASE_URL! + "/index-node/graphql"), []);
   const [slugsToCheck, setSlugsToCheck] = useState<string[]>([]);
 
   let fullPendingQueryArray = ["query {"];
@@ -54,7 +54,7 @@ function FetchIndexingStatusForType({ slugs, setDeployments }: FetchIndexingStat
       <>
         {slugsToCheck.map((obj: any) => (
           <FetchPendingSubgraphVersion
-            subgraphEndpoint={"https://api.thegraph.com/subgraphs/id/" + obj.id}
+            subgraphEndpoint={process.env.REACT_APP_GRAPH_BASE_URL! + "/subgraphs/id/" + obj.id}
             slug={obj.slug + " (Pending)"}
             setDeployments={setDeployments}
           />

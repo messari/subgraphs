@@ -42,13 +42,13 @@ function ProtocolInfo({
 
   let link = "";
   if (subgraphNameString || nameParam) {
-    link = "https://thegraph.com/hosted-service/subgraph/" + (subgraphNameString || nameParam);
+    link = process.env.REACT_APP_GRAPH_HOSTEDSERVICE_URL! + "/subgraph/" + (subgraphNameString || nameParam);
     if (versionParam === "pending") {
       link += "?version=pending";
     }
-  } else if (subgraphToQueryURL.includes("https://gateway-arbitrum.network.thegraph.com")) {
+  } else if (subgraphToQueryURL.includes(process.env.REACT_APP_GRAPH_DECEN_URL!)) {
     const subId = subgraphToQueryURL.split("id/")[1];
-    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview&chain=arbitrum-one`;
+    link = `${process.env.REACT_APP_GRAPH_EXPLORER_URL!}/subgraph?id=${subId}&view=Overview&chain=arbitrum-one`;
   } else {
     link = subgraphToQueryURL;
   }
@@ -153,9 +153,7 @@ function ProtocolInfo({
             <span>{protocolSchemaData?.name} - </span>
             <Typography variant="body1" component="span">
               {protocolSchemaData?.network}
-              {subgraphToQueryURL.includes("https://gateway-arbitrum.network.thegraph.com")
-                ? " (DECENTRALIZED NETWORK)"
-                : ""}
+              {subgraphToQueryURL.includes(process.env.REACT_APP_GRAPH_DECEN_URL!) ? " (DECENTRALIZED NETWORK)" : ""}
             </Typography>
           </Typography>
         </Link>

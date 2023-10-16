@@ -48,7 +48,8 @@ export const DeploymentOverlayDropDown = ({
         decentralizedDeployments[data.protocols[0].slug].forEach((item: any) => {
           if (item.signalledTokens > 0) {
             protocolObj[item.network + " (DECENTRALIZED)"] =
-              "https://gateway-arbitrum.network.thegraph.com/api/" +
+              process.env.REACT_APP_GRAPH_DECEN_URL! +
+              "/api/" +
               process.env.REACT_APP_GRAPH_API_KEY +
               "/subgraphs/id/" +
               item.subgraphId;
@@ -59,7 +60,7 @@ export const DeploymentOverlayDropDown = ({
         if (Object.keys(pendingSubgraphData).length > 0) {
           Object.keys(pendingSubgraphData).forEach((depoKey) => {
             protocolObj[depoKey + " (PENDING)"] =
-              "https://api.thegraph.com/subgraphs/id/" + pendingSubgraphData[depoKey].subgraph;
+              process.env.REACT_APP_GRAPH_BASE_URL! + "/subgraphs/id/" + pendingSubgraphData[depoKey].subgraph;
           });
         }
       }
