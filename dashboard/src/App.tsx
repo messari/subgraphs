@@ -21,7 +21,7 @@ function App() {
 
   const getGithubRepoIssues = () => {
     try {
-      fetch(process.env.REACT_APP_GITHUB_ISSUES_ENDPOINT! + "?per_page=100&state=open&sort=updated", {
+      fetch(process.env.REACT_APP_GITHUB_ISSUES_URL! + "?per_page=100&state=open&sort=updated", {
         method: "GET",
         headers: {
           Accept: "*/*",
@@ -50,7 +50,7 @@ function App() {
 
   const getDeployments = () => {
     try {
-      fetch(process.env.REACT_APP_MESSARI_STATUS_ENDPOINT!, {
+      fetch(process.env.REACT_APP_MESSARI_STATUS_URL!, {
         method: "GET",
         headers: {
           Accept: "application/json",

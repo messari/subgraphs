@@ -33,7 +33,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
   const fetchDefiLlamaProtocols = () => {
     try {
       setDefiLlamaProtocolsLoading(true);
-      fetch(process.env.REACT_APP_DEFILLAMA_BASE_ENDPOINT! + "/protocols", {
+      fetch(process.env.REACT_APP_DEFILLAMA_BASE_URL! + "/protocols", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

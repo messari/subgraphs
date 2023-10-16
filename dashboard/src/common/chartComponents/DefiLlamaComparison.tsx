@@ -107,7 +107,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   const fetchDefiLlamaProtocols = () => {
     try {
       setDefiLlamaRequestLoading(true);
-      fetch(process.env.REACT_APP_DEFILLAMA_BASE_ENDPOINT! + "/protocols", {
+      fetch(process.env.REACT_APP_DEFILLAMA_BASE_URL! + "/protocols", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -135,9 +135,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   const defiLlama = () => {
     try {
       fetch(
-        process.env.REACT_APP_DEFILLAMA_BASE_ENDPOINT! +
-          "/protocol/" +
-          defiLlamaSlug?.split(" (")[0].split(" ").join("-"),
+        process.env.REACT_APP_DEFILLAMA_BASE_URL! + "/protocol/" + defiLlamaSlug?.split(" (")[0].split(" ").join("-"),
         {
           method: "GET",
         },
