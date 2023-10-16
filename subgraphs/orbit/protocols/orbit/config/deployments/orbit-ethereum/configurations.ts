@@ -16,6 +16,6 @@ export class OrbitMainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x1Bf68A9d1EaEe7826b3593C20a0ca93293cb489a";
+    return "0x1bf68a9d1eaee7826b3593c20a0ca93293cb489a";
   }
 }

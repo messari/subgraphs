@@ -16,6 +16,6 @@ export class OrbitCeloConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x979cD0826C2bf62703Ef62221a4feA1f23da3777";
+    return "0x979cd0826c2bf62703ef62221a4fea1f23da3777";
   }
 }

@@ -16,6 +16,6 @@ export class OrbitMaticConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x506DC4c6408813948470a06ef6e4a1DaF228dbd5";
+    return "0x506dc4c6408813948470a06ef6e4a1daf228dbd5";
   }
 }

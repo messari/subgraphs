@@ -2,11 +2,9 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  ByteArray,
   Bytes,
   dataSource,
   log,
-  crypto,
   ethereum,
 } from "@graphprotocol/graph-ts";
 
@@ -26,7 +24,7 @@ import { SDK } from "../sdk/protocols/bridge";
 import { CustomEventType } from "../sdk/util/events";
 import { Pool } from "../sdk/protocols/bridge/pool";
 import { Versions } from "../versions";
-import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
+import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import { _ERC20 } from "../../generated/Vault/_ERC20";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
@@ -38,7 +36,7 @@ import {
 } from "../../generated/Vault/Vault";
 import { Swap, SwapRequest} from "../../generated/Minter/Minter";
 
-const taxReceiver = "0xE9f3604B85c9672728eEecf689cf1F0cF7Dd03F2";
+const taxReceiver = "0xe9f3604b85c9672728eeecf689cf1f0cf7dd03f2";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {

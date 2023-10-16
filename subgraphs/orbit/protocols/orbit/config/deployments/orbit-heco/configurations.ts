@@ -16,6 +16,6 @@ export class OrbitHecoConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F";
+    return "0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f";
   }
 }

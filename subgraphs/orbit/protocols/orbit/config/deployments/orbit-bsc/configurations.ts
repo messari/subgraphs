@@ -16,6 +16,6 @@ export class OrbitBscConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x89c527764f03BCb7dC469707B23b79C1D7Beb780";
+    return "0x89c527764f03bcb7dc469707b23b79c1d7beb780";
   }
 }
