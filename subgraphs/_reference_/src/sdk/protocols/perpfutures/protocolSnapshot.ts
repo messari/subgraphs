@@ -23,7 +23,7 @@ import {
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
- *  - @dmelotik
+ *  - @melotik
  */
 
 export class ProtocolSnapshot {

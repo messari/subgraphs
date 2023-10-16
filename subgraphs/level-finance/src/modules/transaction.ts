@@ -4,7 +4,8 @@ import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { getOrCreateAccount } from "../common/initializers";
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, dataSource } from "@graphprotocol/graph-ts";
+import { Pool as PoolContract } from "../../generated/Pool/Pool";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
 export function transaction(
@@ -31,11 +32,25 @@ export function transaction(
   const poolInputTokens = pool.getInputTokens();
   const idx = pool.getInputTokens().indexOf(token.id);
   const inputTokenBalances = pool.pool.inputTokenBalances;
-  if (transactionType === TransactionType.DEPOSIT) {
-    inputTokenBalances[idx] = inputTokenBalances[idx].plus(amount);
-  }
-  if (transactionType === TransactionType.WITHDRAW) {
-    inputTokenBalances[idx] = inputTokenBalances[idx].minus(amount);
+  const network = dataSource.network();
+  const poolContract = PoolContract.bind(Address.fromBytes(pool.getBytesID()));
+  if (utils.equalsIgnoreCase(network, constants.Network.ARBITRUM_ONE)) {
+    const tokenBalance = utils.readValue(
+      poolContract.try_poolBalances(Address.fromBytes(token.id)),
+      constants.BIGINT_ZERO
+    );
+    inputTokenBalances[idx] = tokenBalance;
+  } else {
+    const poolTokenResult = poolContract.try_poolTokens(
+      Address.fromBytes(token.id)
+    );
+    if (!poolTokenResult.reverted) {
+      let tokenBalance = poolTokenResult.value.getPoolBalance();
+      if (!tokenBalance) {
+        tokenBalance = constants.BIGINT_ZERO;
+      }
+      inputTokenBalances[idx] = tokenBalance;
+    }
   }
   const amountsArray = new Array<BigInt>(poolInputTokens.length).fill(
     constants.BIGINT_ZERO
