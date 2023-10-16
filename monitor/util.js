@@ -1,6 +1,6 @@
 import { errorNotification } from "./messageDiscord.js";
 
-export const monitorVersion = "v1.4.1";
+export const monitorVersion = "v1.5.0";
 
 export const sleep = (m) => new Promise((r) => setTimeout(r, m));
 
