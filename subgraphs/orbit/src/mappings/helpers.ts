@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";

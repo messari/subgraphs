@@ -3,15 +3,8 @@ import {
   BigInt,
   TypedMap,
   log,
-  dataSource,
   Address,
-  Bytes,
 } from "@graphprotocol/graph-ts";
-import { Token } from "../../../generated/schema";
-import {
-  chainIDToNetwork,
-  networkToChainID,
-} from "../protocols/bridge/chainIds";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -262,59 +255,59 @@ export function getNetworkSpecificConstant(
     const toChainMapping = new TypedMap<string, Address>()
     toChainMapping.set(
       "KLAYTN",
-      Address.fromString("0x60070F5D2e1C1001400A04F152E7ABD43410F7B9")
+      Address.fromString("0x60070f5d2e1c1001400a04f152e7abd43410f7b9")
     );
     toChainMapping.set(
       "AVAX",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "BSC",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "CELO",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "FANTOM",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "HARMONY",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "HECO",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "MATIC",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "MOONRIVER",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "XDAI",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "TON",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "WEMIX",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "ICON",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x6bd8e3beec87176ba9c705c9507aa5e6f0e6706f")
     );
     toChainMapping.set(
       "ORBIT",
-      Address.fromString("0x1b57Ce997Ca6a009ce54bB2d37DEbEBadFDbBb06")
+      Address.fromString("0x1b57ce997ca6a009ce54bb2d37debebadfdbbb06")
     );
     return new NetworkSpecificConstant(
       network,
@@ -326,23 +319,23 @@ export function getNetworkSpecificConstant(
     const toChainMapping = new TypedMap<string, Address>()
     toChainMapping.set(
       "KLAYTN",
-      Address.fromString("0xB0a83941058b109Bd0543fa26d22eFb8a2D0f431")
+      Address.fromString("0xb0a83941058b109bd0543fa26d22efb8a2d0f431")
     );
     toChainMapping.set(
       "HECO",
-      Address.fromString("0xf2C5a817cc8FFaAB4122f2cE27AB8486DFeAb09F")
+      Address.fromString("0xf2c5a817cc8ffaab4122f2ce27ab8486dfeab09f")
     );
     toChainMapping.set(
       "MATIC",
-      Address.fromString("0x89c527764f03BCb7dC469707B23b79C1D7Beb780")
+      Address.fromString("0x89c527764f03bcb7dc469707b23b79c1d7beb780")
     );
     toChainMapping.set(
       "ORBIT",
-      Address.fromString("0xd4EC00c84f01361F36D907E061EA652eE50572AF")
+      Address.fromString("0xd4ec00c84f01361f36d907e061ea652ee50572af")
     );
     return new NetworkSpecificConstant(
       network,
-      Address.fromString("0x89c527764f03BCb7dC469707B23b79C1D7Beb780"),
+      Address.fromString("0x89c527764f03bcb7dc469707b23b79c1d7beb780"),
       toChainMapping
     )
   }
@@ -350,15 +343,15 @@ export function getNetworkSpecificConstant(
     const toChainMapping = new TypedMap<string, Address>()
     toChainMapping.set(
       "KLAYTN",
-      Address.fromString("0x979cD0826C2bf62703Ef62221a4feA1f23da3777")
+      Address.fromString("0x979cd0826c2bf62703ef62221a4fea1f23da3777")
     );
     toChainMapping.set(
       "ORBIT",
-      Address.fromString("0x979cD0826C2bf62703Ef62221a4feA1f23da3777")
+      Address.fromString("0x979cd0826c2bf62703ef62221a4fea1f23da3777")
     );
     return new NetworkSpecificConstant(
       network,
-      Address.fromString("0x979cD0826C2bf62703Ef62221a4feA1f23da3777"),
+      Address.fromString("0x979cd0826c2bf62703ef62221a4fea1f23da3777"),
       toChainMapping
     )
   }
@@ -366,51 +359,51 @@ export function getNetworkSpecificConstant(
     const toChainMapping = new TypedMap<string, Address>()
     toChainMapping.set(
       "KLAYTN",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "AVAX",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "BSC",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "CELO",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "FANTOM",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "HARMONY",
-      Address.fromString("0x7112999b437404B430acf80667E94D8E62b9e44E")
+      Address.fromString("0x7112999b437404b430acf80667e94d8e62b9e44e")
     );
     toChainMapping.set(
       "MATIC",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "MOONRIVER",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "OEC",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "XDAI",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     toChainMapping.set(
       "ORBIT",
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
     );
     return new NetworkSpecificConstant(
       network,
-      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F"),
+      Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f"),
       toChainMapping
     );
   }
@@ -430,7 +423,7 @@ export function getNetworkSpecificConstant(
     );
     toChainMapping.set(
       "ETH",
-      Address.fromString("0x012c6d79b189e1aBD1EFaC759b275c5D49Abd164")
+      Address.fromString("0x012c6d79b189e1abd1efac759b275c5d49abd164")
     );
     toChainMapping.set(
       "FANTOM",
@@ -474,55 +467,55 @@ export function getNetworkSpecificConstant(
     const toChainMapping = new TypedMap<string, Address>()
     toChainMapping.set(
       "AVAX",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "BSC",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "CELO",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "ETH",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "FANTOM",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "HARMONY",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "HECO",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "KLAYTN",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "MOONRIVER",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "OEC",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "XDAI",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     toChainMapping.set(
       "ORBIT",
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")
     );
     return new NetworkSpecificConstant(
       network,
-      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5"),
+      Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5"),
       toChainMapping
     );
   }
