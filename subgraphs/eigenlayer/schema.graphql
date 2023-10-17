@@ -95,23 +95,18 @@ type Protocol @entity @regularPolling {
   ##### Quantitative Data #####
 
   " Current TVL (Total Value Locked) of the entire protocol "
-  totalValueLockedETH: BigInt!
   totalValueLockedUSD: BigDecimal!
 
   " Cumulative value of staked eth deposited "
-  cumulativeDepositVolumeETH: BigInt!
   cumulativeDepositVolumeUSD: BigDecimal!
 
   " Cumulative value of restaked eth withdrawn "
-  cumulativeWithdrawalVolumeETH: BigInt!
   cumulativeWithdrawalVolumeUSD: BigDecimal!
 
   " Volume deposited plus volume withdrawn "
-  cumulativeTotalVolumeETH: BigInt!
   cumulativeTotalVolumeUSD: BigDecimal!
 
   " Volume deposited minus volume withdrawn "
-  netVolumeETH: BigInt!
   netVolumeUSD: BigDecimal!
 
   ##### Usage Data #####
@@ -121,9 +116,6 @@ type Protocol @entity @regularPolling {
 
   " Number of cumulative unique addresses that withdrew restaked eth "
   cumulativeUniqueWithdrawers: Int!
-
-  " Number of cumulative unique addresses that interacted with the protocol "
-  cumulativeUniqueUsers: Int!
 
   " Total number of deposits "
   cumulativeDepositCount: Int!
@@ -186,12 +178,6 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " Number of cumulative unique addresses that withdrew restaked eth "
   cumulativeUniqueWithdrawers: Int!
 
-  " Number of daily unique addresses that interacted with the protocol "
-  dailyActiveUsers: Int!
-
-  " Number of cumulative unique addresses that interacted with the protocol "
-  cumulativeUniqueUsers: Int!
-
   " Number of daily deposits "
   dailyDepositCount: Int!
 
@@ -228,39 +214,30 @@ type FinancialsDailySnapshot @entity @dailySnapshot {
   protocol: Protocol!
 
   " Current TVL (Total Value Locked) of the entire protocol "
-  totalValueLockedETH: BigInt!
   totalValueLockedUSD: BigDecimal!
 
   " Daily value of staked eth deposited "
-  dailyDepositVolumeETH: BigInt!
   dailyDepositVolumeUSD: BigDecimal!
 
   " Cumulative value of staked eth deposited "
-  cumulativeDepositVolumeETH: BigInt!
   cumulativeDepositVolumeUSD: BigDecimal!
 
   " Daily value of restaked eth withdrawn "
-  dailyWithdrawalVolumeETH: BigInt!
   dailyWithdrawalVolumeUSD: BigDecimal!
 
   " Cumulative value of restaked eth withdrawn "
-  cumulativeWithdrawalVolumeETH: BigInt!
   cumulativeWithdrawalVolumeUSD: BigDecimal!
 
   " Daily volume deposited minus daily volume withdrawn "
-  dailyTotalVolumeETH: BigInt!
   dailyTotalVolumeUSD: BigDecimal!
 
   " Volume deposited plus volume withdrawn "
-  cumulativeTotalVolumeETH: BigInt!
   cumulativeTotalVolumeUSD: BigDecimal!
 
   " Daily volume deposited minus daily volume withdrawn "
-  dailyNetVolumeETH: BigInt!
   dailyNetVolumeUSD: BigDecimal!
 
   " Volume deposited minus volume withdrawn "
-  netVolumeETH: BigInt!
   netVolumeUSD: BigDecimal!
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
@@ -293,6 +270,9 @@ type Pool @entity @regularPolling {
   " Token that can be deposited to and withdrawn from this pool "
   inputToken: Token!
 
+  " Is the pool active "
+  active: Boolean!
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -302,23 +282,23 @@ type Pool @entity @regularPolling {
   ##### Quantitative Data #####
 
   " Current TVL (Total Value Locked) of the pool "
-  totalValueLockedETH: BigInt!
+  totalValueLocked: BigInt!
   totalValueLockedUSD: BigDecimal!
 
   " Cumulative value of staked eth deposited "
-  cumulativeDepositVolumeETH: BigInt!
+  cumulativeDepositVolume: BigInt!
   cumulativeDepositVolumeUSD: BigDecimal!
 
   " Cumulative value of restaked eth withdrawn "
-  cumulativeWithdrawalVolumeETH: BigInt!
+  cumulativeWithdrawalVolume: BigInt!
   cumulativeWithdrawalVolumeUSD: BigDecimal!
 
   " Volume deposited plus volume withdrawn "
-  cumulativeTotalVolumeETH: BigInt!
+  cumulativeTotalVolume: BigInt!
   cumulativeTotalVolumeUSD: BigDecimal!
 
   " Volume deposited minus volume withdrawn "
-  netVolumeETH: BigInt!
+  netVolume: BigInt!
   netVolumeUSD: BigDecimal!
 
   ##### Usage Data #####
@@ -329,9 +309,6 @@ type Pool @entity @regularPolling {
   " Number of cumulative unique addresses that withdrew restaked eth "
   cumulativeUniqueWithdrawers: Int!
 
-  " Number of cumulative unique addresses that interacted with the pool "
-  cumulativeUniqueUsers: Int!
-
   " Total number of deposits "
   cumulativeDepositCount: Int!
 
@@ -341,13 +318,10 @@ type Pool @entity @regularPolling {
   " Total number of transactions "
   cumulativeTransactionCount: Int!
 
-  ##### Stakers #####
+  ##### Users #####
 
-  " Total number of stakers "
-  totalStakerCount: Int!
-
-  " All stakers that have restaked in this pool "
-  stakers: [Staker!]! @derivedFrom(field: "pool")
+  " All depositors that have restaked in this pool "
+  depositors: [Account!]! @derivedFrom(field: "pools")
 
   ##### Snapshots #####
 
@@ -355,7 +329,7 @@ type Pool @entity @regularPolling {
   dailySnapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
 
   " Helper field for taking daily snapshots "
-  _lastDailySnapshotTimestamp: BigInt
+  _lastDailySnapshotTimestamp: BigInt!
 }
 
 ###############################
@@ -376,60 +350,48 @@ type PoolDailySnapshot @entity @regularPolling {
   protocol: Protocol!
 
   " Current TVL (Total Value Locked) of the pool "
-  totalValueLockedETH: BigInt!
+  totalValueLocked: BigInt!
   totalValueLockedUSD: BigDecimal!
 
   " Daily value of staked eth deposited "
-  dailyDepositVolumeETH: BigInt!
+  dailyDepositVolume: BigInt!
   dailyDepositVolumeUSD: BigDecimal!
 
   " Cumulative value of staked eth deposited "
-  cumulativeDepositVolumeETH: BigInt!
+  cumulativeDepositVolume: BigInt!
   cumulativeDepositVolumeUSD: BigDecimal!
 
   " Daily value of restaked eth withdrawn "
-  dailyWithdrawalVolumeETH: BigInt!
+  dailyWithdrawalVolume: BigInt!
   dailyWithdrawalVolumeUSD: BigDecimal!
 
   " Cumulative value of restaked eth withdrawn "
-  cumulativeWithdrawalVolumeETH: BigInt!
+  cumulativeWithdrawalVolume: BigInt!
   cumulativeWithdrawalVolumeUSD: BigDecimal!
 
   " Daily volume deposited minus daily volume withdrawn "
-  dailyTotalVolumeETH: BigInt!
+  dailyTotalVolume: BigInt!
   dailyTotalVolumeUSD: BigDecimal!
 
   " Volume deposited plus volume withdrawn "
-  cumulativeTotalVolumeETH: BigInt!
+  cumulativeTotalVolume: BigInt!
   cumulativeTotalVolumeUSD: BigDecimal!
 
   " Daily volume deposited minus daily volume withdrawn "
-  dailyNetVolumeETH: BigInt!
+  dailyNetVolume: BigInt!
   dailyNetVolumeUSD: BigDecimal!
 
   " Volume deposited minus volume withdrawn "
-  netVolumeETH: BigInt!
+  netVolume: BigInt!
   netVolumeUSD: BigDecimal!
 
   ##### Usage Data #####
 
-  " Number of daily unique addresses that deposited staked eth "
-  dailyActiveDepositors: Int!
-
   " Number of cumulative unique addresses that deposited staked eth "
   cumulativeUniqueDepositors: Int!
 
-  " Number of daily unique addresses that withdrew restaked eth "
-  dailyActiveWithdrawers: Int!
-
   " Number of cumulative unique addresses that withdrew restaked eth "
   cumulativeUniqueWithdrawers: Int!
-
-  " Number of daily unique addresses that interacted with the protocol "
-  dailyActiveUsers: Int!
-
-  " Number of cumulative unique addresses that interacted with the pool "
-  cumulativeUniqueUsers: Int!
 
   " Number of daily deposits "
   dailyDepositCount: Int!
@@ -505,6 +467,24 @@ type Deposit implements Event @entity(immutable: true) @transaction {
   " Address that sent the tokens "
   from: Bytes!
 
+  " Address of depositor "
+  depositor: Bytes!
+
+  " Pool that been deposited to "
+  pool: Pool!
+
+  " Pool token "
+  token: Token!
+
+  " Shares of pool granted to depositor "
+  shares: BigInt!
+
+  " Amount of tokens withdrawn "
+  amount: BigInt!
+
+  " Amount withdrawn in USD "
+  amountUSD: BigDecimal!
+
   " Block number of this event "
   blockNumber: BigInt!
 
@@ -512,7 +492,7 @@ type Deposit implements Event @entity(immutable: true) @transaction {
   timestamp: BigInt!
 }
 
-type Withdraw implements Event @entity(immutable: true) @transaction {
+type Withdraw implements Event @entity @transaction {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -531,6 +511,39 @@ type Withdraw implements Event @entity(immutable: true) @transaction {
   " Address that sent the tokens "
   from: Bytes!
 
+  " Address of depositor "
+  depositor: Bytes!
+
+  " Address set by depositor to receive withdrawn funds "
+  withdrawer: Bytes!
+
+  " Address the depositor was delegated to at the time of creating the queued withdrawal "
+  delegatedTo: Bytes!
+
+  " Hash of the input data for the withdrawal "
+  withdrawalRoot: Bytes!
+
+  " Withdrawal's unique identifier "
+  nonce: BigInt!
+
+  " Pool that been withdrawn from "
+  pool: Pool!
+
+  " Pool token "
+  token: Token!
+
+  " Shares of pool queued for withdrawal "
+  shares: BigInt!
+
+  " Amount of tokens withdrawn "
+  amount: BigInt!
+
+  " Amount withdrawn in USD "
+  amountUSD: BigDecimal!
+
+  " Is the queued withdrawal completed "
+  completed: Boolean!
+
   " Block number of this event "
   blockNumber: BigInt!
 
@@ -542,24 +555,39 @@ type Withdraw implements Event @entity(immutable: true) @transaction {
 ##### User-Level Data #####
 ###########################
 
-type Staker @entity @regularPolling {
-  " Address of the staker "
+type Account @entity @regularPolling {
+  " Address of this account "
   id: Bytes!
 
-  " All pools the staker has restaked in. "
-  pools: [Pool!]! @derivedFrom(field: "account")
+  " All pools this account has restaked in. "
+  pools: [Pool!]!
 
-  " Amount of restaked tokens in the pools. The ordering should be the same as the pool's id. "
-  restakeAmount: [BigInt!]!
-  restakeValueUSD: [BigDecimal!]!
+  " Value restaked by this account in each pool. The ordering should be the same as the pool's id. "
+  poolBalance: [BigInt!]!
+  poolBalanceUSD: [BigDecimal!]!
 
-  " Total value restaked by the staker. "
-  totalValueRestaked: [BigInt!]!
-  totalValueRestakedUSD: [BigDecimal!]!
+  " Total value restaked by this account. "
+  totalValueLockedUSD: BigDecimal!
 
   " All deposit events for this account. "
-  deposits: [Deposit!]! @derivedFrom(field: "account")
+  deposits: [Deposit!]!
 
   " All withdraw events for this account. "
-  withdraws: [Withdraw!]! @derivedFrom(field: "account")
+  withdrawsQueued: [Withdraw!]!
+  withdrawsCompleted: [Withdraw!]!
+
+  " Helper field to calculate pool.cumulativeUniqueWithdrawers. "
+  _hasWithdrawnFromPool: [Boolean!]!
+}
+
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity @regularPolling {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: Bytes!
+
+  " All deposit events for this account. "
+  deposits: [Deposit!]!
+
+  " All withdraw events for this account. "
+  withdraws: [Withdraw!]!
 }
