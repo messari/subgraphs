@@ -18,6 +18,6 @@ export class EigenLayerEthereumConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0x369e6F597e22EaB55fFb173C6d9cD234BD699111");
+    return Address.fromString("0x369e6f597e22eab55ffb173c6d9cd234bd699111");
   }
 }
