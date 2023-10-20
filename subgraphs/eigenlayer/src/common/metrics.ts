@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  Bytes,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import {
   getOrCreateAccount,
@@ -12,14 +6,13 @@ import {
   getOrCreateToken,
   getPool,
 } from "./getters";
-import { getUsdPrice } from "../prices";
 import {
   accountArraySort,
   addToArrayAtIndex,
   bigIntToBigDecimal,
   updateArrayAtIndex,
 } from "./utils";
-import { BIGDECIMAL_MINUS_ONE, BIGINT_MINUS_ONE, INT_ONE } from "./constants";
+import { BIGINT_MINUS_ONE, INT_ONE } from "./constants";
 
 export function updatePoolIsActive(
   poolAddress: Address,
@@ -32,23 +25,29 @@ export function updatePoolIsActive(
 
 export function updateTVL(
   poolAddress: Address,
+  tokenAddress: Address,
   isDeposit: boolean,
   amount: BigInt,
-  amountUSD: BigDecimal
+  event: ethereum.Event
 ): void {
   const protocol = getOrCreateProtocol();
   const pool = getPool(poolAddress);
+  const token = getOrCreateToken(tokenAddress, event);
 
   if (isDeposit) {
-    pool.totalValueLocked = pool.totalValueLocked.plus(amount);
-    pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(amountUSD);
-    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(amountUSD);
+    pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
   } else {
-    pool.totalValueLocked = pool.totalValueLocked.minus(amount);
-    pool.totalValueLockedUSD = pool.totalValueLockedUSD.minus(amountUSD);
-    protocol.totalValueLockedUSD =
-      protocol.totalValueLockedUSD.minus(amountUSD);
+    pool.inputTokenBalances = [pool.inputTokenBalances[0].minus(amount)];
   }
+  pool.inputTokenBalancesUSD = [
+    bigIntToBigDecimal(pool.inputTokenBalances[0]).times(token.lastPriceUSD!),
+  ];
+
+  const oldPoolTVL = pool.totalValueLockedUSD;
+  pool.totalValueLockedUSD = pool.inputTokenBalancesUSD[0];
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    pool.totalValueLockedUSD.minus(oldPoolTVL)
+  );
 
   pool.save();
   protocol.save();
@@ -56,45 +55,61 @@ export function updateTVL(
 
 export function updateVolume(
   poolAddress: Address,
+  tokenAddress: Address,
   isDeposit: boolean,
   amount: BigInt,
-  amountUSD: BigDecimal
+  event: ethereum.Event
 ): void {
   const protocol = getOrCreateProtocol();
   const pool = getPool(poolAddress);
+  const token = getOrCreateToken(tokenAddress, event);
 
   if (isDeposit) {
-    pool.cumulativeDepositVolume = pool.cumulativeDepositVolume.plus(amount);
-    pool.cumulativeDepositVolumeUSD =
-      pool.cumulativeDepositVolumeUSD.plus(amountUSD);
+    pool.cumulativeDepositVolumeAmount =
+      pool.cumulativeDepositVolumeAmount.plus(amount);
+
+    const oldPoolCumulativeDepositVolumeUSD = pool.cumulativeDepositVolumeUSD;
+    pool.cumulativeDepositVolumeUSD = bigIntToBigDecimal(
+      pool.cumulativeDepositVolumeAmount
+    ).times(token.lastPriceUSD!);
     protocol.cumulativeDepositVolumeUSD =
-      protocol.cumulativeDepositVolumeUSD.plus(amountUSD);
+      protocol.cumulativeDepositVolumeUSD.plus(
+        pool.cumulativeDepositVolumeUSD.minus(oldPoolCumulativeDepositVolumeUSD)
+      );
   } else {
-    pool.cumulativeWithdrawalVolume =
-      pool.cumulativeWithdrawalVolume.plus(amount);
-    pool.cumulativeWithdrawalVolumeUSD =
-      pool.cumulativeWithdrawalVolumeUSD.plus(amountUSD);
+    pool.cumulativeWithdrawalVolumeAmount =
+      pool.cumulativeWithdrawalVolumeAmount.plus(amount);
+
+    const oldPoolCumulativeWithdrawalVolumeUSD =
+      pool.cumulativeWithdrawalVolumeUSD;
+    pool.cumulativeWithdrawalVolumeUSD = bigIntToBigDecimal(
+      pool.cumulativeWithdrawalVolumeAmount
+    ).times(token.lastPriceUSD!);
     protocol.cumulativeWithdrawalVolumeUSD =
-      protocol.cumulativeWithdrawalVolumeUSD.plus(amountUSD);
+      protocol.cumulativeWithdrawalVolumeUSD.plus(
+        pool.cumulativeWithdrawalVolumeUSD.minus(
+          oldPoolCumulativeWithdrawalVolumeUSD
+        )
+      );
   }
-  pool.cumulativeTotalVolume = pool.cumulativeDepositVolume.plus(
-    pool.cumulativeWithdrawalVolume
+  pool.cumulativeTotalVolumeAmount = pool.cumulativeDepositVolumeAmount.plus(
+    pool.cumulativeWithdrawalVolumeAmount
   );
   pool.cumulativeTotalVolumeUSD = pool.cumulativeDepositVolumeUSD.plus(
     pool.cumulativeWithdrawalVolumeUSD
   );
   protocol.cumulativeTotalVolumeUSD = protocol.cumulativeDepositVolumeUSD.plus(
-    pool.cumulativeWithdrawalVolumeUSD
+    protocol.cumulativeWithdrawalVolumeUSD
   );
 
-  pool.netVolume = pool.cumulativeDepositVolume.minus(
-    pool.cumulativeWithdrawalVolume
+  pool.netVolumeAmount = pool.cumulativeDepositVolumeAmount.minus(
+    pool.cumulativeWithdrawalVolumeAmount
   );
   pool.netVolumeUSD = pool.cumulativeDepositVolumeUSD.minus(
     pool.cumulativeWithdrawalVolumeUSD
   );
   protocol.netVolumeUSD = protocol.cumulativeDepositVolumeUSD.minus(
-    pool.cumulativeWithdrawalVolumeUSD
+    protocol.cumulativeWithdrawalVolumeUSD
   );
 
   pool.save();
@@ -103,15 +118,25 @@ export function updateVolume(
 
 export function updateUsage(
   poolAddress: Address,
+  tokenAddress: Address,
   accountAddress: Address,
   isDeposit: boolean,
   amount: BigInt,
-  amountUSD: BigDecimal,
-  eventID: Bytes
+  eventID: Bytes,
+  event: ethereum.Event
 ): void {
   const protocol = getOrCreateProtocol();
   const pool = getPool(poolAddress);
   const account = getOrCreateAccount(accountAddress);
+  const token = getOrCreateToken(tokenAddress, event);
+
+  if (
+    !account.deposits.length &&
+    !account.withdrawsQueued.length &&
+    !account.withdrawsCompleted.length
+  ) {
+    protocol.cumulativeUniqueUsers += INT_ONE;
+  }
 
   if (isDeposit) {
     if (!account.deposits.length) {
@@ -123,14 +148,9 @@ export function updateUsage(
     protocol.cumulativeDepositCount += INT_ONE;
   } else {
     amount = amount.times(BIGINT_MINUS_ONE);
-    amountUSD = amountUSD.times(BIGDECIMAL_MINUS_ONE);
 
     if (!account.withdrawsQueued.length && !account.withdrawsCompleted.length) {
       protocol.cumulativeUniqueWithdrawers += INT_ONE;
-      account.withdrawsQueued = addToArrayAtIndex(
-        account.withdrawsQueued,
-        eventID
-      );
     }
 
     pool.cumulativeWithdrawalCount += INT_ONE;
@@ -143,20 +163,28 @@ export function updateUsage(
     pool.cumulativeUniqueDepositors += INT_ONE;
 
     let pools = account.pools;
-    let poolBalance = account.poolBalance;
-    let poolBalanceUSD = account.poolBalanceUSD;
+    let poolBalances = account.poolBalances;
+    let poolBalancesUSD = account.poolBalancesUSD;
     let _hasWithdrawnFromPool = account._hasWithdrawnFromPool;
 
     pools = addToArrayAtIndex(pools, pool.id);
-    poolBalance = addToArrayAtIndex(poolBalance, amount);
-    poolBalanceUSD = addToArrayAtIndex(poolBalanceUSD, amountUSD);
+    poolBalances = addToArrayAtIndex(poolBalances, amount);
+    poolBalancesUSD = addToArrayAtIndex(
+      poolBalancesUSD,
+      bigIntToBigDecimal(amount).times(token.lastPriceUSD!)
+    );
     _hasWithdrawnFromPool = addToArrayAtIndex(_hasWithdrawnFromPool, false);
 
-    accountArraySort(pools, poolBalance, poolBalanceUSD, _hasWithdrawnFromPool);
+    accountArraySort(
+      pools,
+      poolBalances,
+      poolBalancesUSD,
+      _hasWithdrawnFromPool
+    );
 
     account.pools = pools;
-    account.poolBalance = poolBalance;
-    account.poolBalanceUSD = poolBalanceUSD;
+    account.poolBalances = poolBalances;
+    account.poolBalancesUSD = poolBalancesUSD;
     account._hasWithdrawnFromPool = _hasWithdrawnFromPool;
   } else {
     const index = account.pools.indexOf(pool.id);
@@ -172,21 +200,22 @@ export function updateUsage(
       );
     }
 
-    const newPoolBalance = account.poolBalance[index].plus(amount);
-    const newPoolBalanceUSD = account.poolBalanceUSD[index].plus(amountUSD);
+    const newPoolBalances = account.poolBalances[index].plus(amount);
+    const newPoolBalancesUSD = account.poolBalancesUSD[index].plus(
+      bigIntToBigDecimal(newPoolBalances).times(token.lastPriceUSD!)
+    );
 
-    account.poolBalance = updateArrayAtIndex(
-      account.poolBalance,
-      newPoolBalance,
+    account.poolBalances = updateArrayAtIndex(
+      account.poolBalances,
+      newPoolBalances,
       index
     );
-    account.poolBalanceUSD = updateArrayAtIndex(
-      account.poolBalanceUSD,
-      newPoolBalanceUSD,
+    account.poolBalancesUSD = updateArrayAtIndex(
+      account.poolBalancesUSD,
+      newPoolBalancesUSD,
       index
     );
   }
-  account.totalValueLockedUSD = account.totalValueLockedUSD.plus(amountUSD);
 
   account.save();
   pool.save();

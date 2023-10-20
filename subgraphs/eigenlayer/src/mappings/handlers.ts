@@ -1,6 +1,7 @@
 import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
+  ETH_ADDRESS,
   INT_FOUR,
   INT_THREE,
   INT_TWO,
@@ -22,6 +23,19 @@ import {
   updateUsage,
   updateVolume,
 } from "../common/metrics";
+import {
+  createDeposit,
+  createWithdraw,
+  getWithdraw,
+  updateWithdraw,
+} from "../common/events";
+import {
+  updateFinancialsDailySnapshot,
+  updatePoolDailySnapshot,
+  updatePoolHourlySnapshot,
+  updateUsageMetricsDailySnapshot,
+  updateUsageMetricsHourlySnapshot,
+} from "../common/snapshots";
 
 import { PodDeployed } from "../../generated/EigenPodManager/EigenPodManager";
 import { EigenPod } from "../../generated/EigenPodManager/EigenPod";
@@ -33,48 +47,45 @@ import {
   WithdrawalCompleted,
 } from "../../generated/StrategyManager/StrategyManager";
 import { Strategy } from "../../generated/StrategyManager/Strategy";
-import {
-  completeWithdraw,
-  createDeposit,
-  createWithdraw,
-} from "../common/events";
-import {
-  updateFinancialsDailySnapshot,
-  updatePoolDailySnapshot,
-  updateUsageMetricsDailySnapshot,
-} from "../common/snapshots";
-import { getUsdPrice } from "../prices";
-import { bigIntToBigDecimal } from "../common/utils";
 
 /////////////////////////////////////////
 /////////// Native Restaking ////////////
 /////////////////////////////////////////
 
 export function handlePodDeployed(event: PodDeployed): void {
-  // let hasRestaked = false;
-  // const eigenPod = EigenPod.bind(event.params.eigenPod);
-  // const hasRestaked = eigenPod.hasRestaked();
-  // const restakedGwei = eigenPod.restakedExecutionLayerGwei();
-  // const hasRestakedCall = eigenPod.try_hasRestaked();
-  // if (!hasRestakedCall.reverted) {
-  // hasRestaked = hasRestakedCall.value;
-  // } else {
-  //   log.warning(
-  //     "[handlePodDeployed] eigenPod.try_hasRestaked reverted for podAddress: {}",
-  //     [event.params.eigenPod.toHexString()]
-  //   );
-  // }
-  // if (hasRestaked) {
-  // log.warning(
-  //   "[handlePodDeployed] pod: {} owner: {} hasRestaked: {} restakedGwei: {}",
-  //   [
-  //     event.params.eigenPod.toHexString(),
-  //     event.params.podOwner.toHexString(),
-  //     hasRestaked.toString(),
-  //     restakedGwei.toString(),
-  //   ]
-  // );
-  // }
+  const podAddress = event.params.eigenPod;
+
+  // As per communication on EigenLayer's discord, currently native staking is technically not proven restaked
+  // i.e. delegateable without the proof system launching in the upcoming M2 release,
+  // so that’s why hasRestaked is false for all EigenPods for now.
+  let isActive = false;
+  const eigenPod = EigenPod.bind(podAddress);
+  const hasRestakedCall = eigenPod.try_hasRestaked();
+  if (!hasRestakedCall.reverted) {
+    isActive = hasRestakedCall.value;
+  } else {
+    log.warning(
+      "[handlePodDeployed] eigenPod.try_hasRestaked reverted for podAddress: {}",
+      [event.params.eigenPod.toHexString()]
+    );
+  }
+
+  const underlyingToken = getOrCreateToken(
+    Address.fromString(ETH_ADDRESS),
+    event
+  );
+
+  const poolName = "EigenPod-" + underlyingToken.name;
+  const poolSymbol = "E-" + underlyingToken.symbol;
+  createPool(
+    podAddress,
+    poolName,
+    poolSymbol,
+    PoolType.EIGEN_POD,
+    Address.fromBytes(underlyingToken.id),
+    isActive,
+    event
+  );
 }
 
 /////////////////////////////////////////
@@ -137,11 +148,6 @@ export function handleDeposit(event: Deposit): void {
     return;
   }
   const amount = amountCall.value;
-  const amountUSD = getUsdPrice(
-    Address.fromBytes(token.id),
-    bigIntToBigDecimal(amount, token.decimals),
-    event.block
-  );
 
   const depositID = createDeposit(
     Address.fromBytes(pool.id),
@@ -149,33 +155,52 @@ export function handleDeposit(event: Deposit): void {
     Address.fromBytes(account.id),
     shares,
     amount,
-    amountUSD,
     event
   );
   updateUsage(
     Address.fromBytes(pool.id),
+    Address.fromBytes(token.id),
     Address.fromBytes(account.id),
     true,
     amount,
-    amountUSD,
-    depositID
-  );
-  updateTVL(Address.fromBytes(pool.id), true, amount, amountUSD);
-  updateVolume(Address.fromBytes(pool.id), true, amount, amountUSD);
-  updatePoolDailySnapshot(
-    Address.fromBytes(pool.id),
-    true,
-    amount,
-    amountUSD,
+    depositID,
     event
   );
+  updateTVL(
+    Address.fromBytes(pool.id),
+    Address.fromBytes(token.id),
+    true,
+    amount,
+    event
+  );
+  updateVolume(
+    Address.fromBytes(pool.id),
+    Address.fromBytes(token.id),
+    true,
+    amount,
+    event
+  );
+  updatePoolHourlySnapshot(Address.fromBytes(pool.id), event);
+  updatePoolDailySnapshot(
+    Address.fromBytes(pool.id),
+    Address.fromBytes(token.id),
+    true,
+    amount,
+    event
+  );
+  updateUsageMetricsHourlySnapshot(Address.fromBytes(account.id), event);
   updateUsageMetricsDailySnapshot(
     Address.fromBytes(account.id),
     true,
     depositID,
     event
   );
-  updateFinancialsDailySnapshot(true, amountUSD, event);
+  updateFinancialsDailySnapshot(
+    Address.fromBytes(token.id),
+    true,
+    amount,
+    event
+  );
 }
 
 export function handleShareWithdrawalQueued(
@@ -187,24 +212,8 @@ export function handleShareWithdrawalQueued(
   const shares = event.params.shares;
 
   const pool = getPool(strategyAddress);
-  const token = getOrCreateToken(Address.fromBytes(pool.inputToken), event);
+  const token = getOrCreateToken(Address.fromBytes(pool.inputTokens[0]), event);
   const account = getOrCreateAccount(depositorAddress);
-
-  const strategyContract = Strategy.bind(strategyAddress);
-  const amountCall = strategyContract.try_sharesToUnderlying(shares);
-  if (amountCall.reverted) {
-    log.error(
-      "[handleShareWithdrawalQueued] strategyContract.try_sharesToUnderlying() reverted for strategy: {}",
-      [strategyAddress.toHexString()]
-    );
-    return;
-  }
-  const amount = amountCall.value;
-  const amountUSD = getUsdPrice(
-    Address.fromBytes(token.id),
-    bigIntToBigDecimal(amount, token.decimals),
-    event.block
-  );
 
   let withdrawerAddress = Address.fromString(ZERO_ADDRESS);
   let delegatedAddress = Address.fromString(ZERO_ADDRESS);
@@ -245,7 +254,7 @@ export function handleShareWithdrawalQueued(
     }
   }
 
-  const withdrawID = createWithdraw(
+  createWithdraw(
     Address.fromBytes(pool.id),
     Address.fromBytes(token.id),
     Address.fromBytes(account.id),
@@ -254,39 +263,83 @@ export function handleShareWithdrawalQueued(
     withdrawalRoot,
     nonce,
     shares,
-    amount,
-    amountUSD,
     event
   );
-  updateUsage(
-    Address.fromBytes(pool.id),
-    Address.fromBytes(account.id),
-    false,
-    amount,
-    amountUSD,
-    withdrawID
-  );
-  updateTVL(Address.fromBytes(pool.id), false, amount, amountUSD);
-  updateVolume(Address.fromBytes(pool.id), false, amount, amountUSD);
-  updatePoolDailySnapshot(
-    Address.fromBytes(pool.id),
-    false,
-    amount,
-    amountUSD,
-    event
-  );
-  updateUsageMetricsDailySnapshot(
-    Address.fromBytes(account.id),
-    false,
-    withdrawID,
-    event
-  );
-  updateFinancialsDailySnapshot(false, amountUSD, event);
 }
 
 export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
   const depositorAddress = event.params.depositor;
-  const nonce = event.params.nonce;
+  const withdrawalRoot = event.params.withdrawalRoot;
 
-  completeWithdraw(depositorAddress, nonce, event);
+  const withdraw = getWithdraw(depositorAddress, withdrawalRoot);
+  if (!withdraw) return;
+
+  const withdrawID = withdraw.id;
+  const poolID = withdraw.pool;
+  const tokenID = withdraw.token;
+  const accountID = withdraw.depositor;
+  const shares = withdraw.shares;
+
+  const strategyContract = Strategy.bind(Address.fromBytes(poolID));
+  const amountCall = strategyContract.try_sharesToUnderlying(shares);
+  if (amountCall.reverted) {
+    log.error(
+      "[handleShareWithdrawalQueued] strategyContract.try_sharesToUnderlying() reverted for strategy: {}",
+      [poolID.toHexString()]
+    );
+    return;
+  }
+  const amount = amountCall.value;
+
+  updateUsage(
+    Address.fromBytes(poolID),
+    Address.fromBytes(tokenID),
+    Address.fromBytes(accountID),
+    false,
+    amount,
+    withdrawID,
+    event
+  );
+  updateTVL(
+    Address.fromBytes(poolID),
+    Address.fromBytes(tokenID),
+    false,
+    amount,
+    event
+  );
+  updateVolume(
+    Address.fromBytes(poolID),
+    Address.fromBytes(tokenID),
+    false,
+    amount,
+    event
+  );
+  updatePoolHourlySnapshot(Address.fromBytes(poolID), event);
+  updatePoolDailySnapshot(
+    Address.fromBytes(poolID),
+    Address.fromBytes(tokenID),
+    false,
+    amount,
+    event
+  );
+  updateUsageMetricsHourlySnapshot(Address.fromBytes(accountID), event);
+  updateUsageMetricsDailySnapshot(
+    Address.fromBytes(accountID),
+    false,
+    withdrawID,
+    event
+  );
+  updateFinancialsDailySnapshot(
+    Address.fromBytes(tokenID),
+    false,
+    amount,
+    event
+  );
+  updateWithdraw(
+    Address.fromBytes(accountID),
+    Address.fromBytes(tokenID),
+    withdrawID,
+    amount,
+    event
+  );
 }

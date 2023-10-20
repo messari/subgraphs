@@ -1,6 +1,15 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
-import { BIGINT_TEN, ETH_DECIMALS, SECONDS_PER_DAY } from "./constants";
+import {
+  BIGINT_TEN,
+  ETH_DECIMALS,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+} from "./constants";
+
+export function getHoursSinceEpoch(secondsSinceEpoch: number): i32 {
+  return <i32>Math.floor(secondsSinceEpoch / SECONDS_PER_HOUR);
+}
 
 export function getDaysSinceEpoch(secondsSinceEpoch: number): i32 {
   return <i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY);

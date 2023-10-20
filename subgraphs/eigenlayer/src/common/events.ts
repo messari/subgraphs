@@ -1,21 +1,12 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  Bytes,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
-import { BIGDECIMAL_ZERO, ZERO_ADDRESS } from "./constants";
-import { getUsdPrice } from "../prices";
-import { getOrCreateAccount, getOrCreateToken, getPool } from "./getters";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
+import { getOrCreateAccount, getOrCreateToken } from "./getters";
 import {
   addToArrayAtIndex,
   bigIntToBigDecimal,
   removeFromArrayAtIndex,
 } from "./utils";
-import { updateTVL, updateVolume } from "./metrics";
 import { NetworkConfigs } from "../../configurations/configure";
 
 import { Deposit, Withdraw } from "../../generated/schema";
@@ -26,9 +17,9 @@ export function createDeposit(
   accountAddress: Address,
   shares: BigInt,
   amount: BigInt,
-  amountUSD: BigDecimal,
   event: ethereum.Event
 ): Bytes {
+  const token = getOrCreateToken(tokenAddress, event);
   const id = Bytes.empty()
     .concat(event.transaction.hash)
     .concatI32(event.logIndex.toI32());
@@ -46,7 +37,9 @@ export function createDeposit(
   depositEvent.token = tokenAddress;
   depositEvent.shares = shares;
   depositEvent.amount = amount;
-  depositEvent.amountUSD = amountUSD;
+  depositEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
+    token.lastPriceUSD!
+  );
   depositEvent.blockNumber = event.block.number;
   depositEvent.timestamp = event.block.timestamp;
 
@@ -63,8 +56,6 @@ export function createWithdraw(
   withdrawalRoot: Bytes,
   nonce: BigInt,
   shares: BigInt,
-  amount: BigInt,
-  amountUSD: BigDecimal,
   event: ethereum.Event
 ): Bytes {
   const id = Bytes.empty()
@@ -87,80 +78,73 @@ export function createWithdraw(
   withdrawEvent.pool = poolAddress;
   withdrawEvent.token = tokenAddress;
   withdrawEvent.shares = shares;
-  withdrawEvent.amount = amount;
-  withdrawEvent.amountUSD = amountUSD;
   withdrawEvent.blockNumber = event.block.number;
   withdrawEvent.timestamp = event.block.timestamp;
 
   // Populated on WithdrawalCompleted event
   withdrawEvent.completed = false;
+  withdrawEvent.hashCompleted = Bytes.empty();
+  withdrawEvent.amount = BIGINT_ZERO;
+  withdrawEvent.amountUSD = BIGDECIMAL_ZERO;
 
   withdrawEvent.save();
+
+  const account = getOrCreateAccount(accountAddress);
+  account.withdrawsQueued = addToArrayAtIndex(
+    account.withdrawsQueued,
+    withdrawEvent.id
+  );
+  account.save();
+
   return withdrawEvent.id;
 }
 
-export function completeWithdraw(
+export function getWithdraw(
   accountAddress: Address,
-  nonce: BigInt,
-  event: ethereum.Event
-): void {
-  let found = false;
+  withdrawalRoot: Bytes
+): Withdraw | null {
   const account = getOrCreateAccount(accountAddress);
 
   for (let i = 0; i < account.withdrawsQueued.length; i++) {
     const id = account.withdrawsQueued[i];
     const withdrawEvent = Withdraw.load(id)!;
 
-    if (
-      withdrawEvent.depositor == accountAddress &&
-      withdrawEvent.nonce == nonce
-    ) {
-      found = true;
-
-      // const token = getOrCreateToken(
-      //   Address.fromBytes(withdrawEvent.token),
-      //   event
-      // );
-      // let amountUSD = getUsdPrice(
-      //   Address.fromBytes(token.id),
-      //   bigIntToBigDecimal(withdrawEvent.amount, token.decimals),
-      //   event.block
-      // );
-
-      // withdrawEvent.amountUSD = amountUSD;
-      withdrawEvent.completed = true;
-      withdrawEvent.save();
-
-      account.withdrawsQueued = removeFromArrayAtIndex(
-        account.withdrawsQueued,
-        i
-      );
-      account.withdrawsCompleted = addToArrayAtIndex(
-        account.withdrawsCompleted,
-        withdrawEvent.id
-      );
-      account.save();
-
-      // updateTVL(
-      //   Address.fromBytes(withdrawEvent.pool),
-      //   false,
-      //   withdrawEvent.amount,
-      //   event
-      // );
-      // updateVolume(
-      //   Address.fromBytes(withdrawEvent.pool),
-      //   false,
-      //   withdrawEvent.amount,
-      //   event
-      // );
-      break;
+    if (withdrawEvent.withdrawalRoot == withdrawalRoot) {
+      return withdrawEvent;
     }
   }
 
-  if (!found) {
-    log.warning(
-      "[completeWithdraw] queued withdraw transaction not found for depositor: {} and nonce: {}",
-      [accountAddress.toHexString(), nonce.toString()]
-    );
-  }
+  log.warning(
+    "[completeWithdraw] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
+    [accountAddress.toHexString(), withdrawalRoot.toHexString()]
+  );
+  return null;
+}
+
+export function updateWithdraw(
+  accountAddress: Address,
+  tokenAddress: Address,
+  withdrawID: Bytes,
+  amount: BigInt,
+  event: ethereum.Event
+): void {
+  const token = getOrCreateToken(tokenAddress, event);
+
+  const withdrawEvent = Withdraw.load(withdrawID)!;
+  withdrawEvent.amount = amount;
+  withdrawEvent.amountUSD = bigIntToBigDecimal(amount).times(
+    token.lastPriceUSD!
+  );
+  withdrawEvent.hashCompleted = event.transaction.hash;
+  withdrawEvent.completed = true;
+  withdrawEvent.save();
+
+  const account = getOrCreateAccount(accountAddress);
+  const i = account.withdrawsQueued.indexOf(withdrawID);
+  account.withdrawsQueued = removeFromArrayAtIndex(account.withdrawsQueued, i);
+  account.withdrawsCompleted = addToArrayAtIndex(
+    account.withdrawsCompleted,
+    withdrawEvent.id
+  );
+  account.save();
 }
