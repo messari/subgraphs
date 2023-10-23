@@ -310,6 +310,7 @@ export class config implements Configurations {
           Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"), // KP3RETH-f
           Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"), // SDTETH-f
           Address.fromString("0x2889302a794da87fbf1d6db415c1492194663d13"), // crvCRVUSDTBTCWSTETH
+          Address.fromString("0x3a283d9c08e8b55966afb64c515f5143cf907611"), // crvCVXETH
           //
           Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
           Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
