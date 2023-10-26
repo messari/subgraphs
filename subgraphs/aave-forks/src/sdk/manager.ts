@@ -685,11 +685,11 @@ export class DataManager {
         [this.market.id.toHexString(), liquidatee.toHexString()]
       );
 
-      return null;
+      // return null;
     }
     positions.push(collateralPositionID!);
     // we may want to do call subtractPosition outside this function
-    // to close both stable and variable borrowing poositions, e.g.
+    // to close both stable and variable borrowing positions, e.g.
     // in aave-forks
     if (subtractBorrowerPosition) {
       const debtMarket = Market.load(debtTokenId);
@@ -718,7 +718,7 @@ export class DataManager {
           "[createLiquidate] positionID is null for market: {} account: {}",
           [debtMarket.id.toHexString(), liquidatee.toHexString()]
         );
-        return null;
+        // return null;
       }
       positions.push(borrowerPositionID!);
     }
