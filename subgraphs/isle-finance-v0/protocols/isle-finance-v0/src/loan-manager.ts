@@ -32,10 +32,10 @@ import {
 } from "../../../generated/schema";
 
 export function handleAccountingStateUpdated(
-  event: AccountingStateUpdatedEvent,
+  event: AccountingStateUpdatedEvent
 ): void {
   let entity = new AccountingStateUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.issuanceRate_ = event.params.issuanceRate_;
   entity.accountedInterest_ = event.params.accountedInterest_;
@@ -49,7 +49,7 @@ export function handleAccountingStateUpdated(
 
 export function handleFeesPaid(event: FeesPaidEvent): void {
   let entity = new FeesPaid(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.adminFee_ = event.params.adminFee_;
@@ -64,7 +64,7 @@ export function handleFeesPaid(event: FeesPaidEvent): void {
 
 export function handleFundsDistributed(event: FundsDistributedEvent): void {
   let entity = new FundsDistributed(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.principal_ = event.params.principal_;
@@ -79,7 +79,7 @@ export function handleFundsDistributed(event: FundsDistributedEvent): void {
 
 export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
   let entity = new FundsWithdrawn(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.amount_ = event.params.amount_;
@@ -93,7 +93,7 @@ export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
 
 export function handleImpairmentRemoved(event: ImpairmentRemovedEvent): void {
   let entity = new ImpairmentRemoved(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.originalPaymentDueDate_ = event.params.originalPaymentDueDate_;
@@ -107,7 +107,7 @@ export function handleImpairmentRemoved(event: ImpairmentRemovedEvent): void {
 
 export function handleInitialized(event: InitializedEvent): void {
   let entity = new Initialized(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.poolAddressesProvider_ = event.params.poolAddressesProvider_;
 
@@ -119,10 +119,10 @@ export function handleInitialized(event: InitializedEvent): void {
 }
 
 export function handleIssuanceParamsUpdated(
-  event: IssuanceParamsUpdatedEvent,
+  event: IssuanceParamsUpdatedEvent
 ): void {
   let entity = new IssuanceParamsUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.domainEnd_ = event.params.domainEnd_;
   entity.issuanceRate_ = event.params.issuanceRate_;
@@ -137,7 +137,7 @@ export function handleIssuanceParamsUpdated(
 
 export function handleLoanImpaired(event: LoanImpairedEvent): void {
   let entity = new LoanImpaired(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.newDueDate_ = event.params.newDueDate_;
@@ -151,7 +151,7 @@ export function handleLoanImpaired(event: LoanImpairedEvent): void {
 
 export function handleLoanRepaid(event: LoanRepaidEvent): void {
   let entity = new LoanRepaid(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.principal_ = event.params.principal_;
@@ -166,7 +166,7 @@ export function handleLoanRepaid(event: LoanRepaidEvent): void {
 
 export function handleLoanRequested(event: LoanRequestedEvent): void {
   let entity = new LoanRequested(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
 
@@ -179,7 +179,7 @@ export function handleLoanRequested(event: LoanRequestedEvent): void {
 
 export function handlePaymentAdded(event: PaymentAddedEvent): void {
   let entity = new PaymentAdded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.paymentId_ = event.params.paymentId_;
@@ -198,7 +198,7 @@ export function handlePaymentAdded(event: PaymentAddedEvent): void {
 
 export function handlePaymentRemoved(event: PaymentRemovedEvent): void {
   let entity = new PaymentRemoved(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.loanId_ = event.params.loanId_;
   entity.paymentId_ = event.params.paymentId_;
@@ -211,10 +211,10 @@ export function handlePaymentRemoved(event: PaymentRemovedEvent): void {
 }
 
 export function handlePrincipalOutUpdated(
-  event: PrincipalOutUpdatedEvent,
+  event: PrincipalOutUpdatedEvent
 ): void {
   let entity = new PrincipalOutUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.principalOut_ = event.params.principalOut_;
 
@@ -226,10 +226,10 @@ export function handlePrincipalOutUpdated(
 }
 
 export function handleUnrealizedLossesUpdated(
-  event: UnrealizedLossesUpdatedEvent,
+  event: UnrealizedLossesUpdatedEvent
 ): void {
   let entity = new UnrealizedLossesUpdated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.unrealizedLosses_ = event.params.unrealizedLosses_;
 

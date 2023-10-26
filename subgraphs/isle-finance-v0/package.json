@@ -1,24 +1,13 @@
 {
-  "name": "isle-finance-v0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ isle-finance-v0",
-    "create-local": "graph create --node http://localhost:8020/ isle-finance-v0",
-    "remove-local": "graph remove --node http://localhost:8020/ isle-finance-v0",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 isle-finance-v0",
-    "test": "graph test",
-    "prettier": "prettier --loglevel silent --write \"**/*.{md,jsx,tsx,ts,json,html,css,js}\""
+    "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.59.0",
-    "@graphprotocol/graph-ts": "0.30.0",
-    "messari-subgraph-cli": "^0.2.4",
-    "mustache": "^4.2.0",
-    "prettier": "^3.0.3"
+    "@graphprotocol/graph-cli": "0.42.4",
+    "@graphprotocol/graph-ts": "0.29.3"
   },
   "devDependencies": {
-    "matchstick-as": "0.5.0"
+    "prettier": "^2.8.3"
   }
 }

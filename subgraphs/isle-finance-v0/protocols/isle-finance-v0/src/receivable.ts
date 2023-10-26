@@ -27,7 +27,7 @@ import {
 
 export function handleAdminChanged(event: AdminChangedEvent): void {
   let entity = new AdminChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.previousAdmin = event.params.previousAdmin;
   entity.newAdmin = event.params.newAdmin;
@@ -41,7 +41,7 @@ export function handleAdminChanged(event: AdminChangedEvent): void {
 
 export function handleApproval(event: ApprovalEvent): void {
   let entity = new Approval(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.owner = event.params.owner;
   entity.approved = event.params.approved;
@@ -56,7 +56,7 @@ export function handleApproval(event: ApprovalEvent): void {
 
 export function handleApprovalForAll(event: ApprovalForAllEvent): void {
   let entity = new ApprovalForAll(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.owner = event.params.owner;
   entity.operator = event.params.operator;
@@ -71,7 +71,7 @@ export function handleApprovalForAll(event: ApprovalForAllEvent): void {
 
 export function handleAssetBurned(event: AssetBurnedEvent): void {
   let entity = new AssetBurned(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.tokenId_ = event.params.tokenId_;
 
@@ -84,7 +84,7 @@ export function handleAssetBurned(event: AssetBurnedEvent): void {
 
 export function handleAssetCreated(event: AssetCreatedEvent): void {
   let entity = new AssetCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.buyer_ = event.params.buyer_;
   entity.seller_ = event.params.seller_;
@@ -101,7 +101,7 @@ export function handleAssetCreated(event: AssetCreatedEvent): void {
 
 export function handleBeaconUpgraded(event: BeaconUpgradedEvent): void {
   let entity = new BeaconUpgraded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.beacon = event.params.beacon;
 
@@ -114,7 +114,7 @@ export function handleBeaconUpgraded(event: BeaconUpgradedEvent): void {
 
 export function handleInitialized(event: InitializedEvent): void {
   let entity = new Initialized(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.version = event.params.version;
 
@@ -127,7 +127,7 @@ export function handleInitialized(event: InitializedEvent): void {
 
 export function handleIsleGlobalsSet(event: IsleGlobalsSetEvent): void {
   let entity = new IsleGlobalsSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.previousIsleGlobals_ = event.params.previousIsleGlobals_;
   entity.currentIsleGlobals_ = event.params.currentIsleGlobals_;
@@ -141,7 +141,7 @@ export function handleIsleGlobalsSet(event: IsleGlobalsSetEvent): void {
 
 export function handleTransfer(event: TransferEvent): void {
   let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.from = event.params.from;
   entity.to = event.params.to;
@@ -156,7 +156,7 @@ export function handleTransfer(event: TransferEvent): void {
 
 export function handleTransferGovernor(event: TransferGovernorEvent): void {
   let entity = new TransferGovernor(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.oldGovernor = event.params.oldGovernor;
   entity.newGovernor = event.params.newGovernor;
@@ -170,7 +170,7 @@ export function handleTransferGovernor(event: TransferGovernorEvent): void {
 
 export function handleUpgraded(event: UpgradedEvent): void {
   let entity = new Upgraded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.implementation = event.params.implementation;
 

@@ -39,7 +39,7 @@ import {
 
 export function handleAdminFeeSet(event: AdminFeeSetEvent): void {
   let entity = new AdminFeeSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.adminFee_ = event.params.adminFee_;
 
@@ -52,7 +52,7 @@ export function handleAdminFeeSet(event: AdminFeeSetEvent): void {
 
 export function handleBaseRateSet(event: BaseRateSetEvent): void {
   let entity = new BaseRateSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.baseRate_ = event.params.baseRate_;
 
@@ -65,7 +65,7 @@ export function handleBaseRateSet(event: BaseRateSetEvent): void {
 
 export function handleBuyerSet(event: BuyerSetEvent): void {
   let entity = new BuyerSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.buyer_ = event.params.buyer_;
 
@@ -78,7 +78,7 @@ export function handleBuyerSet(event: BuyerSetEvent): void {
 
 export function handleCoverDeposited(event: CoverDepositedEvent): void {
   let entity = new CoverDeposited(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.amount_ = event.params.amount_;
 
@@ -91,7 +91,7 @@ export function handleCoverDeposited(event: CoverDepositedEvent): void {
 
 export function handleCoverLiquidated(event: CoverLiquidatedEvent): void {
   let entity = new CoverLiquidated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.toPool_ = event.params.toPool_;
 
@@ -104,7 +104,7 @@ export function handleCoverLiquidated(event: CoverLiquidatedEvent): void {
 
 export function handleCoverWithdrawn(event: CoverWithdrawnEvent): void {
   let entity = new CoverWithdrawn(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.amount_ = event.params.amount_;
 
@@ -117,7 +117,7 @@ export function handleCoverWithdrawn(event: CoverWithdrawnEvent): void {
 
 export function handleInitialized(event: InitializedEvent): void {
   let entity = new Initialized(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.poolAdmin_ = event.params.poolAdmin_;
   entity.asset_ = event.params.asset_;
@@ -131,10 +131,10 @@ export function handleInitialized(event: InitializedEvent): void {
 }
 
 export function handleMaxCoverLiquidationSet(
-  event: MaxCoverLiquidationSetEvent,
+  event: MaxCoverLiquidationSetEvent
 ): void {
   let entity = new MaxCoverLiquidationSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.maxCoverLiquidation_ = event.params.maxCoverLiquidation_;
 
@@ -147,7 +147,7 @@ export function handleMaxCoverLiquidationSet(
 
 export function handleMinCoverSet(event: MinCoverSetEvent): void {
   let entity = new MinCoverSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.minCover_ = event.params.minCover_;
 
@@ -160,7 +160,7 @@ export function handleMinCoverSet(event: MinCoverSetEvent): void {
 
 export function handleOpenToPublicSet(event: OpenToPublicSetEvent): void {
   let entity = new OpenToPublicSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.isOpenToPublic_ = event.params.isOpenToPublic_;
 
@@ -173,7 +173,7 @@ export function handleOpenToPublicSet(event: OpenToPublicSetEvent): void {
 
 export function handlePoolLimitSet(event: PoolLimitSetEvent): void {
   let entity = new PoolLimitSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.poolLimit_ = event.params.poolLimit_;
 
@@ -186,7 +186,7 @@ export function handlePoolLimitSet(event: PoolLimitSetEvent): void {
 
 export function handleRedeemProcessed(event: RedeemProcessedEvent): void {
   let entity = new RedeemProcessed(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.owner_ = event.params.owner_;
   entity.redeemableShares_ = event.params.redeemableShares_;
@@ -201,7 +201,7 @@ export function handleRedeemProcessed(event: RedeemProcessedEvent): void {
 
 export function handleRedeemRequested(event: RedeemRequestedEvent): void {
   let entity = new RedeemRequested(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.owner_ = event.params.owner_;
   entity.shares_ = event.params.shares_;
@@ -215,7 +215,7 @@ export function handleRedeemRequested(event: RedeemRequestedEvent): void {
 
 export function handleSharesRemoved(event: SharesRemovedEvent): void {
   let entity = new SharesRemoved(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.owner_ = event.params.owner_;
   entity.shares_ = event.params.shares_;
@@ -229,7 +229,7 @@ export function handleSharesRemoved(event: SharesRemovedEvent): void {
 
 export function handleTransferAdmin(event: TransferAdminEvent): void {
   let entity = new TransferAdmin(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.oldAdmin_ = event.params.oldAdmin_;
   entity.newAdmin_ = event.params.newAdmin_;
@@ -243,7 +243,7 @@ export function handleTransferAdmin(event: TransferAdminEvent): void {
 
 export function handleValidLenderSet(event: ValidLenderSetEvent): void {
   let entity = new ValidLenderSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.lender_ = event.params.lender_;
   entity.isValid_ = event.params.isValid_;
@@ -257,7 +257,7 @@ export function handleValidLenderSet(event: ValidLenderSetEvent): void {
 
 export function handleValidSellerSet(event: ValidSellerSetEvent): void {
   let entity = new ValidSellerSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   entity.seller_ = event.params.seller_;
   entity.isValid_ = event.params.isValid_;
