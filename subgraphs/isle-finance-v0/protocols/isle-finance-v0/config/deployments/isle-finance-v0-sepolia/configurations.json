@@ -4,10 +4,6 @@
     "startBlock": 4517593,
     "address": "0x103d37376F312C0D3FA4021351dC87811E0464B2"
   },
-  "IsleGlobals": {
-    "startBlock": 4517597,
-    "address": "0x359f8Cfc8EadB4acB591211B73F5968b9900dB06"
-  },
   "WithdrawalManager": {
     "startBlock": 4517611,
     "address": "0x9EDe7Fa06de4CcF3be5e26e27120eb608D001Ed8"
