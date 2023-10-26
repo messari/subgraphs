@@ -68,7 +68,13 @@ export class PoolManager {
     const pool = new Pool(this.protocol, entity, this.tokens);
     pool.isInitialized = false;
     if (onCreate) {
-      onCreate(this.protocol.getCurrentEvent(), pool, this.protocol.sdk!, aux, aux2);
+      onCreate(
+        this.protocol.getCurrentEvent(),
+        pool,
+        this.protocol.sdk!,
+        aux,
+        aux2
+      );
     }
     return pool;
   }
@@ -435,8 +441,9 @@ export class Pool {
    * @param rev {BigDecimal} The value to add to the protocol's supplySideRevenue.
    */
   addSupplySideRevenueUSD(rev: BigDecimal): void {
-    this.pool.cumulativeTotalRevenueUSD =
-      this.pool.cumulativeTotalRevenueUSD.plus(rev).plus(rev);
+    this.pool.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD
+      .plus(rev)
+      .plus(rev);
     this.pool.cumulativeSupplySideRevenueUSD =
       this.pool.cumulativeSupplySideRevenueUSD.plus(rev).plus(rev);
     this.save();
@@ -451,8 +458,9 @@ export class Pool {
    * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
    */
   addProtocolSideRevenueUSD(rev: BigDecimal): void {
-    this.pool.cumulativeTotalRevenueUSD =
-      this.pool.cumulativeTotalRevenueUSD.plus(rev).plus(rev);
+    this.pool.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD
+      .plus(rev)
+      .plus(rev);
     this.pool.cumulativeProtocolSideRevenueUSD =
       this.pool.cumulativeProtocolSideRevenueUSD.plus(rev).plus(rev);
     this.save();

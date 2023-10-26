@@ -6,7 +6,7 @@
     {
       "name": "Vault",
       "address": "0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F",
-      "startBlock": 	15695183,
+      "startBlock": 15695183,
       "abi": "Vault",
       "depositHandler": "handleLockIn",
       "withdrawHandler": "handleOTVWithdraw"
@@ -16,7 +16,7 @@
     {
       "name": "Minter",
       "address": "0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f",
-      "startBlock": 	13137143,
+      "startBlock": 13137143,
       "abi": "Minter",
       "mintHandler": "handleMint",
       "burnHandler": "handleBurn"
@@ -26,7 +26,7 @@
     {
       "name": "MinterBSC",
       "address": "0xf2C5a817cc8FFaAB4122f2cE27AB8486DFeAb09F",
-      "startBlock": 	19870568,
+      "startBlock": 19870568,
       "abi": "Minter",
       "mintHandler": "handleMint",
       "burnHandler": "handleBurn"
@@ -36,7 +36,7 @@
     {
       "name": "MinterKLAYTN",
       "address": "0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d",
-      "startBlock": 	10807604,
+      "startBlock": 10807604,
       "abi": "Minter",
       "mintHandler": "handleMint",
       "burnHandler": "handleBurn"
@@ -46,7 +46,7 @@
     {
       "name": "MinterMATIC",
       "address": "0x506DC4c6408813948470a06ef6e4a1DaF228dbd5",
-      "startBlock": 	13565212,
+      "startBlock": 13565212,
       "abi": "Minter",
       "mintHandler": "handleMint",
       "burnHandler": "handleBurn"

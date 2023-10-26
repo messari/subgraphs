@@ -232,11 +232,11 @@ export namespace PoolName {
 
 export type PoolName = string;
 export class NetworkSpecificConstant {
-  constructor (
+  constructor(
     public readonly chainName: string,
     public readonly originalTokenVault: Address,
-    public readonly peggedTokenBridge: TypedMap<string, Address>,
-  ){}
+    public readonly peggedTokenBridge: TypedMap<string, Address>
+  ) {}
 
   getOriginalTokenVaultAddress(): Address {
     return this.originalTokenVault;
@@ -252,7 +252,7 @@ export function getNetworkSpecificConstant(
   network: Network
 ): NetworkSpecificConstant {
   if (equalsIgnoreCase(network, Network.MAINNET)) {
-    const toChainMapping = new TypedMap<string, Address>()
+    const toChainMapping = new TypedMap<string, Address>();
     toChainMapping.set(
       "KLAYTN",
       Address.fromString("0x60070f5d2e1c1001400a04f152e7abd43410f7b9")
@@ -314,9 +314,8 @@ export function getNetworkSpecificConstant(
       Address.fromString("0x1bf68a9d1eaee7826b3593c20a0ca93293cb489a"),
       toChainMapping
     );
-  }
-  else if (equalsIgnoreCase(network, Network.BSC)) {
-    const toChainMapping = new TypedMap<string, Address>()
+  } else if (equalsIgnoreCase(network, Network.BSC)) {
+    const toChainMapping = new TypedMap<string, Address>();
     toChainMapping.set(
       "KLAYTN",
       Address.fromString("0xb0a83941058b109bd0543fa26d22efb8a2d0f431")
@@ -337,10 +336,9 @@ export function getNetworkSpecificConstant(
       network,
       Address.fromString("0x89c527764f03bcb7dc469707b23b79c1d7beb780"),
       toChainMapping
-    )
-  }
-  else if (equalsIgnoreCase(network, Network.CELO)) {
-    const toChainMapping = new TypedMap<string, Address>()
+    );
+  } else if (equalsIgnoreCase(network, Network.CELO)) {
+    const toChainMapping = new TypedMap<string, Address>();
     toChainMapping.set(
       "KLAYTN",
       Address.fromString("0x979cd0826c2bf62703ef62221a4fea1f23da3777")
@@ -353,10 +351,9 @@ export function getNetworkSpecificConstant(
       network,
       Address.fromString("0x979cd0826c2bf62703ef62221a4fea1f23da3777"),
       toChainMapping
-    )
-  }
-  else if (equalsIgnoreCase(network, Network.HECO)) {
-    const toChainMapping = new TypedMap<string, Address>()
+    );
+  } else if (equalsIgnoreCase(network, Network.HECO)) {
+    const toChainMapping = new TypedMap<string, Address>();
     toChainMapping.set(
       "KLAYTN",
       Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f")
@@ -406,9 +403,8 @@ export function getNetworkSpecificConstant(
       Address.fromString("0x38c92a7c2b358e2f2b91723e5c4fc7aa8b4d279f"),
       toChainMapping
     );
-  }
-  else if (equalsIgnoreCase(network, Network.KLAYTN)) {
-    const toChainMapping = new TypedMap<string, Address>()
+  } else if (equalsIgnoreCase(network, Network.KLAYTN)) {
+    const toChainMapping = new TypedMap<string, Address>();
     toChainMapping.set(
       "AVAX",
       Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
@@ -462,9 +458,8 @@ export function getNetworkSpecificConstant(
       Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d"),
       toChainMapping
     );
-  }
-  else if (equalsIgnoreCase(network, Network.MATIC)) {
-    const toChainMapping = new TypedMap<string, Address>()
+  } else if (equalsIgnoreCase(network, Network.MATIC)) {
+    const toChainMapping = new TypedMap<string, Address>();
     toChainMapping.set(
       "AVAX",
       Address.fromString("0x506dc4c6408813948470a06ef6e4a1daf228dbd5")

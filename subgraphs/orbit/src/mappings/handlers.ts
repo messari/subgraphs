@@ -31,10 +31,8 @@ import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 import { ERC20NameBytes } from "../../generated/Vault/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
 import { BIGINT_ZERO, getNetworkSpecificConstant } from "../sdk/util/constants";
-import {
-  Deposit, Withdraw
-} from "../../generated/Vault/Vault";
-import { Swap, SwapRequest} from "../../generated/Minter/Minter";
+import { Deposit, Withdraw } from "../../generated/Vault/Vault";
+import { Swap, SwapRequest } from "../../generated/Minter/Minter";
 
 const taxReceiver = "0xe9f3604b85c9672728eeecf689cf1f0cf7dd03f2";
 
@@ -140,7 +138,6 @@ function _getSDK(
   return new SDK(conf, new Pricer(), new TokenInit(), customEvent);
 }
 
-
 export function onCreatePool(
   // eslint-disable-next-line no-unused-vars
   event: CustomEventType,
@@ -163,10 +160,11 @@ export function onCreatePool(
 
 // Bridge via the Original Token Vault
 export function handleLockIn(event: Deposit): void {
-  
-  const poolId = event.address.concat(event.params.token)
+  const poolId = event.address.concat(event.params.token);
   const networkConstants = getNetworkSpecificConstant(dataSource.network());
-  const dstPoolId = networkConstants.getpeggedTokenBridgeForChain(event.params.toChain);
+  const dstPoolId = networkConstants.getpeggedTokenBridgeForChain(
+    event.params.toChain
+  );
   _handleTransferOut(
     event.params.token,
     event.params.fromAddr,
@@ -178,17 +176,18 @@ export function handleLockIn(event: Deposit): void {
     CrosschainTokenType.WRAPPED,
     event,
     event.params.depositId,
-    dstPoolId,
+    dstPoolId
   );
 }
 
 // Withdraw from the Original Token Vault
 export function handleOTVWithdraw(event: Withdraw): void {
-
-  const tokenAddress = Address.fromBytes(event.params.token)
+  const tokenAddress = Address.fromBytes(event.params.token);
   const poolId = event.address.concat(tokenAddress);
   const networkConstants = getNetworkSpecificConstant(dataSource.network());
-  const srcPoolId = networkConstants.getpeggedTokenBridgeForChain(event.params.fromChain);
+  const srcPoolId = networkConstants.getpeggedTokenBridgeForChain(
+    event.params.fromChain
+  );
   _handleTransferIn(
     tokenAddress,
     event.params.fromAddr,
@@ -199,7 +198,7 @@ export function handleOTVWithdraw(event: Withdraw): void {
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
-    srcPoolId,
+    srcPoolId
   );
 }
 
@@ -218,7 +217,7 @@ export function handleMint(event: Swap): void {
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.CANONICAL,
     event,
-    srcPoolId,
+    srcPoolId
   );
 }
 
@@ -238,10 +237,9 @@ export function handleBurn(event: SwapRequest): void {
     CrosschainTokenType.CANONICAL,
     event,
     event.params.depositId,
-    dstPoolId,
+    dstPoolId
   );
 }
-
 
 function _handleTransferIn(
   token: Address,
@@ -253,7 +251,7 @@ function _handleTransferIn(
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event,
-  srcPoolId: Address | null = null,
+  srcPoolId: Address | null = null
 ): void {
   if (!srcPoolId) {
     log.warning("srcPoolId is null for srcChain: {}", [srcChain]);
@@ -274,11 +272,16 @@ function _handleTransferIn(
     token
   );
   pool.addDestinationToken(crossToken);
-  const account = sdk.Accounts.loadAccount(Address.fromBytes(receiver))
+  const account = sdk.Accounts.loadAccount(Address.fromBytes(receiver));
   if (sender.byteLength != 20) {
-    sender = receiver
+    sender = receiver;
   }
-  account.transferIn(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(sender), amount);
+  account.transferIn(
+    pool,
+    pool.getDestinationTokenRoute(crossToken)!,
+    Address.fromBytes(sender),
+    amount
+  );
 }
 
 function _handleTransferOut(
@@ -292,10 +295,13 @@ function _handleTransferOut(
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event,
   refId: BigInt,
-  dstPoolId: Address | null = null,
+  dstPoolId: Address | null = null
 ): void {
   if (!dstPoolId) {
-    log.warning("dstPoolId is null for transaction: {} and chain: {}", [event.transaction.hash.toHexString(), toChain]);
+    log.warning("dstPoolId is null for transaction: {} and chain: {}", [
+      event.transaction.hash.toHexString(),
+      toChain,
+    ]);
     return;
   }
   const sdk = _getSDK(event)!;
@@ -306,12 +312,15 @@ function _handleTransferOut(
     token.toHexString()
   );
 
-  const account = sdk.Accounts.loadAccount(Address.fromBytes(sender))
+  const account = sdk.Accounts.loadAccount(Address.fromBytes(sender));
   if (receiver.byteLength != 20) {
-    receiver = sender
+    receiver = sender;
   }
   // If Receiver is taxReceiver, this is the tax fee
-  if (receiver.byteLength == 20 && Address.fromBytes(receiver) == Address.fromString(taxReceiver)) {
+  if (
+    receiver.byteLength == 20 &&
+    Address.fromBytes(receiver) == Address.fromString(taxReceiver)
+  ) {
     pool.addRevenueNative(amount, BIGINT_ZERO);
     return;
   }
@@ -324,8 +333,11 @@ function _handleTransferOut(
   );
   pool.addDestinationToken(crossToken);
   if (sender.byteLength == 20 && receiver.byteLength == 20) {
-    account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, Address.fromBytes(receiver), amount);
+    account.transferOut(
+      pool,
+      pool.getDestinationTokenRoute(crossToken)!,
+      Address.fromBytes(receiver),
+      amount
+    );
   }
 }
-
-
