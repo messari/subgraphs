@@ -1,0 +1,18 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+	- grafting
+graft:
+	base: {{subgraphId}} # Subgraph ID of base subgraph
+	block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+	- kind: enthereum/contract
+		name: Receivable
+		network: {{network}}
+		source:
+			address: 
+
