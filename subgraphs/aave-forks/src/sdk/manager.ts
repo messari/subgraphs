@@ -685,7 +685,7 @@ export class DataManager {
         [this.market.id.toHexString(), liquidatee.toHexString()]
       );
 
-      // return null;
+      return null;
     }
     positions.push(collateralPositionID!);
     // we may want to do call subtractPosition outside this function
@@ -718,7 +718,7 @@ export class DataManager {
           "[createLiquidate] positionID is null for market: {} account: {}",
           [debtMarket.id.toHexString(), liquidatee.toHexString()]
         );
-        // return null;
+        return null;
       }
       positions.push(borrowerPositionID!);
     }

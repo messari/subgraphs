@@ -935,10 +935,13 @@ export function _handleLiquidate(
   // liquidationBonus = 1 + liquidationPenalty
   // => liquidationProtocolFee = liquidationPenalty * liquidationProtocolFeePercentage * liquidatedCollateralAmount / (1 + liquidationPenalty - liquidationPenalty*liquidationProtocolFeePercentage)
   if (!market._liquidationProtocolFee) {
-    log.warning("[_handleLiquidate]market {} _liquidationProtocolFee = null ", [
-      collateralAsset.toHexString(),
-    ]);
-    return;
+    // liquidationProtocolFee is only set for v3 markets
+    log.warning(
+      "[_handleLiquidate]market {} _liquidationProtocolFee = null. Must be a v2 market, setting to 0.",
+      [collateralAsset.toHexString()]
+    );
+    market._liquidationProtocolFee = BIGDECIMAL_ZERO;
+    market.save();
   }
   const liquidationProtocolFeeUSD = amountUSD
     .times(market.liquidationPenalty)
