@@ -99,6 +99,10 @@ export const SECONDS_PER_DAY = 60 * 60 * 24;
 ////////////////////////
 /// Protocol Specific //
 ////////////////////////
+export const TRANSFER_SIGNATURE = crypto.keccak256(
+  ByteArray.fromUTF8("Transfer(address,address,uint256)")
+);
+export const TRANSFER_DATA_TYPE = "(uint256)";
 export const WITHDRAWAL_QUEUED_SIGNATURE = crypto.keccak256(
   ByteArray.fromUTF8("WithdrawalQueued(address,uint96,address,address,bytes32)")
 );

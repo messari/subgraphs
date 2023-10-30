@@ -127,9 +127,11 @@ dataSources:
           handler: handleStrategyRemoved
         - event: Deposit(address,address,address,uint256)
           handler: handleDeposit
+          receipt: true
         - event: ShareWithdrawalQueued(address,uint96,address,uint256)
           handler: handleShareWithdrawalQueued
           receipt: true
         - event: WithdrawalCompleted(indexed address,uint96,indexed address,bytes32)
           handler: handleWithdrawalCompleted
+          receipt: true
       file: {{{ file }}}

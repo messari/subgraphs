@@ -1,12 +1,15 @@
 import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
+  BIGINT_ZERO,
   ETH_ADDRESS,
   INT_FOUR,
   INT_THREE,
   INT_TWO,
   INT_ZERO,
   PoolType,
+  TRANSFER_DATA_TYPE,
+  TRANSFER_SIGNATURE,
   WITHDRAWAL_QUEUED_DATA_TYPE,
   WITHDRAWAL_QUEUED_SIGNATURE,
   ZERO_ADDRESS,
@@ -140,16 +143,35 @@ export function handleDeposit(event: Deposit): void {
   const token = getOrCreateToken(tokenAddress, event);
   const account = getOrCreateAccount(depositorAddress);
 
-  const tokenContract = ERC20.bind(tokenAddress);
-  const balanceCall = tokenContract.try_balanceOf(Address.fromBytes(pool.id));
-  if (balanceCall.reverted) {
-    log.error(
-      "[handleDeposit] tokenContract.try_balanceOf() reverted for token: {}strategy: {}",
-      [tokenAddress.toHexString(), strategyAddress.toHexString()]
-    );
+  let amount = BIGINT_ZERO;
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.error("[handleDeposit] No event receipt. Tx: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
-  const amount = balanceCall.value.minus(pool.inputTokenBalances[0]);
+  const logs = receipt.logs;
+  if (!logs) {
+    log.error("[handleDeposit] No logs for event receipt. Tx: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
+
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs.at(i);
+    const logTopicSignature = thisLog.topics.at(INT_ZERO);
+
+    if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
+      const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+      if (!decoded) continue;
+
+      const logData = decoded.toTuple();
+      amount = logData[INT_ZERO].toBigInt();
+      break;
+    }
+  }
 
   const depositID = createDeposit(
     Address.fromBytes(pool.id),
@@ -281,20 +303,35 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
   const tokenID = withdraw.token;
   const accountID = withdraw.depositor;
 
-  const pool = getPool(Address.fromBytes(poolID));
-  const tokenContract = ERC20.bind(Address.fromBytes(tokenID));
-  const balanceCall = tokenContract.try_balanceOf(Address.fromBytes(poolID));
-  if (balanceCall.reverted) {
-    log.error(
-      "[handleWithdrawalCompleted] tokenContract.try_balanceOf() reverted for token: {}strategy: {}",
-      [
-        Address.fromBytes(tokenID).toHexString(),
-        Address.fromBytes(poolID).toHexString(),
-      ]
-    );
+  let amount = BIGINT_ZERO;
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.error("[handleWithdrawalCompleted] No event receipt. Tx: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
-  const amount = pool.inputTokenBalances[0].minus(balanceCall.value);
+  const logs = receipt.logs;
+  if (!logs) {
+    log.error("[handleWithdrawalCompleted] No logs for event receipt. Tx: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
+
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs.at(i);
+    const logTopicSignature = thisLog.topics.at(INT_ZERO);
+
+    if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
+      const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+      if (!decoded) continue;
+
+      const logData = decoded.toTuple();
+      amount = logData[INT_ZERO].toBigInt();
+      break;
+    }
+  }
 
   updateUsage(
     Address.fromBytes(poolID),
