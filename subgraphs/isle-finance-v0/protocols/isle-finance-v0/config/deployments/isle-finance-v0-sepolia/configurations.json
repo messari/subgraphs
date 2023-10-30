@@ -1,5 +1,8 @@
 {
   "network": "sepolia",
+  "graftEnabled": false,
+  "subgraphId": "QmRAQHXVEa45NjhXYUdjzrnhapCbnHvLBFxzZ1m94uF6LE",
+  "graftStartBlock": 0,
   "Receivable": {
     "startBlock": 4517593,
     "address": "0x103d37376F312C0D3FA4021351dC87811E0464B2"

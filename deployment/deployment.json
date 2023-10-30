@@ -3129,6 +3129,36 @@
       }
     }
   },
+  "isle-finance-v0": {
+    "schema": "lending",
+    "base": "isle-finance-v0",
+    "protocol": "isle-finance-v0",
+    "project": "isle",
+    "deployments": {
+      "isle-finance-v0-sepolia": {
+        "network": "sepolia",
+        "status": "dev",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "isle.finance.v0.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "isle_sepolia",
+            "query-id": "isle_sepolia"
+          }
+        }
+      }
+    }
+  },
   "silo-finance": {
     "schema": "lending",
     "base": "silo-finance",
