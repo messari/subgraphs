@@ -50,7 +50,6 @@ import {
   WithdrawalCompleted,
 } from "../../generated/StrategyManager/StrategyManager";
 import { Strategy } from "../../generated/StrategyManager/Strategy";
-import { ERC20 } from "../../generated/StrategyManager/ERC20";
 
 /////////////////////////////////////////
 /////////// Native Restaking ////////////
