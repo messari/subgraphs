@@ -146,6 +146,7 @@ export function updatePoolHourlySnapshot(
 
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
+  snapshot.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
 
   snapshot.timestamp = event.block.timestamp;
   snapshot.blockNumber = event.block.number;
@@ -166,6 +167,7 @@ export function updatePoolDailySnapshot(
 
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
+  snapshot.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   snapshot.cumulativeDepositVolumeAmount = pool.cumulativeDepositVolumeAmount;
   snapshot.cumulativeDepositVolumeUSD = pool.cumulativeDepositVolumeUSD;
   snapshot.cumulativeWithdrawalVolumeAmount =

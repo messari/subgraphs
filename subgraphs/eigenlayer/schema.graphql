@@ -463,7 +463,7 @@ type Pool @entity @regularPolling {
 ###############################
 
 type PoolDailySnapshot @entity @dailySnapshot {
-  " ID is # of days since Unix epoch time "
+  " { Smart contract address of the pool }-{ ID is # of days since Unix epoch time } "
   id: Bytes!
 
   " Number of days since Unix epoch time "
@@ -581,7 +581,7 @@ type PoolDailySnapshot @entity @dailySnapshot {
 }
 
 type PoolHourlySnapshot @entity @hourlySnapshot {
-  " ID is # of hours since Unix epoch time "
+  " { Smart contract address of the pool }-{ ID is # of hours since Unix epoch time } "
   id: Bytes!
 
   " Number of hours since Unix epoch time "

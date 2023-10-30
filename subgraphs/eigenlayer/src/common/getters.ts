@@ -257,12 +257,16 @@ export function getOrCreatePoolDailySnapshot(
   poolAddress: Address,
   event: ethereum.Event
 ): PoolDailySnapshot {
-  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
-  let snapshot = PoolDailySnapshot.load(Bytes.fromI32(dayId));
+  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const id = Bytes.empty()
+    .concat(poolAddress)
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(day));
+  let snapshot = PoolDailySnapshot.load(id);
 
   if (!snapshot) {
-    snapshot = new PoolDailySnapshot(Bytes.fromI32(dayId));
-    snapshot.day = dayId;
+    snapshot = new PoolDailySnapshot(id);
+    snapshot.day = day;
     snapshot.pool = poolAddress;
     snapshot.protocol = NetworkConfigs.getFactoryAddress();
 
@@ -273,8 +277,8 @@ export function getOrCreatePoolDailySnapshot(
     snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.inputTokenBalances = [];
-    snapshot.inputTokenBalancesUSD = [];
+    snapshot.inputTokenBalances = [BIGINT_ZERO];
+    snapshot.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     snapshot.dailyDepositVolumeAmount = BIGINT_ZERO;
     snapshot.dailyDepositVolumeUSD = BIGDECIMAL_ZERO;
     snapshot.cumulativeDepositVolumeAmount = BIGINT_ZERO;
@@ -312,12 +316,16 @@ export function getOrCreatePoolHourlySnapshot(
   poolAddress: Address,
   event: ethereum.Event
 ): PoolHourlySnapshot {
-  const hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
-  let snapshot = PoolHourlySnapshot.load(Bytes.fromI32(hourId));
+  const hour = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const id = Bytes.empty()
+    .concat(poolAddress)
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(hour));
+  let snapshot = PoolHourlySnapshot.load(id);
 
   if (!snapshot) {
-    snapshot = new PoolHourlySnapshot(Bytes.fromI32(hourId));
-    snapshot.hour = hourId;
+    snapshot = new PoolHourlySnapshot(id);
+    snapshot.hour = hour;
     snapshot.pool = poolAddress;
     snapshot.protocol = NetworkConfigs.getFactoryAddress();
 
@@ -328,8 +336,8 @@ export function getOrCreatePoolHourlySnapshot(
     snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.inputTokenBalances = [];
-    snapshot.inputTokenBalancesUSD = [];
+    snapshot.inputTokenBalances = [BIGINT_ZERO];
+    snapshot.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
 
     snapshot.timestamp = event.block.timestamp;
     snapshot.blockNumber = event.block.number;

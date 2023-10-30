@@ -47,6 +47,7 @@ import {
   WithdrawalCompleted,
 } from "../../generated/StrategyManager/StrategyManager";
 import { Strategy } from "../../generated/StrategyManager/Strategy";
+import { ERC20 } from "../../generated/StrategyManager/ERC20";
 
 /////////////////////////////////////////
 /////////// Native Restaking ////////////
@@ -138,16 +139,16 @@ export function handleDeposit(event: Deposit): void {
   const token = getOrCreateToken(tokenAddress, event);
   const account = getOrCreateAccount(depositorAddress);
 
-  const strategyContract = Strategy.bind(strategyAddress);
-  const amountCall = strategyContract.try_sharesToUnderlying(shares);
-  if (amountCall.reverted) {
+  const tokenContract = ERC20.bind(tokenAddress);
+  const balanceCall = tokenContract.try_balanceOf(Address.fromBytes(pool.id));
+  if (balanceCall.reverted) {
     log.error(
-      "[handleDeposit] strategyContract.try_sharesToUnderlying() reverted for strategy: {}",
-      [strategyAddress.toHexString()]
+      "[handleDeposit] tokenContract.try_balanceOf() reverted for token: {}strategy: {}",
+      [tokenAddress.toHexString(), strategyAddress.toHexString()]
     );
     return;
   }
-  const amount = amountCall.value;
+  const amount = balanceCall.value.minus(pool.inputTokenBalances[0]);
 
   const depositID = createDeposit(
     Address.fromBytes(pool.id),
@@ -278,18 +279,21 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
   const poolID = withdraw.pool;
   const tokenID = withdraw.token;
   const accountID = withdraw.depositor;
-  const shares = withdraw.shares;
 
-  const strategyContract = Strategy.bind(Address.fromBytes(poolID));
-  const amountCall = strategyContract.try_sharesToUnderlying(shares);
-  if (amountCall.reverted) {
+  const pool = getPool(Address.fromBytes(poolID));
+  const tokenContract = ERC20.bind(Address.fromBytes(tokenID));
+  const balanceCall = tokenContract.try_balanceOf(Address.fromBytes(poolID));
+  if (balanceCall.reverted) {
     log.error(
-      "[handleShareWithdrawalQueued] strategyContract.try_sharesToUnderlying() reverted for strategy: {}",
-      [poolID.toHexString()]
+      "[handleWithdrawalCompleted] tokenContract.try_balanceOf() reverted for token: {}strategy: {}",
+      [
+        Address.fromBytes(tokenID).toHexString(),
+        Address.fromBytes(poolID).toHexString(),
+      ]
     );
     return;
   }
-  const amount = amountCall.value;
+  const amount = pool.inputTokenBalances[0].minus(balanceCall.value);
 
   updateUsage(
     Address.fromBytes(poolID),

@@ -115,7 +115,7 @@ export function getWithdraw(
   }
 
   log.warning(
-    "[completeWithdraw] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
+    "[getWithdraw] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
     [accountAddress.toHexString(), withdrawalRoot.toHexString()]
   );
   return null;
