@@ -15,6 +15,9 @@ import { LpToken as LpTokenContract } from "../../generated/Pool/LpToken";
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
 }
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,

@@ -24,7 +24,7 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
- *  - @dmelotik
+ *  - @melotik
  */
 
 /**
