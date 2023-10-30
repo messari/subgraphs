@@ -9760,7 +9760,7 @@
     }
   },
   "eigenlayer": {
-    "schema": "non-standard",
+    "schema": "generic",
     "base": "eigenlayer",
     "protocol": "eigenlayer",
     "project": "eigenlayer",

@@ -1,6 +1,6 @@
 # EigenLayer Protocol Subgraph Metrics Methodology v1.0.0
 
-eigenlayer subgraph based on a non-standard schema.
+eigenlayer subgraph based on a non-standard schema - based on generic schema v2.1.1.
 
 ## Business Summary
 

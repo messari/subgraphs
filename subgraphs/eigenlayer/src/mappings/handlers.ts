@@ -59,6 +59,7 @@ export function handlePodDeployed(event: PodDeployed): void {
   // As per communication on EigenLayer's discord, currently native staking is technically not proven restaked
   // i.e. delegateable without the proof system launching in the upcoming M2 release,
   // so that’s why hasRestaked is false for all EigenPods for now.
+  // ref: https://discord.com/channels/1089434273720832071/1090553231031140382/1162436943066443846
   let isActive = false;
   const eigenPod = EigenPod.bind(podAddress);
   const hasRestakedCall = eigenPod.try_hasRestaked();
