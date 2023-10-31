@@ -141,9 +141,8 @@ export function updateUsage(
   if (isDeposit) {
     if (!account.deposits.length) {
       protocol.cumulativeUniqueDepositors += INT_ONE;
-      account.deposits = addToArrayAtIndex(account.deposits, eventID);
     }
-
+    account.deposits = addToArrayAtIndex(account.deposits, eventID);
     pool.cumulativeDepositCount += INT_ONE;
     protocol.cumulativeDepositCount += INT_ONE;
   } else {
