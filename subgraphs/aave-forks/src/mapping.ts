@@ -537,7 +537,10 @@ export function _handleReserveDataUpdated(
     assetPriceUSD,
     tryTotalSupply.value,
     vBorrowBalance,
-    sBorrowBalance
+    sBorrowBalance,
+    null,
+    null,
+    tryTotalSupply.value
   );
 
   const tryScaledSupply = aTokenContract.try_scaledTotalSupply();
@@ -1164,7 +1167,7 @@ export function _handleMintedToTreasury(
     return;
   }
 
-  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const tokenManager = new TokenManager(market.inputToken, event);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const treasuryAddress = getTreasuryAddress(market);
   const treasuryBalance = getCollateralBalance(market, treasuryAddress);
@@ -1269,7 +1272,8 @@ export function _handleTransfer(
     interestRateType
   );
 
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const inputTokenManager = new TokenManager(market.inputToken, event);
+  const amountUSD = inputTokenManager.getAmountUSD(amount);
   const manager = new DataManager(
     market.id,
     market.inputToken,
