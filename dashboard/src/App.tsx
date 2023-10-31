@@ -13,6 +13,7 @@ import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetwo
 
 function App() {
   console.log("RUNNING VERSION " + dashboardVersion);
+  const [loading, setLoading] = useState(false);
   const [protocolsToQuery, setProtocolsToQuery] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
@@ -49,25 +50,30 @@ function App() {
   };
 
   const getDeployments = () => {
-    try {
-      fetch(process.env.REACT_APP_MESSARI_STATUS_URL!, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "x-messari-api-key": process.env.REACT_APP_MESSARI_API_KEY!,
-        },
-      })
-        .then(function (res) {
-          return res.json();
+    if (Object.keys(protocolsToQuery).length === 0) {
+      setLoading(true);
+      try {
+        fetch(process.env.REACT_APP_MESSARI_STATUS_URL!, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "x-messari-api-key": process.env.REACT_APP_MESSARI_API_KEY!,
+          },
         })
-        .then(function (json) {
-          setProtocolsToQuery(json);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } catch (error) {
-      console.error(error);
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (json) {
+            setLoading(false);
+            setProtocolsToQuery(json);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        setLoading(false);
+        console.error(error);
+      }
     }
   };
 
@@ -193,6 +199,7 @@ function App() {
               <DeploymentsPage
                 issuesMapping={issuesMapping}
                 getData={() => getDeployments()}
+                loading={loading}
                 protocolsToQuery={protocolsToQuery}
                 subgraphCounts={depoCount}
                 decentralizedDeployments={decentralizedDeployments}

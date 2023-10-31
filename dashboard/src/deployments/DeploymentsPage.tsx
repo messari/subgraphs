@@ -13,6 +13,7 @@ const DeploymentsLayout = styled("div")`
 
 interface DeploymentsPageProps {
   protocolsToQuery: { [x: string]: any };
+  loading: boolean;
   getData: any;
   subgraphCounts: any;
   decentralizedDeployments: any;
@@ -21,6 +22,7 @@ interface DeploymentsPageProps {
 
 function DeploymentsPage({
   protocolsToQuery,
+  loading,
   getData,
   subgraphCounts,
   decentralizedDeployments,
@@ -37,7 +39,9 @@ function DeploymentsPage({
   const [showSubstreamsBasedSubgraphs, setShowSubstreamsBasedSubgraphs] = useState<boolean>(false);
 
   useEffect(() => {
-    getData();
+    if (!protocolsToQuery || Object.keys(protocolsToQuery).length === 0) {
+      getData();
+    }
   }, []);
 
   useEffect(() => {
@@ -156,12 +160,26 @@ function DeploymentsPage({
           </span>
         </div>
         {devCountTable}
-        <DeploymentsTable
-          getData={() => getData()}
-          issuesMapping={issuesMapping}
-          protocolsToQuery={showSubstreamsBasedSubgraphs ? substreamsBasedSubgraphs : nonSubstreamsBasedSubgraphs}
-          decenDeposToSubgraphIds={decenDeposToSubgraphIds}
-        />
+        {loading ? (
+          <div
+            className="loader-container"
+            style={{
+              width: "100%",
+              height: "100vh",
+              position: "fixed",
+              zIndex: 1001,
+              background:
+                "transparent url('https://media.giphy.com/media/8agqybiK5LW8qrG3vJ/giphy.gif') center no-repeat",
+            }}
+          ></div>
+        ) : (
+          <DeploymentsTable
+            getData={() => getData()}
+            issuesMapping={issuesMapping}
+            protocolsToQuery={showSubstreamsBasedSubgraphs ? substreamsBasedSubgraphs : nonSubstreamsBasedSubgraphs}
+            decenDeposToSubgraphIds={decenDeposToSubgraphIds}
+          />
+        )}
       </DeploymentsLayout>
     </DeploymentsContextProvider>
   );
