@@ -1,6 +1,6 @@
 # Friend Tech Protocol Subgraph Metrics Methodology v1.0.0
 
-friend-tech subgraph based on a non-standard schema.
+friend-tech subgraph based on a non-standard schema - (derived from generic schema v2.1.1).
 
 ## Business Summary
 

@@ -6,7 +6,7 @@ import {
   CHAINLINK_AGGREGATOR_ETH_USD,
   ETH_DECIMALS,
 } from "./constants";
-import { getOrCreateEthToken } from "./getters";
+import { getOrCreateToken } from "./getters";
 
 import { ChainLinkAggregator } from "../../generated/Shares/ChainLinkAggregator";
 
@@ -33,7 +33,7 @@ export function getUsdPriceForEthAmount(
   amount: BigInt,
   event: ethereum.Event
 ): BigDecimal {
-  const eth = getOrCreateEthToken(event);
+  const eth = getOrCreateToken(event);
 
   return amount
     .toBigDecimal()

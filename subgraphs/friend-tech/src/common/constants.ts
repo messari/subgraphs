@@ -46,7 +46,6 @@ export namespace ProtocolType {
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
   export const GENERIC = "GENERIC";
-  export const SOCIAL = "SOCIAL";
 }
 
 export namespace TradeType {
@@ -93,6 +92,7 @@ export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
 export const SECONDS_PER_DAY = 60 * 60 * 24;
+export const SECONDS_PER_HOUR = 60 * 60;
 
 ////////////////////////
 /// Protocol Specific //

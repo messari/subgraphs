@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.6
 schema:
   file: ./schema.graphql
 {{#graftEnabled}}

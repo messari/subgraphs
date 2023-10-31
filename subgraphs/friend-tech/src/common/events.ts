@@ -1,22 +1,39 @@
 import { Address, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-import { getUsdPriceForEthAmount } from "./prices";
+import { bigIntToBigDecimal } from "./utils";
 import { TradeType, ZERO_ADDRESS } from "./constants";
 import { NetworkConfigs } from "../../configurations/configure";
 
-import { Trade } from "../../generated/schema";
+import { Token, Trade } from "../../generated/schema";
 
-export function createEvent(
+export function createTrade(
+  token: Token,
   traderAddress: Address,
   subjectAddress: Address,
   shares: BigInt,
-  sharePriceETH: BigInt,
-  subjectFeeETH: BigInt,
-  protocolFeeETH: BigInt,
-  tradeAmountETH: BigInt,
+  sharePriceAmount: BigInt,
+  subjectFeeAmount: BigInt,
+  protocolFeeAmount: BigInt,
+  tradeAmount: BigInt,
   isBuy: boolean,
   event: ethereum.Event
-): void {
+): Bytes {
+  const sharePriceUSD = bigIntToBigDecimal(
+    sharePriceAmount,
+    token.decimals
+  ).times(token.lastPriceUSD!);
+  const protocolFeeUSD = bigIntToBigDecimal(
+    protocolFeeAmount,
+    token.decimals
+  ).times(token.lastPriceUSD!);
+  const subjectFeeUSD = bigIntToBigDecimal(
+    subjectFeeAmount,
+    token.decimals
+  ).times(token.lastPriceUSD!);
+  const tradeAmountUSD = bigIntToBigDecimal(tradeAmount, token.decimals).times(
+    token.lastPriceUSD!
+  );
+
   const id = Bytes.empty()
     .concat(event.transaction.hash)
     .concatI32(event.logIndex.toI32());
@@ -34,24 +51,18 @@ export function createEvent(
   tradeEvent.subject = subjectAddress;
   tradeEvent.type = isBuy ? TradeType.BUY : TradeType.SELL;
   tradeEvent.shares = shares;
-
-  const sharePriceUSD = getUsdPriceForEthAmount(sharePriceETH, event);
-  const protocolFeeUSD = getUsdPriceForEthAmount(protocolFeeETH, event);
-  const subjectFeeUSD = getUsdPriceForEthAmount(subjectFeeETH, event);
-  const tradeAmountUSD = getUsdPriceForEthAmount(tradeAmountETH, event);
-
-  tradeEvent.sharePriceETH = sharePriceETH;
+  tradeEvent.sharePriceAmount = sharePriceAmount;
   tradeEvent.sharePriceUSD = sharePriceUSD;
-  tradeEvent.protocolFeeETH = protocolFeeETH;
+  tradeEvent.protocolFeeAmount = protocolFeeAmount;
   tradeEvent.protocolFeeUSD = protocolFeeUSD;
-  tradeEvent.subjectFeeETH = subjectFeeETH;
+  tradeEvent.subjectFeeAmount = subjectFeeAmount;
   tradeEvent.subjectFeeUSD = subjectFeeUSD;
-  tradeEvent.amountETH = tradeAmountETH;
+  tradeEvent.amount = tradeAmount;
   tradeEvent.amountUSD = tradeAmountUSD;
 
   tradeEvent.blockNumber = event.block.number;
   tradeEvent.timestamp = event.block.timestamp;
-
   tradeEvent.save();
-  return;
+
+  return tradeEvent.id;
 }

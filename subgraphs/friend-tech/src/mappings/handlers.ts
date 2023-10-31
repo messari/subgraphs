@@ -1,65 +1,73 @@
 import {
-  updateConnections,
+  getOrCreateAccount,
+  getOrCreateConnection,
+  getOrCreatePool,
+  getOrCreateProtocol,
+  getOrCreateToken,
+} from "../common/getters";
+import {
+  updateConnection,
   updateRevenue,
-  updateSubjectPrice,
+  updateShares,
   updateTVL,
   updateUsage,
   updateVolume,
 } from "../common/metrics";
-import {
-  updateConnectionDailySnapshot,
-  updateProtocolSnapshots,
-  updateSubjectDailySnapshot,
-  updateTraderDailySnapshot,
-} from "../common/snapshots";
-import { createEvent } from "../common/events";
+import { takePoolSnapshots, takeProtocolSnapshots } from "../common/snapshots";
+import { createTrade } from "../common/events";
 
 import { Trade } from "../../generated/Shares/Shares";
 
 export function handleTrade(event: Trade): void {
-  const trader = event.params.trader;
-  const subject = event.params.subject;
+  const traderAddress = event.params.trader;
+  const subjectAddress = event.params.subject;
   const isBuy = event.params.isBuy;
   const shares = event.params.shareAmount;
   const supply = event.params.supply;
-  const tradeAmountETH = event.params.ethAmount;
-  const subjectFeeETH = event.params.subjectEthAmount;
-  const protocolFeeETH = event.params.protocolEthAmount;
-  const sharePriceETH = event.params.ethAmount.minus(
+  const sharePriceAmount = event.params.ethAmount;
+  const subjectFeeAmount = event.params.subjectEthAmount;
+  const protocolFeeAmount = event.params.protocolEthAmount;
+  const tradeAmount = event.params.ethAmount.plus(
     event.params.subjectEthAmount.plus(event.params.protocolEthAmount)
   );
 
-  updateTVL(sharePriceETH, isBuy, event);
-  updateUsage(trader, subject, isBuy, event);
-  updateRevenue(subject, subjectFeeETH, protocolFeeETH, event);
-  updateVolume(trader, subject, sharePriceETH, isBuy, event);
-
-  updateConnections(trader, subject, shares, sharePriceETH, isBuy, event);
-  updateSubjectPrice(subject, supply, tradeAmountETH, event);
-
-  updateProtocolSnapshots(event);
-  updateTraderDailySnapshot(trader, sharePriceETH, isBuy, event);
-  updateSubjectDailySnapshot(
-    subject,
-    supply,
-    sharePriceETH,
-    subjectFeeETH,
-    isBuy,
+  const token = getOrCreateToken(event);
+  const protocol = getOrCreateProtocol();
+  const pool = getOrCreatePool(subjectAddress, event);
+  const account = getOrCreateAccount(traderAddress, event);
+  const connection = getOrCreateConnection(
+    traderAddress,
+    subjectAddress,
     event
   );
-  updateConnectionDailySnapshot(trader, subject, sharePriceETH, isBuy, event);
 
-  createEvent(
-    trader,
-    subject,
+  const tradeID = createTrade(
+    token,
+    traderAddress,
+    subjectAddress,
     shares,
-    sharePriceETH,
-    subjectFeeETH,
-    protocolFeeETH,
-    tradeAmountETH,
+    sharePriceAmount,
+    subjectFeeAmount,
+    protocolFeeAmount,
+    tradeAmount,
     isBuy,
     event
   );
+
+  updateTVL(token, protocol, pool, sharePriceAmount, isBuy);
+  updateRevenue(token, protocol, pool, subjectFeeAmount, protocolFeeAmount);
+  updateVolume(token, protocol, pool, account, sharePriceAmount, isBuy);
+  updateShares(token, pool, sharePriceAmount, supply);
+  updateUsage(protocol, pool, account, isBuy, tradeID);
+  updateConnection(token, connection, shares, sharePriceAmount, isBuy);
+
+  takeProtocolSnapshots(protocol, event);
+  takePoolSnapshots(pool, event);
+
+  connection.save();
+  account.save();
+  pool.save();
+  protocol.save();
 
   return;
 }

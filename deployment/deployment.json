@@ -9760,7 +9760,7 @@
     }
   },
   "friend-tech": {
-    "schema": "non-standard",
+    "schema": "generic",
     "base": "friend-tech",
     "protocol": "friend-tech",
     "project": "friend-tech",

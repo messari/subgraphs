@@ -1,4 +1,11 @@
-import { SECONDS_PER_DAY } from "./constants";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+
+import {
+  BIGINT_TEN,
+  ETH_DECIMALS,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+} from "./constants";
 
 export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
   if (x.length == 0) {
@@ -23,4 +30,15 @@ export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
 
 export function getDaysSinceEpoch(secondsSinceEpoch: number): i32 {
   return <i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY);
+}
+
+export function getHoursSinceEpoch(secondsSinceEpoch: number): i32 {
+  return <i32>Math.floor(secondsSinceEpoch / SECONDS_PER_HOUR);
+}
+
+export function bigIntToBigDecimal(
+  quantity: BigInt,
+  decimals: i32 = ETH_DECIMALS
+): BigDecimal {
+  return quantity.divDecimal(BIGINT_TEN.pow(decimals as u8).toBigDecimal());
 }
