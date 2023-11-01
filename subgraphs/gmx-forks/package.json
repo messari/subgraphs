@@ -6,7 +6,7 @@
     "deploy": "graph deploy --product hosted-service shashwats22/mummy-finance-arbitrum"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.51.1",
+    "@graphprotocol/graph-cli": "^0.60.0",
     "@graphprotocol/graph-ts": "^0.31.0"
   },
   "devDependencies": {
