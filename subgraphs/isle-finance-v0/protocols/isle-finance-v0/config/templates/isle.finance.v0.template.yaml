@@ -73,6 +73,12 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
         - name: LoanManager
           file: ./abis/LoanManager.json
         - name: WithdrawalManager
@@ -140,6 +146,8 @@ dataSources:
           handler: handleCoverLiquidated
         - event: CoverWithdrawn(uint256)
           handler: handleCoverWithdrawn
+        - event: Initialized(indexed address,indexed address,address)
+          handler: handleInitialized
         - event: MaxCoverLiquidationSet(uint24)
           handler: handleMaxCoverLiquidationSet
         - event: MinCoverSet(uint104)
@@ -158,4 +166,38 @@ dataSources:
           handler: handleValidLenderSet
         - event: ValidSellerSet(indexed address,bool)
           handler: handleValidSellerSet
+      file: ./protocols/isle-finance-v0/src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: WithdrawalManager
+          file: ./abis/WithdrawalManager.json
+        - name: PoolConfigurator
+          file: ./abis/PoolConfigurator.json
+      eventHandlers:
+      - event: Transfer(indexed address,indexed address,uint256)
+        handler: handleTransfer
+      - event: Deposit(indexed address,indexed address,uint256,uint256)
+        handler: handleDeposit
+      - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+        handler: handleWithdraw
       file: ./protocols/isle-finance-v0/src/mapping.ts

@@ -15,7 +15,7 @@ import {
   RevenueDetail,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
-} from "../../../../generated/schema";
+} from "../../generated/schema";
 import {
   activityCounter,
   BIGDECIMAL_ZERO,

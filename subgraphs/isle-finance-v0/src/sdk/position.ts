@@ -12,7 +12,7 @@ import {
   Position,
   _PositionCounter,
   PositionSnapshot,
-} from "../../../../generated/schema";
+} from "../../generated/schema";
 import {
   BIGINT_ZERO,
   exponentToBigDecimal,
