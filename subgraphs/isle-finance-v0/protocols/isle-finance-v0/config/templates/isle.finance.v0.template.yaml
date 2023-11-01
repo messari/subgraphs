@@ -10,7 +10,7 @@ graft:
   block: {{graftStartBlock}} # Block number
 {{/graftEnabled}}
 dataSources:
-  - kind: enthereum/contract
+  - kind: ethereum/contract
     name: Receivable
     network: {{ network }}
     source:
