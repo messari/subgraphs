@@ -17,7 +17,7 @@ dataSources:
       address: "{{ Receivable.address }}"
       abi: Receivable
       startBlock: {{ Receivable.startBlock }}
-      mapping:
+    mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
