@@ -72,24 +72,32 @@ export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
 
 export function addArrays<T>(a: T[], b: T[]): T[] {
   const retval = new Array<T>();
-  if (a.length == b.length) {
-    let i = 0;
-    while (i < a.length) {
-      retval.push(a[i].plus(b[i]));
-      i += 1;
-    }
+  const arraysByLength = a.length <= b.length ? [a, b] : [b, a];
+
+  let i = 0;
+  while (i < arraysByLength[0].length) {
+    retval.push(a[i].plus(b[i]));
+    i += 1;
+  }
+  while (i < arraysByLength[1].length) {
+    retval.push(arraysByLength[1][i]);
+    i += 1;
   }
   return retval;
 }
 
 export function subtractArrays<T>(a: T[], b: T[]): T[] {
   const retval = new Array<T>();
-  if (a.length == b.length) {
-    let i = 0;
-    while (i < a.length) {
-      retval.push(a[i].minus(b[i]));
-      i += 1;
-    }
+  const arraysByLength = a.length <= b.length ? [a, b] : [b, a];
+
+  let i = 0;
+  while (i < arraysByLength[0].length) {
+    retval.push(a[i].minus(b[i]));
+    i += 1;
+  }
+  while (i < arraysByLength[1].length) {
+    retval.push(arraysByLength[1][i]);
+    i += 1;
   }
   return retval;
 }
