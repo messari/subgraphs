@@ -1,0 +1,14 @@
+{
+  "name": "eigenlayer",
+  "license": "MIT",
+  "scripts": {
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.58.0",
+    "@graphprotocol/graph-ts": "^0.31.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  }
+}

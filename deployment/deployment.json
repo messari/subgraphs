@@ -9784,5 +9784,35 @@
         }
       }
     }
+  },
+  "eigenlayer": {
+    "schema": "generic",
+    "base": "eigenlayer",
+    "protocol": "eigenlayer",
+    "project": "eigenlayer",
+    "deployments": {
+      "eigenlayer-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "eigenlayer.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "eigenlayer-ethereum",
+            "query-id": "eigenlayer-ethereum"
+          }
+        }
+      }
+    }
   }
 }

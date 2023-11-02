@@ -1,0 +1,473 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract IETHPOSDeposit",
+        "name": "_ethPOS",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IDelayedWithdrawalRouter",
+        "name": "_delayedWithdrawalRouter",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IEigenPodManager",
+        "name": "_eigenPodManager",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_REQUIRED_BALANCE_WEI",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "pubkey",
+        "type": "bytes"
+      }
+    ],
+    "name": "EigenPodStaked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "validatorIndex",
+        "type": "uint40"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "withdrawalAmountGwei",
+        "type": "uint64"
+      }
+    ],
+    "name": "FullWithdrawalRedeemed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "validatorIndex",
+        "type": "uint40"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "partialWithdrawalAmountGwei",
+        "type": "uint64"
+      }
+    ],
+    "name": "PartialWithdrawalRedeemed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RestakedBeaconChainETHWithdrawn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "validatorIndex",
+        "type": "uint40"
+      }
+    ],
+    "name": "ValidatorOvercommitted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "validatorIndex",
+        "type": "uint40"
+      }
+    ],
+    "name": "ValidatorRestaked",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "REQUIRED_BALANCE_GWEI",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "REQUIRED_BALANCE_WEI",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "delayedWithdrawalRouter",
+    "outputs": [
+      {
+        "internalType": "contract IDelayedWithdrawalRouter",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "eigenPodManager",
+    "outputs": [
+      {
+        "internalType": "contract IEigenPodManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ethPOS",
+    "outputs": [
+      {
+        "internalType": "contract IETHPOSDeposit",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "hasRestaked",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_podOwner", "type": "address" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mostRecentWithdrawalBlockNumber",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "podOwner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint40", "name": "", "type": "uint40" },
+      { "internalType": "uint64", "name": "", "type": "uint64" }
+    ],
+    "name": "provenPartialWithdrawal",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "restakedExecutionLayerGwei",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "pubkey", "type": "bytes" },
+      { "internalType": "bytes", "name": "signature", "type": "bytes" },
+      {
+        "internalType": "bytes32",
+        "name": "depositDataRoot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "name": "validatorStatus",
+    "outputs": [
+      {
+        "internalType": "enum IEigenPod.VALIDATOR_STATUS",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "blockHeaderProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "withdrawalProof",
+            "type": "bytes"
+          },
+          { "internalType": "bytes", "name": "slotProof", "type": "bytes" },
+          {
+            "internalType": "bytes",
+            "name": "executionPayloadProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "blockNumberProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint64",
+            "name": "blockHeaderRootIndex",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "withdrawalIndex",
+            "type": "uint64"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "blockHeaderRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "blockBodyRoot",
+            "type": "bytes32"
+          },
+          { "internalType": "bytes32", "name": "slotRoot", "type": "bytes32" },
+          {
+            "internalType": "bytes32",
+            "name": "blockNumberRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "executionPayloadRoot",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct BeaconChainProofs.WithdrawalProofs",
+        "name": "withdrawalProofs",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "validatorFieldsProof",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "validatorFields",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "withdrawalFields",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "beaconChainETHStrategyIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "oracleBlockNumber",
+        "type": "uint64"
+      }
+    ],
+    "name": "verifyAndProcessWithdrawal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint40", "name": "validatorIndex", "type": "uint40" },
+      {
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "validatorFieldsProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "validatorBalanceProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "balanceRoot",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct BeaconChainProofs.ValidatorFieldsAndBalanceProofs",
+        "name": "proofs",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "validatorFields",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "beaconChainETHStrategyIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "oracleBlockNumber",
+        "type": "uint64"
+      }
+    ],
+    "name": "verifyOvercommittedStake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "oracleBlockNumber",
+        "type": "uint64"
+      },
+      { "internalType": "uint40", "name": "validatorIndex", "type": "uint40" },
+      {
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "validatorFieldsProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "validatorBalanceProof",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "balanceRoot",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct BeaconChainProofs.ValidatorFieldsAndBalanceProofs",
+        "name": "proofs",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "validatorFields",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "verifyWithdrawalCredentialsAndBalance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawBeforeRestaking",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      { "internalType": "uint256", "name": "amountWei", "type": "uint256" }
+    ],
+    "name": "withdrawRestakedBeaconChainETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
