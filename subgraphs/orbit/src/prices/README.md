@@ -3,6 +3,7 @@
 ## Configuration
 
 In `subgraph.yaml`, add the following code snippet inside the `abis` section of the `datasources` which is going to fetch prices of token using the `Price Oracle`.
+</br>
 **NOTE**: Include the following code snippet in each of the datasources, that is dependent on the `Price Oracle` and update imports in each file inside oracle folder.
 
 ```
@@ -46,9 +47,21 @@ Following are some ways through which you can get the prices of tokens:
 
 ```
 import { BigDecimal } from "@graphprotocol/graph-ts";
-import { getUsdPricePerToken, getUsdPrice } from "../Oracle";
+import { getUsdPrice, getUsdPricePerToken, getLiquidityBoundPrice } from "../Oracle";
 
 // Method 1
+// Using function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal
+
+let tokenPrice = getUsdPrice(tokenAddr, amount);
+```
+
+> Note: Preferred as it internally calls `getLiquidityBoundPrice(...)` and returns token price bounded by it's pool's liquidity.
+> </br>
+> To get the price per token, you can still use `getUsdPrice(...)` as:
+> </br></br> > `let tokenPrice = getUsdPrice(tokenAddr, BIGDECIMAL_ONE);`
+
+```
+// Method 2
 // Using function getUsdPricePerToken(tokenAddr: Address): CustomPriceType
 
 let tokenPrice: BigDecimal;
@@ -57,18 +70,33 @@ let fetchPrice = getUsdPricePerToken(tokenAddr);
 // fetchPrice.reverted: Bool
 // fetchPrice.usdPrice: BigDecimal
 // fetchPrice.decimals: number
+// fetchPrice.oracleType: string
+// fetchPrice.liquidity: BigDecimal
 
-tokenPrice = fetchPrice.usdPrice * amount
-
-// Method 2
-// Using function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal
-
-let tokenPrice = getUsdPrice(tokenAddr, amount);
+if (!fetchPrice.reverted) {
+  if (
+    fetchPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
+    fetchPrice.oracleType == constants.OracleType.CURVE_ROUTER
+  ) {
+    fetchPrice = getLiquidityBoundPrice(tokenAddr, fetchPrice, amount)
+  }
+  tokenPrice = fetchPrice.usdPrice * amount
+}
 ```
 
 ## Optimizations
 
-- Reorder the methods present in `index.ts`, depending on which method works best for you.
+- Configure default `number of oracles` to fetch price from and their `order of preference` in OracleType's constructor, depending on which oracles _generally_ works best for you.
+- Although querying multiple oracles for the same token's price mean more contract calls, this overhead can be beared for smaller subgraphs, and for specific tokens/block ranges for larger ones in favour of spotting and ignoring outlier values by avoiding complete reliance on a single source of truth and trusting the closer majority values, especially for low/distributed liquidity tokens, or during volatile markets.
+  </br></br>
+  The result is an average price on the k-closest reported values.
+  </br>
+  where, `k = ceil(reportedPrices.length/2)`
+- For any observed pricing discrepancies, you may define an override on the default oracle configuration in network's config file which works better for the mispriced token(s).
+  </br>
+  An example override is defined under `ORACLE CONFIG OVERRIDES` section in `config/template.ts`
+  </br></br>
+  Any new overrides shall be maintained in both the subgraph as well as the reference pricelib directory, so the same inconsistencies do not have to be handled separately.
 
 ## Folder Structure
 
@@ -86,13 +114,17 @@ Prices
 │   ├── aurora.ts
 │   ├── avalanche.ts
 │   ├── bsc.ts
+│   ├── celo.ts
+│   ├── cronos.ts
 │   ├── fantom.ts
+│   ├── fuse.ts
 │   ├── gnosis.ts
 │   ├── harmony.ts
 │   ├── mainnet.ts
 │   ├── moonbeam.ts
 │   ├── optimism.ts
-│   └── polygon.ts
+│   ├── polygon.ts
+│   └── template.ts
 ├── oracles
 │   ├── AaveOracle.ts
 │   ├── ChainLinkFeed.ts
@@ -154,6 +186,21 @@ Prices
 |              | `0x10ED43C718714eb63d5aA57B78B54704E256024E` |   `6810080`    |      ✅       |
 |              | `0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F` |    `586899`    |      ✅       |
 
+### Celo
+
+| **Method**   |                 **Address**                  | **StartBlock** | **MultiCall** |
+| ------------ | :------------------------------------------: | :------------: | :-----------: |
+| UniswapForks |                                              |                |               |
+|              | `0xe3d8bd6aed4f159bc8000a9cd47cffdb95f96121` |   `5272598`    |      ✅       |
+|              | `0x1b02da8cb0d097eb8d57a175b88c7d8b47997506` |   `7254057`    |      ✅       |
+
+### Cronos
+
+| **Method**   |                 **Address**                  | **StartBlock** | **MultiCall** |
+| ------------ | :------------------------------------------: | :------------: | :-----------: |
+| UniswapForks |                                              |                |               |
+|              | `0x145863eb42cf62847a6ca784e6416c1682b1b2ae` |     `5247`     |      ✅       |
+
 ### Fantom
 
 | **Method**   |                 **Address**                  | **StartBlock** | **MultiCall** |
@@ -168,6 +215,14 @@ Prices
 |              | `0xbe4fc72f8293f9d3512d58b969c98c3f676cb957` |   `3796241`    |      ✅       |
 |              | `0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52` |   `4250168`    |      ✅       |
 |              | `0x1b02da8cb0d097eb8d57a175b88c7d8b47997506` |   `2457904`    |      ✅       |
+
+### Fuse
+
+| **Method**   |                 **Address**                  | **StartBlock** | **MultiCall** |
+| ------------ | :------------------------------------------: | :------------: | :-----------: |
+| UniswapForks |                                              |                |               |
+|              | `0xe3f85aad0c8dd7337427b9df5d0fb741d65eeeb5` |   `15645719`   |      ✅       |
+|              | `0x1b02da8cb0d097eb8d57a175b88c7d8b47997506` |   `12936314`   |      ✅       |
 
 ### Gnosis
 
