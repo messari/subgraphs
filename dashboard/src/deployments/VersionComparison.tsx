@@ -96,16 +96,17 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
       <>
         {prodDeploymentsToQuery.map((depo: any) => {
           let slug = depo?.["services"]?.["hosted-service"]?.["slug"];
-          let endpoint = "https://api.thegraph.com/subgraphs/name/messari/" + slug;
+          let endpoint = process.env.REACT_APP_GRAPH_BASE_URL! + "/subgraphs/name/messari/" + slug;
           if (depo.network === "cronos") {
             slug = depo?.["services"]?.["cronos-portal"]?.["slug"];
-            endpoint = "https://graph.cronoslabs.com/subgraphs/name/messari/" + slug;
+            endpoint = process.env.REACT_APP_GRAPH_CRONOS_URL! + "/subgraphs/name/messari/" + slug;
           }
           slugToQueryString[slug] = "messari/" + slug;
           let decentralizedFetch = null;
           if (depo?.["services"]?.["decentralized-network"]) {
             let decenEndpoint =
-              "https://gateway-arbitrum.network.thegraph.com/api/" +
+              process.env.REACT_APP_GRAPH_DECEN_URL! +
+              "/api/" +
               process.env.REACT_APP_GRAPH_API_KEY +
               "/subgraphs/id/" +
               depo?.["services"]?.["decentralized-network"]?.["query-id"];
@@ -250,7 +251,9 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
       } else if (subgraphVersionMapping[depo]) {
         failedQueryRows.push(
           <TableRow
-            onClick={() => (window.location.href = "https://okgraph.xyz/?q=" + slugToQueryString[depo])}
+            onClick={() =>
+              (window.location.href = process.env.REACT_APP_OKGRAPH_BASE_URL! + "/?q=" + slugToQueryString[depo])
+            }
             key={depo + "RowComp"}
             sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}
           >

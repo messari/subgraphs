@@ -8,7 +8,7 @@ interface PendingCallsProps {
 }
 
 function PendingCalls({ query, setPendingSubgraphData }: PendingCallsProps) {
-  const clientPending = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
+  const clientPending = useMemo(() => NewClient(process.env.REACT_APP_GRAPH_BASE_URL! + "/index-node/graphql"), []);
 
   // Generate query from subgraphEndpoints
   const [fetchPending, { data: pendingRequest }] = useLazyQuery(query, {

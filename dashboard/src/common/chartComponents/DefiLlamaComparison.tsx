@@ -105,23 +105,27 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   }
 
   const fetchDefiLlamaProtocols = () => {
-    setDefiLlamaRequestLoading(true);
-    fetch("https://api.llama.fi/protocols", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then(function (res) {
-        return res.json();
+    try {
+      setDefiLlamaRequestLoading(true);
+      fetch(process.env.REACT_APP_DEFILLAMA_BASE_URL! + "/protocols", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
       })
-      .then(function (json) {
-        setDefiLlamaRequestLoading(false);
-        setDefiLlamaProtocols(json);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (json) {
+          setDefiLlamaRequestLoading(false);
+          setDefiLlamaProtocols(json);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -129,19 +133,26 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   }, []);
 
   const defiLlama = () => {
-    fetch("https://api.llama.fi/protocol/" + defiLlamaSlug?.split(" (")[0].split(" ").join("-"), {
-      method: "GET",
-    })
-      .then(function (res) {
-        return res.json();
-      })
-      .then(function (json) {
-        setDefiLlamaData(json);
-      })
-      .catch((err) => {
-        setDefiLlamaProtocolFetchError(true);
-        console.log(err);
-      });
+    try {
+      fetch(
+        process.env.REACT_APP_DEFILLAMA_BASE_URL! + "/protocol/" + defiLlamaSlug?.split(" (")[0].split(" ").join("-"),
+        {
+          method: "GET",
+        },
+      )
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (json) {
+          setDefiLlamaData(json);
+        })
+        .catch((err) => {
+          setDefiLlamaProtocolFetchError(true);
+          console.log(err);
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {

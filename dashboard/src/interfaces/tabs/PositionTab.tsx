@@ -1,6 +1,7 @@
 import { Box, CircularProgress } from "@mui/material";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import { DataGrid } from "@mui/x-data-grid";
+import { blockExplorers } from "../../constants";
 
 interface PositionTabProps {
   positions: any[];
@@ -68,10 +69,10 @@ export default function PositionTab({
                   return;
                 }
                 if (key.toUpperCase().includes("HASH") || relatedEvents.includes(key)) {
-                  return "https://etherscan.io/tx/";
+                  return blockExplorers.MAINNET + "tx/";
                 }
                 if (key.toUpperCase().includes("ACCOUNT")) {
-                  return "https://etherscan.io/address/";
+                  return blockExplorers.MAINNET + "address/";
                 }
               };
               const baseUrl = getBaseUrl();

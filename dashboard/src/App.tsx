@@ -13,6 +13,7 @@ import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetwo
 
 function App() {
   console.log("RUNNING VERSION " + dashboardVersion);
+  const [loading, setLoading] = useState(false);
   const [protocolsToQuery, setProtocolsToQuery] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
@@ -20,57 +21,67 @@ function App() {
   const [issuesMapping, setIssuesMapping] = useState<any>({});
 
   const getGithubRepoIssues = () => {
-    fetch("https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open&sort=updated", {
-      method: "GET",
-      headers: {
-        Accept: "*/*",
-      },
-    })
-      .then(function (res) {
-        return res.json();
+    try {
+      fetch(process.env.REACT_APP_GITHUB_ISSUES_URL! + "?per_page=100&state=open&sort=updated", {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+        },
       })
-      .then(function (json) {
-        if (Array.isArray(json)) {
-          let newIssuesMapping: { [x: string]: string } = {};
-          json.forEach((x: { [x: string]: any }) => {
-            const key: string = x.title.toUpperCase().split(" ").join(" ") || "";
-            newIssuesMapping[key] = x.html_url;
-          });
-          setIssuesMapping(newIssuesMapping);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (json) {
+          if (Array.isArray(json)) {
+            let newIssuesMapping: { [x: string]: string } = {};
+            json.forEach((x: { [x: string]: any }) => {
+              const key: string = x.title.toUpperCase().split(" ").join(" ") || "";
+              newIssuesMapping[key] = x.html_url;
+            });
+            setIssuesMapping(newIssuesMapping);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getDeployments = () => {
-    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
-      method: "GET",
-      headers: {
-        Accept: "*/*",
-      },
-    })
-      .then(function (res) {
-        return res.json();
-      })
-      .then(function (json) {
-        setProtocolsToQuery(json);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (Object.keys(protocolsToQuery).length === 0) {
+      setLoading(true);
+      try {
+        fetch(process.env.REACT_APP_MESSARI_STATUS_URL!, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "x-messari-api-key": process.env.REACT_APP_MESSARI_API_KEY!,
+          },
+        })
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (json) {
+            setLoading(false);
+            setProtocolsToQuery(json);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        setLoading(false);
+        console.error(error);
+      }
+    }
   };
-
-  const aliasToProtocol: { [x: string]: string } = {};
 
   const depoCount: { [x: string]: { totalCount: number; prodCount: number; devCount: number } } = {
     all: { totalCount: 0, prodCount: 0, devCount: 0 },
   };
   // Construct subgraph endpoints
   const subgraphEndpoints: { [x: string]: any } = {};
-  const endpointSlugs: string[] = [];
-  const endpointSlugsByType: { [x: string]: any } = {};
   if (Object.keys(protocolsToQuery)?.length > 0) {
     Object.keys(protocolsToQuery).forEach((protocolName: string) => {
       const protocol: { [x: string]: any } = protocolsToQuery[protocolName];
@@ -100,19 +111,15 @@ function App() {
             const networkKey = protocolKeyArr.pop();
             subgraphEndpoints[schemaType][protocolKeyArr.join("-")] = {};
             subgraphEndpoints[schemaType][protocolKeyArr.join("-")][networkKey] =
-              "https://api.thegraph.com/subgraphs/name/messari/" + depoData["services"]["hosted-service"]["slug"];
+              process.env.REACT_APP_GRAPH_BASE_URL! +
+              "/subgraphs/name/messari/" +
+              depoData["services"]["hosted-service"]["slug"];
           } else {
             subgraphEndpoints[schemaType][protocolName][depoData.network] =
-              "https://api.thegraph.com/subgraphs/name/messari/" + depoData["services"]["hosted-service"]["slug"];
+              process.env.REACT_APP_GRAPH_BASE_URL! +
+              "/subgraphs/name/messari/" +
+              depoData["services"]["hosted-service"]["slug"];
           }
-          endpointSlugs.push(depoData["services"]["hosted-service"]["slug"]);
-          if (!endpointSlugsByType[schemaType]) {
-            endpointSlugsByType[schemaType] = [depoData["services"]["hosted-service"]["slug"]];
-          } else {
-            endpointSlugsByType[schemaType].push(depoData["services"]["hosted-service"]["slug"]);
-          }
-          const alias = depoData["services"]["hosted-service"]["slug"]?.split("-")?.join("_");
-          aliasToProtocol[alias] = protocolName;
         }
         if (!depoCount[schemaType]) {
           depoCount[schemaType] = { totalCount: 0, prodCount: 0, devCount: 0 };
@@ -133,97 +140,22 @@ function App() {
     });
   }
 
-  // Generate indexing queries
-  const queryContents = `
-  subgraph
-  synced
-  fatalError {
-    message
-  }
-  chains {
-    chainHeadBlock {
-      number
-    }
-    earliestBlock {
-      number
-    }
-    latestBlock {
-      number
-    }
-    lastHealthyBlock {
-      number
-    }
-  }
-  entityCount`;
-
-  const indexingStatusQueries: { [x: string]: { [x: string]: string[] } } = {};
-  Object.keys(endpointSlugsByType).forEach((protocolType: string) => {
-    let fullCurrentQueryArray = ["query {"];
-    let fullPendingQueryArray = ["query {"];
-    endpointSlugsByType[protocolType].forEach((name: string) => {
-      if (
-        fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 75000 ||
-        fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 75000
-      ) {
-        return;
-      }
-      fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += `      
-                ${name.split("-").join("_")}: indexingStatusForCurrentVersion(subgraphName: "messari/${name}") {
-                  ${queryContents}
-                }
-            `;
-      fullPendingQueryArray[fullPendingQueryArray.length - 1] += `      
-              ${name.split("-").join("_")}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${name}") {
-                ${queryContents}
-              }
-          `;
-      if (fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 80000) {
-        fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
-        fullCurrentQueryArray.push(" query Status {");
-      }
-      if (fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 80000) {
-        fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
-        fullPendingQueryArray.push(" query Status {");
-      }
-    });
-    fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
-    fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
-
-    if (endpointSlugs.length === 0) {
-      fullCurrentQueryArray = [
-        `    query {
-        indexingStatuses(subgraphs: "") {
-          subgraph
-        }
-      }`,
-      ];
-      fullPendingQueryArray = [
-        `    query {
-        indexingStatuses(subgraphs: "") {
-          subgraph
-        }
-      }`,
-      ];
-    }
-    indexingStatusQueries[protocolType] = { fullCurrentQueryArray, fullPendingQueryArray };
-  });
+  useEffect(() => {
+    getGithubRepoIssues();
+  }, []);
 
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [network: string]: any };
   }>({});
 
   const clientDecentralizedEndpoint = useMemo(
-    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum"),
+    () => NewClient(process.env.REACT_APP_GRAPH_BASE_URL! + "/subgraphs/name/graphprotocol/graph-network-arbitrum"),
     [],
   );
 
   const { data: decentralized } = useQuery(decentralizedNetworkSubgraphsQuery, {
     client: clientDecentralizedEndpoint,
   });
-
-  useEffect(() => {
-    getGithubRepoIssues();
-  }, []);
 
   useEffect(() => {
     if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
@@ -267,11 +199,9 @@ function App() {
               <DeploymentsPage
                 issuesMapping={issuesMapping}
                 getData={() => getDeployments()}
+                loading={loading}
                 protocolsToQuery={protocolsToQuery}
                 subgraphCounts={depoCount}
-                indexingStatusQueries={indexingStatusQueries}
-                endpointSlugs={endpointSlugs}
-                aliasToProtocol={aliasToProtocol}
                 decentralizedDeployments={decentralizedDeployments}
               />
             }

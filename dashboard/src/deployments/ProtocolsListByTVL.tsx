@@ -31,24 +31,28 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
   const [defiLlamaProtocolsLoading, setDefiLlamaProtocolsLoading] = useState<boolean>(false);
   const [currentProtocolType, setProtocolType] = useState<string>("All Protocol Types");
   const fetchDefiLlamaProtocols = () => {
-    setDefiLlamaProtocolsLoading(true);
-    fetch("https://api.llama.fi/protocols", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then(function (res) {
-        return res.json();
+    try {
+      setDefiLlamaProtocolsLoading(true);
+      fetch(process.env.REACT_APP_DEFILLAMA_BASE_URL! + "/protocols", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
       })
-      .then(function (json) {
-        setDefiLlamaProtocols(json);
-        setDefiLlamaProtocolsLoading(false);
-      })
-      .catch((err) => {
-        setDefiLlamaProtocolsLoading(false);
-        console.log(err);
-      });
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (json) {
+          setDefiLlamaProtocols(json);
+          setDefiLlamaProtocolsLoading(false);
+        })
+        .catch((err) => {
+          setDefiLlamaProtocolsLoading(false);
+          console.log(err);
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -149,7 +153,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
 
     return (
       <TableRow
-        onClick={() => (window.location.href = "https://defillama.com/protocol/" + protocol.slug)}
+        onClick={() => (window.location.href = process.env.REACT_APP_DEFILLAMA_WEB_URL! + "/protocol/" + protocol.slug)}
         key={protocol.slug + "PROTOCOLLISTROW"}
         sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}
       >

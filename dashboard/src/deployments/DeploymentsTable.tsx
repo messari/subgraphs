@@ -21,26 +21,10 @@ interface DeploymentsTable {
   protocolsToQuery: { [x: string]: any };
   issuesMapping: any;
   getData: any;
-  decenDepoIndexingStatus: any;
   decenDeposToSubgraphIds: { [x: string]: any };
-  indexingStatusLoaded: any;
-  indexingStatusLoadedPending: any;
-  indexingStatusError: any;
-  indexingStatusErrorPending: any;
 }
 
-function DeploymentsTable({
-  protocolsToQuery,
-  issuesMapping,
-  getData,
-  decenDepoIndexingStatus,
-  decenDeposToSubgraphIds,
-  indexingStatusLoaded,
-  indexingStatusLoadedPending,
-  indexingStatusError,
-  indexingStatusErrorPending,
-}: DeploymentsTable) {
-  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
+function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDeposToSubgraphIds }: DeploymentsTable) {
   const [tableExpanded, setTableExpanded] = useState<any>({
     lending: false,
     exchanges: false,
@@ -196,12 +180,20 @@ function DeploymentsTable({
           };
         }
         let decentralizedNetworkId = null;
+        let decentralizedIndexStatus = null;
         if (!!deploymentData["services"]["decentralized-network"]) {
           decentralizedNetworkId = deploymentData["services"]["decentralized-network"]["slug"];
+
+          decentralizedIndexStatus = deploymentData["services"]["decentralized-network"]["health"][0];
         }
         let hostedServiceId = null;
+        let indexStatus = null;
+        let pendingIndexStatus = null;
         if (!!deploymentData["services"]["hosted-service"]) {
           hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+
+          indexStatus = deploymentData["services"]["hosted-service"]["health"][0];
+          pendingIndexStatus = deploymentData["services"]["hosted-service"]["health"][1];
         }
         if (!!deploymentData["services"]["cronos-portal"]) {
           hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
@@ -209,8 +201,9 @@ function DeploymentsTable({
         deposToPass[protocol.schema][protocolName].networks.push({
           deploymentName: depoKey,
           chain: deploymentData.network,
-          indexStatus: deploymentData?.indexStatus,
-          pendingIndexStatus: deploymentData?.pendingIndexStatus,
+          decentralizedIndexStatus: decentralizedIndexStatus,
+          indexStatus: indexStatus,
+          pendingIndexStatus: pendingIndexStatus,
           status: deploymentData?.status,
           versions: deploymentData?.versions,
           hostedServiceId,
@@ -250,10 +243,6 @@ function DeploymentsTable({
           } else {
             schemaType = schemaMapping[schemaType];
           }
-          const isLoaded = indexingStatusLoaded[schemaType];
-          const isLoadedPending = indexingStatusLoadedPending[schemaType];
-          const indexQueryError = indexingStatusError[schemaType];
-          const indexQueryErrorPending = indexingStatusErrorPending[schemaType];
           const tableRows = Object.keys(subgraph)
             .sort()
             .map((subgraphName) => {
@@ -283,7 +272,9 @@ function DeploymentsTable({
                         schemaVersion={depo.versions.schema}
                         timestampLt={timestampLt}
                         timestampGt={timestampGt}
-                        queryURL={`https://api.thegraph.com/subgraphs/name/messari/${depo.hostedServiceId}`}
+                        queryURL={`${process.env.REACT_APP_GRAPH_BASE_URL!}/subgraphs/name/messari/${
+                          depo.hostedServiceId
+                        }`}
                         resultsObject={resultsObject}
                         setResultsObject={setResultsObject}
                       />
@@ -296,15 +287,6 @@ function DeploymentsTable({
                   }
                 });
               }
-              const decenDepoData: any = {};
-              Object.keys(decenDepoIndexingStatus).forEach((x) => {
-                if (
-                  x.includes(subgraphName) ||
-                  !!protocol.networks.find((x: any) => x.deploymentName.includes(subgraphName))
-                ) {
-                  decenDepoData[x] = decenDepoIndexingStatus[x];
-                }
-              });
 
               return (
                 <>
@@ -314,16 +296,10 @@ function DeploymentsTable({
                     issuesMapping={issuesMapping}
                     subgraphName={subgraphName}
                     protocol={protocol}
-                    decenDepoData={decenDepoData}
                     schemaType={schemaType}
-                    clientIndexing={clientIndexing}
                     decenDeposToSubgraphIds={decenDeposToSubgraphIds}
                     tableExpanded={tableExpanded[schemaType]}
                     validationSupported={validationSupported}
-                    isLoaded={isLoaded}
-                    isLoadedPending={isLoadedPending}
-                    indexQueryError={indexQueryError}
-                    indexQueryErrorPending={indexQueryErrorPending}
                   />
                 </>
               );
