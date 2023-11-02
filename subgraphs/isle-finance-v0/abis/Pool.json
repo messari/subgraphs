@@ -76,7 +76,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "maxMint",  
+        "name": "maxMint",
         "type": "uint256"
       }
     ],

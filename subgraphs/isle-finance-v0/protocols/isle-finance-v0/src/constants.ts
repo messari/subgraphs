@@ -24,22 +24,15 @@ export const DEFAULT_DECIMALS = 18;
 
 export const CHAINLINK_DECIMALS = 8;
 
+// encourage address literals to be all lowercase to comparison errors when using strings.
 // Global contracts
-export const ISLE_GLOBALS = 
-  "0xd5175C76F5a129De4F53b0DF5c878706E31910a1";
-export const ISLE_USD_ADDRESS =
-  "0xD7719799520b89A6b934A4402388e9EDdFD85387";
-export const RECEIVABLE =
-  "0x103d37376F312C0D3FA4021351dC87811E0464B2";
+export const ISLE_GLOBALS = "0xd5175c76f5a129de4f53b0df5c878706e31910a1";
+export const ISLE_USD_ADDRESS = "0xd7719799520b89a6b934a4402388e9eddfd85387";
+export const RECEIVABLE = "0x103d37376f312c0d3Fa4021351dc87811e0464b2";
 
 // Pool-side contracts
-export const POOL_CONFIGURATOR = 
-  "0x4137b1072c18F50D8D5f883043712727efa7B038";
-export const LOAN_MANAGER =
-  "0x14C0c74483abeaA0122DE6b8dD6c51795b48314c";
-export const WITHDRAWAL_MANAGER =
-  "0x9EDe7Fa06de4CcF3be5e26e27120eb608D001Ed8";
-
+export const POOL_ADDRESSES_PROVIDER =
+  "0x454bc3c86ab284F2aa7a746733b23b46866fbedb";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -58,7 +51,7 @@ export const RISK_TYPE = RiskType.ISOLATED;
 
 export function getProtocolData(): ProtocolData {
   return new ProtocolData(
-    Bytes.fromHexString(POOL_CONFIGURATOR),
+    Bytes.fromHexString(POOL_ADDRESSES_PROVIDER),
     PROTOCOL,
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
