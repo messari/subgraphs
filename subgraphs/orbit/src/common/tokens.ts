@@ -24,13 +24,6 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
     // for broken pairs that have no symbol function exposed
     if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
       return symbolResultBytes.value.toString();
-    } else {
-      // try with the static definition
-      let staticTokenDefinition =
-        StaticTokenDefinition.fromAddress(tokenAddress);
-      if (staticTokenDefinition != null) {
-        return staticTokenDefinition.symbol;
-      }
     }
   }
   log.warning(
@@ -57,13 +50,6 @@ export function fetchTokenName(tokenAddress: Address): string {
     // for broken exchanges that have no name function exposed
     if (!isNullEthValue(nameResultBytes.value.toHexString())) {
       return nameResultBytes.value.toString();
-    } else {
-      // try with the static definition
-      let staticTokenDefinition =
-        StaticTokenDefinition.fromAddress(tokenAddress);
-      if (staticTokenDefinition != null) {
-        return staticTokenDefinition.name;
-      }
     }
   }
   log.warning(
@@ -83,17 +69,11 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
     return decimalValue as i32;
   }
 
-  // try with the static definition
-  let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
-  if (staticTokenDefinition != null) {
-    return staticTokenDefinition.decimals as i32;
-  } else {
-    log.warning(
-      "[getTokenParams]token {} decimals() call reverted; default to 18 decimals",
-      [tokenAddress.toHexString()]
-    );
-    return 18 as i32;
-  }
+  log.warning(
+    "[getTokenParams]token {} decimals() call reverted; default to 18 decimals",
+    [tokenAddress.toHexString()]
+  );
+  return 18 as i32;
 }
 
 export function isNullEthValue(value: string): boolean {
