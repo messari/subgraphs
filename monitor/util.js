@@ -67,3 +67,13 @@ export const ONE_HUNDRED_MILLION = 100000000;
 export const ONE_BILLION = 1000000000;
 export const TEN_BILLION = 10000000000;
 export const ONE_HUNDRED_BILLION = 100000000000;
+
+export function getIndexedPercentage(startBlock, latestBlock, chainHeadBlock) {
+  let indexedPercentage =
+    ((latestBlock - startBlock) / (chainHeadBlock - startBlock)) * 100;
+  if (indexedPercentage > 99.5) {
+    indexedPercentage = 100;
+  }
+
+  return indexedPercentage;
+}

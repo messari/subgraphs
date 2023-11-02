@@ -1,26 +1,5 @@
-import axios from "axios";
 import { errorNotification, postAlert } from "./messageDiscord.js";
-
-const queryContents = `
-subgraph
-synced
-fatalError {
-  message
-  block {
-    number
-  }
-}
-chains {
-  chainHeadBlock {
-    number
-  }
-  earliestBlock {
-    number
-  }
-  latestBlock {
-    number
-  }
-}`;
+import { getIndexedPercentage } from "./util.js";
 
 export async function generateProtocolToBaseMap(data) {
   const protocolToBaseMap = {};
@@ -51,7 +30,8 @@ export async function generateDecenEndpoints(data) {
           const decenObj = depoData?.services["decentralized-network"];
           if (!!decenObj) {
             hostedEndpointToDecenNetwork[
-              "https://api.thegraph.com/subgraphs/name/messari/" +
+              process.env.GRAPH_BASE_URL +
+                "/subgraphs/name/messari/" +
                 hostedServiceId
             ] = decenObj?.["query-id"];
           }
@@ -89,7 +69,8 @@ export async function generateEndpoints(data) {
             hostedServiceId = depoData?.services["hosted-service"]?.slug;
           }
           subgraphEndpoints[protocol.schema][protocolName][depoData.network] =
-            "https://api.thegraph.com/subgraphs/name/messari/" +
+            process.env.GRAPH_BASE_URL +
+            "/subgraphs/name/messari/" +
             hostedServiceId;
         });
       });
@@ -119,13 +100,14 @@ export async function queryDecentralizedIndex(data) {
 
             if (healthObj) {
               const deploymentID = healthObj["deployment-id"];
-              let indexedPercentage =
-                ((healthObj["latest-block"] - healthObj["start-block"]) /
-                  (healthObj["chain-head-block"] - healthObj["start-block"])) *
-                100;
-              if (indexedPercentage > 99.5) {
-                indexedPercentage = 100;
-              }
+              const startBlock = healthObj["start-block"];
+              const latestBlock = healthObj["latest-block"];
+              const chainHeadBlock = healthObj["chain-head-block"];
+              const indexedPercentage = getIndexedPercentage(
+                startBlock,
+                latestBlock,
+                chainHeadBlock
+              );
 
               if (!healthObj["is-healthy"] && !isNaN(indexedPercentage)) {
                 const errorBlock = healthObj["error"]["block-number"];
@@ -133,7 +115,8 @@ export async function queryDecentralizedIndex(data) {
 
                 decenSubgraphHashToIndexingObj[subgraphID] = {
                   endpoint:
-                    "https://gateway-arbitrum.network.thegraph.com/api/" +
+                    process.env.GRAPH_DECEN_URL +
+                    "/api/" +
                     process.env.GRAPH_API_KEY +
                     "/subgraphs/id/" +
                     subgraphID,
@@ -177,15 +160,14 @@ export async function indexStatusFlow(data, deployments) {
             // Indexed Deployment
             if (healthObj.length > 0) {
               const healthObjIndexed = healthObj[0];
-              let indexedPercentage =
-                ((healthObjIndexed["latest-block"] -
-                  healthObjIndexed["start-block"]) /
-                  (healthObjIndexed["chain-head-block"] -
-                    healthObjIndexed["start-block"])) *
-                100;
-              if (indexedPercentage > 99.5) {
-                indexedPercentage = 100;
-              }
+              const startBlock = healthObjIndexed["start-block"];
+              const latestBlock = healthObjIndexed["latest-block"];
+              const chainHeadBlock = healthObjIndexed["chain-head-block"];
+              const indexedPercentage = getIndexedPercentage(
+                startBlock,
+                latestBlock,
+                chainHeadBlock
+              );
 
               if (deployments[depoSlug]) {
                 deployments[depoSlug].indexedPercentage =
@@ -213,15 +195,14 @@ export async function indexStatusFlow(data, deployments) {
             if (healthObj.length > 1) {
               const healthObjPending = healthObj[1];
               const deploymentID = healthObjPending["deployment-id"];
-              let indexedPercentage =
-                ((healthObjPending["latest-block"] -
-                  healthObjPending["start-block"]) /
-                  (healthObjPending["chain-head-block"] -
-                    healthObjPending["start-block"])) *
-                100;
-              if (indexedPercentage > 99.5) {
-                indexedPercentage = 100;
-              }
+              const startBlock = healthObjPending["start-block"];
+              const latestBlock = healthObjPending["latest-block"];
+              const chainHeadBlock = healthObjPending["chain-head-block"];
+              const indexedPercentage = getIndexedPercentage(
+                startBlock,
+                latestBlock,
+                chainHeadBlock
+              );
 
               const depoSlugPending = depoSlug + "-pending";
               if (deployments[depoSlug]) {
@@ -231,7 +212,7 @@ export async function indexStatusFlow(data, deployments) {
                 deployments[depoSlugPending].pending = true;
 
                 deployments[depoSlugPending].url =
-                  "https://api.thegraph.com/subgraphs/id/" + deploymentID;
+                  process.env.GRAPH_BASE_URL + "/subgraphs/id/" + deploymentID;
                 deployments[depoSlugPending].hash = deploymentID;
                 deployments[depoSlugPending].indexedPercentage =
                   indexedPercentage.toFixed(2);

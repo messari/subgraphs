@@ -42,7 +42,7 @@ async function executionFlow() {
   postAlert("START");
   let data = null;
   try {
-    const result = await axios.get(process.env.MESSARI_STATUS_ENDPOINT, {
+    const result = await axios.get(process.env.MESSARI_STATUS_URL, {
       headers: {
         Accept: "application/json",
         "x-messari-api-key": process.env.MESSARI_API_KEY,
