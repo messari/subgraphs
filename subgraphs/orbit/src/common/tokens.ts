@@ -2,7 +2,7 @@
 import { ERC20 } from "../../generated/Vault/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Vault/ERC20NameBytes";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
@@ -12,7 +12,7 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
 
   // try types string and bytes32 for symbol
-  let symbolValue = UNKNOWN_TOKEN_VALUE;
+  let symbolValue = "Unknown";
   let symbolResult = contract.try_symbol();
   if (!symbolResult.reverted) {
     return symbolResult.value;
@@ -23,17 +23,20 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   if (!symbolResultBytes.reverted) {
     // for broken pairs that have no symbol function exposed
     if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
-      symbolValue = symbolResultBytes.value.toString();
+      return symbolResultBytes.value.toString();
     } else {
       // try with the static definition
       let staticTokenDefinition =
         StaticTokenDefinition.fromAddress(tokenAddress);
       if (staticTokenDefinition != null) {
-        symbolValue = staticTokenDefinition.symbol;
+        return staticTokenDefinition.symbol;
       }
     }
   }
-
+  log.warning(
+    "[getTokenParams]Fail to get symbol for token {}; default to 'Unknown'",
+    [tokenAddress.toHexString()]
+  );
   return symbolValue;
 }
 
@@ -42,7 +45,7 @@ export function fetchTokenName(tokenAddress: Address): string {
   let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
 
   // try types string and bytes32 for name
-  let nameValue = UNKNOWN_TOKEN_VALUE;
+  let nameValue = "Unknown Token";
   let nameResult = contract.try_name();
   if (!nameResult.reverted) {
     return nameResult.value;
@@ -53,17 +56,20 @@ export function fetchTokenName(tokenAddress: Address): string {
   if (!nameResultBytes.reverted) {
     // for broken exchanges that have no name function exposed
     if (!isNullEthValue(nameResultBytes.value.toHexString())) {
-      nameValue = nameResultBytes.value.toString();
+      return nameResultBytes.value.toString();
     } else {
       // try with the static definition
       let staticTokenDefinition =
         StaticTokenDefinition.fromAddress(tokenAddress);
       if (staticTokenDefinition != null) {
-        nameValue = staticTokenDefinition.name;
+        return staticTokenDefinition.name;
       }
     }
   }
-
+  log.warning(
+    "[getTokenParams]Fail to get name for token {}; default to 'Unknown Token'",
+    [tokenAddress.toHexString()]
+  );
   return nameValue;
 }
 
@@ -82,7 +88,11 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
   if (staticTokenDefinition != null) {
     return staticTokenDefinition.decimals as i32;
   } else {
-    return INVALID_TOKEN_DECIMALS as i32;
+    log.warning(
+      "[getTokenParams]token {} decimals() call reverted; default to 18 decimals",
+      [tokenAddress.toHexString()]
+    );
+    return 18 as i32;
   }
 }
 

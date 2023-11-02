@@ -7,16 +7,13 @@ import {
   log,
   ethereum,
 } from "@graphprotocol/graph-ts";
-
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { NetworkConfigs } from "../../configurations/configure";
-
 import {
   BridgePermissionType,
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
-
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenPricer } from "../sdk/protocols/config";
 import { Token } from "../../generated/schema";
@@ -28,13 +25,15 @@ import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import { _ERC20 } from "../../generated/Vault/_ERC20";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
-import { ERC20NameBytes } from "../../generated/Vault/ERC20NameBytes";
-import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
 import { BIGINT_ZERO, getNetworkSpecificConstant } from "../sdk/util/constants";
 import { Deposit, Withdraw } from "../../generated/Vault/Vault";
 import { Swap, SwapRequest } from "../../generated/Minter/Minter";
-
-const taxReceiver = "0xe9f3604b85c9672728eeecf689cf1f0cf7dd03f2";
+import { TAX_RECEIVER } from "../common/constants";
+import {
+  fetchTokenDecimals,
+  fetchTokenName,
+  fetchTokenSymbol,
+} from "../common/tokens";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -51,50 +50,9 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
-    const decimalsResult = erc20.try_decimals();
-    let decimals: i32 = 18;
-    if (!decimalsResult.reverted) {
-      decimals = decimalsResult.value.toI32();
-    } else {
-      log.warning(
-        "[getTokenParams]token {} decimals() call reverted; default to 18 decimals",
-        [address.toHexString()]
-      );
-    }
-
-    let name = "Unknown Token";
-    const nameResult = erc20.try_name();
-    if (!nameResult.reverted) {
-      name = nameResult.value;
-    } else {
-      const erc20name = ERC20NameBytes.bind(address);
-      const nameResult = erc20name.try_name();
-      if (!nameResult.reverted) {
-        name = nameResult.value.toString();
-      } else {
-        log.warning(
-          "[getTokenParams]Fail to get name for token {}; default to 'Unknown Token'",
-          [address.toHexString()]
-        );
-      }
-    }
-
-    let symbol = "Unknown";
-    const symbolResult = erc20.try_symbol();
-    if (!symbolResult.reverted) {
-      symbol = symbolResult.value;
-    } else {
-      const erc20symbol = ERC20SymbolBytes.bind(address);
-      const symbolResult = erc20symbol.try_symbol();
-      if (!symbolResult.reverted) {
-        symbol = symbolResult.value.toString();
-      } else {
-        log.warning(
-          "[getTokenParams]Fail to get symbol for token {}; default to 'Unknown'",
-          [address.toHexString()]
-        );
-      }
-    }
+    let decimals = fetchTokenDecimals(address);
+    let name = fetchTokenName(address);
+    let symbol = fetchTokenSymbol(address);
 
     return {
       name,
@@ -319,7 +277,7 @@ function _handleTransferOut(
   // If Receiver is taxReceiver, this is the tax fee
   if (
     receiver.byteLength == 20 &&
-    Address.fromBytes(receiver) == Address.fromString(taxReceiver)
+    Address.fromBytes(receiver) == Address.fromString(TAX_RECEIVER)
   ) {
     pool.addRevenueNative(amount, BIGINT_ZERO);
     return;
