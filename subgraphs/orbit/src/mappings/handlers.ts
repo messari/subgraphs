@@ -23,7 +23,6 @@ import { Pool } from "../sdk/protocols/bridge/pool";
 import { Versions } from "../versions";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
-import { _ERC20 } from "../../generated/Vault/_ERC20";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 import { BIGINT_ZERO, getNetworkSpecificConstant } from "../sdk/util/constants";
 import { Deposit, Withdraw } from "../../generated/Vault/Vault";
@@ -49,10 +48,9 @@ class Pricer implements TokenPricer {
 
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
-    const erc20 = _ERC20.bind(address);
-    let decimals = fetchTokenDecimals(address);
-    let name = fetchTokenName(address);
-    let symbol = fetchTokenSymbol(address);
+    const decimals = fetchTokenDecimals(address);
+    const name = fetchTokenName(address);
+    const symbol = fetchTokenSymbol(address);
 
     return {
       name,
