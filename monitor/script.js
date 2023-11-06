@@ -42,19 +42,19 @@ async function executionFlow() {
   postAlert("START");
   let data = null;
   try {
-    const result = await axios.get(
-      "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json"
-    );
+    const result = await axios.get(process.env.MESSARI_STATUS_URL, {
+      headers: {
+        Accept: "application/json",
+        "x-messari-api-key": process.env.MESSARI_API_KEY,
+      },
+    });
     data = result.data;
   } catch (err) {
     console.log(err.message);
   }
   const subgraphEndpoints = await generateEndpoints(data);
   const hostedEndpointToDecenNetwork = await generateDecenEndpoints(data);
-  const protocolNameToBaseMapping = await generateProtocolToBaseMap(data);
-  const decenKeyToEndpoint = await queryDecentralizedIndex(
-    hostedEndpointToDecenNetwork
-  );
+  const decenKeyToEndpoint = await queryDecentralizedIndex(data);
 
   let deployments = {};
   let decentralizedDeployments = {};
@@ -143,7 +143,7 @@ async function executionFlow() {
   await getAllThreadsToClear(Date.now() - 86400000 * 7, process.env.CHANNEL_ID);
   await clearThread(Date.now() - 86400000, process.env.PROD_CHANNEL);
 
-  const indexStatusFlowDepos = await indexStatusFlow(deployments);
+  const indexStatusFlowDepos = await indexStatusFlow(data, deployments);
   deployments = { ...indexStatusFlowDepos, ...decentralizedDeployments };
 
   // pass invalid deployments arr to protocolLevel, before execution check if depo key is included in array
@@ -163,6 +163,7 @@ async function executionFlow() {
     }
   });
 
+  const protocolNameToBaseMapping = await generateProtocolToBaseMap(data);
   const newProtocolThreads = await resolveThreadCreation(
     protocolThreadsToStart,
     protocolNameToChannelMapping,
