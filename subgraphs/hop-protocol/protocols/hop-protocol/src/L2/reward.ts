@@ -88,8 +88,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
     poolSymbol,
     hPoolName,
     poolAddress,
-    event,
-    amount
+    event
   );
 }
 

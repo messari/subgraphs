@@ -65,7 +65,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
   log.info("inputToken1: {}, bridgeAddress: {}, chainId: {}", [
     inputTokenOne,
     event.address.toHexString(),
-    event.params.chainId.toHexString(),
+    event.params.chainId.toString(),
   ]);
 
   const poolAddress = NetworkConfigs.getPoolAddressFromChainId(
