@@ -38,4 +38,5 @@ export const BLACKLIST_TOKENS = [
   Address.fromString("0x4674672bcddda2ea5300f5207e1158185c944bc0"), // GXT
   Address.fromString("0x050cbff7bff0432b6096dd15cd9499913ddf8e23"), // FCI
   Address.fromString("0x924828a9fb17d47d0eb64b57271d10706699ff11"), // SFI fantom
+  Address.fromString("0x363053c3eb5c25bce94f0ce6568fa7292f600614"), // ESMPTOKIN polygon
 ];
