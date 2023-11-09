@@ -26,19 +26,14 @@ export function updatePoolIsActive(
 export function updateTVL(
   poolAddress: Address,
   tokenAddress: Address,
-  isDeposit: boolean,
-  amount: BigInt,
+  balance: BigInt,
   event: ethereum.Event
 ): void {
   const protocol = getOrCreateProtocol();
   const pool = getPool(poolAddress);
   const token = getOrCreateToken(tokenAddress, event);
 
-  if (isDeposit) {
-    pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
-  } else {
-    pool.inputTokenBalances = [pool.inputTokenBalances[0].minus(amount)];
-  }
+  pool.inputTokenBalances = [balance];
   pool.inputTokenBalancesUSD = [
     bigIntToBigDecimal(pool.inputTokenBalances[0]).times(token.lastPriceUSD!),
   ];

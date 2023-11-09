@@ -4,6 +4,7 @@ import {
   BIGINT_ZERO,
   ETH_ADDRESS,
   INT_FOUR,
+  INT_ONE,
   INT_THREE,
   INT_TWO,
   INT_ZERO,
@@ -163,12 +164,18 @@ export function handleDeposit(event: Deposit): void {
     const logTopicSignature = thisLog.topics.at(INT_ZERO);
 
     if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
-      const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
-      if (!decoded) continue;
+      const logTopicTo = ethereum
+        .decode("address", thisLog.topics.at(INT_TWO))!
+        .toAddress();
 
-      const logData = decoded.toTuple();
-      amount = logData[INT_ZERO].toBigInt();
-      break;
+      if (logTopicTo.equals(Address.fromBytes(pool.id))) {
+        const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        amount = logData[INT_ZERO].toBigInt();
+        break;
+      }
     }
   }
 
@@ -189,11 +196,34 @@ export function handleDeposit(event: Deposit): void {
     depositID,
     event
   );
+
+  let strategyContract = Strategy.bind(Address.fromBytes(pool.id));
+  const totalSharesResult = strategyContract.try_totalShares();
+  if (totalSharesResult.reverted) {
+    log.error(
+      "[handleDeposit] strategyContract.try_totalShares() reverted for strategy: {}",
+      [Address.fromBytes(pool.id).toHexString()]
+    );
+    return;
+  }
+  let sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
+    totalSharesResult.value
+  );
+  if (sharesToUnderlyingResult.reverted) {
+    log.error(
+      "[handleDeposit] strategyContract.try_sharesToUnderlying() reverted for strategy: {} and value: {}",
+      [
+        Address.fromBytes(pool.id).toHexString(),
+        totalSharesResult.value.toString(),
+      ]
+    );
+    return;
+  }
+
   updateTVL(
     Address.fromBytes(pool.id),
     Address.fromBytes(token.id),
-    true,
-    amount,
+    sharesToUnderlyingResult.value,
     event
   );
   updateVolume(
@@ -323,12 +353,18 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     const logTopicSignature = thisLog.topics.at(INT_ZERO);
 
     if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
-      const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
-      if (!decoded) continue;
+      const logTopicFrom = ethereum
+        .decode("address", thisLog.topics.at(INT_ONE))!
+        .toAddress();
 
-      const logData = decoded.toTuple();
-      amount = logData[INT_ZERO].toBigInt();
-      break;
+      if (logTopicFrom.equals(Address.fromBytes(poolID))) {
+        const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        amount = logData[INT_ZERO].toBigInt();
+        break;
+      }
     }
   }
 
@@ -341,11 +377,34 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     withdrawID,
     event
   );
+
+  let strategyContract = Strategy.bind(Address.fromBytes(poolID));
+  const totalSharesResult = strategyContract.try_totalShares();
+  if (totalSharesResult.reverted) {
+    log.error(
+      "[handleWithdrawalCompleted] strategyContract.try_totalShares() reverted for strategy: {}",
+      [Address.fromBytes(poolID).toHexString()]
+    );
+    return;
+  }
+  let sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
+    totalSharesResult.value
+  );
+  if (sharesToUnderlyingResult.reverted) {
+    log.error(
+      "[handleWithdrawalCompleted] strategyContract.try_sharesToUnderlying() reverted for strategy: {} and value: {}",
+      [
+        Address.fromBytes(poolID).toHexString(),
+        totalSharesResult.value.toString(),
+      ]
+    );
+    return;
+  }
+
   updateTVL(
     Address.fromBytes(poolID),
     Address.fromBytes(tokenID),
-    false,
-    amount,
+    sharesToUnderlyingResult.value,
     event
   );
   updateVolume(
