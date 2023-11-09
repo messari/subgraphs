@@ -197,7 +197,7 @@ export function handleDeposit(event: Deposit): void {
     event
   );
 
-  let strategyContract = Strategy.bind(Address.fromBytes(pool.id));
+  const strategyContract = Strategy.bind(Address.fromBytes(pool.id));
   const totalSharesResult = strategyContract.try_totalShares();
   if (totalSharesResult.reverted) {
     log.error(
@@ -206,7 +206,7 @@ export function handleDeposit(event: Deposit): void {
     );
     return;
   }
-  let sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
+  const sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
     totalSharesResult.value
   );
   if (sharesToUnderlyingResult.reverted) {
@@ -378,7 +378,7 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     event
   );
 
-  let strategyContract = Strategy.bind(Address.fromBytes(poolID));
+  const strategyContract = Strategy.bind(Address.fromBytes(poolID));
   const totalSharesResult = strategyContract.try_totalShares();
   if (totalSharesResult.reverted) {
     log.error(
@@ -387,7 +387,7 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     );
     return;
   }
-  let sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
+  const sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
     totalSharesResult.value
   );
   if (sharesToUnderlyingResult.reverted) {
