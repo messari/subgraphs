@@ -30,7 +30,8 @@ export async function errorNotification(
 export async function postAlert(message) {
   try {
     const baseURL =
-      "https://discordapp.com/api/channels/" +
+      process.env.DISCORD_BASE_URL +
+      "/channels/" +
       process.env.DEBUG_CHANNEL +
       "/messages";
     const headers = {
@@ -99,7 +100,8 @@ export async function fetchMessages(
     beforeQueryParam = "&before=" + before;
   }
   const baseURL =
-    "https://discordapp.com/api/channels/" +
+    process.env.DISCORD_BASE_URL +
+    "/channels/" +
     channelId +
     "/messages?limit=100" +
     beforeQueryParam;
@@ -127,7 +129,7 @@ export async function fetchMessages(
 }
 
 export async function getChannel(channelId = process.env.CHANNEL_ID) {
-  let baseURL = "https://discordapp.com/api/channels/" + channelId;
+  let baseURL = process.env.DISCORD_BASE_URL + "/channels/" + channelId;
   const headers = {
     Authorization: "Bot " + process.env.BOT_TOKEN,
     "Content-Type": "application/json",
@@ -157,7 +159,7 @@ export async function clearChannel(channelId) {
   // This function is called to clear the main channel of all threads within it
   try {
     const msgs = await getDiscordMessages([], channelId);
-    const baseURL = "https://discordapp.com/api/channels/";
+    const baseURL = process.env.DISCORD_BASE_URL + "/channels/";
     const headers = {
       Authorization: "Bot " + process.env.BOT_TOKEN,
       "Content-Type": "application/json",
@@ -191,7 +193,7 @@ export async function clearMessages(channelId) {
   // Note that this does not delete threads but only the message which heads the thread
   try {
     const msgs = await getDiscordMessages([], channelId);
-    const baseURL = "https://discordapp.com/api/channels/" + channelId;
+    const baseURL = process.env.DISCORD_BASE_URL + "/channels/" + channelId;
     const headers = {
       Authorization: "Bot " + process.env.BOT_TOKEN,
       "Content-Type": "application/json",
@@ -255,7 +257,7 @@ export async function clearThread(deleteMsgsFromBeforeTS, channelId) {
   let messages = [];
   try {
     const msgs = await getDiscordMessages([], channelId);
-    const baseURL = "https://discordapp.com/api/channels/" + channelId;
+    const baseURL = process.env.DISCORD_BASE_URL + "/channels/" + channelId;
     const headers = {
       Authorization: "Bot " + process.env.BOT_TOKEN,
       "Content-Type": "application/json",
@@ -311,7 +313,8 @@ export async function deleteSingleMessage(
       "Content-Type": "application/json",
     };
     const baseURL =
-      "https://discordapp.com/api/channels/" +
+      process.env.DISCORD_BASE_URL +
+      "/channels/" +
       channelId +
       "/messages/" +
       messageId;
@@ -349,7 +352,7 @@ export async function sendDiscordMessage(
     return null;
   }
   const baseURL =
-    "https://discordapp.com/api/channels/" + channelId + "/messages";
+    process.env.DISCORD_BASE_URL + "/channels/" + channelId + "/messages";
   const headers = {
     Authorization: "Bot " + process.env.BOT_TOKEN,
     "Content-Type": "application/json",
@@ -402,7 +405,7 @@ export async function startProtocolThread(
   channelId = process.env.CHANNEL_ID
 ) {
   let baseURL =
-    "https://discordapp.com/api/channels/" + channelId + "/messages";
+    process.env.DISCORD_BASE_URL + "/channels/" + channelId + "/messages";
   const headers = {
     Authorization: "Bot " + process.env.BOT_TOKEN,
     "Content-Type": "application/json",
@@ -434,7 +437,8 @@ export async function startProtocolThread(
   }
 
   baseURL =
-    "https://discordapp.com/api/channels/" +
+    process.env.DISCORD_BASE_URL +
+    "/channels/" +
     channelId +
     "/messages/" +
     msgId +
@@ -471,7 +475,7 @@ export async function startProtocolThread(
 export async function unarchiveThread(channelId = process.env.CHANNEL_ID) {
   // This function sends a message to an archived thread, thereby unarchiving it, then deleting this message
   let baseURL =
-    "https://discordapp.com/api/channels/" + channelId + "/messages";
+    process.env.DISCORD_BASE_URL + "/channels/" + channelId + "/messages";
   const headers = {
     Authorization: "Bot " + process.env.BOT_TOKEN,
     "Content-Type": "application/json",
@@ -794,7 +798,7 @@ export async function sendMessageToAggThread(
   try {
     const currentThreadMessages = await fetchMessages("", aggThreadId);
     const baseURL =
-      "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+      process.env.DISCORD_BASE_URL + "/channels/" + aggThreadId + "/messages";
     const headers = {
       Authorization: "Bot " + process.env.BOT_TOKEN,
       "Content-Type": "application/json",
@@ -1077,7 +1081,8 @@ export async function executeGithubPromiseArr(ghIssuePromiseArray) {
 export async function sendMessageToZapierThread(messageConstruction) {
   try {
     const baseURL =
-      "https://discordapp.com/api/channels/" +
+      process.env.DISCORD_BASE_URL +
+      "/channels/" +
       process.env.PROD_CHANNEL +
       "/messages";
     const headers = {

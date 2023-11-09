@@ -34,7 +34,7 @@ import {
  *  - Making position snapshots
  *
  * Schema Version:  1.3.3
- * SDK Version:     1.1.7
+ * SDK Version:     1.1.8
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -156,7 +156,10 @@ export class Account {
     return true;
   }
 
-  private trackActivity(activityType: ActivityType): void {
+  private trackActivity(
+    activityType: ActivityType,
+    liquidator: Address | null = null
+  ): void {
     const days = getUnixDays(this.event.block);
     const hours = getUnixHours(this.event.block);
 
@@ -168,8 +171,10 @@ export class Account {
       hourly: this.isActiveByActivityID(Bytes.fromUTF8(generalHourlyID)),
     };
 
-    const typeHourlyID = `${this.account.id.toHexString()}-hourly-${hours}-${activityType}`;
-    const typeDailyID = `${this.account.id.toHexString()}-daily-${days}-${activityType}`;
+    let accountId = this.account.id.toHexString();
+    if (liquidator) accountId = liquidator.toHexString();
+    const typeHourlyID = `${accountId}-hourly-${hours}-${activityType}`;
+    const typeDailyID = `${accountId}-daily-${days}-${activityType}`;
 
     const typeActivity: AccountWasActive = {
       daily: this.isActiveByActivityID(Bytes.fromUTF8(typeDailyID)),
@@ -640,7 +645,7 @@ export class Account {
     entity!.liquidateCount += 1;
     entity!.save();
 
-    this.trackActivity(ActivityType.LIQUIDATOR);
+    this.trackActivity(ActivityType.LIQUIDATOR, liquidator);
   }
 
   /**

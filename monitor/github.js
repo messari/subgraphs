@@ -43,7 +43,8 @@ export async function getGithubIssues() {
   if (process.env.GH_TOKEN) {
     try {
       const baseURL =
-        "https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open&labels=monitor&sort=updated";
+        process.env.GH_BASE_URL +
+        "/repos/messari/subgraphs/issues?per_page=100&state=open&labels=monitor&sort=updated";
       const headers = {
         Accept: "*/*",
         Authorization: "Bearer " + process.env.GH_TOKEN,
