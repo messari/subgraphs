@@ -20,6 +20,7 @@ import {
   getOrCreateAccount,
   getOrCreateToken,
   getPool,
+  getPoolBalance,
 } from "../common/getters";
 import {
   updatePoolIsActive,
@@ -197,33 +198,12 @@ export function handleDeposit(event: Deposit): void {
     event
   );
 
-  const strategyContract = Strategy.bind(Address.fromBytes(pool.id));
-  const totalSharesResult = strategyContract.try_totalShares();
-  if (totalSharesResult.reverted) {
-    log.error(
-      "[handleDeposit] strategyContract.try_totalShares() reverted for strategy: {}",
-      [Address.fromBytes(pool.id).toHexString()]
-    );
-    return;
-  }
-  const sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
-    totalSharesResult.value
-  );
-  if (sharesToUnderlyingResult.reverted) {
-    log.error(
-      "[handleDeposit] strategyContract.try_sharesToUnderlying() reverted for strategy: {} and value: {}",
-      [
-        Address.fromBytes(pool.id).toHexString(),
-        totalSharesResult.value.toString(),
-      ]
-    );
-    return;
-  }
+  const poolBalance = getPoolBalance(Address.fromBytes(pool.id));
 
   updateTVL(
     Address.fromBytes(pool.id),
     Address.fromBytes(token.id),
-    sharesToUnderlyingResult.value,
+    poolBalance,
     event
   );
   updateVolume(
@@ -378,33 +358,12 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     event
   );
 
-  const strategyContract = Strategy.bind(Address.fromBytes(poolID));
-  const totalSharesResult = strategyContract.try_totalShares();
-  if (totalSharesResult.reverted) {
-    log.error(
-      "[handleWithdrawalCompleted] strategyContract.try_totalShares() reverted for strategy: {}",
-      [Address.fromBytes(poolID).toHexString()]
-    );
-    return;
-  }
-  const sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
-    totalSharesResult.value
-  );
-  if (sharesToUnderlyingResult.reverted) {
-    log.error(
-      "[handleWithdrawalCompleted] strategyContract.try_sharesToUnderlying() reverted for strategy: {} and value: {}",
-      [
-        Address.fromBytes(poolID).toHexString(),
-        totalSharesResult.value.toString(),
-      ]
-    );
-    return;
-  }
+  const poolBalance = getPoolBalance(Address.fromBytes(poolID));
 
   updateTVL(
     Address.fromBytes(poolID),
     Address.fromBytes(tokenID),
-    sharesToUnderlyingResult.value,
+    poolBalance,
     event
   );
   updateVolume(

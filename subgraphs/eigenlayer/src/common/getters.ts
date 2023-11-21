@@ -1,4 +1,4 @@
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
   BIGDECIMAL_ZERO,
@@ -30,6 +30,7 @@ import {
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
+import { Strategy } from "../../generated/StrategyManager/Strategy";
 
 export function getOrCreateToken(
   tokenAddress: Address,
@@ -374,4 +375,27 @@ export function getOrCreateActiveAccount(id: Bytes): ActiveAccount {
     account.save();
   }
   return account;
+}
+
+export function getPoolBalance(poolAddress: Address): BigInt {
+  const strategyContract = Strategy.bind(poolAddress);
+  const totalSharesResult = strategyContract.try_totalShares();
+  if (totalSharesResult.reverted) {
+    log.error(
+      "[getPoolBalance] strategyContract.try_totalShares() reverted for strategy: {}",
+      [poolAddress.toHexString()]
+    );
+    return BIGINT_ZERO;
+  }
+  const sharesToUnderlyingResult = strategyContract.try_sharesToUnderlying(
+    totalSharesResult.value
+  );
+  if (sharesToUnderlyingResult.reverted) {
+    log.error(
+      "[getPoolBalance] strategyContract.try_sharesToUnderlying() reverted for strategy: {} and value: {}",
+      [poolAddress.toHexString(), totalSharesResult.value.toString()]
+    );
+    return BIGINT_ZERO;
+  }
+  return sharesToUnderlyingResult.value;
 }
