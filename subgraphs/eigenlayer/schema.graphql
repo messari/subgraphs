@@ -242,10 +242,10 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   totalPoolCount: Int!
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
+  timestamp: BigInt
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
+  blockNumber: BigInt
 }
 
 type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
@@ -271,10 +271,10 @@ type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   cumulativeTransactionCount: Int!
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
+  timestamp: BigInt
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
+  blockNumber: BigInt
 }
 
 type FinancialsDailySnapshot @entity @dailySnapshot {
@@ -336,10 +336,10 @@ type FinancialsDailySnapshot @entity @dailySnapshot {
   netVolumeUSD: BigDecimal!
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
+  timestamp: BigInt
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
+  blockNumber: BigInt
 }
 
 ###########################
@@ -574,10 +574,10 @@ type PoolDailySnapshot @entity @dailySnapshot {
   cumulativeTransactionCount: Int!
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
+  timestamp: BigInt
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
+  blockNumber: BigInt
 }
 
 type PoolHourlySnapshot @entity @hourlySnapshot {
@@ -634,10 +634,10 @@ type PoolHourlySnapshot @entity @hourlySnapshot {
   rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
+  timestamp: BigInt
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
+  blockNumber: BigInt
 }
 
 ##################################

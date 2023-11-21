@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import {
   BIGINT_TEN,
@@ -6,6 +6,21 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "./constants";
+import {
+  getOrCreateFinancialsDailySnapshot,
+  getOrCreatePoolDailySnapshot,
+  getOrCreatePoolHourlySnapshot,
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+} from "./getters";
+
+import {
+  FinancialsDailySnapshot,
+  PoolDailySnapshot,
+  PoolHourlySnapshot,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
+} from "../../generated/schema";
 
 export function getHoursSinceEpoch(secondsSinceEpoch: number): i32 {
   return <i32>Math.floor(secondsSinceEpoch / SECONDS_PER_HOUR);
@@ -113,5 +128,269 @@ export function accountArraySort(
     poolBalance[i] = BigInt.fromString(sorter[i][1]);
     poolBalanceUSD[i] = BigDecimal.fromString(sorter[i][2]);
     _hasWithdrawnFromPool[i] = sorter[i][3] == "true";
+  }
+}
+
+export function findPreviousPoolHourlySnapshot(
+  poolAddress: Address,
+  currentSnapshotHour: number
+): PoolHourlySnapshot | null {
+  let previousHour = (currentSnapshotHour - 1) as i32;
+  let previousId = Bytes.empty()
+    .concat(poolAddress)
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(previousHour));
+  let previousSnapshot = PoolHourlySnapshot.load(previousId);
+
+  while (!previousSnapshot && previousHour > 0) {
+    previousHour--;
+    previousId = Bytes.empty()
+      .concat(poolAddress)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(previousHour));
+    previousSnapshot = PoolHourlySnapshot.load(previousId);
+  }
+  return previousSnapshot;
+}
+
+export function fillInMissingPoolHourlySnapshots(
+  poolAddress: Address,
+  currentSnapshotHour: i32
+): void {
+  let previousSnapshot = findPreviousPoolHourlySnapshot(
+    poolAddress,
+    currentSnapshotHour
+  );
+  if (previousSnapshot) {
+    let counter = 1;
+    for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
+      const snapshot = getOrCreatePoolHourlySnapshot(poolAddress, i as i32);
+
+      snapshot.totalValueLockedUSD = previousSnapshot.totalValueLockedUSD;
+      snapshot.inputTokenBalances = previousSnapshot.inputTokenBalances;
+      snapshot.inputTokenBalancesUSD = previousSnapshot.inputTokenBalancesUSD;
+
+      snapshot.timestamp = previousSnapshot.timestamp!.plus(
+        BigInt.fromI32((counter * 3600) as i32)
+      );
+      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+        BigInt.fromI32((counter * 300) as i32)
+      );
+      counter++;
+
+      snapshot.save();
+    }
+  }
+}
+
+export function findPreviousPoolDailySnapshot(
+  poolAddress: Address,
+  currentSnapshotDay: number
+): PoolDailySnapshot | null {
+  let previousDay = (currentSnapshotDay - 1) as i32;
+  let previousId = Bytes.empty()
+    .concat(poolAddress)
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(previousDay));
+  let previousSnapshot = PoolDailySnapshot.load(previousId);
+
+  while (!previousSnapshot && previousDay > 0) {
+    previousDay--;
+    previousId = Bytes.empty()
+      .concat(poolAddress)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(previousDay));
+    previousSnapshot = PoolDailySnapshot.load(previousId);
+  }
+  return previousSnapshot;
+}
+
+export function fillInMissingPoolDailySnapshots(
+  poolAddress: Address,
+  currentSnapshotDay: i32
+): void {
+  let previousSnapshot = findPreviousPoolDailySnapshot(
+    poolAddress,
+    currentSnapshotDay
+  );
+  if (previousSnapshot) {
+    let counter = 1;
+    for (let i = previousSnapshot.day + 1; i < currentSnapshotDay; i++) {
+      const snapshot = getOrCreatePoolDailySnapshot(poolAddress, i as i32);
+
+      snapshot.totalValueLockedUSD = previousSnapshot.totalValueLockedUSD;
+      snapshot.inputTokenBalances = previousSnapshot.inputTokenBalances;
+      snapshot.inputTokenBalancesUSD = previousSnapshot.inputTokenBalancesUSD;
+      snapshot.cumulativeDepositVolumeAmount =
+        previousSnapshot.cumulativeDepositVolumeAmount;
+      snapshot.cumulativeDepositVolumeUSD =
+        previousSnapshot.cumulativeDepositVolumeUSD;
+      snapshot.cumulativeWithdrawalVolumeAmount =
+        previousSnapshot.cumulativeWithdrawalVolumeAmount;
+      snapshot.cumulativeWithdrawalVolumeUSD =
+        previousSnapshot.cumulativeWithdrawalVolumeUSD;
+      snapshot.cumulativeTotalVolumeAmount =
+        previousSnapshot.cumulativeTotalVolumeAmount;
+      snapshot.cumulativeTotalVolumeUSD =
+        previousSnapshot.cumulativeTotalVolumeUSD;
+      snapshot.netVolumeAmount = previousSnapshot.netVolumeAmount;
+      snapshot.netVolumeUSD = previousSnapshot.netVolumeUSD;
+      snapshot.cumulativeUniqueDepositors =
+        previousSnapshot.cumulativeUniqueDepositors;
+      snapshot.cumulativeUniqueWithdrawers =
+        previousSnapshot.cumulativeUniqueWithdrawers;
+      snapshot.cumulativeDepositCount = previousSnapshot.cumulativeDepositCount;
+      snapshot.cumulativeWithdrawalCount =
+        previousSnapshot.cumulativeWithdrawalCount;
+      snapshot.cumulativeTransactionCount =
+        previousSnapshot.cumulativeTransactionCount;
+
+      snapshot.timestamp = previousSnapshot.timestamp!.plus(
+        BigInt.fromI32((counter * 86400) as i32)
+      );
+      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+        BigInt.fromI32((counter * 7200) as i32)
+      );
+      counter++;
+
+      snapshot.save();
+    }
+  }
+}
+
+export function findPreviousUsageMetricsHourlySnapshot(
+  currentSnapshotHour: number
+): UsageMetricsHourlySnapshot | null {
+  let previousHour = (currentSnapshotHour - 1) as i32;
+  let previousId = Bytes.fromI32(previousHour);
+  let previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
+
+  while (!previousSnapshot && previousHour > 0) {
+    previousHour--;
+    previousId = Bytes.fromI32(previousHour);
+    previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
+  }
+  return previousSnapshot;
+}
+
+export function fillInMissingUsageMetricsHourlySnapshots(
+  currentSnapshotHour: i32
+): void {
+  let previousSnapshot =
+    findPreviousUsageMetricsHourlySnapshot(currentSnapshotHour);
+  if (previousSnapshot) {
+    let counter = 1;
+    for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
+      const snapshot = getOrCreateUsageMetricsHourlySnapshot(i as i32);
+
+      snapshot.cumulativeUniqueUsers = previousSnapshot.cumulativeUniqueUsers;
+
+      snapshot.timestamp = previousSnapshot.timestamp!.plus(
+        BigInt.fromI32((counter * 3600) as i32)
+      );
+      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+        BigInt.fromI32((counter * 300) as i32)
+      );
+      counter++;
+
+      snapshot.save();
+    }
+  }
+}
+
+export function findPreviousUsageMetricsDailySnapshot(
+  currentSnapshotDay: number
+): UsageMetricsDailySnapshot | null {
+  let previousDay = (currentSnapshotDay - 1) as i32;
+  let previousId = Bytes.fromI32(previousDay);
+  let previousSnapshot = UsageMetricsDailySnapshot.load(previousId);
+
+  while (!previousSnapshot && previousDay > 0) {
+    previousDay--;
+    previousId = Bytes.fromI32(previousDay);
+    previousSnapshot = UsageMetricsDailySnapshot.load(previousId);
+  }
+  return previousSnapshot;
+}
+
+export function fillInMissingUsageMetricsDailySnapshots(
+  currentSnapshotDay: i32
+): void {
+  let previousSnapshot =
+    findPreviousUsageMetricsDailySnapshot(currentSnapshotDay);
+  if (previousSnapshot) {
+    let counter = 1;
+    for (let i = previousSnapshot.day + 1; i < currentSnapshotDay; i++) {
+      const snapshot = getOrCreateUsageMetricsDailySnapshot(i as i32);
+
+      snapshot.cumulativeUniqueDepositors =
+        previousSnapshot.cumulativeUniqueDepositors;
+      snapshot.cumulativeUniqueWithdrawers =
+        previousSnapshot.cumulativeUniqueWithdrawers;
+      snapshot.cumulativeUniqueUsers = previousSnapshot.cumulativeUniqueUsers;
+      snapshot.cumulativeDepositCount = previousSnapshot.cumulativeDepositCount;
+      snapshot.cumulativeWithdrawalCount =
+        previousSnapshot.cumulativeWithdrawalCount;
+      snapshot.cumulativeTransactionCount =
+        previousSnapshot.cumulativeTransactionCount;
+      snapshot.totalPoolCount = previousSnapshot.totalPoolCount;
+
+      snapshot.timestamp = previousSnapshot.timestamp!.plus(
+        BigInt.fromI32((counter * 86400) as i32)
+      );
+      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+        BigInt.fromI32((counter * 7200) as i32)
+      );
+      counter++;
+
+      snapshot.save();
+    }
+  }
+}
+
+export function findPreviousFinancialsDailySnapshot(
+  currentSnapshotDay: number
+): FinancialsDailySnapshot | null {
+  let previousDay = (currentSnapshotDay - 1) as i32;
+  let previousId = Bytes.fromI32(previousDay);
+  let previousSnapshot = FinancialsDailySnapshot.load(previousId);
+
+  while (!previousSnapshot && previousDay > 0) {
+    previousDay--;
+    previousId = Bytes.fromI32(previousDay);
+    previousSnapshot = FinancialsDailySnapshot.load(previousId);
+  }
+  return previousSnapshot;
+}
+
+export function fillInMissingFinancialsDailySnapshots(
+  currentSnapshotDay: i32
+): void {
+  let previousSnapshot =
+    findPreviousFinancialsDailySnapshot(currentSnapshotDay);
+  if (previousSnapshot) {
+    let counter = 1;
+    for (let i = previousSnapshot.day + 1; i < currentSnapshotDay; i++) {
+      const snapshot = getOrCreateFinancialsDailySnapshot(i as i32);
+
+      snapshot.totalValueLockedUSD = previousSnapshot.totalValueLockedUSD;
+      snapshot.cumulativeDepositVolumeUSD =
+        previousSnapshot.cumulativeDepositVolumeUSD;
+      snapshot.cumulativeWithdrawalVolumeUSD =
+        previousSnapshot.cumulativeWithdrawalVolumeUSD;
+      snapshot.cumulativeTotalVolumeUSD =
+        previousSnapshot.cumulativeTotalVolumeUSD;
+      snapshot.netVolumeUSD = previousSnapshot.netVolumeUSD;
+
+      snapshot.timestamp = previousSnapshot.timestamp!.plus(
+        BigInt.fromI32((counter * 86400) as i32)
+      );
+      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+        BigInt.fromI32((counter * 7200) as i32)
+      );
+      counter++;
+
+      snapshot.save();
+    }
   }
 }
