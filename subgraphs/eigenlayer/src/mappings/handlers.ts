@@ -4,6 +4,7 @@ import {
   BIGINT_ZERO,
   ETH_ADDRESS,
   INT_FOUR,
+  INT_ONE,
   INT_THREE,
   INT_TWO,
   INT_ZERO,
@@ -19,6 +20,7 @@ import {
   getOrCreateAccount,
   getOrCreateToken,
   getPool,
+  getPoolBalance,
 } from "../common/getters";
 import {
   updatePoolIsActive,
@@ -163,12 +165,18 @@ export function handleDeposit(event: Deposit): void {
     const logTopicSignature = thisLog.topics.at(INT_ZERO);
 
     if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
-      const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
-      if (!decoded) continue;
+      const logTopicTo = ethereum
+        .decode("address", thisLog.topics.at(INT_TWO))!
+        .toAddress();
 
-      const logData = decoded.toTuple();
-      amount = logData[INT_ZERO].toBigInt();
-      break;
+      if (logTopicTo.equals(Address.fromBytes(pool.id))) {
+        const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        amount = logData[INT_ZERO].toBigInt();
+        break;
+      }
     }
   }
 
@@ -189,11 +197,13 @@ export function handleDeposit(event: Deposit): void {
     depositID,
     event
   );
+
+  const poolBalance = getPoolBalance(Address.fromBytes(pool.id));
+
   updateTVL(
     Address.fromBytes(pool.id),
     Address.fromBytes(token.id),
-    true,
-    amount,
+    poolBalance,
     event
   );
   updateVolume(
@@ -323,12 +333,18 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     const logTopicSignature = thisLog.topics.at(INT_ZERO);
 
     if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
-      const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
-      if (!decoded) continue;
+      const logTopicFrom = ethereum
+        .decode("address", thisLog.topics.at(INT_ONE))!
+        .toAddress();
 
-      const logData = decoded.toTuple();
-      amount = logData[INT_ZERO].toBigInt();
-      break;
+      if (logTopicFrom.equals(Address.fromBytes(poolID))) {
+        const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+        if (!decoded) continue;
+
+        const logData = decoded.toTuple();
+        amount = logData[INT_ZERO].toBigInt();
+        break;
+      }
     }
   }
 
@@ -341,11 +357,13 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
     withdrawID,
     event
   );
+
+  const poolBalance = getPoolBalance(Address.fromBytes(poolID));
+
   updateTVL(
     Address.fromBytes(poolID),
     Address.fromBytes(tokenID),
-    false,
-    amount,
+    poolBalance,
     event
   );
   updateVolume(

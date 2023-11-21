@@ -137,6 +137,7 @@ export function updateWithdraw(
   );
   withdrawEvent.hashCompleted = event.transaction.hash;
   withdrawEvent.completed = true;
+  withdrawEvent.blockNumberCompleted = event.block.number;
   withdrawEvent.save();
 
   const account = getOrCreateAccount(accountAddress);

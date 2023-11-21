@@ -771,6 +771,7 @@ type Withdraw implements Event @entity @transaction {
 
   " Block number of this event "
   blockNumber: BigInt!
+  blockNumberCompleted: BigInt
 
   " Timestamp of this event "
   timestamp: BigInt!
