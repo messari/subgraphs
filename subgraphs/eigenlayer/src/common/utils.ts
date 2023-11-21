@@ -157,7 +157,7 @@ export function fillInMissingPoolHourlySnapshots(
   poolAddress: Address,
   currentSnapshotHour: i32
 ): void {
-  let previousSnapshot = findPreviousPoolHourlySnapshot(
+  const previousSnapshot = findPreviousPoolHourlySnapshot(
     poolAddress,
     currentSnapshotHour
   );
@@ -209,7 +209,7 @@ export function fillInMissingPoolDailySnapshots(
   poolAddress: Address,
   currentSnapshotDay: i32
 ): void {
-  let previousSnapshot = findPreviousPoolDailySnapshot(
+  const previousSnapshot = findPreviousPoolDailySnapshot(
     poolAddress,
     currentSnapshotDay
   );
@@ -276,7 +276,7 @@ export function findPreviousUsageMetricsHourlySnapshot(
 export function fillInMissingUsageMetricsHourlySnapshots(
   currentSnapshotHour: i32
 ): void {
-  let previousSnapshot =
+  const previousSnapshot =
     findPreviousUsageMetricsHourlySnapshot(currentSnapshotHour);
   if (previousSnapshot) {
     let counter = 1;
@@ -316,7 +316,7 @@ export function findPreviousUsageMetricsDailySnapshot(
 export function fillInMissingUsageMetricsDailySnapshots(
   currentSnapshotDay: i32
 ): void {
-  let previousSnapshot =
+  const previousSnapshot =
     findPreviousUsageMetricsDailySnapshot(currentSnapshotDay);
   if (previousSnapshot) {
     let counter = 1;
@@ -366,7 +366,7 @@ export function findPreviousFinancialsDailySnapshot(
 export function fillInMissingFinancialsDailySnapshots(
   currentSnapshotDay: i32
 ): void {
-  let previousSnapshot =
+  const previousSnapshot =
     findPreviousFinancialsDailySnapshot(currentSnapshotDay);
   if (previousSnapshot) {
     let counter = 1;
