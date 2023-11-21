@@ -9,17 +9,17 @@ import {
 import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreatePoolDailySnapshot,
-  getOrCreatePoolHourlySnapshot,
+  // getOrCreatePoolHourlySnapshot,
   getOrCreateUsageMetricsDailySnapshot,
-  getOrCreateUsageMetricsHourlySnapshot,
+  // getOrCreateUsageMetricsHourlySnapshot,
 } from "./getters";
 
 import {
   FinancialsDailySnapshot,
   PoolDailySnapshot,
-  PoolHourlySnapshot,
+  // PoolHourlySnapshot,
   UsageMetricsDailySnapshot,
-  UsageMetricsHourlySnapshot,
+  // UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 
 export function getHoursSinceEpoch(secondsSinceEpoch: number): i32 {
@@ -131,57 +131,57 @@ export function accountArraySort(
   }
 }
 
-export function findPreviousPoolHourlySnapshot(
-  poolAddress: Address,
-  currentSnapshotHour: number
-): PoolHourlySnapshot | null {
-  let previousHour = (currentSnapshotHour - 1) as i32;
-  let previousId = Bytes.empty()
-    .concat(poolAddress)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(previousHour));
-  let previousSnapshot = PoolHourlySnapshot.load(previousId);
+// export function findPreviousPoolHourlySnapshot(
+//   poolAddress: Address,
+//   currentSnapshotHour: number
+// ): PoolHourlySnapshot | null {
+//   let previousHour = (currentSnapshotHour - 1) as i32;
+//   let previousId = Bytes.empty()
+//     .concat(poolAddress)
+//     .concat(Bytes.fromUTF8("-"))
+//     .concat(Bytes.fromI32(previousHour));
+//   let previousSnapshot = PoolHourlySnapshot.load(previousId);
 
-  while (!previousSnapshot && previousHour > 0) {
-    previousHour--;
-    previousId = Bytes.empty()
-      .concat(poolAddress)
-      .concat(Bytes.fromUTF8("-"))
-      .concat(Bytes.fromI32(previousHour));
-    previousSnapshot = PoolHourlySnapshot.load(previousId);
-  }
-  return previousSnapshot;
-}
+//   while (!previousSnapshot && previousHour > 0) {
+//     previousHour--;
+//     previousId = Bytes.empty()
+//       .concat(poolAddress)
+//       .concat(Bytes.fromUTF8("-"))
+//       .concat(Bytes.fromI32(previousHour));
+//     previousSnapshot = PoolHourlySnapshot.load(previousId);
+//   }
+//   return previousSnapshot;
+// }
 
-export function fillInMissingPoolHourlySnapshots(
-  poolAddress: Address,
-  currentSnapshotHour: i32
-): void {
-  const previousSnapshot = findPreviousPoolHourlySnapshot(
-    poolAddress,
-    currentSnapshotHour
-  );
-  if (previousSnapshot) {
-    let counter = 1;
-    for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
-      const snapshot = getOrCreatePoolHourlySnapshot(poolAddress, i as i32);
+// export function fillInMissingPoolHourlySnapshots(
+//   poolAddress: Address,
+//   currentSnapshotHour: i32
+// ): void {
+//   const previousSnapshot = findPreviousPoolHourlySnapshot(
+//     poolAddress,
+//     currentSnapshotHour
+//   );
+//   if (previousSnapshot) {
+//     let counter = 1;
+//     for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
+//       const snapshot = getOrCreatePoolHourlySnapshot(poolAddress, i as i32);
 
-      snapshot.totalValueLockedUSD = previousSnapshot.totalValueLockedUSD;
-      snapshot.inputTokenBalances = previousSnapshot.inputTokenBalances;
-      snapshot.inputTokenBalancesUSD = previousSnapshot.inputTokenBalancesUSD;
+//       snapshot.totalValueLockedUSD = previousSnapshot.totalValueLockedUSD;
+//       snapshot.inputTokenBalances = previousSnapshot.inputTokenBalances;
+//       snapshot.inputTokenBalancesUSD = previousSnapshot.inputTokenBalancesUSD;
 
-      snapshot.timestamp = previousSnapshot.timestamp!.plus(
-        BigInt.fromI32((counter * 3600) as i32)
-      );
-      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-        BigInt.fromI32((counter * 300) as i32)
-      );
-      counter++;
+//       snapshot.timestamp = previousSnapshot.timestamp!.plus(
+//         BigInt.fromI32((counter * 3600) as i32)
+//       );
+//       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+//         BigInt.fromI32((counter * 300) as i32)
+//       );
+//       counter++;
 
-      snapshot.save();
-    }
-  }
-}
+//       snapshot.save();
+//     }
+//   }
+// }
 
 export function findPreviousPoolDailySnapshot(
   poolAddress: Address,
@@ -258,45 +258,45 @@ export function fillInMissingPoolDailySnapshots(
   }
 }
 
-export function findPreviousUsageMetricsHourlySnapshot(
-  currentSnapshotHour: number
-): UsageMetricsHourlySnapshot | null {
-  let previousHour = (currentSnapshotHour - 1) as i32;
-  let previousId = Bytes.fromI32(previousHour);
-  let previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
+// export function findPreviousUsageMetricsHourlySnapshot(
+//   currentSnapshotHour: number
+// ): UsageMetricsHourlySnapshot | null {
+//   let previousHour = (currentSnapshotHour - 1) as i32;
+//   let previousId = Bytes.fromI32(previousHour);
+//   let previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
 
-  while (!previousSnapshot && previousHour > 0) {
-    previousHour--;
-    previousId = Bytes.fromI32(previousHour);
-    previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
-  }
-  return previousSnapshot;
-}
+//   while (!previousSnapshot && previousHour > 0) {
+//     previousHour--;
+//     previousId = Bytes.fromI32(previousHour);
+//     previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
+//   }
+//   return previousSnapshot;
+// }
 
-export function fillInMissingUsageMetricsHourlySnapshots(
-  currentSnapshotHour: i32
-): void {
-  const previousSnapshot =
-    findPreviousUsageMetricsHourlySnapshot(currentSnapshotHour);
-  if (previousSnapshot) {
-    let counter = 1;
-    for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
-      const snapshot = getOrCreateUsageMetricsHourlySnapshot(i as i32);
+// export function fillInMissingUsageMetricsHourlySnapshots(
+//   currentSnapshotHour: i32
+// ): void {
+//   const previousSnapshot =
+//     findPreviousUsageMetricsHourlySnapshot(currentSnapshotHour);
+//   if (previousSnapshot) {
+//     let counter = 1;
+//     for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
+//       const snapshot = getOrCreateUsageMetricsHourlySnapshot(i as i32);
 
-      snapshot.cumulativeUniqueUsers = previousSnapshot.cumulativeUniqueUsers;
+//       snapshot.cumulativeUniqueUsers = previousSnapshot.cumulativeUniqueUsers;
 
-      snapshot.timestamp = previousSnapshot.timestamp!.plus(
-        BigInt.fromI32((counter * 3600) as i32)
-      );
-      snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-        BigInt.fromI32((counter * 300) as i32)
-      );
-      counter++;
+//       snapshot.timestamp = previousSnapshot.timestamp!.plus(
+//         BigInt.fromI32((counter * 3600) as i32)
+//       );
+//       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
+//         BigInt.fromI32((counter * 300) as i32)
+//       );
+//       counter++;
 
-      snapshot.save();
-    }
-  }
-}
+//       snapshot.save();
+//     }
+//   }
+// }
 
 export function findPreviousUsageMetricsDailySnapshot(
   currentSnapshotDay: number
