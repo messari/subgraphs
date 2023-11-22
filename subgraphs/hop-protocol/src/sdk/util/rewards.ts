@@ -12,16 +12,20 @@ import {
   Bytes,
   Address,
   ethereum,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
-import { _CircularBuffer } from "../../../generated/schema";
+import { Token, _CircularBuffer } from "../../../generated/schema";
 import { L2_Reward } from "../../../generated/HopL2Rewards/L2_Reward";
 import {
   GNO_REWARDS,
   HOP_REWARDS,
   Network,
   OP_REWARDS,
+  RPL_REWARDS,
   RewardTokens,
+  WETH_REWARDS,
+  WMATIC_REWARDS,
 } from "./constants";
 import {
   BIGDECIMAL_ZERO,
@@ -36,7 +40,6 @@ import { BridgePoolType } from "../../sdk/protocols/bridge/enums";
 import { TokenManager } from "../../sdk/protocols/bridge/tokens";
 import {
   BIGINT_MINUS_ONE,
-  BIGINT_TEN_TO_EIGHTEENTH,
   BIGINT_TWO,
   RewardTokenType,
 } from "../../sdk/util/constants";
@@ -324,57 +327,53 @@ export function updateWithdrawn(
   rewardToken: string,
   amount: BigInt
 ): void {
+  let token: Token | null = null;
   if (GNO_REWARDS.includes(rewardToken)) {
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
-    hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
   }
   if (OP_REWARDS.includes(rewardToken)) {
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
-    hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
   }
   if (HOP_REWARDS.includes(rewardToken)) {
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
-    hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
   }
+  if (RPL_REWARDS.includes(rewardToken)) {
+    if (
+      dataSource.network().toUpperCase().replace("-", "_") ==
+      Network.ARBITRUM_ONE
+    )
+      token = tokens.getOrCreateToken(
+        Address.fromString(RewardTokens.rETH_ARB)
+      );
+    if (
+      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
+    )
+      token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
+  }
+  if (WMATIC_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WMATIC));
+  }
+  if (WETH_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WETH));
+  }
+  if (!token) return;
+
+  poolAddress =
+    NetworkConfigs.getPoolAddressFromRewardTokenAddress(rewardToken);
+  const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+  const hPool = hPools.loadPool<string>(
+    Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+  );
+
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+  pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
+  hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE));
 }
 
 export function updateStaked(
@@ -388,57 +387,53 @@ export function updateStaked(
   rewardToken: string,
   amount: BigInt
 ): void {
+  let token: Token | null = null;
   if (GNO_REWARDS.includes(rewardToken)) {
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    pool.addStakedOutputTokenAmount(amount);
-    hPool.addStakedOutputTokenAmount(amount);
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
   }
   if (OP_REWARDS.includes(rewardToken)) {
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    pool.addStakedOutputTokenAmount(amount);
-    hPool.addStakedOutputTokenAmount(amount);
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
   }
   if (HOP_REWARDS.includes(rewardToken)) {
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    pool.addStakedOutputTokenAmount(amount);
-    hPool.addStakedOutputTokenAmount(amount);
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
   }
+  if (RPL_REWARDS.includes(rewardToken)) {
+    if (
+      dataSource.network().toUpperCase().replace("-", "_") ==
+      Network.ARBITRUM_ONE
+    )
+      token = tokens.getOrCreateToken(
+        Address.fromString(RewardTokens.rETH_ARB)
+      );
+    if (
+      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
+    )
+      token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
+  }
+  if (WMATIC_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WMATIC));
+  }
+  if (WETH_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WETH));
+  }
+  if (!token) return;
+
+  poolAddress =
+    NetworkConfigs.getPoolAddressFromRewardTokenAddress(rewardToken);
+  const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+  const hPool = hPools.loadPool<string>(
+    Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+  );
+
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+  pool.addStakedOutputTokenAmount(amount);
+  hPool.addStakedOutputTokenAmount(amount);
 }
 
 export function updateRewardsPaid(
@@ -449,149 +444,62 @@ export function updateRewardsPaid(
   poolSymbol: string,
   hPoolName: string,
   poolAddress: string,
-  event: ethereum.Event,
-  amount: BigInt
+  event: ethereum.Event
 ): void {
-  if (GNO_REWARDS.includes(event.address.toHexString())) {
-    log.info("GNO RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
-      event.address.toHexString(),
-      poolAddress,
-      amount.toString(),
-    ]);
-
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    const Reward = L2_Reward.bind(event.address);
-    const rewardRateCall = Reward.try_rewardRate();
-    if (!rewardRateCall.reverted) {
-      log.info("GNO RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}", [
-        event.transaction.hash.toHexString(),
-        rewardRateCall.value.toString(),
-        BIGINT_TEN_TO_EIGHTEENTH.toString(),
-      ]);
-      const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
-
-      const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
-      pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
-      hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
-
-      log.info(
-        "GNO RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
-        [
-          event.transaction.hash.toHexString(),
-          rewardRate.toString(),
-          dailyEmission.toString(),
-        ]
-      );
-    } else {
-      log.info("GNO Rewards rate call reverted", []);
-    }
+  const rewardToken = event.address.toHexString();
+  let token: Token | null = null;
+  if (GNO_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
   }
-  if (OP_REWARDS.includes(event.address.toHexString())) {
-    const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
-      event.address.toHexString()
-    );
-    log.info("OP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
-      event.address.toHexString(),
-      poolAddress,
-      amount.toString(),
-    ]);
-    log.info("OP RewardsPaid 1 --> poolAddress: {},", [poolAddress]);
-
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-    const Reward = L2_Reward.bind(event.address);
-    const rewardRateCall = Reward.try_rewardRate();
-    if (!rewardRateCall.reverted) {
-      log.info("OP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}", [
-        event.transaction.hash.toHexString(),
-        rewardRateCall.value.toString(),
-        BIGINT_TEN_TO_EIGHTEENTH.toString(),
-      ]);
-      const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
-
-      const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
-      pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
-      hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
-
-      log.info(
-        "OP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
-        [
-          event.transaction.hash.toHexString(),
-          rewardRate.toString(),
-          dailyEmission.toString(),
-        ]
-      );
-    } else {
-      log.info("OP Rewards rate call reverted", []);
-    }
+  if (OP_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
   }
-  if (HOP_REWARDS.includes(event.address.toHexString())) {
-    log.info("HOP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}", [
-      event.address.toHexString(),
-      poolAddress,
-      amount.toString(),
-    ]);
-
-    const pool = pools.loadPool<string>(Address.fromString(poolAddress));
-
-    const hPool = hPools.loadPool<string>(
-      Bytes.fromHexString(poolAddress.concat("-").concat("1"))
-    );
-    const token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
-
-    if (!pool.isInitialized) {
-      pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    if (!hPool.isInitialized) {
-      hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
-    }
-
-    const Reward = L2_Reward.bind(event.address);
-    const rewardRateCall = Reward.try_rewardRate();
-    if (!rewardRateCall.reverted) {
-      log.info("HOP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}", [
-        event.transaction.hash.toHexString(),
-        rewardRateCall.value.toString(),
-        BIGINT_TEN_TO_EIGHTEENTH.toString(),
-      ]);
-      const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
-
-      const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
-      pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
-      hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
-
-      log.info(
-        "HOP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}",
-        [
-          event.transaction.hash.toHexString(),
-          rewardRate.toString(),
-          dailyEmission.toString(),
-        ]
+  if (HOP_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
+  }
+  if (RPL_REWARDS.includes(rewardToken)) {
+    if (
+      dataSource.network().toUpperCase().replace("-", "_") ==
+      Network.ARBITRUM_ONE
+    )
+      token = tokens.getOrCreateToken(
+        Address.fromString(RewardTokens.rETH_ARB)
       );
-    } else {
-      log.info("HOP Rewards rate call reverted", []);
-    }
+    if (
+      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
+    )
+      token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
+  }
+  if (WMATIC_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WMATIC));
+  }
+  if (WETH_REWARDS.includes(rewardToken)) {
+    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WETH));
+  }
+  if (!token) return;
+
+  poolAddress =
+    NetworkConfigs.getPoolAddressFromRewardTokenAddress(rewardToken);
+  const pool = pools.loadPool<string>(Address.fromString(poolAddress));
+  const hPool = hPools.loadPool<string>(
+    Bytes.fromHexString(poolAddress.concat("-").concat("1"))
+  );
+
+  if (!pool.isInitialized) {
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+  if (!hPool.isInitialized) {
+    hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+  }
+  const Reward = L2_Reward.bind(event.address);
+  const rewardRateCall = Reward.try_rewardRate();
+  if (!rewardRateCall.reverted) {
+    const rewardRate = rewardRateCall.value.div(BIGINT_TWO);
+
+    const dailyEmission = BigInt.fromI32(RATE_IN_SECONDS).times(rewardRate);
+    pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+    hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission);
+  } else {
+    log.info("Rewards rate call reverted", []);
   }
 }

@@ -16,6 +16,7 @@ import {
   ArbitrumNovaHtoken,
   ArbitrumNovaAmm,
   BaseToken,
+  LineaToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolOptimismConfigurations implements Configurations {
@@ -63,7 +64,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     else if (rewardToken == OptimismRewardToken.USDC) return OptimismAmm.USDC;
     else if (rewardToken == OptimismRewardToken.USDT) return OptimismAmm.USDT;
     else {
-      log.critical("RewardToken not found", []);
+      log.critical("Pool not found for reward token: {}", [rewardToken]);
       return "";
     }
   }
@@ -110,8 +111,10 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return this.getArbitrumNovaConfigFromTokenAddress(tokenAddress)[0];
     else if (chainId == "8453")
       return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "59144")
+      return this.getLineaCrossTokenFromTokenAddress(tokenAddress);
     else {
-      log.critical("Chain not found", []);
+      log.critical("Chain not found: {}", [chainId]);
       return "";
     }
   }
@@ -189,7 +192,15 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     if (tokenAddress == OptimismToken.USDC) return BaseToken.USDC;
     if (tokenAddress == OptimismToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
+      log.critical("Base CrossToken not found for token: {}", [tokenAddress]);
+    }
+    return "";
+  }
+
+  getLineaCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == OptimismToken.ETH) return LineaToken.ETH;
+    else {
+      log.critical("Linea CrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
