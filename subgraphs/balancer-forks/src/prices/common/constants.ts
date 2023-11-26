@@ -63,4 +63,5 @@ export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x2bbf681cc4eb09218bee85ea2a5d3d13fa40fc0c"), // bb-a-USDT deprecated
   Address.fromString("0x48f07301e9e29c3c38a80ae8d9ae771f224f1054"), // South African Tether
   Address.fromString("0x616e8bfa43f920657b3497dbf40d6b1a02d4608d"), // Aura BAL
+  Address.fromString("0xf16aee6a71af1a9bc8f56975a4c2705ca7a782bc"), // Alchemix
 ];

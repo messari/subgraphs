@@ -99,6 +99,9 @@ export function Swap(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
+  if (constants.BLACKLISTED_PHANTOM_POOLS.includes(poolAddress))
+    return
+
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
   const tokenInStore = getOrCreateToken(tokenIn, block);
