@@ -33,7 +33,7 @@ export function handleTrade(event: Trade): void {
 
   const token = getOrCreateToken(event);
   const protocol = getOrCreateProtocol();
-  const pool = getOrCreatePool(subjectAddress, event);
+  const pool = getOrCreatePool(protocol, subjectAddress, event);
   const account = getOrCreateAccount(traderAddress, event);
   const connection = getOrCreateConnection(
     traderAddress,

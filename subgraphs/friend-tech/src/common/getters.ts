@@ -86,18 +86,17 @@ export function getOrCreateProtocol(): Protocol {
   protocol.subgraphVersion = Versions.getSubgraphVersion();
   protocol.methodologyVersion = Versions.getMethodologyVersion();
 
-  protocol.save();
   return protocol;
 }
 
 export function getOrCreatePool(
+  protocol: Protocol,
   poolAddress: Address,
   event: ethereum.Event
 ): Pool {
   let pool = Pool.load(poolAddress);
 
   if (!pool) {
-    const protocol = getOrCreateProtocol();
     pool = new Pool(poolAddress);
     pool.protocol = protocol.id;
     pool.name = "Subject-" + poolAddress.toHexString();
@@ -136,9 +135,6 @@ export function getOrCreatePool(
     pool._lastHourlySnapshotTimestamp = BIGINT_ZERO;
 
     protocol.totalPoolCount += INT_ONE;
-
-    pool.save();
-    protocol.save();
   }
   return pool;
 }
@@ -167,8 +163,6 @@ export function getOrCreateAccount(
     trader.buys = [];
     trader.sells = [];
     trader.subjects = [];
-
-    trader.save();
   }
   return trader;
 }
@@ -190,8 +184,6 @@ export function getOrCreateConnection(
 
     connection.trader = traderAddress;
     connection.subject = subjectAddress;
-
-    // TODO
     connection.shares = BIGINT_ZERO;
 
     connection.cumulativeBuyVolumeUSD = BIGDECIMAL_ZERO;
@@ -205,8 +197,6 @@ export function getOrCreateConnection(
 
     connection.createdTimestamp = event.block.timestamp;
     connection.createdBlockNumber = event.block.number;
-
-    connection.save();
   }
   return connection;
 }
