@@ -9814,5 +9814,35 @@
         }
       }
     }
+  },
+  "friend-tech": {
+    "schema": "generic",
+    "base": "friend-tech",
+    "protocol": "friend-tech",
+    "project": "friend-tech",
+    "deployments": {
+      "friend-tech-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "friend.tech.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "friend-tech-base",
+            "query-id": "friend-tech-base"
+          }
+        }
+      }
+    }
   }
 }
