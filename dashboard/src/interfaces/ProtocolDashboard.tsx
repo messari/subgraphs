@@ -71,12 +71,13 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     } else if (!subgraphParam.includes("/")) {
       if (subgraphParam?.toUpperCase()?.split("QM")?.length === 1) {
         queryURL =
-          "https://gateway-arbitrum.network.thegraph.com/api/" +
+          process.env.REACT_APP_GRAPH_DECEN_URL! +
+          "/api/" +
           process.env.REACT_APP_GRAPH_API_KEY +
           "/subgraphs/id/" +
           subgraphParam;
       } else {
-        queryURL = "https://api.thegraph.com/subgraphs/id/" + subgraphParam;
+        queryURL = process.env.REACT_APP_GRAPH_BASE_URL! + "/subgraphs/id/" + subgraphParam;
       }
     }
   }
@@ -85,7 +86,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   const endpointObject: { [x: string]: string } = { current: "", pending: "" };
   endpointObject[version] = queryURL;
   if (subgraphName && !endpointObject.current) {
-    endpointObject.current = "https://api.thegraph.com/subgraphs/name/" + subgraphName;
+    endpointObject.current = process.env.REACT_APP_GRAPH_BASE_URL! + "/subgraphs/name/" + subgraphName;
   }
   const [endpoints, setEndpoints] = useState(endpointObject);
   const [isCurrentVersion, setIsCurrentVersion] = useState(version == "current" ? true : false);
@@ -93,12 +94,15 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
   const [overlayDeploymentClient, setOverlayDeploymentClient] = useState<ApolloClient<NormalizedCacheObject>>(
-    NewClient("https://api.thegraph.com/index-node/graphql"),
+    NewClient(process.env.REACT_APP_GRAPH_BASE_URL! + "/index-node/graphql"),
   );
   const [overlayDeploymentURL, setOverlayDeploymentURL] = useState<string>("");
   const [overlayError, setOverlayError] = useState<ApolloError | null>(null);
 
-  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), [subgraphParam]);
+  const clientIndexing = useMemo(
+    () => NewClient(process.env.REACT_APP_GRAPH_BASE_URL! + "/index-node/graphql"),
+    [subgraphParam],
+  );
 
   const [getPendingSubgraph, { data: pendingVersion, error: errorSubId, loading: subIdLoading }] = useLazyQuery(
     getPendingSubgraphId,
@@ -502,7 +506,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
     ) {
       const pendingURL =
-        "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph;
+        process.env.REACT_APP_GRAPH_BASE_URL! +
+        "/subgraphs/id/" +
+        pendingVersion?.indexingStatusForPendingVersion?.subgraph;
       if (isCurrentVersion === false) {
         setSubgraphToQuery({ url: pendingURL, version: "pending" });
       }

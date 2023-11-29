@@ -1,0 +1,16 @@
+{
+  "deployment": "EIGEN_LAYER_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0,
+  "eigenPodManager": {
+    "address": "0x91E677b07F7AF907ec9a428aafA9fc14a0d3A338",
+    "startBlock": "17445564"
+  },
+  "strategyManager": {
+    "address": "0x858646372CC42E1A627fcE94aa7A7033e7CF075A",
+    "startBlock": "17445564"
+  }
+}

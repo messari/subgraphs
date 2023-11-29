@@ -19,7 +19,7 @@ import {
  * Schema Version:  3.1.1
  * SDK Version:     1.0.7
  * Author(s):
- *  - @dmelotik
+ *  - @melotik
  *  - @dhruv-chauhan
  */
 

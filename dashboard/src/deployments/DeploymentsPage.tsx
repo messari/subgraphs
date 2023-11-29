@@ -6,8 +6,6 @@ import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import DevCountTable from "./DevCountTable";
-import IndexingCalls from "./IndexingCalls";
-import DecenIndexingCalls from "./DecenIndexingCalls";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
@@ -15,90 +13,22 @@ const DeploymentsLayout = styled("div")`
 
 interface DeploymentsPageProps {
   protocolsToQuery: { [x: string]: any };
+  loading: boolean;
   getData: any;
   subgraphCounts: any;
-  indexingStatusQueries: any;
-  endpointSlugs: string[];
-  aliasToProtocol: any;
   decentralizedDeployments: any;
   issuesMapping: any;
 }
 
 function DeploymentsPage({
   protocolsToQuery,
+  loading,
   getData,
   subgraphCounts,
-  indexingStatusQueries,
-  endpointSlugs,
-  aliasToProtocol,
   decentralizedDeployments,
   issuesMapping,
 }: DeploymentsPageProps) {
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
-
-  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({
-    lending: false,
-    exchanges: false,
-    vaults: false,
-    generic: false,
-    bridge: false,
-    erc20: false,
-    erc721: false,
-    governance: false,
-    // network: false,
-    ["nft-marketplace"]: false,
-    ["derivatives-options"]: false,
-    ["derivatives-perpfutures"]: false,
-  });
-
-  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({
-    lending: false,
-    exchanges: false,
-    vaults: false,
-    generic: false,
-    bridge: false,
-    erc20: false,
-    erc721: false,
-    governance: false,
-    // network: false,
-    ["nft-marketplace"]: false,
-    ["derivatives-options"]: false,
-    ["derivatives-perpfutures"]: false,
-  });
-
-  const [indexingStatusError, setIndexingStatusError] = useState<any>({
-    lending: false,
-    exchanges: false,
-    vaults: false,
-    generic: false,
-    bridge: false,
-    erc20: false,
-    erc721: false,
-    governance: false,
-    // network: false,
-    ["nft-marketplace"]: false,
-    ["derivatives-options"]: false,
-    ["derivatives-perpfutures"]: false,
-  });
-
-  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({
-    lending: false,
-    exchanges: false,
-    vaults: false,
-    generic: false,
-    bridge: false,
-    erc20: false,
-    erc721: false,
-    governance: false,
-    // network: false,
-    ["nft-marketplace"]: false,
-    ["derivatives-options"]: false,
-    ["derivatives-perpfutures"]: false,
-  });
-
-  const [decenDepoIndexingStatus, setDecenDepoIndexingStatus] = useState<boolean>(false);
-  const [indexingStatus, setIndexingStatus] = useState<any>(false);
-  const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
 
   const [substreamsBasedSubgraphs, setSubstreamsBasedSubgraphs] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
@@ -109,7 +39,9 @@ function DeploymentsPage({
   const [showSubstreamsBasedSubgraphs, setShowSubstreamsBasedSubgraphs] = useState<boolean>(false);
 
   useEffect(() => {
-    getData();
+    if (!protocolsToQuery || Object.keys(protocolsToQuery).length === 0) {
+      getData();
+    }
   }, []);
 
   useEffect(() => {
@@ -131,10 +63,6 @@ function DeploymentsPage({
   window.scrollTo(0, 0);
 
   const decenDeposToSubgraphIds: any = {};
-  const depoIdToSubgraphName: any = {};
-  const depoIds: any = [];
-  let decentralizedDepoQuery: any = "";
-
   if (Object.keys(decentralizedDeployments)?.length) {
     Object.keys(decentralizedDeployments).forEach((key) => {
       const protocolObj = Object.keys(protocolsToQuery).find((pro) => pro.includes(key));
@@ -152,9 +80,6 @@ function DeploymentsPage({
               networkStr = "arbitrum";
             }
             let subgraphIdToMap = { id: "", signal: 0 };
-            depoIdToSubgraphName[item.deploymentId] =
-              (protocolsToQuery[protocolObj]?.protocol || protocolObj) + "-" + networkStr;
-            depoIds.push(item.deploymentId);
             subgraphIdToMap = {
               id: item.subgraphId,
               signal: item.signalledTokens,
@@ -164,107 +89,12 @@ function DeploymentsPage({
         });
       }
     });
-
-    const subgraphIdString = JSON.stringify(depoIds);
-    decentralizedDepoQuery = `query Status { indexingStatuses(subgraphs: ${subgraphIdString} ) { 
-          subgraph
-          synced
-          fatalError {
-            message
-          }
-          chains {
-            chainHeadBlock {
-              number
-            }
-            earliestBlock {
-              number
-            }
-            latestBlock {
-              number
-            }
-            lastHealthyBlock {
-              number
-            }
-          }
-          entityCount
-      }
-  }`;
   }
 
   // counts section
   let devCountTable = null;
   if (!!showSubgraphCountTable) {
     devCountTable = <DevCountTable subgraphCounts={subgraphCounts} />;
-  }
-
-  let indexingCalls = null;
-  if (endpointSlugs.length > 0) {
-    indexingCalls = (
-      <IndexingCalls
-        setIndexingStatus={setIndexingStatus}
-        setPendingIndexingStatus={setPendingIndexingStatus}
-        indexingStatusQueries={indexingStatusQueries}
-        setIndexingStatusLoaded={setIndexingStatusLoaded}
-        setIndexingStatusLoadedPending={setIndexingStatusLoadedPending}
-        setIndexingStatusError={setIndexingStatusError}
-        setIndexingStatusErrorPending={setIndexingStatusErrorPending}
-        indexingStatusLoaded={indexingStatusLoaded}
-        indexingStatusLoadedPending={indexingStatusLoadedPending}
-        indexingStatusError={indexingStatusError}
-        indexingStatusErrorPending={indexingStatusErrorPending}
-      />
-    );
-  }
-  let decenIndexingCalls = null;
-  if (decentralizedDepoQuery?.length > 0) {
-    decenIndexingCalls = (
-      <DecenIndexingCalls
-        setDepoIndexingStatus={setDecenDepoIndexingStatus}
-        decentralizedDepoQuery={decentralizedDepoQuery}
-        depoIdToSubgraphName={depoIdToSubgraphName}
-      />
-    );
-  }
-
-  if (!!indexingStatus) {
-    Object.keys(indexingStatus).forEach((depo: string) => {
-      let deploymentStr = depo.split("_").join("-");
-      if (protocolsToQuery[aliasToProtocol[depo]]) {
-        if (!!protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr]) {
-          protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr].indexStatus = indexingStatus[depo];
-        } else {
-          if (depo.includes("erc") || depo.includes("governance")) {
-            deploymentStr += "-ethereum";
-          }
-          const network = deploymentStr.split("-").pop() || "";
-          const depoKey =
-            Object.keys(protocolsToQuery[aliasToProtocol[depo]].deployments).find((x: any) => {
-              return protocolsToQuery[aliasToProtocol[depo]].deployments[x].network === network;
-            }) || "";
-          if (!protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey]) {
-            return;
-          }
-          protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey].indexStatus = indexingStatus[depo];
-        }
-      }
-    });
-  }
-
-  if (!!pendingIndexingStatus) {
-    Object.keys(pendingIndexingStatus).forEach((depo: string) => {
-      if (!pendingIndexingStatus[depo]) {
-        return;
-      }
-      const depoNoPendingArr = depo.split("_");
-      depoNoPendingArr.pop();
-      const deploymentStr = depoNoPendingArr.join("-");
-      if (protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]]) {
-        if (!!protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr]) {
-          protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr].pendingIndexStatus =
-            pendingIndexingStatus[depo];
-        }
-      }
-    });
   }
 
   return (
@@ -330,20 +160,27 @@ function DeploymentsPage({
           </span>
         </div>
         {devCountTable}
-        <DeploymentsTable
-          getData={() => getData()}
-          decenDepoIndexingStatus={decenDepoIndexingStatus}
-          issuesMapping={issuesMapping}
-          protocolsToQuery={showSubstreamsBasedSubgraphs ? substreamsBasedSubgraphs : nonSubstreamsBasedSubgraphs}
-          decenDeposToSubgraphIds={decenDeposToSubgraphIds}
-          indexingStatusLoaded={indexingStatusLoaded}
-          indexingStatusLoadedPending={indexingStatusLoadedPending}
-          indexingStatusError={indexingStatusError}
-          indexingStatusErrorPending={indexingStatusErrorPending}
-        />
+        {loading ? (
+          <div
+            className="loader-container"
+            style={{
+              width: "100%",
+              height: "100vh",
+              position: "fixed",
+              zIndex: 1001,
+              background:
+                "transparent url('https://media.giphy.com/media/8agqybiK5LW8qrG3vJ/giphy.gif') center no-repeat",
+            }}
+          ></div>
+        ) : (
+          <DeploymentsTable
+            getData={() => getData()}
+            issuesMapping={issuesMapping}
+            protocolsToQuery={showSubstreamsBasedSubgraphs ? substreamsBasedSubgraphs : nonSubstreamsBasedSubgraphs}
+            decenDeposToSubgraphIds={decenDeposToSubgraphIds}
+          />
+        )}
       </DeploymentsLayout>
-      {decenIndexingCalls}
-      {indexingCalls}
     </DeploymentsContextProvider>
   );
 }

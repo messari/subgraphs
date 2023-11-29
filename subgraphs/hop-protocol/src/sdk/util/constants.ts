@@ -378,6 +378,7 @@ export namespace ArbitrumRewardToken {
   export const DAI = "0xd4d28588ac1d9ef272aa29d4424e3e2a03789d1e";
   export const ETH = "0x755569159598f3702bdd7dff6233a317c156d3dd";
   export const rETH = "0x3d4cad734b464ed6edcf6254c2a3e5fa5d449b32";
+  export const MAGIC = "0x4e9840f3c1ff368a10731d15c11516b9fe7e1898";
 }
 
 export namespace OptimismBridge {
@@ -451,6 +452,10 @@ export namespace ArbitrumNovaHtoken {
   export const MAGIC = "0xe3b4a0a9904d75a0334893989d06814ad969d80f";
 }
 
+export namespace ArbitrumNovaRewardToken {
+  export const MAGIC = "0xeb35dac45077319042d62a735aa0f9edd1f01fa6";
+}
+
 export namespace PolygonBridge {
   export const USDC = "0x25d8039bb044dc227f741a9e381ca4ceae2e6ae8";
   export const USDT = "0x6c9a1acf73bd85463a46b0afc076fbdf602b690b";
@@ -482,10 +487,15 @@ export namespace PolygonHtoken {
   export const MATIC = "0x712f0cf37bdb8299d0666727f73a5caba7c1c24c";
 }
 export namespace PolygonRewardToken {
-  export const USDC = "0x7811737716942967ae6567b26a5051cc72af550e";
-  export const USDT = "0x297e5079df8173ae1696899d3eacd708f0af82ce";
-  export const DAI = "0xd6dc6f69f81537fe9decc18152b7005b45dc2ee7";
-  export const ETH = "0xaa7b3a4a084e6461d486e53a03cf45004f0963b7";
+  export const USDC_A = "0x7811737716942967ae6567b26a5051cc72af550e";
+  export const USDC_B = "0x2c2ab81cf235e86374468b387e241df22459a265";
+  export const USDT_A = "0x297e5079df8173ae1696899d3eacd708f0af82ce";
+  export const USDT_B = "0x07932e9a5ab8800922b2688fb1fa0daad8341772";
+  export const DAI_A = "0xd6dc6f69f81537fe9decc18152b7005b45dc2ee7";
+  export const DAI_B = "0x4aeb0b5b1f3e74314a7fa934db090af603e8289b";
+  export const MATIC = "0x7deebcad1416110022f444b03aeb1d20eb4ea53f";
+  export const ETH_A = "0xaa7b3a4a084e6461d486e53a03cf45004f0963b7";
+  export const ETH_B = "0x7bceda1db99d64f25efa279bb11ce48e15fda427";
 }
 
 export namespace BaseBridge {
@@ -507,6 +517,22 @@ export namespace BaseHToken {
 export namespace BaseRewardToken {
   export const USDC = "0x7ac115536fe3a185100b2c4de4cb328bf3a58ba6";
   export const ETH = "0x12e59c59d282d2c00f3166915bed6dc2f5e2b5c7";
+}
+
+export namespace LineaBridge {
+  export const ETH = "0xcbb852a6274e03fa00fb4895de0463f66df27a11";
+}
+export namespace LineaAmm {
+  export const ETH = "0x2935173357c010f8b56c8719a44f9fbdda90f67c";
+}
+export namespace LineaToken {
+  export const ETH = "0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f";
+}
+export namespace LineaHToken {
+  export const ETH = "0xdc38c5af436b9652225f92c370a011c673fa7ba5";
+}
+export namespace LineaRewardToken {
+  export const ETH = "0xa50395bdeaca7062255109fede012efe63d6d402";
 }
 
 export const priceTokens = [
@@ -585,17 +611,22 @@ export namespace RewardTokens {
   export const GNO = "0x9c58bacc331c9aa871afd802db6379a98e80cedb";
   export const rETH_OP = "0xc81d1f0eb955b0c020e5d5b264e1ff72c14d1401";
   export const rETH_ARB = "0xb766039cc6db368759c1e56b79affe831d0cc507";
+  export const WETH = "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1";
+  export const WMATIC = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
 }
 export const GNO_REWARDS = [
   XdaiRewardToken.DAI_A,
   XdaiRewardToken.USDC_A,
   XdaiRewardToken.USDT_A,
+  XdaiRewardToken.ETH_A,
 ];
 export const HOP_REWARDS = [
   ArbitrumRewardToken.ETH,
   ArbitrumRewardToken.DAI,
   ArbitrumRewardToken.USDC,
   ArbitrumRewardToken.USDT,
+  ArbitrumRewardToken.MAGIC,
+  ArbitrumNovaRewardToken.MAGIC,
   OptimismRewardToken.DAI,
   OptimismRewardToken.SNX_A,
   OptimismRewardToken.ETH,
@@ -603,10 +634,10 @@ export const HOP_REWARDS = [
   OptimismRewardToken.sUSD_A,
   OptimismRewardToken.USDC,
   OptimismRewardToken.USDT,
-  PolygonRewardToken.ETH,
-  PolygonRewardToken.USDC,
-  PolygonRewardToken.USDT,
-  PolygonRewardToken.DAI,
+  PolygonRewardToken.ETH_A,
+  PolygonRewardToken.USDC_A,
+  PolygonRewardToken.USDT_A,
+  PolygonRewardToken.DAI_A,
   XdaiRewardToken.DAI_B,
   XdaiRewardToken.USDC_B,
   XdaiRewardToken.ETH_B,
@@ -614,6 +645,19 @@ export const HOP_REWARDS = [
   BaseRewardToken.USDC,
   BaseRewardToken.ETH,
 ];
+export const OP_REWARDS = [
+  OptimismRewardToken.SNX_B,
+  OptimismRewardToken.sUSD_B,
+];
+export const RPL_REWARDS = [OptimismRewardToken.rETH, ArbitrumRewardToken.rETH];
+export const WMATIC_REWARDS = [
+  PolygonRewardToken.USDC_B,
+  PolygonRewardToken.USDT_B,
+  PolygonRewardToken.DAI_B,
+  PolygonRewardToken.MATIC,
+  PolygonRewardToken.ETH_B,
+];
+export const WETH_REWARDS = [LineaRewardToken.ETH];
 
 export const SIX_DECIMAL_TOKENS = [
   ArbitrumToken.USDT,
@@ -625,9 +669,3 @@ export const SIX_DECIMAL_TOKENS = [
   XdaiToken.USDT,
   XdaiToken.USDC,
 ];
-
-export const OP_REWARDS = [
-  OptimismRewardToken.SNX_B,
-  OptimismRewardToken.sUSD_B,
-];
-export const RPL_REWARDS = [OptimismRewardToken.rETH, ArbitrumRewardToken.rETH];

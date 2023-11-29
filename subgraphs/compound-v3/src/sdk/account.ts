@@ -13,7 +13,7 @@ import { INT_ONE, INT_ZERO } from "./constants";
  * Schema Version:  3.1.0
  * SDK Version:     1.0.5
  * Author(s):
- *  - @dmelotik
+ *  - @melotik
  *  - @dhruv-chauhan
  */
 

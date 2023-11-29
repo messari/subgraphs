@@ -1,0 +1,48 @@
+{
+  "deployment": "KWENTA_OPTIMISM",
+  "network": "optimism",
+  "marketManagerV2": [
+    {
+      "name": "FuturesMarketManager2",
+      "address": "0xdb89f3fc45A707Dd49781495f77f8ae69bF5cA6e",
+      "startBlock": 52456507
+    },
+    {
+      "name": "FuturesMarketManager3",
+      "address": "0xd30bdfd7e7a65fe109d5de1d4e95f3b800fb7463",
+      "startBlock": 86524190
+    }
+  ],
+  "smartMarginFactory": [
+    {
+      "name": "SmartMarginFactory1",
+      "address": "0xf1BC9852e89e0b6ABa81548A10c0afF9ACa95CaA",
+      "startBlock": 89109827
+    },
+    {
+      "name": "SmartMarginFactory2",
+      "address": "0x8234F990b149Ae59416dc260305E565e5DAfEb54",
+      "startBlock": 92005505
+    }
+  ],
+  "marketSettings": [
+    {
+      "name": "PerpsV2MarketSettings1",
+      "address": "0xd442Dc2Ac1f3cA1C86C8329246e47Ca0C91D0471",
+      "startBlock": 52456606
+    },
+    {
+      "name": "PerpsV2MarketSettings2",
+      "address": "0x09793Aad1518B8d8CC72FDd356479E3CBa7B4Ad1",
+      "startBlock": 71308622
+    },
+    {
+      "name": "PerpsV2MarketSettings3",
+      "address": "0x649F44CAC3276557D03223Dbf6395Af65b11c11c",
+      "startBlock": 86524289
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "QmfHRGh3tC4yb2bBRn5A6ctytG32Jwfi9eNo76EFjiWyrf",
+  "graftStartBlock": 15217959
+}

@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Perpetual Futures
-# Version: 1.3.3
+# Version: 1.3.4
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -1895,7 +1895,7 @@ type Position @entity @regularPolling {
   collateralOutCount: Int!
 
   " Liquidation event related to this position (if exists) "
-  liquidation: Liquidate @derivedFrom(field: "position")
+  liquidation: [Liquidate!] @derivedFrom(field: "position")
 
   " Number of liquidations related to this position "
   liquidationCount: Int!

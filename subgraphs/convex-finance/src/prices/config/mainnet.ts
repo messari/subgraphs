@@ -310,6 +310,7 @@ export class config implements Configurations {
           Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"), // KP3RETH-f
           Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"), // SDTETH-f
           Address.fromString("0x2889302a794da87fbf1d6db415c1492194663d13"), // crvCRVUSDTBTCWSTETH
+          Address.fromString("0x3a283d9c08e8b55966afb64c515f5143cf907611"), // crvCVXETH
           //
           Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
           Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
@@ -317,6 +318,9 @@ export class config implements Configurations {
           Address.fromString("0xf3a43307dcafa93275993862aae628fcb50dc768"), // Factory Crypto Pool: cvxFxs/Fxs
           Address.fromString("0xb79565c01b7ae53618d9b847b9443aaf4f9011e7"), // Factory Crypto Pool: LDO/ETH
           Address.fromString("0x4704ab1fb693ce163f7c9d3a31b3ff4eaf797714"), // Factory Crypto Pool: FPI2Pool
+          Address.fromString("0xda68f66fc0f10ee61048e70106df4bdb26baf595"), // Factory Crypto Pool: JPEG/pETH
+          Address.fromString("0x5be6c45e2d074faa20700c49ada3e88a1cc0025d"), // Factory Crypto Pool: Curve GEAR/ETH
+          Address.fromString("0x8109a51542294cdbb489ae5516f42ffbd92177aa"), // Factory Crypto Pool: OGV/ETH
           Address.fromString("0x390f3595bca2df7d23783dfd126427cceb997bf4"), // Factory Plain Pool: crvUSD/USDT
           Address.fromString("0x4dece678ceceb27446b35c672dc7d61f30bad69e"), // Factory Plain Pool: crvUSD/USDC
         ].includes(tokenAddr)
@@ -330,6 +334,7 @@ export class config implements Configurations {
           Address.fromString("0x62b9c7356a2dc64a1969e19c23e4f579f9810aa7"), // cvxCRV
           Address.fromString("0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44"), // KP3R
           Address.fromString("0x73968b9a57c6e53d41345fd57a6e6ae27d6cdb2f"), // SDT
+          Address.fromString("0xba3335588d9403515223f109edc4eb7269a9ab5d"), // GEAR
         ].includes(tokenAddr)
       ) {
         return new PreferUniswapOverride();

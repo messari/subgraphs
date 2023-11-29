@@ -55,15 +55,6 @@ module.exports = {
       },
     ],
 
-    // disallow magic numbers: https://eslint.org/docs/latest/rules/no-magic-numbers
-    "@typescript-eslint/no-magic-numbers": [
-      "error",
-      {
-        ignoreArrayIndexes: true,
-        ignore: [-1, 0, 1, 2],
-      },
-    ],
-
     // CUSTOM RULES, find them in subgraphs/_eslint-rules
     // -----------------------------------------------
 

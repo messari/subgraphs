@@ -13,7 +13,7 @@ import { INT_ONE, INT_ZERO } from "./constants";
  * Schema Version:  3.0.1
  * SDK Version:     1.0.1
  * Author(s):
- *  - @dmelotik
+ *  - @melotik
  */
 
 export class AccountManager {

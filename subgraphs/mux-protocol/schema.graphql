@@ -1876,7 +1876,7 @@ type Position @entity @regularPolling {
   collateralOutCount: Int!
 
   " Liquidation event related to this position (if exists) "
-  liquidation: Liquidate @derivedFrom(field: "position")
+  liquidation: [Liquidate!] @derivedFrom(field: "position")
 
   " Number of liquidations related to this position "
   liquidationCount: Int!

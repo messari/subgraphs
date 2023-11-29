@@ -1,0 +1,137 @@
+specVersion: 0.0.6
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: EigenPodManager
+    network: {{ network }}
+    source:
+      address: "{{ eigenPodManager.address }}"
+      abi: EigenPodManager
+      startBlock: {{ eigenPodManager.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+      abis:
+        - name: EigenPodManager
+          file: ./abis/EigenPodManager.json
+        - name: EigenPod
+          file: ./abis/EigenPod.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: PodDeployed(indexed address,indexed address)
+          handler: handlePodDeployed
+      file: {{{ file }}}
+  - kind: ethereum
+    name: StrategyManager
+    network: {{ network }}
+    source:
+      address: "{{ strategyManager.address }}"
+      abi: StrategyManager
+      startBlock: {{ strategyManager.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+      abis:
+        - name: StrategyManager
+          file: ./abis/StrategyManager.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: StrategyAddedToDepositWhitelist(address)
+          handler: handleStrategyAdded
+        - event: StrategyRemovedFromDepositWhitelist(address)
+          handler: handleStrategyRemoved
+        - event: Deposit(address,address,address,uint256)
+          handler: handleDeposit
+          receipt: true
+        - event: ShareWithdrawalQueued(address,uint96,address,uint256)
+          handler: handleShareWithdrawalQueued
+          receipt: true
+        - event: WithdrawalCompleted(indexed address,uint96,indexed address,bytes32)
+          handler: handleWithdrawalCompleted
+          receipt: true
+      file: {{{ file }}}

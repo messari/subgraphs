@@ -1,0 +1,173 @@
+specVersion: 0.0.6
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  {{#marketManagerV2}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: FuturesMarketManager
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DerivPerpProtocol
+      abis:
+        - name: FuturesMarket
+          file: ./abis/kwenta/FuturesMarket.json
+        - name: FuturesMarketManager
+          file: ./abis/kwenta/FuturesMarketManager.json
+
+                  
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: 'MarketAdded(address,indexed bytes32,indexed bytes32)'
+          handler: 'handleMarketAdded'
+      file: ./src/mappings/handlers.ts
+  {{/marketManagerV2}}
+  {{#smartMarginFactory}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: SmartMarginFactory
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DerivPerpProtocol
+      abis:
+        - name: SmartMarginFactory
+          file: ./abis/kwenta/SmartMarginFactory.json
+      eventHandlers:
+        - event: 'NewAccount(indexed address,indexed address,bytes32)'
+          handler: 'handleNewAccountSmartMargin'
+      file: ./src/mappings/handlers.ts
+  {{/smartMarginFactory}}
+
+  {{#marketSettings}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: PerpsV2MarketSettings
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DerivPerpProtocol
+      abis:
+        - name: PerpsV2MarketSettings
+          file: ./abis/kwenta/PerpsV2MarketSettings.json
+      eventHandlers:
+        - event: 'ParameterUpdated(indexed bytes32,indexed bytes32,uint256)'
+          handler: 'handleParameterUpdated'
+      file: ./src/mappings/handlers.ts
+  {{/marketSettings}}
+templates:
+  - kind: ethereum/contract
+    name: PerpsV2Market
+    network: {{ network }}
+    source:
+      abi: PerpsV2MarketProxyable
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+      abis: 
+        - name: PerpsV2MarketProxyable
+          file: ./abis/kwenta/PerpsV2MarketProxyable.json
+                  
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: 'MarginTransferred(indexed address,int256)'
+          handler: 'handleMarginTransferred'
+        - event: 'PositionModified(indexed uint256,indexed address,uint256,int256,int256,uint256,uint256,uint256,int256)'
+          handler: 'handlePositionModified'
+        - event: 'PositionLiquidated(uint256,address,address,int256,uint256,uint256,uint256,uint256)'
+          handler: 'handlePositionLiquidated'
+        - event: 'FundingRecomputed(int256,int256,uint256,uint256)'
+          handler: 'handleFundingRecomputed'
+      file: ./src/mappings/handlers.ts

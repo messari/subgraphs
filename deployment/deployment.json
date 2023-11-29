@@ -696,7 +696,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.4",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2783,8 +2783,8 @@
         "network": "fantom",
         "status": "prod",
         "versions": {
-          "schema": "1.3.3",
-          "subgraph": "1.0.1",
+          "schema": "1.3.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -2809,8 +2809,8 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.3.3",
-          "subgraph": "1.0.1",
+          "schema": "1.3.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -2831,8 +2831,8 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.3",
-          "subgraph": "1.0.1",
+          "schema": "1.3.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -3646,6 +3646,28 @@
             "query-id": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
           }
         }
+      },
+      "spark-lend-gnosis": {
+        "network": "gnosis",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "2.0.5",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spark.lend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spark-lend-gnosis",
+            "query-id": "spark-lend-gnosis"
+          }
+        }
       }
     }
   },
@@ -3676,8 +3698,8 @@
             "query-id": "radiant-arbitrum"
           },
           "decentralized-network": {
-            "slug": "radiant-arbitrum",
-            "query-id": "8PUSqUn6dSkoxJb3LDLmdKHzbHFn1cz7XjbSob5uiR4v"
+            "slug": "radiant-capital-arbitrum",
+            "query-id": "5HTkKJNSm72tUGakwj8yroDGHxc6fBhmLaA5oJepZGL3"
           }
         }
       }
@@ -5322,6 +5344,10 @@
           "hosted-service": {
             "slug": "trader-joe-avalanche",
             "query-id": "trader-joe-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "trader-joe-avalanche",
+            "query-id": "H2VGe2tYavUEosSjomHwxbvCKy3LaNaW8Kjw2KhhHs1K"
           }
         }
       }
@@ -8158,7 +8184,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8184,7 +8210,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8210,7 +8236,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8232,7 +8258,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8258,7 +8284,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8366,7 +8392,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8919,8 +8945,8 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.3",
-          "subgraph": "1.1.3",
+          "schema": "1.3.4",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8945,8 +8971,8 @@
         "network": "avalanche",
         "status": "prod",
         "versions": {
-          "schema": "1.3.3",
-          "subgraph": "1.1.3",
+          "schema": "1.3.4",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9152,7 +9178,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9178,7 +9204,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9272,7 +9298,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9298,7 +9324,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9324,7 +9350,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9346,7 +9372,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9372,7 +9398,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9399,9 +9425,9 @@
     "deployments": {
       "kwenta-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.4",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -9416,7 +9442,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
@@ -9431,8 +9457,8 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "1.3.1",
-          "subgraph": "1.0.1",
+          "schema": "1.3.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9453,8 +9479,8 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.1",
-          "subgraph": "1.0.1",
+          "schema": "1.3.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -9754,6 +9780,36 @@
           "hosted-service": {
             "slug": "thena-v1-bsc",
             "query-id": "thena-v1-bsc"
+          }
+        }
+      }
+    }
+  },
+  "eigenlayer": {
+    "schema": "generic",
+    "base": "eigenlayer",
+    "protocol": "eigenlayer",
+    "project": "eigenlayer",
+    "deployments": {
+      "eigenlayer-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.1.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "eigenlayer.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "eigenlayer-ethereum",
+            "query-id": "eigenlayer-ethereum"
           }
         }
       }
