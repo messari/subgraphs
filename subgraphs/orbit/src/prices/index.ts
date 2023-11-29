@@ -106,14 +106,7 @@ export function getLiquidityBoundPrice(
 
   let liquidityBoundPriceUSD = reportedPriceUSD;
   if (liquidity > constants.BIGDECIMAL_ZERO && reportedPriceUSD > liquidity) {
-    liquidityBoundPriceUSD = liquidity
-      .div(
-        constants.BIGINT_TEN.pow(
-          constants.DEFAULT_USDC_DECIMALS as u8
-        ).toBigDecimal()
-      )
-      .times(constants.BIGINT_TEN.pow(tokenPrice.decimals as u8).toBigDecimal())
-      .div(amount);
+    liquidityBoundPriceUSD = liquidity.div(amount);
 
     log.warning(
       "[getLiquidityBoundPrice] token: {} (reported price * amount): ({} * {}) bound to available liquidity: {}; new price: {}",
@@ -138,12 +131,12 @@ export function getUsdPrice(
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
-    if (
-      tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
-      tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
-    ) {
-      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
-    }
+    // if (
+    //   tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
+    //   tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
+    // ) {
+    //   return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
+    // }
     return tokenPrice.usdPrice.times(amount);
   }
 
