@@ -6499,6 +6499,36 @@
       }
     }
   },
+  "hifi-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "hifi-governance",
+    "project": "hifi",
+    "deployments": {
+      "hifi-governance-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "hifi-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "hifi-governance",
+            "query-id": "hifi-governance"
+          }
+        }
+      }
+    }
+  },
   "idle-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
