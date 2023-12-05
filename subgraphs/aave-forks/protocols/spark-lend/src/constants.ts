@@ -47,7 +47,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   } else if (equalsIgnoreCase(network, Network.GNOSIS)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xa98dacb3fc964a6a0d2ce3b77294241585eaba6d"),
-      Network.GNOSIS,
+      Network.GNOSIS
     );
   } else {
     log.critical("[getNetworkSpecificConstant] Unsupported network: {}", [

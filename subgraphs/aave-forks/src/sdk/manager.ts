@@ -52,7 +52,7 @@ import { PositionManager } from "./position";
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.1
- * SDK Version:     1.0.7
+ * SDK Version:     1.0.8
  * Author(s):
  *  - @melotik
  *  - @dhruv-chauhan
@@ -689,7 +689,7 @@ export class DataManager {
     }
     positions.push(collateralPositionID!);
     // we may want to do call subtractPosition outside this function
-    // to close both stable and variable borrowing poositions, e.g.
+    // to close both stable and variable borrowing positions, e.g.
     // in aave-forks
     if (subtractBorrowerPosition) {
       const debtMarket = Market.load(debtTokenId);
@@ -950,7 +950,8 @@ export class DataManager {
     newVariableBorrowBalance: BigInt | null = null,
     newStableBorrowBalance: BigInt | null = null,
     newReserveBalance: BigInt | null = null,
-    exchangeRate: BigDecimal | null = null
+    exchangeRate: BigDecimal | null = null,
+    outputTokenSupply: BigInt | null = null
   ): void {
     const mantissaFactorBD = exponentToBigDecimal(
       this.inputToken.getDecimals()
@@ -958,6 +959,7 @@ export class DataManager {
     this.inputToken.updatePrice(inputTokenPriceUSD);
     this.market.inputTokenPriceUSD = inputTokenPriceUSD;
     this.market.inputTokenBalance = newInputTokenBalance;
+    this.market.outputTokenSupply = outputTokenSupply;
     if (newVariableBorrowBalance) {
       this.market.variableBorrowedTokenBalance = newVariableBorrowBalance;
     }
