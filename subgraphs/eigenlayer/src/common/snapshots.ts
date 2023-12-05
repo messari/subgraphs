@@ -16,8 +16,6 @@ import {
   addToArrayAtIndex,
   bigIntToBigDecimal,
   fillInMissingPoolDailySnapshots,
-  // fillInMissingPoolHourlySnapshots,
-  // fillInMissingUsageMetricsHourlySnapshots,
   fillInMissingUsageMetricsDailySnapshots,
   fillInMissingFinancialsDailySnapshots,
   getDaysSinceEpoch,
@@ -90,7 +88,6 @@ export function updateUsageMetricsHourlySnapshot(
   snapshot.timestamp = event.block.timestamp;
   snapshot.blockNumber = event.block.number;
 
-  // fillInMissingUsageMetricsHourlySnapshots(hour);
   snapshot.save();
 }
 
@@ -165,7 +162,6 @@ export function updatePoolHourlySnapshot(
   snapshot.timestamp = event.block.timestamp;
   snapshot.blockNumber = event.block.number;
 
-  // fillInMissingPoolHourlySnapshots(poolAddress, hour);
   snapshot.save();
 }
 

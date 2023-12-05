@@ -134,7 +134,6 @@ export function getOrCreateUsageMetricsDailySnapshot(
       snapshot.timestamp = block.timestamp;
       snapshot.blockNumber = block.number;
     }
-    snapshot.save();
   }
 
   return snapshot;
@@ -160,7 +159,6 @@ export function getOrCreateUsageMetricsHourlySnapshot(
       snapshot.timestamp = block.timestamp;
       snapshot.blockNumber = block.number;
     }
-    snapshot.save();
   }
 
   return snapshot;
@@ -197,7 +195,6 @@ export function getOrCreateFinancialsDailySnapshot(
       snapshot.timestamp = block.timestamp;
       snapshot.blockNumber = block.number;
     }
-    snapshot.save();
   }
   return snapshot;
 }
@@ -315,7 +312,6 @@ export function getOrCreatePoolDailySnapshot(
       snapshot.timestamp = block.timestamp;
       snapshot.blockNumber = block.number;
     }
-    snapshot.save();
   }
   return snapshot;
 }
@@ -351,7 +347,6 @@ export function getOrCreatePoolHourlySnapshot(
       snapshot.timestamp = block.timestamp;
       snapshot.blockNumber = block.number;
     }
-    snapshot.save();
   }
   return snapshot;
 }

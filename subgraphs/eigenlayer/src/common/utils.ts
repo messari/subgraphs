@@ -2,6 +2,7 @@ import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import {
   BIGINT_TEN,
+  ETHEREUM_AVG_BLOCKS_PER_DAY,
   ETH_DECIMALS,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -9,17 +10,13 @@ import {
 import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreatePoolDailySnapshot,
-  // getOrCreatePoolHourlySnapshot,
   getOrCreateUsageMetricsDailySnapshot,
-  // getOrCreateUsageMetricsHourlySnapshot,
 } from "./getters";
 
 import {
   FinancialsDailySnapshot,
   PoolDailySnapshot,
-  // PoolHourlySnapshot,
   UsageMetricsDailySnapshot,
-  // UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 
 export function getHoursSinceEpoch(secondsSinceEpoch: number): i32 {
@@ -131,58 +128,6 @@ export function accountArraySort(
   }
 }
 
-// export function findPreviousPoolHourlySnapshot(
-//   poolAddress: Address,
-//   currentSnapshotHour: number
-// ): PoolHourlySnapshot | null {
-//   let previousHour = (currentSnapshotHour - 1) as i32;
-//   let previousId = Bytes.empty()
-//     .concat(poolAddress)
-//     .concat(Bytes.fromUTF8("-"))
-//     .concat(Bytes.fromI32(previousHour));
-//   let previousSnapshot = PoolHourlySnapshot.load(previousId);
-
-//   while (!previousSnapshot && previousHour > 0) {
-//     previousHour--;
-//     previousId = Bytes.empty()
-//       .concat(poolAddress)
-//       .concat(Bytes.fromUTF8("-"))
-//       .concat(Bytes.fromI32(previousHour));
-//     previousSnapshot = PoolHourlySnapshot.load(previousId);
-//   }
-//   return previousSnapshot;
-// }
-
-// export function fillInMissingPoolHourlySnapshots(
-//   poolAddress: Address,
-//   currentSnapshotHour: i32
-// ): void {
-//   const previousSnapshot = findPreviousPoolHourlySnapshot(
-//     poolAddress,
-//     currentSnapshotHour
-//   );
-//   if (previousSnapshot) {
-//     let counter = 1;
-//     for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
-//       const snapshot = getOrCreatePoolHourlySnapshot(poolAddress, i as i32);
-
-//       snapshot.totalValueLockedUSD = previousSnapshot.totalValueLockedUSD;
-//       snapshot.inputTokenBalances = previousSnapshot.inputTokenBalances;
-//       snapshot.inputTokenBalancesUSD = previousSnapshot.inputTokenBalancesUSD;
-
-//       snapshot.timestamp = previousSnapshot.timestamp!.plus(
-//         BigInt.fromI32((counter * 3600) as i32)
-//       );
-//       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-//         BigInt.fromI32((counter * 300) as i32)
-//       );
-//       counter++;
-
-//       snapshot.save();
-//     }
-//   }
-// }
-
 export function findPreviousPoolDailySnapshot(
   poolAddress: Address,
   currentSnapshotDay: number
@@ -246,10 +191,10 @@ export function fillInMissingPoolDailySnapshots(
         previousSnapshot.cumulativeTransactionCount;
 
       snapshot.timestamp = previousSnapshot.timestamp!.plus(
-        BigInt.fromI32((counter * 86400) as i32)
+        BigInt.fromI32((counter * SECONDS_PER_DAY) as i32)
       );
       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-        BigInt.fromI32((counter * 7200) as i32)
+        BigInt.fromI32((counter * ETHEREUM_AVG_BLOCKS_PER_DAY) as i32)
       );
       counter++;
 
@@ -257,46 +202,6 @@ export function fillInMissingPoolDailySnapshots(
     }
   }
 }
-
-// export function findPreviousUsageMetricsHourlySnapshot(
-//   currentSnapshotHour: number
-// ): UsageMetricsHourlySnapshot | null {
-//   let previousHour = (currentSnapshotHour - 1) as i32;
-//   let previousId = Bytes.fromI32(previousHour);
-//   let previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
-
-//   while (!previousSnapshot && previousHour > 0) {
-//     previousHour--;
-//     previousId = Bytes.fromI32(previousHour);
-//     previousSnapshot = UsageMetricsHourlySnapshot.load(previousId);
-//   }
-//   return previousSnapshot;
-// }
-
-// export function fillInMissingUsageMetricsHourlySnapshots(
-//   currentSnapshotHour: i32
-// ): void {
-//   const previousSnapshot =
-//     findPreviousUsageMetricsHourlySnapshot(currentSnapshotHour);
-//   if (previousSnapshot) {
-//     let counter = 1;
-//     for (let i = previousSnapshot.hour + 1; i < currentSnapshotHour; i++) {
-//       const snapshot = getOrCreateUsageMetricsHourlySnapshot(i as i32);
-
-//       snapshot.cumulativeUniqueUsers = previousSnapshot.cumulativeUniqueUsers;
-
-//       snapshot.timestamp = previousSnapshot.timestamp!.plus(
-//         BigInt.fromI32((counter * 3600) as i32)
-//       );
-//       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-//         BigInt.fromI32((counter * 300) as i32)
-//       );
-//       counter++;
-
-//       snapshot.save();
-//     }
-//   }
-// }
 
 export function findPreviousUsageMetricsDailySnapshot(
   currentSnapshotDay: number
@@ -336,10 +241,10 @@ export function fillInMissingUsageMetricsDailySnapshots(
       snapshot.totalPoolCount = previousSnapshot.totalPoolCount;
 
       snapshot.timestamp = previousSnapshot.timestamp!.plus(
-        BigInt.fromI32((counter * 86400) as i32)
+        BigInt.fromI32((counter * SECONDS_PER_DAY) as i32)
       );
       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-        BigInt.fromI32((counter * 7200) as i32)
+        BigInt.fromI32((counter * ETHEREUM_AVG_BLOCKS_PER_DAY) as i32)
       );
       counter++;
 
@@ -383,10 +288,10 @@ export function fillInMissingFinancialsDailySnapshots(
       snapshot.netVolumeUSD = previousSnapshot.netVolumeUSD;
 
       snapshot.timestamp = previousSnapshot.timestamp!.plus(
-        BigInt.fromI32((counter * 86400) as i32)
+        BigInt.fromI32((counter * SECONDS_PER_DAY) as i32)
       );
       snapshot.blockNumber = previousSnapshot.blockNumber!.plus(
-        BigInt.fromI32((counter * 7200) as i32)
+        BigInt.fromI32((counter * ETHEREUM_AVG_BLOCKS_PER_DAY) as i32)
       );
       counter++;
 
