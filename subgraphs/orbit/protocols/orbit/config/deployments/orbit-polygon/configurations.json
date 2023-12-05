@@ -1,0 +1,58 @@
+{
+  "deployment": "ORBIT_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "vault": [
+    {
+      "name": "Vault",
+      "address": "0x506DC4c6408813948470a06ef6e4a1DaF228dbd5",
+      "startBlock": 26067333,
+      "abi": "Vault",
+      "depositHandler": "handleLockIn",
+      "withdrawHandler": "handleOTVWithdraw"
+    }
+  ],
+  "minterETH": [
+    {
+      "name": "Minter",
+      "address": "0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f",
+      "startBlock": 25529601,
+      "abi": "Minter",
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
+    }
+  ],
+  "minterBSC": [
+    {
+      "name": "MinterBSC",
+      "address": "0x89c527764f03BCb7dC469707B23b79C1D7Beb780",
+      "startBlock": 14315256,
+      "abi": "Minter",
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
+    }
+  ],
+  "minterHECO": [
+    {
+      "name": "MinterHECO",
+      "address": "0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F",
+      "startBlock": 22230017,
+      "abi": "Minter",
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
+    }
+  ],
+  "minterKLAYTN": [
+    {
+      "name": "MinterKLAYTN",
+      "address": "0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d",
+      "startBlock": 22438252,
+      "abi": "Minter",
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
