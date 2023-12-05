@@ -12,7 +12,6 @@ import {
   PoolType,
   ProtocolType,
 } from "./constants";
-import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./tokens";
 import { getUsdPricePerToken } from "../prices";
 import { Versions } from "../versions";
@@ -107,14 +106,14 @@ export function getOrCreateProtocol(): Protocol {
 }
 
 export function getOrCreateUsageMetricsDailySnapshot(
-  event: ethereum.Event
+  day: i32,
+  block: ethereum.Block | null = null
 ): UsageMetricsDailySnapshot {
-  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
-  let snapshot = UsageMetricsDailySnapshot.load(Bytes.fromI32(dayId));
+  let snapshot = UsageMetricsDailySnapshot.load(Bytes.fromI32(day));
 
   if (!snapshot) {
-    snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(dayId));
-    snapshot.day = dayId;
+    snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
+    snapshot.day = day;
     snapshot.protocol = NetworkConfigs.getFactoryAddress();
 
     snapshot.dailyActiveDepositors = INT_ZERO;
@@ -131,23 +130,24 @@ export function getOrCreateUsageMetricsDailySnapshot(
     snapshot.cumulativeTransactionCount = INT_ZERO;
     snapshot.totalPoolCount = INT_ZERO;
 
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-    snapshot.save();
+    if (block) {
+      snapshot.timestamp = block.timestamp;
+      snapshot.blockNumber = block.number;
+    }
   }
 
   return snapshot;
 }
 
 export function getOrCreateUsageMetricsHourlySnapshot(
-  event: ethereum.Event
+  hour: i32,
+  block: ethereum.Block | null = null
 ): UsageMetricsHourlySnapshot {
-  const hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
-  let snapshot = UsageMetricsHourlySnapshot.load(Bytes.fromI32(hourId));
+  let snapshot = UsageMetricsHourlySnapshot.load(Bytes.fromI32(hour));
 
   if (!snapshot) {
-    snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hourId));
-    snapshot.hour = hourId;
+    snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
+    snapshot.hour = hour;
     snapshot.protocol = NetworkConfigs.getFactoryAddress();
 
     snapshot.hourlyActiveUsers = INT_ZERO;
@@ -155,23 +155,24 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     snapshot.hourlyTransactionCount = INT_ZERO;
     snapshot.cumulativeTransactionCount = INT_ZERO;
 
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-    snapshot.save();
+    if (block) {
+      snapshot.timestamp = block.timestamp;
+      snapshot.blockNumber = block.number;
+    }
   }
 
   return snapshot;
 }
 
 export function getOrCreateFinancialsDailySnapshot(
-  event: ethereum.Event
+  day: i32,
+  block: ethereum.Block | null = null
 ): FinancialsDailySnapshot {
-  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
-  let snapshot = FinancialsDailySnapshot.load(Bytes.fromI32(dayId));
+  let snapshot = FinancialsDailySnapshot.load(Bytes.fromI32(day));
 
   if (!snapshot) {
-    snapshot = new FinancialsDailySnapshot(Bytes.fromI32(dayId));
-    snapshot.day = dayId;
+    snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
+    snapshot.day = day;
     snapshot.protocol = NetworkConfigs.getFactoryAddress();
 
     snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -190,9 +191,10 @@ export function getOrCreateFinancialsDailySnapshot(
     snapshot.dailyNetVolumeUSD = BIGDECIMAL_ZERO;
     snapshot.netVolumeUSD = BIGDECIMAL_ZERO;
 
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-    snapshot.save();
+    if (block) {
+      snapshot.timestamp = block.timestamp;
+      snapshot.blockNumber = block.number;
+    }
   }
   return snapshot;
 }
@@ -256,9 +258,9 @@ export function getPool(poolAddress: Address): Pool {
 
 export function getOrCreatePoolDailySnapshot(
   poolAddress: Address,
-  event: ethereum.Event
+  day: i32,
+  block: ethereum.Block | null = null
 ): PoolDailySnapshot {
-  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
   const id = Bytes.empty()
     .concat(poolAddress)
     .concat(Bytes.fromUTF8("-"))
@@ -306,18 +308,19 @@ export function getOrCreatePoolDailySnapshot(
     snapshot.dailyTransactionCount = INT_ZERO;
     snapshot.cumulativeTransactionCount = INT_ZERO;
 
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-    snapshot.save();
+    if (block) {
+      snapshot.timestamp = block.timestamp;
+      snapshot.blockNumber = block.number;
+    }
   }
   return snapshot;
 }
 
 export function getOrCreatePoolHourlySnapshot(
   poolAddress: Address,
-  event: ethereum.Event
+  hour: i32,
+  block: ethereum.Block | null = null
 ): PoolHourlySnapshot {
-  const hour = getHoursSinceEpoch(event.block.timestamp.toI32());
   const id = Bytes.empty()
     .concat(poolAddress)
     .concat(Bytes.fromUTF8("-"))
@@ -340,9 +343,10 @@ export function getOrCreatePoolHourlySnapshot(
     snapshot.inputTokenBalances = [BIGINT_ZERO];
     snapshot.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
 
-    snapshot.timestamp = event.block.timestamp;
-    snapshot.blockNumber = event.block.number;
-    snapshot.save();
+    if (block) {
+      snapshot.timestamp = block.timestamp;
+      snapshot.blockNumber = block.number;
+    }
   }
   return snapshot;
 }
