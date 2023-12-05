@@ -1,0 +1,34 @@
+specVersion: 0.0.6
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: Shares
+    network: {{ network }}
+    source:
+      address: "{{ shares.address }}"
+      abi: Shares
+      startBlock: {{ shares.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+      abis:
+        - name: Shares
+          file: ./abis/Shares.json
+        - name: ChainLinkAggregator
+          file: ./abis/ChainLinkAggregator.json
+      eventHandlers:
+        - event: Trade(address,address,bool,uint256,uint256,uint256,uint256,uint256)
+          handler: handleTrade
+      file: {{{ file }}}
