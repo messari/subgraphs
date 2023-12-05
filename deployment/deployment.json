@@ -9870,6 +9870,10 @@
           "hosted-service": {
             "slug": "friend-tech-base",
             "query-id": "friend-tech-base"
+          },
+          "decentralized-network": {
+            "slug": "friend-tech-base",
+            "query-id": "8fjDwMF5JPXYEg3tU45ttTsnp3mdTQd5efhkHhHGHCKj"
           }
         }
       }
