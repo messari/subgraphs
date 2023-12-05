@@ -6,6 +6,8 @@ description: ...
 graft:
   base: {{subgraphId}} # Subgraph ID of base subgraph
   block: {{graftStartBlock}} # Block number
+features: 
+  - grafting
 {{/graftEnabled}}
 dataSources:
   - kind: ethereum
