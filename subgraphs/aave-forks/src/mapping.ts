@@ -537,7 +537,10 @@ export function _handleReserveDataUpdated(
     assetPriceUSD,
     tryTotalSupply.value,
     vBorrowBalance,
-    sBorrowBalance
+    sBorrowBalance,
+    null,
+    null,
+    tryTotalSupply.value
   );
 
   const tryScaledSupply = aTokenContract.try_scaledTotalSupply();
@@ -935,10 +938,13 @@ export function _handleLiquidate(
   // liquidationBonus = 1 + liquidationPenalty
   // => liquidationProtocolFee = liquidationPenalty * liquidationProtocolFeePercentage * liquidatedCollateralAmount / (1 + liquidationPenalty - liquidationPenalty*liquidationProtocolFeePercentage)
   if (!market._liquidationProtocolFee) {
-    log.warning("[_handleLiquidate]market {} _liquidationProtocolFee = null ", [
-      collateralAsset.toHexString(),
-    ]);
-    return;
+    // liquidationProtocolFee is only set for v3 markets
+    log.warning(
+      "[_handleLiquidate]market {} _liquidationProtocolFee = null. Must be a v2 market, setting to 0.",
+      [collateralAsset.toHexString()]
+    );
+    market._liquidationProtocolFee = BIGDECIMAL_ZERO;
+    market.save();
   }
   const liquidationProtocolFeeUSD = amountUSD
     .times(market.liquidationPenalty)
@@ -1161,7 +1167,7 @@ export function _handleMintedToTreasury(
     return;
   }
 
-  const tokenManager = new TokenManager(asset, event, TokenType.REBASING);
+  const tokenManager = new TokenManager(market.inputToken, event);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const treasuryAddress = getTreasuryAddress(market);
   const treasuryBalance = getCollateralBalance(market, treasuryAddress);
@@ -1266,7 +1272,8 @@ export function _handleTransfer(
     interestRateType
   );
 
-  const amountUSD = tokenManager.getAmountUSD(amount);
+  const inputTokenManager = new TokenManager(market.inputToken, event);
+  const amountUSD = inputTokenManager.getAmountUSD(amount);
   const manager = new DataManager(
     market.id,
     market.inputToken,
