@@ -96,6 +96,8 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
+export const ETHEREUM_AVG_BLOCKS_PER_DAY = 7200;
+
 ////////////////////////
 /// Protocol Specific //
 ////////////////////////

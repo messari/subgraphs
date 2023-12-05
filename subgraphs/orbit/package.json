@@ -1,0 +1,19 @@
+{
+  "name": "orbit",
+  "license": "UNLICENSED",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
+    "codegen": "graph codegen",
+    "build:subgraph": "graph build"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.37.0",
+    "@graphprotocol/graph-ts": "0.29.0",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "prettier": "2.7.1"
+  }
+}

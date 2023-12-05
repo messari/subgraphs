@@ -16,6 +16,7 @@ import {
   ArbitrumNovaHtoken,
   ArbitrumNovaAmm,
   BaseToken,
+  LineaToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -99,12 +100,17 @@ export class HopProtocolPolygonConfigurations implements Configurations {
   }
 
   getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
-    if (rewardToken == PolygonRewardToken.USDC) return PolygonAmm.USDC;
-    else if (rewardToken == PolygonRewardToken.USDT) return PolygonAmm.USDT;
-    else if (rewardToken == PolygonRewardToken.ETH) return PolygonAmm.ETH;
-    else if (rewardToken == PolygonRewardToken.DAI) return PolygonAmm.DAI;
+    if (rewardToken == PolygonRewardToken.USDC_A) return PolygonAmm.USDC;
+    else if (rewardToken == PolygonRewardToken.USDC_B) return PolygonAmm.USDC;
+    else if (rewardToken == PolygonRewardToken.USDT_A) return PolygonAmm.USDT;
+    else if (rewardToken == PolygonRewardToken.USDT_B) return PolygonAmm.USDT;
+    else if (rewardToken == PolygonRewardToken.ETH_A) return PolygonAmm.ETH;
+    else if (rewardToken == PolygonRewardToken.ETH_B) return PolygonAmm.ETH;
+    else if (rewardToken == PolygonRewardToken.DAI_A) return PolygonAmm.DAI;
+    else if (rewardToken == PolygonRewardToken.DAI_B) return PolygonAmm.DAI;
+    else if (rewardToken == PolygonRewardToken.MATIC) return PolygonAmm.MATIC;
     else {
-      log.critical("RewardToken not found", []);
+      log.critical("Pool not found for reward token: {}", [rewardToken]);
       return "";
     }
   }
@@ -141,6 +147,8 @@ export class HopProtocolPolygonConfigurations implements Configurations {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress); //Mainnet
     } else if (chainId == "8453") {
       return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
+    } else if (chainId == "59144") {
+      return this.getLineaCrossTokenFromTokenAddress(tokenAddress);
     } else {
       log.critical("Chain not found", []);
       return "";
@@ -214,7 +222,15 @@ export class HopProtocolPolygonConfigurations implements Configurations {
     if (tokenAddress == PolygonToken.USDC) return BaseToken.USDC;
     if (tokenAddress == PolygonToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
+      log.critical("Base CrossToken not found for token: {}", [tokenAddress]);
+    }
+    return "";
+  }
+
+  getLineaCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == PolygonToken.ETH) return LineaToken.ETH;
+    else {
+      log.critical("Linea CrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
@@ -308,10 +324,15 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 
   getRewardTokenList(): string[] {
     return [
-      PolygonRewardToken.DAI,
-      PolygonRewardToken.ETH,
-      PolygonRewardToken.USDC,
-      PolygonRewardToken.USDT,
+      PolygonRewardToken.DAI_A,
+      PolygonRewardToken.DAI_B,
+      PolygonRewardToken.ETH_A,
+      PolygonRewardToken.ETH_B,
+      PolygonRewardToken.USDC_A,
+      PolygonRewardToken.USDC_B,
+      PolygonRewardToken.USDT_A,
+      PolygonRewardToken.USDT_B,
+      PolygonRewardToken.MATIC,
     ];
   }
   getUsdcPools(): string[] {

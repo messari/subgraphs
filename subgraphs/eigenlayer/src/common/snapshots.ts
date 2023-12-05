@@ -15,6 +15,9 @@ import { INT_ONE } from "./constants";
 import {
   addToArrayAtIndex,
   bigIntToBigDecimal,
+  fillInMissingPoolDailySnapshots,
+  fillInMissingUsageMetricsDailySnapshots,
+  fillInMissingFinancialsDailySnapshots,
   getDaysSinceEpoch,
   getHoursSinceEpoch,
 } from "./utils";
@@ -25,7 +28,8 @@ export function updateFinancialsDailySnapshot(
   amount: BigInt,
   event: ethereum.Event
 ): void {
-  const snapshot = getOrCreateFinancialsDailySnapshot(event);
+  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = getOrCreateFinancialsDailySnapshot(day, event.block);
   const protocol = getOrCreateProtocol();
   const token = getOrCreateToken(tokenAddress, event);
   const amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
@@ -56,6 +60,7 @@ export function updateFinancialsDailySnapshot(
   snapshot.timestamp = event.block.timestamp;
   snapshot.blockNumber = event.block.number;
 
+  fillInMissingFinancialsDailySnapshots(day);
   snapshot.save();
 }
 
@@ -63,10 +68,10 @@ export function updateUsageMetricsHourlySnapshot(
   accountAddress: Address,
   event: ethereum.Event
 ): void {
-  const snapshot = getOrCreateUsageMetricsHourlySnapshot(event);
+  const hour = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = getOrCreateUsageMetricsHourlySnapshot(hour, event.block);
   const protocol = getOrCreateProtocol();
 
-  const hour = getHoursSinceEpoch(event.block.timestamp.toI32());
   const id = Bytes.empty()
     .concat(Bytes.fromUTF8("hourly"))
     .concat(Bytes.fromI32(hour))
@@ -92,7 +97,8 @@ export function updateUsageMetricsDailySnapshot(
   eventID: Bytes,
   event: ethereum.Event
 ): void {
-  const snapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = getOrCreateUsageMetricsDailySnapshot(day, event.block);
   const protocol = getOrCreateProtocol();
 
   snapshot.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
@@ -103,7 +109,6 @@ export function updateUsageMetricsDailySnapshot(
   snapshot.cumulativeTransactionCount = protocol.cumulativeTransactionCount;
   snapshot.totalPoolCount = protocol.totalPoolCount;
 
-  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
   const id = Bytes.empty()
     .concat(Bytes.fromUTF8("daily"))
     .concat(Bytes.fromI32(day))
@@ -133,6 +138,7 @@ export function updateUsageMetricsDailySnapshot(
   snapshot.timestamp = event.block.timestamp;
   snapshot.blockNumber = event.block.number;
 
+  fillInMissingUsageMetricsDailySnapshots(day);
   snapshot.save();
   account.save();
 }
@@ -141,7 +147,12 @@ export function updatePoolHourlySnapshot(
   poolAddress: Address,
   event: ethereum.Event
 ): void {
-  const snapshot = getOrCreatePoolHourlySnapshot(poolAddress, event);
+  const hour = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = getOrCreatePoolHourlySnapshot(
+    poolAddress,
+    hour,
+    event.block
+  );
   const pool = getPool(poolAddress);
 
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -161,7 +172,8 @@ export function updatePoolDailySnapshot(
   amount: BigInt,
   event: ethereum.Event
 ): void {
-  const snapshot = getOrCreatePoolDailySnapshot(poolAddress, event);
+  const day = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const snapshot = getOrCreatePoolDailySnapshot(poolAddress, day, event.block);
   const pool = getPool(poolAddress);
   const token = getOrCreateToken(tokenAddress, event);
 
@@ -215,5 +227,6 @@ export function updatePoolDailySnapshot(
   snapshot.timestamp = event.block.timestamp;
   snapshot.blockNumber = event.block.number;
 
+  fillInMissingPoolDailySnapshots(poolAddress, day);
   snapshot.save();
 }

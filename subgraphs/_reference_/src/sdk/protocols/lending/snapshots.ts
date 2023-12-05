@@ -36,7 +36,7 @@ import {
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.1
- * SDK Version:     1.0.7
+ * SDK Version:     1.0.8
  * Author(s):
  *  - @melotik
  *  - @dhruv-chauhan
@@ -456,6 +456,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
       this.financialSnapshot.dailyDepositUSD =
         this.financialSnapshot.dailyDepositUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyDepositCount += INT_ONE;
       this.usageDailySnapshot.dailyDepositCount += INT_ONE;
       this.usageHourlySnapshot.hourlyDepositCount += INT_ONE;
     } else if (transactionType == TransactionType.WITHDRAW) {
@@ -467,6 +468,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
       this.financialSnapshot.dailyWithdrawUSD =
         this.financialSnapshot.dailyWithdrawUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyWithdrawCount += INT_ONE;
       this.usageDailySnapshot.dailyWithdrawCount += INT_ONE;
       this.usageHourlySnapshot.hourlyWithdrawCount += INT_ONE;
     } else if (transactionType == TransactionType.BORROW) {
@@ -478,6 +480,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
       this.financialSnapshot.dailyBorrowUSD =
         this.financialSnapshot.dailyBorrowUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyBorrowCount += INT_ONE;
       this.usageDailySnapshot.dailyBorrowCount += INT_ONE;
       this.usageHourlySnapshot.hourlyBorrowCount += INT_ONE;
     } else if (transactionType == TransactionType.REPAY) {
@@ -489,6 +492,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyRepayUSD.plus(amountUSD);
       this.financialSnapshot.dailyRepayUSD =
         this.financialSnapshot.dailyRepayUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyRepayCount += INT_ONE;
       this.usageDailySnapshot.dailyRepayCount += INT_ONE;
       this.usageHourlySnapshot.hourlyRepayCount += INT_ONE;
     } else if (transactionType == TransactionType.LIQUIDATE) {
@@ -500,6 +504,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
       this.financialSnapshot.dailyLiquidateUSD =
         this.financialSnapshot.dailyLiquidateUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyLiquidateCount += INT_ONE;
       this.usageDailySnapshot.dailyLiquidateCount += INT_ONE;
       this.usageHourlySnapshot.hourlyLiquidateCount += INT_ONE;
     } else if (transactionType == TransactionType.TRANSFER) {
@@ -511,6 +516,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyTransferUSD.plus(amountUSD);
       this.financialSnapshot.dailyTransferUSD =
         this.financialSnapshot.dailyTransferUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyTransferCount += INT_ONE;
       this.usageDailySnapshot.dailyTransferCount += INT_ONE;
     } else if (transactionType == TransactionType.FLASHLOAN) {
       this.marketDailySnapshot.dailyFlashloanUSD =
@@ -521,6 +527,7 @@ export class SnapshotManager {
         this.marketHourlySnapshot.hourlyFlashloanUSD.plus(amountUSD);
       this.financialSnapshot.dailyFlashloanUSD =
         this.financialSnapshot.dailyFlashloanUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyFlashloanCount += INT_ONE;
       this.usageDailySnapshot.dailyFlashloanCount += INT_ONE;
     } else {
       log.error("[updateTransactionData] Invalid transaction type: {}", [
