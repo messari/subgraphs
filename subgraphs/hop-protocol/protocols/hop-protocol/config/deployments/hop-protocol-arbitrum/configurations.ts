@@ -16,6 +16,7 @@ import {
   ArbitrumNovaAmm,
   ArbitrumNovaHtoken,
   BaseToken,
+  LineaToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolArbitrumConfigurations implements Configurations {
@@ -76,8 +77,10 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
       return this.getMainnetCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "8453")
       return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "59144")
+      return this.getLineaCrossTokenFromTokenAddress(tokenAddress);
     else {
-      log.critical("Chain not found", []);
+      log.critical("Chain not found: {}", [chainId]);
       return "";
     }
   }
@@ -173,7 +176,15 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     if (tokenAddress == ArbitrumToken.USDC) return BaseToken.USDC;
     if (tokenAddress == ArbitrumToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("BaseCrossToken not found for token: {}", [tokenAddress]);
+      log.critical("Base CrossToken not found for token: {}", [tokenAddress]);
+    }
+    return "";
+  }
+
+  getLineaCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == ArbitrumToken.ETH) return LineaToken.ETH;
+    else {
+      log.critical("Linea CrossToken not found for token: {}", [tokenAddress]);
     }
     return "";
   }
@@ -374,13 +385,13 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
     ];
   }
   getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
-    if (rewardToken == ArbitrumRewardToken.DAI) return ArbitrumAmm.USDC;
-    else if (rewardToken == ArbitrumRewardToken.ETH) return ArbitrumAmm.USDT;
-    else if (rewardToken == ArbitrumRewardToken.USDC) return ArbitrumAmm.ETH;
-    else if (rewardToken == ArbitrumRewardToken.USDT) return ArbitrumAmm.ETH;
+    if (rewardToken == ArbitrumRewardToken.DAI) return ArbitrumAmm.DAI;
+    else if (rewardToken == ArbitrumRewardToken.ETH) return ArbitrumAmm.ETH;
+    else if (rewardToken == ArbitrumRewardToken.USDC) return ArbitrumAmm.USDC;
+    else if (rewardToken == ArbitrumRewardToken.USDT) return ArbitrumAmm.USDT;
     else if (rewardToken == ArbitrumRewardToken.rETH) return ArbitrumAmm.rETH;
     else {
-      log.critical("RewardToken not found", []);
+      log.critical("Pool not found for reward token: {}", [rewardToken]);
       return "";
     }
   }

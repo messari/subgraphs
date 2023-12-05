@@ -58,7 +58,6 @@ export function handleRewardsPaid(event: RewardPaid): void {
     log.error("Missing Config", []);
     return;
   }
-  const amount = event.params.reward;
   const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
     event.address.toHexString()
   );
@@ -88,8 +87,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
     poolSymbol,
     hPoolName,
     poolAddress,
-    event,
-    amount
+    event
   );
 }
 

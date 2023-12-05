@@ -1,0 +1,38 @@
+{
+  "deployment": "ORBIT_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "vault": [
+    {
+      "name": "Vault",
+      "address": "0x1Bf68A9d1EaEe7826b3593C20a0ca93293cb489a",
+      "startBlock": 11149846,
+      "abi": "Vault",
+      "depositHandler": "handleLockIn",
+      "withdrawHandler": "handleOTVWithdraw"
+    }
+  ],
+  "minterKLAYTN": [
+    {
+      "name": "Minter",
+      "address": "0x012c6d79b189e1aBD1EFaC759b275c5D49Abd164",
+      "startBlock": 14208740,
+      "abi": "Minter",
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
+    }
+  ],
+  "minterMATIC": [
+    {
+      "name": "MinterMATIC",
+      "address": "0x506DC4c6408813948470a06ef6e4a1DaF228dbd5",
+      "startBlock": 14409142,
+      "abi": "Minter",
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

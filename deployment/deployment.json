@@ -6499,6 +6499,36 @@
       }
     }
   },
+  "hifi-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "hifi-governance",
+    "project": "hifi",
+    "deployments": {
+      "hifi-governance-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "hifi-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "hifi-governance",
+            "query-id": "hifi-governance"
+          }
+        }
+      }
+    }
+  },
   "idle-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
@@ -7590,7 +7620,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7991,6 +8021,102 @@
       }
     }
   },
+  "orbit": {
+    "schema": "bridge",
+    "base": "orbit",
+    "protocol": "orbit",
+    "project": "orbit",
+    "deployments": {
+      "orbit-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-ethereum",
+            "query-id": "orbit-ethereum"
+          }
+        }
+      },
+      "orbit-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-bsc",
+            "query-id": "orbit-bsc"
+          }
+        }
+      },
+      "orbit-celo": {
+        "network": "celo",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-celo",
+            "query-id": "orbit-celo"
+          }
+        }
+      },
+      "orbit-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-polygon",
+            "query-id": "orbit-polygon"
+          }
+        }
+      }
+    }
+  },
   "polygon-bridge": {
     "schema": "bridge",
     "base": "polygon-bridge",
@@ -8184,7 +8310,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8210,7 +8336,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8236,7 +8362,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8258,7 +8384,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8284,7 +8410,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8491,102 +8617,6 @@
         },
         "options": {
           "prepare:yaml": true
-        }
-      }
-    }
-  },
-  "orbit-bridge": {
-    "schema": "bridge",
-    "base": "orbit-bridge",
-    "protocol": "orbit-bridge",
-    "project": "orbit",
-    "deployments": {
-      "orbit-bridge-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "orbit-bridge-ethereum",
-            "query-id": "orbit-bridge-ethereum"
-          }
-        },
-        "files": {
-          "template": "orbit.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "orbit-bridge-bsc": {
-        "network": "bsc",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "orbit-bridge-bsc",
-            "query-id": "orbit-bridge-bsc"
-          }
-        },
-        "files": {
-          "template": "orbit.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "orbit-bridge-polygon": {
-        "network": "polygon",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "orbit-bridge-polygon",
-            "query-id": "orbit-bridge-polygon"
-          }
-        },
-        "files": {
-          "template": "orbit.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "orbit-bridge-celo": {
-        "network": "celo",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "orbit-bridge-celo",
-            "query-id": "orbit-bridge-celo"
-          }
-        },
-        "files": {
-          "template": "orbit.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
         }
       }
     }
@@ -9810,6 +9840,36 @@
           "hosted-service": {
             "slug": "eigenlayer-ethereum",
             "query-id": "eigenlayer-ethereum"
+          }
+        }
+      }
+    }
+  },
+  "friend-tech": {
+    "schema": "generic",
+    "base": "friend-tech",
+    "protocol": "friend-tech",
+    "project": "friend-tech",
+    "deployments": {
+      "friend-tech-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "friend.tech.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "friend-tech-base",
+            "query-id": "friend-tech-base"
           }
         }
       }
