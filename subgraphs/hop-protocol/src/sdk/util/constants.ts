@@ -612,7 +612,8 @@ export namespace RewardTokens {
   export const rETH_OP = "0xc81d1f0eb955b0c020e5d5b264e1ff72c14d1401";
   export const rETH_ARB = "0xb766039cc6db368759c1e56b79affe831d0cc507";
   export const WETH = "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1";
-  export const WMATIC = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
+  export const WMATIC_POLYGON = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
+  export const WMATIC_XDAI = "0x7122d7661c4564b7c6cd4878b06766489a6028a2";
 }
 export const GNO_REWARDS = [
   XdaiRewardToken.DAI_A,
