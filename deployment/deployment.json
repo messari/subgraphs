@@ -8046,6 +8046,10 @@
           "hosted-service": {
             "slug": "orbit-ethereum",
             "query-id": "orbit-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "orbit-ethereum",
+            "query-id": "DpGRvQhDPH3EXRuCjMM7RednJz25Ucm2oYp56Vb4k74F"
           }
         }
       },
@@ -8112,6 +8116,10 @@
           "hosted-service": {
             "slug": "orbit-polygon",
             "query-id": "orbit-polygon"
+          },
+          "decentralized-network": {
+            "slug": "orbit-polygon",
+            "query-id": "FQVKZkxeeqdnGU4a1Qwm5SVu8FxtQVPshzpLBAhMH1V9"
           }
         }
       }
