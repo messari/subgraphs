@@ -94,7 +94,9 @@ export namespace InterestRateSide {
 export namespace UsageType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";
-  export const SWAP = "SWAP";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATE = "LIQUIDATE";
 }
 
 //////////////////////////////
@@ -127,6 +129,7 @@ export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
+export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
@@ -145,6 +148,7 @@ export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
 
+export const BIGDECIMAL_MINUS_ONE = new BigDecimal(BIGINT_MINUS_ONE);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
@@ -224,6 +228,25 @@ MAI_TOKEN_ADDRESS.set(
 MAI_TOKEN_ADDRESS.set(
   Network.HARMONY,
   "0x3F56e0c36d275367b8C502090EDF38289b3dEa0d"
+);
+
+// https://docs.mai.finance/functions/smart-contract-addresses#performance-fee-management-contracts
+export const PERFORMANCE_MANAGER_ADDRESS = new Map<string, string>();
+PERFORMANCE_MANAGER_ADDRESS.set(
+  Network.ARBITRUM_ONE,
+  "0xdCC1c692110E0e53Bd57D5B2234867E9C5B98158"
+);
+PERFORMANCE_MANAGER_ADDRESS.set(
+  Network.MAINNET,
+  "0xCA3EB45FB186Ed4e75B9B22A514fF1d4abAdD123"
+);
+PERFORMANCE_MANAGER_ADDRESS.set(
+  Network.MATIC,
+  "0x11606d99AD8aAC49E033B14c89552F585028bA7d"
+);
+PERFORMANCE_MANAGER_ADDRESS.set(
+  Network.OPTIMISM,
+  "0xbdef6DAD6841aA60Caf462baAee0AA912EeF817A"
 );
 
 export const COLLATERAL_PRICE_DECIMALS = new Map<string, i32>();

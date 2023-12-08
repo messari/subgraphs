@@ -27,9 +27,44 @@
       "startBlock": 15529443
     },
     {
+      "name": "StakeDAO Curve stETH - New",
+      "address": "0x67411793c5dcf9abc5a8d113ddd0e596cd5ba3e7",
+      "startBlock": 16990048
+    },
+    {
       "name": "Yearn Curve stETH",
       "address": "0x82E90EB7034C1DF646bD06aFb9E67281AAb5ed28",
       "startBlock": 15529344
+    },
+    {
+      "name": "Yearn Curve stETH - New",
+      "address": "0xD1a6F422ceFf5a39b764e340Fd1bCd46C0744F83",
+      "startBlock": 16990193
+    },
+    {
+      "name": "Beeft Convex Curve stETH",
+      "address": "0x86f78d3cbCa0636817AD9e27a44996C738Ec4932",
+      "startBlock": 16989713
+    },
+    {
+      "name": "CRV Vault",
+      "address": "0xCA3EB45FB186Ed4e75B9B22A514fF1d4abAdD123",
+      "startBlock": 17033164
+    },
+    {
+      "name": "cbETH Vault",
+      "address": "0x4ce4c542d96ce1872fea4fa3fbb2e7ae31862bad",
+      "startBlock": 17365527
+    },
+    {
+      "name": "stETH Vault",
+      "address": "0x5773e8953cf60f495eb3c2db45dd753b5c4b7473",
+      "startBlock": 17365563
+    },
+    {
+      "name": "LDO Vault",
+      "address": "0x954ac12c339c60eafbb32213b15af3f7c7a0dec2",
+      "startBlock": 17364247
     }
   ]
 }
