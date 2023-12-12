@@ -99,6 +99,9 @@ export class UniswapV3MainnetConfigurations implements Configurations {
   getUntrackedTokens(): Bytes[] {
     return stringToBytesList([
       "0x0df66b8644771fae9400d93e74a509a3546cd13e", // X token
+      "0x1f8e858d03de1d6ce671ef87590fa8dc542eb49a", // PFWH token
+      "0x23befbcb388c3d71efa20f34cb2f7eb23953f909", // MCHI token
+      "0x6adb2e268de2aa1abf6578e4a8119b960e02928f", // ShibDoge token
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
