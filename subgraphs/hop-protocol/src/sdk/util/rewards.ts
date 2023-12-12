@@ -317,6 +317,10 @@ function getStartingBlockRate(): BigDecimal {
   }
 }
 
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
 function getTokenFromRewardToken(
   tokens: TokenManager,
   rewardToken: string
@@ -332,24 +336,19 @@ function getTokenFromRewardToken(
     token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
   }
   if (RPL_REWARDS.includes(rewardToken)) {
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") ==
-      Network.ARBITRUM_ONE
-    )
+    if (equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE))
       token = tokens.getOrCreateToken(
         Address.fromString(RewardTokens.rETH_ARB)
       );
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
-    )
+    if (equalsIgnoreCase(dataSource.network(), Network.OPTIMISM))
       token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
   }
   if (WMATIC_REWARDS.includes(rewardToken)) {
-    if (dataSource.network().toUpperCase().replace("-", "_") == Network.MATIC)
+    if (equalsIgnoreCase(dataSource.network(), Network.MATIC))
       token = tokens.getOrCreateToken(
         Address.fromString(RewardTokens.WMATIC_POLYGON)
       );
-    if (dataSource.network().toUpperCase().replace("-", "_") == Network.XDAI)
+    if (equalsIgnoreCase(dataSource.network(), Network.XDAI))
       token = tokens.getOrCreateToken(
         Address.fromString(RewardTokens.WMATIC_XDAI)
       );
