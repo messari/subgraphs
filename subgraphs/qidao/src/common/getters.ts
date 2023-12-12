@@ -6,6 +6,7 @@ import {
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  COLLATERAL_PRICE_DECIMALS,
   INT_ONE,
   INT_ZERO,
   InterestRateSide,
@@ -24,7 +25,7 @@ import {
   YEARN_STETH_VAULT,
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { uppercaseNetwork } from "../utils/strings";
+import { prefixID, uppercaseNetwork } from "../utils/strings";
 import { addToArrayAtIndex } from "../utils/arrays";
 import { Versions } from "../versions";
 import { updateMetadata } from "../common/helpers";
@@ -97,14 +98,23 @@ export function getOrCreateToken(
             price = priceCall.value;
           }
           let decimals = INT_ONE as i32;
-          const decimalsCall = contract.try_priceSourceDecimals();
-          if (decimalsCall.reverted) {
-            log.error("Failed to get collateral decimals for market: {}", [
-              token._market!,
-            ]);
+          const id = prefixID(
+            dataSource.network(),
+            contract._address.toHexString()
+          );
+          if (COLLATERAL_PRICE_DECIMALS.has(id)) {
+            decimals = COLLATERAL_PRICE_DECIMALS.get(id);
           } else {
-            decimals = decimalsCall.value;
+            const decimalsCall = contract.try_priceSourceDecimals();
+            if (decimalsCall.reverted) {
+              log.error("Failed to get collateral decimals for market: {}", [
+                token._market!,
+              ]);
+            } else {
+              decimals = decimalsCall.value;
+            }
           }
+
           token.lastPriceUSD = bigIntToBigDecimal(price, decimals);
         }
       }
