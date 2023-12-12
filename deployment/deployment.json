@@ -4473,6 +4473,102 @@
     "protocol": "qidao",
     "project": "qidao",
     "deployments": {
+      "qidao-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-arbitrum",
+            "query-id": "qidao-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "qidao-arbitrum",
+            "query-id": "Duw2tSACo9uRGFctAGsCc9pF7ZGMyqpjkAHPwm49dZe6"
+          }
+        }
+      },
+      "qidao-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-avalanche",
+            "query-id": "qidao-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "qidao-avalanche",
+            "query-id": "98GG74FxxsG25Ltd8qvJ9BRfFmQWyN1AkS92MZBG1BsR"
+          }
+        }
+      },
+      "qidao-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-base",
+            "query-id": "qidao-base"
+          }
+        }
+      },
+      "qidao-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-bsc",
+            "query-id": "qidao-bsc"
+          }
+        }
+      },
       "qidao-ethereum": {
         "network": "ethereum",
         "status": "prod",
@@ -4496,6 +4592,106 @@
           "decentralized-network": {
             "slug": "qidao-ethereum",
             "query-id": "BmQSQaXsivq866kUobQSbyxycjk3D7CiaczKgu3P9ifB"
+          }
+        }
+      },
+      "qidao-gnosis": {
+        "network": "gnosis",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-gnosis",
+            "query-id": "qidao-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "qidao-gnosis",
+            "query-id": "7vJEsy8pJmRQZQh5kTXNz68SRHXBS859hMq3o5uWF1Ac"
+          }
+        }
+      },
+      "qidao-metis": {
+        "network": "metis",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-metis",
+            "query-id": "qidao-metis"
+          },
+          "decentralized-network": {
+            "slug": "qidao-metis",
+            "query-id": "7vJEsy8pJmRQZQh5kTXNz68SRHXBS859hMq3o5uWF1Ac"
+          }
+        }
+      },
+      "qidao-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-optimism",
+            "query-id": "qidao-optimism"
+          }
+        }
+      },
+      "qidao-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-polygon",
+            "query-id": "qidao-polygon"
+          },
+          "decentralized-network": {
+            "slug": "qidao-polygon",
+            "query-id": "5UxEcMvYW4vVYP81tkPQMAvJv1e4m1xU8BJkDXBnpc6x"
           }
         }
       }

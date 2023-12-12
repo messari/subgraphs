@@ -1,0 +1,35 @@
+{
+  "chain": "arbitrum-one",
+  "erc20Vaults": [
+    {
+      "name": "WETH",
+      "address": "0xC76a3cBefE490Ae4450B2fCC2c38666aA99f7aa0",
+      "startBlock": 6847550
+    },
+    {
+      "name": "WBTC",
+      "address": "0xB237f4264938f0903F5EC120BB1Aa4beE3562FfF",
+      "startBlock": 9372406
+    },
+    {
+      "name": "GDMVT",
+      "address": "0xd371281896f2F5f7A2C65F49d23A2B6ecfd594f3",
+      "startBlock": 63648404
+    },
+    {
+      "name": "KMMVT",
+      "address": "0xe47ca047Cb7E6A9AdE9405Ca68077d63424F34eC",
+      "startBlock": 65555608
+    },
+    {
+      "name": "BCSEAMVT",
+      "address": "0xa864956ff961ce62c266a8563b46577d3573372e",
+      "startBlock": 76571752
+    },
+    {
+      "name": "AAMVT",
+      "address": "0x950eceee9e7d7366a24fc9d2ed4c0c37d17a0fa9",
+      "startBlock": 79737972
+    }
+  ]
+}

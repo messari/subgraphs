@@ -1,0 +1,20 @@
+{
+  "chain": "bsc",
+  "erc20Vaults": [
+    {
+      "name": "WBNB",
+      "address": "0xa56f9a54880afbc30cf29bb66d2d9adcdcaeadd6",
+      "startBlock": 16937681
+    },
+    {
+      "name": "CAKE",
+      "address": "0x014a177e9642d1b4e970418f894985dc1b85657f",
+      "startBlock": 16991008
+    },
+    {
+      "name": "DMVT",
+      "address": "0x7333fd58d8D73a8e5FC1a16C8037ADa4f580FA2B",
+      "startBlock": 19293384
+    }
+  ]
+}

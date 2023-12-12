@@ -11,97 +11,99 @@ features:
   - grafting
 {{/graftEnabled}}
 dataSources:
-  # {{#maticVault}}
-  # - kind: ethereum
-  #   name: {{ name }}
-  #   network: {{ chain }}
-  #   source:
-  #     address: "{{ address }}"
-  #     abi: QiStablecoin
-  #     startBlock: {{ startBlock }}
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.6
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - Token
-  #       - InterestRate
-  #       - LendingProtocol
-  #       - UsageMetricsDailySnapshot
-  #       - UsageMetricsHourlySnapshot
-  #       - FinancialsDailySnapshot
-  #       - Market
-  #       - MarketDailySnapshot
-  #       - MarketHourlySnapshot
-  #       - Deposit
-  #       - Withdraw
-  #       - Borrow
-  #       - Repay
-  #       - Liquidate
-  #       - Account
-  #       - ActiveAccount
-  #       - _InProgressLiquidate
-  #     abis:
-  #       - name: QiStablecoin
-  #         file: ./abis/QiStablecoin.json
-  #       - name: ERC20QiStablecoin
-  #         file: ./abis/ERC20QiStablecoin.json
-  #       - name: QiStablecoinDecimals
-  #         file: ./abis/QiStablecoinDecimals.json
-  #       - name: ERC20
-  #         file: ./abis/ERC20.json
-  #       - name: ERC20NameBytes
-  #         file: ./abis/ERC20NameBytes.json
-  #       - name: ERC20SymbolBytes
-  #         file: ./abis/ERC20SymbolBytes.json
+  {{#maticVault}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      abi: QiStablecoin
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - InterestRate
+        - LendingProtocol
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - FinancialsDailySnapshot
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - Account
+        - ActiveAccount
+        - _InProgressLiquidate
+      abis:
+        - name: QiStablecoin
+          file: ./abis/QiStablecoin.json
+        - name: ERC20QiStablecoin
+          file: ./abis/ERC20QiStablecoin.json
+        - name: QiStablecoinDecimals
+          file: ./abis/QiStablecoinDecimals.json
+        - name: PerformanceFeeManager
+          file: ./abis/PerformanceFeeManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
 
-          # ###########################################
-          # ############## Price Oracle ###############
-          # ###########################################
-          # # ERC20
-          # - name: _ERC20
-          #   file: ./abis/Prices/ERC20.json
-          # # Curve Contracts
-          # - name: CurvePool
-          #   file: ./abis/Prices/Curve/Pool.json
-          # - name: CurveRegistry
-          #   file: ./abis/Prices/Curve/Registry.json
-          # - name: CalculationsCurve
-          #   file: ./abis/Prices/Calculations/Curve.json
-          # # YearnLens Contracts
-          # - name: YearnLensContract
-          #   file: ./abis/Prices/YearnLens.json
-          # # Aave Oracle Contract
-          # - name: AaveOracleContract
-          #   file: ./abis/Prices/AaveOracle.json
-          # # SushiSwap Contracts
-          # - name: CalculationsSushiSwap
-          #   file: ./abis/Prices/Calculations/SushiSwap.json
-          # # ChainLink Contracts
-          # - name: ChainLinkContract
-          #   file: ./abis/Prices/ChainLink.json
-          # # Uniswap Contracts
-          # - name: UniswapRouter
-          #   file: ./abis/Prices/Uniswap/Router.json
-          # - name: UniswapFactory
-          #   file: ./abis/Prices/Uniswap/Factory.json
-          # - name: UniswapPair
-          #   file: ./abis/Prices/Uniswap/Pair.json
-  #     eventHandlers:
-  #       - event: OwnershipTransferred(indexed address,indexed address)
-  #         handler: handleOwnershipTransferred
-  #       - event: DepositCollateral(uint256,uint256)
-  #         handler: handleDepositCollateral
-  #       - event: WithdrawCollateral(uint256,uint256)
-  #         handler: handleWithdrawCollateral
-  #       - event: BorrowToken(uint256,uint256)
-  #         handler: handleBorrowToken
-  #       - event: PayBackToken(uint256,uint256,uint256)
-  #         handler: handlePayBackToken
-  #       - event: BuyRiskyVault(uint256,address,address,uint256)
-  #         handler: handleBuyRiskyVault
-  #     file: ./src/mappings/QiStablecoin.ts
-  # {{/maticVault}}
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: DepositCollateral(uint256,uint256)
+          handler: handleDepositCollateral
+        - event: BorrowToken(uint256,uint256)
+          handler: handleBorrowToken
+        - event: BuyRiskyVault(uint256,address,address,uint256)
+          handler: handleBuyRiskyVault
+        - event: PayBackToken(uint256,uint256,uint256)
+          handler: handlePayBackToken
+        - event: WithdrawCollateral(uint256,uint256)
+          handler: handleWithdrawCollateral
+      file: ./src/mappings/handlersMatic.ts
+  {{/maticVault}}
   {{#erc20Vaults}}
   - kind: ethereum
     name: {{ name }}

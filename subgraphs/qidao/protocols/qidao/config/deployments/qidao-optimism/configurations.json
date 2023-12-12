@@ -1,0 +1,55 @@
+{
+  "chain": "optimism",
+  "erc20Vaults": [
+    {
+      "name": "WETH",
+      "address": "0x062016cd29fabb26c52bab646878987fc9b0bc55",
+      "startBlock": 5498667
+    },
+    {
+      "name": "WBTC",
+      "address": "0xb9c8f0d3254007ee4b98970b94544e473cd610ec",
+      "startBlock": 5386422
+    },
+    {
+      "name": "OPMVT",
+      "address": "0xbf1aea8670d2528e08334083616dd9c5f3b087ae",
+      "startBlock": 14843534
+    },
+    {
+      "name": "MAOBMVT",
+      "address": "0xAB91c51b55F7Dd7B34F2FD7217506fD5b632B2B9",
+      "startBlock": 22572239
+    },
+    {
+      "name": "MAOEMVT",
+      "address": "0xF9CE2522027bD40D3b1aEe4abe969831FE3BeAf5",
+      "startBlock": 22571921
+    },
+    {
+      "name": "MAODMVT",
+      "address": "0xB89c1b3d9f335B9d8Bb16016F3d60160AE71041f",
+      "startBlock": 22041590
+    },
+    {
+      "name": "WSTEOMVT",
+      "address": "0x86f78d3cbca0636817ad9e27a44996c738ec4932",
+      "startBlock": 50165047
+    },
+    {
+      "name": "BCSOMVT",
+      "address": "0xa478e708a27853848c6bc979668fe6225fee46fa",
+      "startBlock": 50161491
+    },
+    {
+      "name": "YEOMVT",
+      "address": "0x7198ff382b5798dab7dc72a23c1fec9dc091893b",
+      "startBlock": 50162004
+    },
+    {
+      "name": "KMMVT",
+      "address": "0xc88c8ada95d92c149377aa660837460775dcc6d9",
+      "startBlock": 77842683
+    }
+  ]
+}

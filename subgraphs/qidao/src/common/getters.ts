@@ -12,12 +12,16 @@ import {
   InterestRateType,
   LendingType,
   MAI_TOKEN_ADDRESS,
+  MATIC_MAXIMUM_LTV,
+  Network,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   ProtocolType,
   RiskType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
+  STAKEDAO_STETH_VAULT,
+  YEARN_STETH_VAULT,
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { uppercaseNetwork } from "../utils/strings";
@@ -39,6 +43,7 @@ import {
 } from "../../generated/schema";
 import { ERC20 } from "../../generated/templates/Vault/ERC20";
 import { ERC20QiStablecoin } from "../../generated/templates/Vault/ERC20QiStablecoin";
+import { QiStablecoin } from "../../generated/templates/Vault/QiStablecoin";
 
 export function getOrCreateToken(
   tokenAddress: Address,
@@ -70,28 +75,38 @@ export function getOrCreateToken(
       token.lastPriceUSD = BIGDECIMAL_ONE;
     } else {
       if (token._market) {
-        const contract = ERC20QiStablecoin.bind(
-          Address.fromString(token._market!)
-        );
-        let price = BIGINT_ZERO;
-        const priceCall = contract.try_getEthPriceSource();
-        if (priceCall.reverted) {
-          log.error("Failed to get collateral price for market: {}", [
-            token._market!,
-          ]);
-        } else {
-          price = priceCall.value;
+        // Wrong prices for StakeDao Curve stETh around block 15542061 and Yearn Curve stETH around block 15542065 in ethereum deployment
+        if (
+          !(
+            (Address.fromString(token._market!) == STAKEDAO_STETH_VAULT ||
+              Address.fromString(token._market!) == YEARN_STETH_VAULT) &&
+            event.block.number.toI32() <= 15563004 &&
+            uppercaseNetwork(dataSource.network()) == Network.MAINNET
+          )
+        ) {
+          const contract = ERC20QiStablecoin.bind(
+            Address.fromString(token._market!)
+          );
+          let price = BIGINT_ZERO;
+          const priceCall = contract.try_getEthPriceSource();
+          if (priceCall.reverted) {
+            log.error("Failed to get collateral price for market: {}", [
+              token._market!,
+            ]);
+          } else {
+            price = priceCall.value;
+          }
+          let decimals = INT_ONE as i32;
+          const decimalsCall = contract.try_priceSourceDecimals();
+          if (decimalsCall.reverted) {
+            log.error("Failed to get collateral decimals for market: {}", [
+              token._market!,
+            ]);
+          } else {
+            decimals = decimalsCall.value;
+          }
+          token.lastPriceUSD = bigIntToBigDecimal(price, decimals);
         }
-        let decimals = INT_ONE as i32;
-        const decimalsCall = contract.try_priceSourceDecimals();
-        if (decimalsCall.reverted) {
-          log.error("Failed to get collateral decimals for market: {}", [
-            token._market!,
-          ]);
-        } else {
-          decimals = decimalsCall.value;
-        }
-        token.lastPriceUSD = bigIntToBigDecimal(price, decimals);
       }
     }
 
@@ -100,6 +115,7 @@ export function getOrCreateToken(
         tokenAddress.toHexString(),
         event.block.number.toString(),
       ]);
+      token.lastPriceUSD = BIGDECIMAL_ZERO;
     } else {
       token.lastPriceBlockNumber = event.block.number;
     }
@@ -275,6 +291,54 @@ export function createERC20Market(
     market.liquidationPenalty = BIGDECIMAL_TEN;
     // Read LTV and liquidationPenalty from contract
     updateMetadata(market);
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    market._borrowToken = borrowToken.id;
+    market._borrowBalance = BIGINT_ZERO;
+    market._performanceFee = BIGINT_ZERO;
+
+    market.save();
+
+    protocol.totalPoolCount += 1;
+    protocol._markets = addToArrayAtIndex(protocol._markets, market.id);
+  }
+}
+
+export function createMaticMarket(
+  protocol: LendingProtocol,
+  token: Token,
+  borrowToken: Token,
+  event: ethereum.Event
+): void {
+  const id = event.address.toHexString();
+  let market = Market.load(id);
+  if (!market) {
+    const contract = QiStablecoin.bind(event.address);
+    market = new Market(id);
+    market.protocol = protocol.id;
+    market.name = contract.name();
+    market.isActive = true;
+    market.canUseAsCollateral = true;
+    market.canBorrowFrom = true;
+    market.inputToken = token.id;
+    market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
+    market.createdTimestamp = event.block.timestamp;
+    market.createdBlockNumber = event.block.number;
+    market.liquidationPenalty = BIGDECIMAL_TEN;
+    market.maximumLTV = MATIC_MAXIMUM_LTV;
+    market.liquidationThreshold = MATIC_MAXIMUM_LTV;
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     market.cumulativeDepositUSD = BIGDECIMAL_ZERO;

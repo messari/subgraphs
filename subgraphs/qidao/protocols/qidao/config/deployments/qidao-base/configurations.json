@@ -1,0 +1,20 @@
+{
+  "chain": "base",
+  "erc20Vaults": [
+    {
+      "name": "CBSTEMVT",
+      "address": "0x7333fd58d8d73a8e5fc1a16c8037ada4f580fa2b",
+      "startBlock": 2572101
+    },
+    {
+      "name": "ETBMVT",
+      "address": "0x8D6CeBD76f18E1558D4DB88138e2DeFB3909fAD6",
+      "startBlock": 2571852
+    },
+    {
+      "name": "WLSSTEMVT",
+      "address": "0x654a31Ba7D714cfCab19b17D0066171c1A292349",
+      "startBlock": 6541087
+    }
+  ]
+}
