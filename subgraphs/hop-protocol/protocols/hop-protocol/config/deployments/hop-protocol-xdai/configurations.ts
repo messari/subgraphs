@@ -32,7 +32,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else if (tokenAddress == XdaiToken.ETH) return XdaiAmm.ETH;
     else if (tokenAddress == XdaiToken.MATIC) return XdaiAmm.MATIC;
     else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getPoolAddressFromTokenAddress] Pool not found for token: {}",
+        [tokenAddress]
+      );
       return "";
     }
   }
@@ -52,7 +55,9 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else if (tokenAddress == RewardTokens.HOP) {
       return ["HOP", "HOP Token", "18", ZERO_ADDRESS];
     } else {
-      log.critical("Token not found", []);
+      log.critical("[getTokenDetails] Token details not found for token: {}", [
+        tokenAddress,
+      ]);
       return [];
     }
   }
@@ -112,7 +117,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else if (tokenAddress == XdaiToken.ETH) {
       return ArbitrumToken.ETH;
     } else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getArbitrumCrossTokenFromTokenAddress] ArbitrumCrossToken not found for token: {}",
+        [tokenAddress]
+      );
     }
     return "";
   }
@@ -129,7 +137,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else if (tokenAddress == XdaiToken.ETH) {
       return PolygonToken.ETH;
     } else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getPolygonCrossTokenFromTokenAddress] PolygonCrossToken not found for token: {}",
+        [tokenAddress]
+      );
     }
     return "";
   }
@@ -144,7 +155,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else if (tokenAddress == XdaiToken.ETH) {
       return OptimismToken.ETH;
     } else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getOptimismCrossTokenFromTokenAddress] OptimismCrossToken not found for token: {}",
+        [tokenAddress]
+      );
     }
     return "";
   }
@@ -156,7 +170,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else if (tokenAddress == XdaiToken.MATIC) return MainnetToken.MATIC;
     else if (tokenAddress == XdaiToken.ETH) return MainnetToken.ETH;
     else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getMainnetCrossTokenFromTokenAddress] MainnetCrossToken not found for token: {}",
+        [tokenAddress]
+      );
     }
     return "";
   }
@@ -165,7 +182,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     if (tokenAddress == XdaiToken.USDC) return BaseToken.USDC;
     if (tokenAddress == XdaiToken.ETH) return BaseToken.ETH;
     else {
-      log.critical("Base CrossToken not found for token: {}", [tokenAddress]);
+      log.critical(
+        "[getBaseCrossTokenFromTokenAddress] BaseCrossToken not found for token: {}",
+        [tokenAddress]
+      );
     }
     return "";
   }
@@ -173,7 +193,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
   getLineaCrossTokenFromTokenAddress(tokenAddress: string): string {
     if (tokenAddress == XdaiToken.ETH) return LineaToken.ETH;
     else {
-      log.critical("Linea CrossToken not found for token: {}", [tokenAddress]);
+      log.critical(
+        "[getLineaCrossTokenFromTokenAddress] LineaCrossToken not found for token: {}",
+        [tokenAddress]
+      );
     }
     return "";
   }
@@ -190,7 +213,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else if (bridgeAddress == XdaiBridge.MATIC) {
       return [XdaiToken.MATIC, XdaiHtoken.MATIC];
     } else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getTokenAddressFromBridgeAddress] Token not found for bridge: {}",
+        [bridgeAddress]
+      );
       return [""];
     }
   }
@@ -204,7 +230,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else if (poolAddress == XdaiAmm.MATIC)
       return [XdaiToken.MATIC, XdaiHtoken.MATIC];
     else {
-      log.critical("Token not found", []);
+      log.critical(
+        "[getTokenAddressFromPoolAddress] Token not found for pool: {}",
+        [poolAddress]
+      );
       return [""];
     }
   }
