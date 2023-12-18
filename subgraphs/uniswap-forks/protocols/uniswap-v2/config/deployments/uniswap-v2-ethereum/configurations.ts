@@ -208,7 +208,10 @@ export class UniswapV2MainnetConfigurations implements Configurations {
     ];
   }
   getBrokenERC20Tokens(): string[] {
-    return ["0x0000000000bf2686748e1c0255036e7617e7e8a5"];
+    return [
+      "0x0000000000bf2686748e1c0255036e7617e7e8a5",
+      "0x000000000000b91b6956fead1dda24c66aa6b972",
+    ];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND;
