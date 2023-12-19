@@ -1,4 +1,4 @@
-import { ethereum, BigInt, log, Address } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, log, Address, Bytes } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveEventAccount,
@@ -21,7 +21,7 @@ import {
 import { getOrCreateActivityHelper } from "./common/getters";
 
 export function getOrCreateAccount(
-  accountId: string,
+  accountId: Address,
   protocol: LendingProtocol
 ): Account {
   let account = Account.load(accountId);
@@ -50,26 +50,28 @@ export function addAccountToProtocol(
   event: ethereum.Event,
   protocol: LendingProtocol
 ): void {
-  const dailyId: string = (
-    event.block.timestamp.toI64() / SECONDS_PER_DAY
-  ).toString();
+  const dailyId = event.block.timestamp.toI32() / SECONDS_PER_DAY;
 
   // get daily active account
-  const activeEventId = "daily"
-    .concat("-")
+  const activeEventId = Bytes.fromUTF8("daily")
+    .concat(Bytes.fromUTF8("-"))
     .concat(account.id)
-    .concat("-")
-    .concat(dailyId)
-    .concat("-")
-    .concat(eventType);
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(dailyId))
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromUTF8(eventType));
   let activeEvent = ActiveEventAccount.load(activeEventId);
 
   // get cumulative account by event type
-  const activeAccountId = account.id.concat("-").concat(eventType);
+  const activeAccountId = account.id
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromUTF8(eventType));
   let activeAccount = ActiveAccount.load(activeAccountId);
 
   const activity = getOrCreateActivityHelper(
-    ActivityInterval.DAILY.concat("-").concat(dailyId)
+    Bytes.fromUTF8(ActivityInterval.DAILY)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(dailyId))
   );
 
   if (eventType == EventType.DEPOSIT) {
@@ -129,7 +131,7 @@ export function updatePositions(
   account: Account,
   event: ethereum.Event,
   liquidation: boolean = false
-): string {
+): Bytes {
   if (
     eventType == EventType.DEPOSIT ||
     eventType == EventType.BORROW ||
@@ -141,8 +143,8 @@ export function updatePositions(
   }
 
   const balance = getAccountBalance(
-    Address.fromString(market.id),
-    Address.fromString(account.id),
+    Address.fromBytes(market.id),
+    Address.fromBytes(account.id),
     side
   );
 
@@ -168,7 +170,7 @@ export function updatePositions(
       event
     );
     if (!position) {
-      return "";
+      return Bytes.empty();
     }
     if (liquidation) {
       position.liquidationCount += 1;
@@ -201,29 +203,35 @@ function getAccountBalance(
 
 export function getLiquidatePosition(
   side: string,
-  marketId: string,
-  accountId: string
-): string {
+  marketId: Address,
+  accountId: Address
+): Bytes {
   const positionCounter = PositionCounter.load(
-    accountId.concat("-").concat(marketId).concat("-").concat(side)
+    accountId
+      .concat(Bytes.fromUTF8("-"))
+      .concat(marketId)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromUTF8(side))
   );
   if (!positionCounter) {
     log.warning("No liquidation position found for account {} on market {}", [
-      accountId,
-      marketId,
+      accountId.toHexString(),
+      marketId.toHexString(),
     ]);
-    return "";
+    return Bytes.empty();
   }
 
   const position = Position.load(
-    positionCounter.id.concat("-").concat(positionCounter.nextCount.toString())
+    positionCounter.id
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(positionCounter.nextCount))
   );
   if (!position) {
     log.warning("No liquidation position found for account {} on market {}", [
-      accountId,
-      marketId,
+      accountId.toHexString(),
+      marketId.toHexString(),
     ]);
-    return "";
+    return Bytes.empty();
   }
 
   return position.id;
@@ -244,10 +252,10 @@ function addPosition(
   event: ethereum.Event
 ): Position {
   const counterID = account.id
-    .concat("-")
+    .concat(Bytes.fromUTF8("-"))
     .concat(market.id)
-    .concat("-")
-    .concat(side);
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromUTF8(side));
   let positionCounter = PositionCounter.load(counterID);
   if (!positionCounter) {
     positionCounter = new PositionCounter(counterID);
@@ -255,8 +263,8 @@ function addPosition(
     positionCounter.save();
   }
   const positionID = positionCounter.id
-    .concat("-")
-    .concat(positionCounter.nextCount.toString());
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(positionCounter.nextCount));
 
   let position = Position.load(positionID);
   const openPosition = position == null;
@@ -353,23 +361,25 @@ function subtractPosition(
   event: ethereum.Event
 ): Position | null {
   const counterID = account.id
-    .concat("-")
+    .concat(Bytes.fromUTF8("-"))
     .concat(market.id)
-    .concat("-")
-    .concat(side);
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromUTF8(side));
   const positionCounter = PositionCounter.load(counterID);
   if (!positionCounter) {
     log.warning("[subtractPosition] position counter {} not found", [
-      counterID,
+      counterID.toHexString(),
     ]);
     return null;
   }
   const positionID = positionCounter.id
-    .concat("-")
-    .concat(positionCounter.nextCount.toString());
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(positionCounter.nextCount));
   const position = Position.load(positionID);
   if (!position) {
-    log.warning("[subtractPosition] position {} not found", [positionID]);
+    log.warning("[subtractPosition] position {} not found", [
+      positionID.toHexString(),
+    ]);
     return null;
   }
   position.balance = newBalance;
@@ -431,10 +441,10 @@ function subtractPosition(
 function snapshotPosition(position: Position, event: ethereum.Event): void {
   const snapshot = new PositionSnapshot(
     position.id
-      .concat("-")
-      .concat(event.transaction.hash.toHexString())
-      .concat("-")
-      .concat(event.logIndex.toString())
+      .concat(Bytes.fromUTF8("-"))
+      .concat(event.transaction.hash)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.logIndex.toI32()))
   );
   snapshot.hash = event.transaction.hash.toHexString();
   snapshot.logIndex = event.logIndex.toI32();

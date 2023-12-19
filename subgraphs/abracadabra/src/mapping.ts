@@ -69,7 +69,7 @@ import {
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
   if (ABRA_ACCOUNTS.indexOf(account) > NEG_INT_ONE) {
-    const marketID = event.params.cloneAddress.toHexString();
+    const marketID = event.params.cloneAddress;
     createMarket(marketID, event.block.number, event.block.timestamp);
     CauldronDataSource.create(event.params.cloneAddress);
     takeProtocolSnapshots(event);
@@ -79,11 +79,11 @@ export function handleLogDeploy(event: LogDeploy): void {
 
 export function handleLogAddCollateral(event: LogAddCollateral): void {
   const depositEvent = new Deposit(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.toString()
+    event.transaction.hash
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
   );
-  const market = getMarket(event.address.toHexString());
+  const market = getMarket(event.address);
   if (!market) {
     return;
   }
@@ -93,7 +93,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
 
   const CauldronContract = Cauldron.bind(event.address);
   const collateralToken = getOrCreateToken(
-    Address.fromString(market.inputToken)
+    Address.fromBytes(market.inputToken)
   );
   const tokenPriceUSD = collateralToken.lastPriceUSD;
   const amountUSD = bigIntToBigDecimal(
@@ -102,7 +102,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   ).times(tokenPriceUSD!);
 
   const protocol = getOrCreateLendingProtocol();
-  const account = getOrCreateAccount(event.params.to.toHexString(), protocol);
+  const account = getOrCreateAccount(event.params.to, protocol);
 
   depositEvent.hash = event.transaction.hash.toHexString();
   depositEvent.nonce = event.transaction.nonce;
@@ -116,7 +116,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   // Amount needs to be calculated differently as bentobox deals shares and amounts in a different way.
   // usage of toAmount function converts shares to actual amount based on collateral
   depositEvent.amount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
-    Address.fromString(collateralToken.id),
+    Address.fromBytes(collateralToken.id),
     event.params.share,
     false
   );
@@ -132,16 +132,16 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   depositEvent.save();
 
   updateMarketStats(
-    market.id,
+    Address.fromBytes(market.id),
     EventType.DEPOSIT,
-    collateralToken.id,
+    Address.fromBytes(collateralToken.id),
     event.params.share,
     event
   );
   updateTVL(event);
   updateUsageMetrics(event, event.params.from, event.params.to);
   takeProtocolSnapshots(event);
-  takeMarketSnapshots(market.id, event);
+  takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
@@ -151,11 +151,11 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     liquidation = true;
   }
   const withdrawalEvent = new Withdraw(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.toString()
+    event.transaction.hash
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
   );
-  const market = getMarket(event.address.toHexString());
+  const market = getMarket(event.address);
   if (!market) {
     return;
   }
@@ -164,7 +164,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   updateAllTokenPrices(event.block.number);
 
   const collateralToken = getOrCreateToken(
-    Address.fromString(market.inputToken)
+    Address.fromBytes(market.inputToken)
   );
   const CauldronContract = Cauldron.bind(event.address);
   const tokenPriceUSD = collateralToken.lastPriceUSD;
@@ -174,7 +174,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   ).times(tokenPriceUSD!);
 
   const protocol = getOrCreateLendingProtocol();
-  const account = getOrCreateAccount(event.params.from.toHexString(), protocol);
+  const account = getOrCreateAccount(event.params.from, protocol);
 
   withdrawalEvent.hash = event.transaction.hash.toHexString();
   withdrawalEvent.nonce = event.transaction.nonce;
@@ -186,7 +186,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   withdrawalEvent.market = market.id;
   withdrawalEvent.asset = collateralToken.id;
   withdrawalEvent.amount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
-    Address.fromString(collateralToken.id),
+    Address.fromBytes(collateralToken.id),
     event.params.share,
     false
   );
@@ -203,25 +203,25 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   withdrawalEvent.save();
 
   updateMarketStats(
-    market.id,
+    Address.fromBytes(market.id),
     EventType.WITHDRAW,
-    collateralToken.id,
+    Address.fromBytes(collateralToken.id),
     event.params.share,
     event
   );
   updateTVL(event);
   updateUsageMetrics(event, event.params.from, event.params.to);
   takeProtocolSnapshots(event);
-  takeMarketSnapshots(market.id, event);
+  takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
 
 export function handleLogBorrow(event: LogBorrow): void {
   const borrowEvent = new Borrow(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.toString()
+    event.transaction.hash
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
   );
-  const market = getMarket(event.address.toHexString());
+  const market = getMarket(event.address);
   if (!market) {
     return;
   }
@@ -239,7 +239,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   ).times(mimPriceUSD!);
 
   const protocol = getOrCreateLendingProtocol();
-  const account = getOrCreateAccount(event.params.from.toHexString(), protocol);
+  const account = getOrCreateAccount(event.params.from, protocol);
 
   borrowEvent.hash = event.transaction.hash.toHexString();
   borrowEvent.nonce = event.transaction.nonce;
@@ -265,15 +265,15 @@ export function handleLogBorrow(event: LogBorrow): void {
   updateBorrowAmount(market);
   updateTotalBorrows(event);
   updateMarketStats(
-    market.id,
+    Address.fromBytes(market.id),
     EventType.BORROW,
-    getMIMAddress(dataSource.network()),
+    Address.fromString(getMIMAddress(dataSource.network())),
     event.params.amount,
     event
   );
   updateUsageMetrics(event, event.params.from, event.params.to);
   takeProtocolSnapshots(event);
-  takeMarketSnapshots(market.id, event);
+  takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
 
 // Liquidation steps
@@ -298,32 +298,36 @@ export function handleLiquidation(event: LogRepay): void {
     return;
   }
   const liquidateEvent = new Liquidate(
-    "liquidate" +
-      "-" +
-      event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.toString()
+    Bytes.fromUTF8("liquidate")
+      .concat(Bytes.fromUTF8("-"))
+      .concat(event.transaction.hash)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
   );
   liquidateEvent.amount = liquidateProxy.amount;
-  const market = getMarket(event.address.toHexString());
+  const market = getMarket(event.address);
   if (!market) {
     return;
   }
 
-  const hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const hourlyId = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
   const hourlyActivity = getOrCreateActivityHelper(
-    ActivityInterval.HOURLY.concat("-").concat(hourlyId.toString())
+    Bytes.fromUTF8(ActivityInterval.HOURLY)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(hourlyId))
   );
-  const dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const dailyId = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   const dailyActivity = getOrCreateActivityHelper(
-    ActivityInterval.DAILY.concat("-").concat(dailyId.toString())
+    Bytes.fromUTF8(ActivityInterval.DAILY)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(dailyId))
   );
 
   // update market prices
   updateAllTokenPrices(event.block.number);
 
   const collateralToken = getOrCreateToken(
-    Address.fromString(market.inputToken)
+    Address.fromBytes(market.inputToken)
   );
   const mimToken = getOrCreateToken(
     Address.fromString(getMIMAddress(dataSource.network()))
@@ -331,7 +335,7 @@ export function handleLiquidation(event: LogRepay): void {
   const CauldronContract = Cauldron.bind(event.address);
   const tokenPriceUSD = collateralToken.lastPriceUSD;
   const collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
-    Address.fromString(collateralToken.id),
+    Address.fromBytes(collateralToken.id),
     liquidateEvent.amount,
     false
   );
@@ -348,14 +352,8 @@ export function handleLiquidation(event: LogRepay): void {
       .lastPriceUSD!
   );
 
-  const liquidateeAccount = getOrCreateAccount(
-    event.params.to.toHexString(),
-    protocol
-  );
-  const liquidatorAccount = getOrCreateAccount(
-    event.params.from.toHexString(),
-    protocol
-  );
+  const liquidateeAccount = getOrCreateAccount(event.params.to, protocol);
+  const liquidatorAccount = getOrCreateAccount(event.params.from, protocol);
 
   liquidateEvent.hash = event.transaction.hash.toHexString();
   liquidateEvent.nonce = event.transaction.nonce;
@@ -371,8 +369,8 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
   liquidateEvent.position = getLiquidatePosition(
     InterestRateSide.BORROW,
-    market.id,
-    event.params.to.toHexString()
+    Address.fromBytes(market.id),
+    event.params.to
   );
   liquidateEvent.save();
 
@@ -411,7 +409,7 @@ export function handleLiquidation(event: LogRepay): void {
   protocol.save();
 
   takeProtocolSnapshots(event);
-  takeMarketSnapshots(market.id, event);
+  takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
 
 export function handleLogRepay(event: LogRepay): void {
@@ -431,11 +429,11 @@ export function handleLogRepay(event: LogRepay): void {
   updateAllTokenPrices(event.block.number);
 
   const repayEvent = new Repay(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.toString()
+    event.transaction.hash
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
   );
-  const market = getMarket(event.address.toHexString());
+  const market = getMarket(event.address);
   if (!market) {
     return;
   }
@@ -449,7 +447,7 @@ export function handleLogRepay(event: LogRepay): void {
   ).times(mimPriceUSD!);
 
   const protocol = getOrCreateLendingProtocol();
-  const account = getOrCreateAccount(event.params.to.toHexString(), protocol);
+  const account = getOrCreateAccount(event.params.to, protocol);
 
   repayEvent.hash = event.transaction.hash.toHexString();
   repayEvent.nonce = event.transaction.nonce;
@@ -476,31 +474,31 @@ export function handleLogRepay(event: LogRepay): void {
   updateBorrowAmount(market);
   updateTotalBorrows(event);
   updateMarketStats(
-    market.id,
+    Address.fromBytes(market.id),
     EventType.REPAY,
-    getMIMAddress(dataSource.network()),
+    Address.fromString(getMIMAddress(dataSource.network())),
     event.params.part,
     event
   ); // smart contract code subs event.params.part from totalBorrow
   updateUsageMetrics(event, event.params.from, event.params.to);
   takeProtocolSnapshots(event);
-  takeMarketSnapshots(market.id, event);
+  takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
-  const market = getMarket(event.address.toHexString());
+  const market = getMarket(event.address);
   if (!market) {
     return;
   }
-  const token = getOrCreateToken(Address.fromString(market.inputToken));
+  const token = getOrCreateToken(Address.fromBytes(market.inputToken));
   updateTokenPrice(event.params.rate, token, market, event.block.number);
   updateTVL(event);
   takeProtocolSnapshots(event);
-  takeMarketSnapshots(market.id, event);
+  takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
 
 export function handleLogAccrue(event: LogAccrue): void {
-  const marketID = event.address.toHexString();
+  const marketID = event.address;
   const mimPriceUSD = getOrCreateToken(
     Address.fromString(getMIMAddress(dataSource.network()))
   ).lastPriceUSD;
@@ -508,7 +506,7 @@ export function handleLogAccrue(event: LogAccrue): void {
     event.params.accruedAmount,
     DEFAULT_DECIMALS
   ).times(mimPriceUSD!);
-  updateFinancials(event, feesUSD, marketID);
+  updateFinancials(feesUSD, marketID);
   takeProtocolSnapshots(event);
   takeMarketSnapshots(marketID, event);
 }
@@ -518,16 +516,16 @@ export function handleLogAccrue(event: LogAccrue): void {
 function updateAllTokenPrices(blockNumber: BigInt): void {
   const protocol = getOrCreateLendingProtocol();
   for (let i = 0; i < protocol.marketIDList.length; i++) {
-    const market = getMarket(protocol.marketIDList[i]);
+    const market = getMarket(Address.fromBytes(protocol.marketIDList[i]));
     if (!market) {
       log.warning("[updateAllTokenPrices] Market not found: {}", [
-        protocol.marketIDList[i],
+        protocol.marketIDList[i].toHexString(),
       ]);
       continue;
     }
 
     // check if price was already updated this block
-    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    const inputToken = getOrCreateToken(Address.fromBytes(market.inputToken));
     if (
       inputToken.lastPriceBlockNumber &&
       inputToken.lastPriceBlockNumber!.ge(blockNumber)
@@ -538,7 +536,7 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
     // load PriceOracle contract and get peek (real/current) exchange rate
     if (market.priceOracle === null) {
       log.warning("[updateAllTokenPrices] Market {} has no priceOracle", [
-        market.id,
+        market.id.toHexString(),
       ]);
       continue;
     }
@@ -553,7 +551,7 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
     if (exchangeRateCall.reverted || exchangeRateCall.value == BIGINT_ZERO) {
       log.warning(
         "[updateAllTokenPrices] Market {} priceOracle peekSpot() failed",
-        [market.id]
+        [market.id.toHexString()]
       );
       continue;
     }

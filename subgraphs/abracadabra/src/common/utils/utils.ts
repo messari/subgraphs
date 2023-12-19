@@ -1,4 +1,4 @@
-import { ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { InterestRate } from "../../../generated/schema";
 
 export function readValue<T>(
@@ -10,22 +10,21 @@ export function readValue<T>(
 
 // create separate InterestRate Entities for each market snapshot
 // this is needed to prevent snapshot rates from being pointers to the current rate
-export function getSnapshotRates(
-  rates: string[],
-  timeSuffix: string
-): string[] {
-  const snapshotRates: string[] = [];
+export function getSnapshotRates(rates: Bytes[], timeSuffix: string): Bytes[] {
+  const snapshotRates: Bytes[] = [];
   for (let i = 0; i < rates.length; i++) {
     const rate = InterestRate.load(rates[i]);
     if (!rate) {
       log.warning("[getSnapshotRates] rate {} not found, should not happen", [
-        rates[i],
+        rates[i].toHexString(),
       ]);
       continue;
     }
 
     // create new snapshot rate
-    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    const snapshotRateId = rates[i]
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromUTF8(timeSuffix));
     const snapshotRate = new InterestRate(snapshotRateId);
     snapshotRate.side = rate.side;
     snapshotRate.type = rate.type;

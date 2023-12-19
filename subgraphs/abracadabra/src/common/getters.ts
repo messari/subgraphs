@@ -1,4 +1,4 @@
-import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, dataSource, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
@@ -50,10 +50,10 @@ import {
 import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
-  let token = Token.load(tokenAddress.toHexString());
+  let token = Token.load(tokenAddress);
   // fetch info if null
   if (!token) {
-    token = new Token(tokenAddress.toHexString());
+    token = new Token(tokenAddress);
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
     if (tokenAddress == Address.fromString(USD_BTC_ETH_ABRA_ADDRESS)) {
@@ -77,11 +77,12 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 ///////////////////////////
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
-  let protocol = LendingProtocol.load(getBentoBoxAddress(dataSource.network()));
+  const id = Address.fromString(getBentoBoxAddress(dataSource.network()));
+  let protocol = LendingProtocol.load(id);
   if (protocol) {
     return protocol;
   }
-  protocol = new LendingProtocol(getBentoBoxAddress(dataSource.network()));
+  protocol = new LendingProtocol(id);
   protocol.name = "Abracadabra Money";
   protocol.slug = "abracadabra";
   protocol.schemaVersion = Versions.getSchemaVersion();
@@ -99,7 +100,9 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   protocol.lendingType = LendingType.CDP;
-  protocol.mintedTokens = [getMIMAddress(dataSource.network())];
+  protocol.mintedTokens = [
+    Address.fromString(getMIMAddress(dataSource.network())),
+  ];
   protocol.totalPoolCount = 0;
 
   protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -125,12 +128,12 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   return protocol;
 }
 
-export function getMarket(marketId: string): Market | null {
+export function getMarket(marketId: Address): Market | null {
   const market = Market.load(marketId);
   if (market) {
     return market;
   }
-  log.error("Cannot find market: {}", [marketId]);
+  log.error("Cannot find market: {}", [marketId.toHexString()]);
   return null;
 }
 
@@ -139,12 +142,11 @@ export function getMarket(marketId: string): Market | null {
 ///////////////////////////
 
 export function getLiquidateEvent(event: LogRepay): LiquidateProxy | null {
-  const liquidateEvent = LiquidateProxy.load(
-    "liquidate-" +
-      event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.minus(BIGINT_ONE).toString()
-  );
+  const id = Bytes.fromUTF8("liquidate-")
+    .concat(event.transaction.hash)
+    .concat(Bytes.fromUTF8("-"))
+    .concat(Bytes.fromI32(event.transactionLogIndex.minus(BIGINT_ONE).toI32()));
+  const liquidateEvent = LiquidateProxy.load(id);
   if (liquidateEvent) {
     return liquidateEvent;
   }
@@ -224,12 +226,16 @@ export function getNetwork(network: string): string {
   return "";
 }
 
-export function getOrCreateInterestRate(marketAddress: string): InterestRate {
-  let interestRate = InterestRate.load("BORROWER-" + "STABLE-" + marketAddress);
+export function getOrCreateInterestRate(marketAddress: Address): InterestRate {
+  const id = Bytes.empty()
+    .concat(Bytes.fromUTF8("BORROWER-"))
+    .concat(Bytes.fromUTF8("STABLE-"))
+    .concat(marketAddress);
+  let interestRate = InterestRate.load(id);
   if (interestRate) {
     return interestRate;
   }
-  interestRate = new InterestRate("BORROWER-" + "STABLE-" + marketAddress);
+  interestRate = new InterestRate(id);
   interestRate.side = InterestRateSide.BORROW;
   interestRate.type = InterestRateType.STABLE;
   interestRate.rate = BIGDECIMAL_ONE;
@@ -237,7 +243,7 @@ export function getOrCreateInterestRate(marketAddress: string): InterestRate {
   return interestRate;
 }
 
-export function getOrCreateActivityHelper(id: string): _ActivityHelper {
+export function getOrCreateActivityHelper(id: Bytes): _ActivityHelper {
   let activity = _ActivityHelper.load(id);
 
   if (!activity) {

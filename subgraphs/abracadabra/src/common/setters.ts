@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { Market, LiquidateProxy, Token } from "../../generated/schema";
 import {
   Cauldron,
@@ -35,7 +35,7 @@ import {
 } from "./constants";
 import { bigIntToBigDecimal } from "./utils/numbers";
 
-export function updateProtocolMarketList(marketAddress: string): void {
+export function updateProtocolMarketList(marketAddress: Address): void {
   const protocol = getOrCreateLendingProtocol();
   const marketIDList = protocol.marketIDList;
   marketIDList.push(marketAddress);
@@ -44,12 +44,12 @@ export function updateProtocolMarketList(marketAddress: string): void {
 }
 
 export function createMarket(
-  marketAddress: string,
+  marketAddress: Address,
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
   const MarketEntity = new Market(marketAddress);
-  const MarketContract = Cauldron.bind(Address.fromString(marketAddress));
+  const MarketContract = Cauldron.bind(marketAddress);
   const collateralCall = MarketContract.try_collateral();
   const protocol = getOrCreateLendingProtocol();
   if (!collateralCall.reverted) {
@@ -86,10 +86,12 @@ export function createMarket(
     MarketEntity.isActive = true;
     MarketEntity.canUseAsCollateral = true;
     MarketEntity.canBorrowFrom = true;
-    const interestRate = getOrCreateInterestRate(MarketEntity.id);
+    const interestRate = getOrCreateInterestRate(
+      Address.fromBytes(MarketEntity.id)
+    );
     interestRate.side = InterestRateSide.BORROW;
     interestRate.type = InterestRateType.STABLE;
-    if (marketAddress.toLowerCase() == YV_USDT_MARKET.toLowerCase()) {
+    if (marketAddress == Address.fromString(YV_USDT_MARKET)) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(LOW_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION
@@ -112,7 +114,7 @@ export function createMarket(
         .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
       MarketEntity.rates = [interestRate.id];
-    } else if (marketAddress.toLowerCase() == YV_WETH_MARKET.toLowerCase()) {
+    } else if (marketAddress == Address.fromString(YV_WETH_MARKET)) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION
@@ -135,7 +137,7 @@ export function createMarket(
         .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
       MarketEntity.rates = [interestRate.id];
-    } else if (marketAddress.toLowerCase() == YV_YFI_MARKET.toLowerCase()) {
+    } else if (marketAddress == Address.fromString(YV_YFI_MARKET)) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION
@@ -158,7 +160,7 @@ export function createMarket(
         .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
       MarketEntity.rates = [interestRate.id];
-    } else if (marketAddress.toLowerCase() == YV_USDC_MARKET.toLowerCase()) {
+    } else if (marketAddress == Address.fromString(YV_USDC_MARKET)) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(STABLE_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION
@@ -181,7 +183,7 @@ export function createMarket(
         .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
       MarketEntity.rates = [interestRate.id];
-    } else if (marketAddress.toLowerCase() == XSUSHI_MARKET.toLowerCase()) {
+    } else if (marketAddress == Address.fromString(XSUSHI_MARKET)) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION
@@ -253,10 +255,10 @@ export function createMarket(
 
 export function createLiquidateEvent(event: LogRemoveCollateral): void {
   const liquidation = new LiquidateProxy(
-    "liquidate-" +
-      event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.toString()
+    Bytes.fromUTF8("liquidate-")
+      .concat(event.transaction.hash)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
   );
   liquidation.amount = event.params.share;
   liquidation.save();
@@ -280,7 +282,8 @@ export function updateTokenPrice(
   // it seems like it should be offset by 6 (instead of 18) until 6431888
   // this only affects one deposit
   if (
-    market.id.toLowerCase() == AVAX_JOE_BAR_MARKET_ADDRESS.toLowerCase() &&
+    Address.fromBytes(market.id) ==
+      Address.fromString(AVAX_JOE_BAR_MARKET_ADDRESS) &&
     blockNumber.lt(BigInt.fromI32(6431889))
   ) {
     priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, 6));

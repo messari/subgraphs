@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import {
   ActivityInterval,
@@ -29,7 +29,7 @@ export function takeProtocolSnapshots(event: ethereum.Event): void {
       .plus(BigInt.fromI32(SECONDS_PER_DAY))
       .lt(event.block.timestamp)
   ) {
-    const dayID = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+    const dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
     takeUsageMetricsDailySnapshot(protocol, dayID, event);
     takeFinancialsDailySnapshot(protocol, dayID, event);
 
@@ -41,7 +41,7 @@ export function takeProtocolSnapshots(event: ethereum.Event): void {
       .plus(BigInt.fromI32(SECONDS_PER_HOUR))
       .lt(event.block.timestamp)
   ) {
-    const hourID = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+    const hourID = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
     takeUsageMetricsHourlySnapshot(protocol, hourID, event);
 
     protocol._lastHourlySnapshotTimestamp = event.block.timestamp;
@@ -51,15 +51,15 @@ export function takeProtocolSnapshots(event: ethereum.Event): void {
 
 function takeFinancialsDailySnapshot(
   protocol: LendingProtocol,
-  id: i64,
+  id: i32,
   event: ethereum.Event
 ): void {
   const previousSnapshotID =
-    protocol._lastDailySnapshotTimestamp!.toI64() / SECONDS_PER_DAY;
+    protocol._lastDailySnapshotTimestamp!.toI32() / SECONDS_PER_DAY;
   const previousSnapshot = FinancialsDailySnapshot.load(
-    previousSnapshotID.toString()
+    Bytes.fromI32(previousSnapshotID)
   );
-  const snapshot = new FinancialsDailySnapshot(id.toString());
+  const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(id));
   snapshot.protocol = protocol.id;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -122,13 +122,15 @@ function takeFinancialsDailySnapshot(
 
 function takeUsageMetricsHourlySnapshot(
   protocol: LendingProtocol,
-  id: i64,
+  id: i32,
   event: ethereum.Event
 ): void {
   const activity = getOrCreateActivityHelper(
-    ActivityInterval.HOURLY.concat("-").concat(id.toString())
+    Bytes.fromUTF8(ActivityInterval.HOURLY)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(id))
   );
-  const snapshot = new UsageMetricsHourlySnapshot(id.toString());
+  const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(id));
   snapshot.protocol = protocol.id;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -148,13 +150,15 @@ function takeUsageMetricsHourlySnapshot(
 
 function takeUsageMetricsDailySnapshot(
   protocol: LendingProtocol,
-  id: i64,
+  id: i32,
   event: ethereum.Event
 ): void {
   const activity = getOrCreateActivityHelper(
-    ActivityInterval.DAILY.concat("-").concat(id.toString())
+    Bytes.fromUTF8(ActivityInterval.DAILY)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromI32(id))
   );
-  const snapshot = new UsageMetricsDailySnapshot(id.toString());
+  const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(id));
   snapshot.protocol = protocol.id;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -183,7 +187,7 @@ function takeUsageMetricsDailySnapshot(
 }
 
 export function takeMarketSnapshots(
-  marketId: string,
+  marketId: Address,
   event: ethereum.Event
 ): void {
   const market = getMarket(marketId);
@@ -196,7 +200,7 @@ export function takeMarketSnapshots(
       .plus(BigInt.fromI32(SECONDS_PER_DAY))
       .lt(event.block.timestamp)
   ) {
-    const dayID = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+    const dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
     takeMarketDailySnapshot(market, dayID, event);
 
     market._lastDailySnapshotTimestamp = event.block.timestamp;
@@ -207,7 +211,7 @@ export function takeMarketSnapshots(
       .plus(BigInt.fromI32(SECONDS_PER_HOUR))
       .lt(event.block.timestamp)
   ) {
-    const hourID = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+    const hourID = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
     takeMarketHourlySnapshot(market, hourID, event);
 
     market._lastHourlySnapshotTimestamp = event.block.timestamp;
@@ -217,16 +221,16 @@ export function takeMarketSnapshots(
 
 function takeMarketHourlySnapshot(
   market: Market,
-  id: i64,
+  id: i32,
   event: ethereum.Event
 ): void {
   const previousSnapshotID =
-    market._lastHourlySnapshotTimestamp!.toI64() / SECONDS_PER_HOUR;
+    market._lastHourlySnapshotTimestamp!.toI32() / SECONDS_PER_HOUR;
   const previousSnapshot = MarketHourlySnapshot.load(
-    previousSnapshotID.toString()
+    Bytes.fromI32(previousSnapshotID)
   );
   const snapshot = new MarketHourlySnapshot(
-    market.id.concat("-").concat(id.toString())
+    market.id.concat(Bytes.fromUTF8("-")).concat(Bytes.fromI32(id))
   );
   snapshot.protocol = getOrCreateLendingProtocol().id;
   snapshot.market = market.id;
@@ -292,16 +296,16 @@ function takeMarketHourlySnapshot(
 
 function takeMarketDailySnapshot(
   market: Market,
-  id: i64,
+  id: i32,
   event: ethereum.Event
 ): void {
   const previousSnapshotID =
-    market._lastDailySnapshotTimestamp!.toI64() / SECONDS_PER_DAY;
+    market._lastDailySnapshotTimestamp!.toI32() / SECONDS_PER_DAY;
   const previousSnapshot = MarketDailySnapshot.load(
-    previousSnapshotID.toString()
+    Bytes.fromI32(previousSnapshotID)
   );
   const snapshot = new MarketDailySnapshot(
-    market.id.concat("-").concat(id.toString())
+    market.id.concat(Bytes.fromUTF8("-")).concat(Bytes.fromI32(id))
   );
   snapshot.protocol = getOrCreateLendingProtocol().id;
   snapshot.market = market.id;
