@@ -74,6 +74,8 @@ export function createMarket(
     MarketEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     MarketEntity.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeWithdrawUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeRepayUSD = BIGDECIMAL_ZERO;
     MarketEntity.rates = [];
     MarketEntity.positionCount = 0;
     MarketEntity.openPositionCount = 0;
@@ -241,6 +243,8 @@ export function createMarket(
       MarketEntity.priceOracle = oracleCall.value;
     }
   }
+  MarketEntity._lastDailySnapshotTimestamp = BIGINT_ZERO;
+  MarketEntity._lastHourlySnapshotTimestamp = BIGINT_ZERO;
   MarketEntity.save();
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();

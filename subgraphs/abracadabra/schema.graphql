@@ -288,6 +288,12 @@ type LendingProtocol implements Protocol @entity @regularPolling {
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
 
+  " Sum of all historical withdrawals in USD "
+  cumulativeWithdrawUSD: BigDecimal!
+
+  " Sum of all historical repayments in USD "
+  cumulativeRepayUSD: BigDecimal!
+
   " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
   mintedTokenSupplies: [BigInt!]
 
@@ -321,13 +327,19 @@ type LendingProtocol implements Protocol @entity @regularPolling {
   ##### Add ons #####
 
   marketIDList: [String!]!
+
+  " Helper field for taking daily snapshots "
+  _lastDailySnapshotTimestamp: BigInt!
+
+  " Helper field for taking hourly snapshots "
+  _lastHourlySnapshotTimestamp: BigInt!
 }
 
 ###############################
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity @dailySnapshot {
+type UsageMetricsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -392,7 +404,7 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
+type UsageMetricsHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " { # of hours since Unix epoch time } "
   id: ID!
 
@@ -430,7 +442,7 @@ type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity @dailySnapshot {
+type FinancialsDailySnapshot @entity(immutable: true) @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: ID!
 
@@ -501,8 +513,14 @@ type FinancialsDailySnapshot @entity @dailySnapshot {
   " Total assets withdrawn on a given day, in USD. "
   dailyWithdrawUSD: BigDecimal!
 
+  " Sum of all historical withdrawals in USD "
+  cumulativeWithdrawUSD: BigDecimal!
+
   " Total assets repaid on a given day, in USD. "
   dailyRepayUSD: BigDecimal!
+
+  " Sum of all historical repayments in USD "
+  cumulativeRepayUSD: BigDecimal!
 }
 
 ###############################
@@ -577,6 +595,12 @@ type Market @entity @regularPolling {
 
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
+
+  " Sum of all historical withdrawals in USD "
+  cumulativeWithdrawUSD: BigDecimal!
+
+  " Sum of all historical repayments in USD "
+  cumulativeRepayUSD: BigDecimal!
 
   ##### Token Balances #####
 
@@ -656,13 +680,19 @@ type Market @entity @regularPolling {
 
   " Market's price oracle "
   priceOracle: Bytes
+
+  " Helper field for taking daily snapshots "
+  _lastDailySnapshotTimestamp: BigInt!
+
+  " Helper field for taking hourly snapshots "
+  _lastHourlySnapshotTimestamp: BigInt!
 }
 
 #################################
 ##### Pool-Level Timeseries #####
 #################################
 
-type MarketDailySnapshot @entity @dailySnapshot {
+type MarketDailySnapshot @entity(immutable: true) @dailySnapshot {
   " { Smart contract address of the market }-{ # of days since Unix epoch time } "
   id: ID!
 
@@ -731,8 +761,14 @@ type MarketDailySnapshot @entity @dailySnapshot {
   " Total assets withdrawn on a given day, in USD. "
   dailyWithdrawUSD: BigDecimal!
 
+  " Sum of all historical withdrawals in USD "
+  cumulativeWithdrawUSD: BigDecimal!
+
   " Total assets repaid on a given day, in USD. "
   dailyRepayUSD: BigDecimal!
+
+  " Sum of all historical repayments in USD "
+  cumulativeRepayUSD: BigDecimal!
 
   ##### Token Balances #####
 
@@ -758,7 +794,7 @@ type MarketDailySnapshot @entity @dailySnapshot {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type MarketHourlySnapshot @entity @hourlySnapshot {
+type MarketHourlySnapshot @entity(immutable: true) @hourlySnapshot {
   " { Smart contract address of the market }-{ # of hours since Unix epoch time } "
   id: ID!
 
@@ -827,8 +863,14 @@ type MarketHourlySnapshot @entity @hourlySnapshot {
   " Total assets withdrawn on a given hour, in USD. "
   hourlyWithdrawUSD: BigDecimal!
 
+  " Sum of all historical withdrawals in USD "
+  cumulativeWithdrawUSD: BigDecimal!
+
   " Total assets repaid on a given hour, in USD. "
   hourlyRepayUSD: BigDecimal!
+
+  " Sum of all historical repayments in USD "
+  cumulativeRepayUSD: BigDecimal!
 
   ##### Token Balances #####
 
@@ -1254,4 +1296,22 @@ type PositionCounter @entity {
 type ActiveEventAccount @entity {
   "{ daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch }-{ EventType: Optional }"
   id: ID!
+}
+
+# Helper entity for calculating daily/hourly fields
+type _ActivityHelper @entity {
+  id: ID!
+
+  activeUsers: Int!
+  activeDepositors: Int!
+  activeBorrowers: Int!
+  activeLiquidators: Int!
+  activeLiquidatees: Int!
+
+  transactionCount: Int!
+  depositCount: Int!
+  borrowCount: Int!
+  liquidateCount: Int!
+  withdrawCount: Int!
+  repayCount: Int!
 }
