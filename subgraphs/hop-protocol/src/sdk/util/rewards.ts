@@ -316,17 +316,15 @@ function getStartingBlockRate(): BigDecimal {
     return BIGDECIMAL_ZERO;
   }
 }
-export function updateWithdrawn(
-  pools: PoolManager,
-  hPools: PoolManager,
+
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+function getTokenFromRewardToken(
   tokens: TokenManager,
-  poolName: string,
-  poolSymbol: string,
-  hPoolName: string,
-  poolAddress: string,
-  rewardToken: string,
-  amount: BigInt
-): void {
+  rewardToken: string
+): Token | null {
   let token: Token | null = null;
   if (GNO_REWARDS.includes(rewardToken)) {
     token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
@@ -338,24 +336,41 @@ export function updateWithdrawn(
     token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
   }
   if (RPL_REWARDS.includes(rewardToken)) {
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") ==
-      Network.ARBITRUM_ONE
-    )
+    if (equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE))
       token = tokens.getOrCreateToken(
         Address.fromString(RewardTokens.rETH_ARB)
       );
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
-    )
+    if (equalsIgnoreCase(dataSource.network(), Network.OPTIMISM))
       token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
   }
   if (WMATIC_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WMATIC));
+    if (equalsIgnoreCase(dataSource.network(), Network.MATIC))
+      token = tokens.getOrCreateToken(
+        Address.fromString(RewardTokens.WMATIC_POLYGON)
+      );
+    if (equalsIgnoreCase(dataSource.network(), Network.XDAI))
+      token = tokens.getOrCreateToken(
+        Address.fromString(RewardTokens.WMATIC_XDAI)
+      );
   }
   if (WETH_REWARDS.includes(rewardToken)) {
     token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WETH));
   }
+  return token;
+}
+
+export function updateWithdrawn(
+  pools: PoolManager,
+  hPools: PoolManager,
+  tokens: TokenManager,
+  poolName: string,
+  poolSymbol: string,
+  hPoolName: string,
+  poolAddress: string,
+  rewardToken: string,
+  amount: BigInt
+): void {
+  const token = getTokenFromRewardToken(tokens, rewardToken);
   if (!token) return;
 
   poolAddress =
@@ -387,35 +402,7 @@ export function updateStaked(
   rewardToken: string,
   amount: BigInt
 ): void {
-  let token: Token | null = null;
-  if (GNO_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
-  }
-  if (OP_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
-  }
-  if (HOP_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
-  }
-  if (RPL_REWARDS.includes(rewardToken)) {
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") ==
-      Network.ARBITRUM_ONE
-    )
-      token = tokens.getOrCreateToken(
-        Address.fromString(RewardTokens.rETH_ARB)
-      );
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
-    )
-      token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
-  }
-  if (WMATIC_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WMATIC));
-  }
-  if (WETH_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WETH));
-  }
+  const token = getTokenFromRewardToken(tokens, rewardToken);
   if (!token) return;
 
   poolAddress =
@@ -447,35 +434,7 @@ export function updateRewardsPaid(
   event: ethereum.Event
 ): void {
   const rewardToken = event.address.toHexString();
-  let token: Token | null = null;
-  if (GNO_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.GNO));
-  }
-  if (OP_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.OP));
-  }
-  if (HOP_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.HOP));
-  }
-  if (RPL_REWARDS.includes(rewardToken)) {
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") ==
-      Network.ARBITRUM_ONE
-    )
-      token = tokens.getOrCreateToken(
-        Address.fromString(RewardTokens.rETH_ARB)
-      );
-    if (
-      dataSource.network().toUpperCase().replace("-", "_") == Network.OPTIMISM
-    )
-      token = tokens.getOrCreateToken(Address.fromString(RewardTokens.rETH_OP));
-  }
-  if (WMATIC_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WMATIC));
-  }
-  if (WETH_REWARDS.includes(rewardToken)) {
-    token = tokens.getOrCreateToken(Address.fromString(RewardTokens.WETH));
-  }
+  const token = getTokenFromRewardToken(tokens, rewardToken);
   if (!token) return;
 
   poolAddress =
