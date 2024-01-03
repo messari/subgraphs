@@ -18,6 +18,7 @@ import {
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
+  safeDiv,
 } from "../../../../../src/common/utils/utils";
 import { getPoolRewardsWithBonus } from "./handleRewarder";
 
@@ -46,11 +47,13 @@ export function updateMasterChef(
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
-  const rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
-    .times(masterChefV2Pool.poolAllocPoint)
-    .div(masterChefV2.totalAllocPoint);
-  const rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
-    rewardAmountPerInterval.toString()
+  const rewardAmountPerIntervalBigDecimal = safeDiv(
+    new BigDecimal(
+      masterChefV2.adjustedRewardTokenRate.times(
+        masterChefV2Pool.poolAllocPoint
+      )
+    ),
+    new BigDecimal(masterChefV2.totalAllocPoint)
   );
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
