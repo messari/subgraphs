@@ -29,7 +29,7 @@ import {
 } from "./getters";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
-import { getSnapshotRates, readValue } from "./utils/utils";
+import { readValue } from "./utils/utils";
 import { getOrCreateAccount } from "../positions";
 import { Cauldron } from "../../generated/templates/Cauldron/Cauldron";
 
@@ -135,7 +135,7 @@ export function updateUsageMetrics(
   dailyActivity.save();
 }
 
-export function updateTVL(event: ethereum.Event): void {
+export function updateTVL(): void {
   // new user count handled in updateUsageMetrics
   // totalBorrowUSD handled updateTotalBorrowUSD
   const protocol = getOrCreateLendingProtocol();
@@ -178,7 +178,7 @@ export function updateTVL(event: ethereum.Event): void {
   protocol.save();
 }
 
-export function updateTotalBorrows(event: ethereum.Event): void {
+export function updateTotalBorrows(): void {
   // new user count handled in updateUsageMetrics
   const protocol = getOrCreateLendingProtocol();
   const marketIDList = protocol.marketIDList;

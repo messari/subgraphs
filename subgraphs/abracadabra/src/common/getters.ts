@@ -1,4 +1,4 @@
-import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, dataSource, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
