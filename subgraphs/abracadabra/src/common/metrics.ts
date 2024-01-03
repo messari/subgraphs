@@ -5,7 +5,6 @@ import {
   ethereum,
   dataSource,
   log,
-  Bytes,
 } from "@graphprotocol/graph-ts";
 import { ActiveAccount, Market } from "../../generated/schema";
 import {
@@ -30,19 +29,21 @@ import {
 } from "./getters";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
-import { readValue } from "./utils/utils";
+import { getSnapshotRates, readValue } from "./utils/utils";
 import { getOrCreateAccount } from "../positions";
 import { Cauldron } from "../../generated/templates/Cauldron/Cauldron";
 
 // Update FinancialsDailySnapshots entity
-export function updateFinancials(feesUSD: BigDecimal, marketId: Address): void {
+export function updateFinancials(
+  event: ethereum.Event,
+  feesUSD: BigDecimal,
+  marketId: string
+): void {
   // feesUSD is handled in handleLogWithdrawFees
   // totalValueLockedUSD is handled in updateTVL()
   const market = getMarket(marketId);
   if (!market) {
-    log.warning("[updateFinancials] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
+    log.warning("[updateFinancials] Market not found: {}", [marketId]);
     return;
   }
 
@@ -79,30 +80,24 @@ export function updateUsageMetrics(
   // Number of days since Unix epoch
   const protocol = getOrCreateLendingProtocol();
 
-  const hourlyId = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   const hourlyActivity = getOrCreateActivityHelper(
-    Bytes.fromUTF8(ActivityInterval.HOURLY)
-      .concat(Bytes.fromUTF8("-"))
-      .concat(Bytes.fromI32(hourlyId))
+    ActivityInterval.HOURLY.concat("-").concat(hourlyId.toString())
   );
-  const dailyId = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const dailyActivity = getOrCreateActivityHelper(
-    Bytes.fromUTF8(ActivityInterval.DAILY)
-      .concat(Bytes.fromUTF8("-"))
-      .concat(Bytes.fromI32(dailyId))
+    ActivityInterval.DAILY.concat("-").concat(dailyId.toString())
   );
 
   hourlyActivity.transactionCount += 1;
   dailyActivity.transactionCount += 1;
 
-  getOrCreateAccount(from, protocol);
-  getOrCreateAccount(to, protocol);
+  getOrCreateAccount(from.toHexString(), protocol);
+  getOrCreateAccount(to.toHexString(), protocol);
 
   // Combine the id and the user address to generate a unique user id for the hour/day
-  const hourlyActiveAccountIdFrom = Bytes.fromUTF8("hourly-")
-    .concat(from)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(hourlyId));
+  const hourlyActiveAccountIdFrom =
+    "hourly-" + from.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountFrom = ActiveAccount.load(hourlyActiveAccountIdFrom);
   if (!hourlyActiveAccountFrom) {
     hourlyActiveAccountFrom = new ActiveAccount(hourlyActiveAccountIdFrom);
@@ -110,10 +105,8 @@ export function updateUsageMetrics(
     hourlyActivity.activeUsers += 1;
   }
 
-  const hourlyActiveAccountIdTo = Bytes.fromUTF8("hourly-")
-    .concat(to)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(hourlyId));
+  const hourlyActiveAccountIdTo =
+    "hourly-" + to.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountTo = ActiveAccount.load(hourlyActiveAccountIdTo);
   if (!hourlyActiveAccountTo) {
     hourlyActiveAccountTo = new ActiveAccount(hourlyActiveAccountIdTo);
@@ -121,10 +114,8 @@ export function updateUsageMetrics(
     hourlyActivity.activeUsers += 1;
   }
 
-  const dailyActiveAccountIdFrom = Bytes.fromUTF8("daily-")
-    .concat(from)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(dailyId));
+  const dailyActiveAccountIdFrom =
+    "daily-" + from.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountFrom = ActiveAccount.load(dailyActiveAccountIdFrom);
   if (!dailyActiveAccountFrom) {
     dailyActiveAccountFrom = new ActiveAccount(dailyActiveAccountIdFrom);
@@ -132,10 +123,8 @@ export function updateUsageMetrics(
     dailyActivity.activeUsers += 1;
   }
 
-  const dailyActiveAccountIdTo = Bytes.fromUTF8("daily-")
-    .concat(to)
-    .concat(Bytes.fromUTF8("-"))
-    .concat(Bytes.fromI32(dailyId));
+  const dailyActiveAccountIdTo =
+    "daily-" + to.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountTo = ActiveAccount.load(dailyActiveAccountIdTo);
   if (!dailyActiveAccountTo) {
     dailyActiveAccountTo = new ActiveAccount(dailyActiveAccountIdTo);
@@ -150,34 +139,30 @@ export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
   // totalBorrowUSD handled updateTotalBorrowUSD
   const protocol = getOrCreateLendingProtocol();
-  log.warning(">> protocol.id: {}", [protocol.id.toHexString()]);
-  const bentoBoxContract = DegenBox.bind(Address.fromBytes(protocol.id));
+  const bentoBoxContract = DegenBox.bind(Address.fromString(protocol.id));
   const degenBoxContract = DegenBox.bind(
     Address.fromString(getDegenBoxAddress(dataSource.network()))
   );
   const marketIDList = protocol.marketIDList;
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
   for (let i: i32 = 0; i < marketIDList.length; i++) {
-    log.warning(">> marketIDList: {}", [marketIDList[i].toHexString()]);
-    const marketAddress = Address.fromBytes(marketIDList[i]);
+    const marketAddress = marketIDList[i];
     const market = getMarket(marketAddress);
     if (!market) {
       return;
     }
-    log.warning(">> market.inputToken: {}", [market.inputToken.toHexString()]);
-    const inputToken = getOrCreateToken(Address.fromBytes(market.inputToken));
-    log.warning(">> inputToken.id: {}", [inputToken.id.toHexString()]);
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     const bentoBoxCall: BigInt = readValue<BigInt>(
       bentoBoxContract.try_balanceOf(
-        Address.fromBytes(inputToken.id),
-        marketAddress
+        Address.fromString(inputToken.id),
+        Address.fromString(marketAddress)
       ),
       BIGINT_ZERO
     );
     const degenBoxCall: BigInt = readValue<BigInt>(
       degenBoxContract.try_balanceOf(
-        Address.fromBytes(inputToken.id),
-        marketAddress
+        Address.fromString(inputToken.id),
+        Address.fromString(marketAddress)
       ),
       BIGINT_ZERO
     );
@@ -205,7 +190,7 @@ export function updateTotalBorrows(event: ethereum.Event): void {
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     const marketAddress = marketIDList[i];
-    const market = getMarket(Address.fromBytes(marketAddress));
+    const market = getMarket(marketAddress);
     if (!market) {
       return;
     }
@@ -224,9 +209,9 @@ export function updateTotalBorrows(event: ethereum.Event): void {
 }
 
 export function updateMarketStats(
-  marketId: Address,
+  marketId: string,
   eventType: string,
-  asset: Address,
+  asset: string,
   amount: BigInt,
   event: ethereum.Event
 ): void {
@@ -234,18 +219,14 @@ export function updateMarketStats(
   if (!market) {
     return;
   }
-  const token = getOrCreateToken(asset);
-  const hourlyId = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const token = getOrCreateToken(Address.fromString(asset));
+  const hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   const hourlyActivity = getOrCreateActivityHelper(
-    Bytes.fromUTF8(ActivityInterval.HOURLY)
-      .concat(Bytes.fromUTF8("-"))
-      .concat(Bytes.fromI32(hourlyId))
+    ActivityInterval.HOURLY.concat("-").concat(hourlyId.toString())
   );
-  const dailyId = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const dailyActivity = getOrCreateActivityHelper(
-    Bytes.fromUTF8(ActivityInterval.DAILY)
-      .concat(Bytes.fromUTF8("-"))
-      .concat(Bytes.fromI32(dailyId))
+    ActivityInterval.DAILY.concat("-").concat(dailyId.toString())
   );
 
   const protocol = getOrCreateLendingProtocol();
@@ -296,7 +277,7 @@ export function updateMarketStats(
     protocol.cumulativeRepayUSD = protocol.cumulativeRepayUSD.plus(amountUSD);
   }
   market.inputTokenPriceUSD = getOrCreateToken(
-    Address.fromBytes(market.inputToken)
+    Address.fromString(market.inputToken)
   ).lastPriceUSD!;
   market.save();
   hourlyActivity.save();
@@ -306,14 +287,14 @@ export function updateMarketStats(
 
 // update borrow amount for the given market
 export function updateBorrowAmount(market: Market): void {
-  const couldronContract = Cauldron.bind(Address.fromBytes(market.id));
+  const couldronContract = Cauldron.bind(Address.fromString(market.id));
 
   // get total borrows
   const tryBorrowBalance = couldronContract.try_totalBorrow();
   if (tryBorrowBalance.reverted) {
     log.warning(
       "[updateBorrowAmount] Could not get borrow balance for market {}",
-      [market.id.toHexString()]
+      [market.id]
     );
     return;
   }
