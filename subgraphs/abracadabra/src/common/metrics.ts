@@ -146,10 +146,11 @@ export function updateUsageMetrics(
   dailyActivity.save();
 }
 
-export function updateTVL(): void {
+export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
   // totalBorrowUSD handled updateTotalBorrowUSD
   const protocol = getOrCreateLendingProtocol();
+  log.warning(">> protocol.id: {}", [protocol.id.toHexString()]);
   const bentoBoxContract = DegenBox.bind(Address.fromBytes(protocol.id));
   const degenBoxContract = DegenBox.bind(
     Address.fromString(getDegenBoxAddress(dataSource.network()))
@@ -157,12 +158,15 @@ export function updateTVL(): void {
   const marketIDList = protocol.marketIDList;
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
   for (let i: i32 = 0; i < marketIDList.length; i++) {
+    log.warning(">> marketIDList: {}", [marketIDList[i].toHexString()]);
     const marketAddress = Address.fromBytes(marketIDList[i]);
     const market = getMarket(marketAddress);
     if (!market) {
       return;
     }
+    log.warning(">> market.inputToken: {}", [market.inputToken.toHexString()]);
     const inputToken = getOrCreateToken(Address.fromBytes(market.inputToken));
+    log.warning(">> inputToken.id: {}", [inputToken.id.toHexString()]);
     const bentoBoxCall: BigInt = readValue<BigInt>(
       bentoBoxContract.try_balanceOf(
         Address.fromBytes(inputToken.id),
@@ -189,7 +193,7 @@ export function updateTVL(): void {
   protocol.save();
 }
 
-export function updateTotalBorrows(): void {
+export function updateTotalBorrows(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
   const protocol = getOrCreateLendingProtocol();
   const marketIDList = protocol.marketIDList;

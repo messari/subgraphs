@@ -138,7 +138,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     event.params.share,
     event
   );
-  updateTVL();
+  updateTVL(event);
   updateUsageMetrics(event, event.params.from, event.params.to);
   takeProtocolSnapshots(event);
   takeMarketSnapshots(Address.fromBytes(market.id), event);
@@ -209,7 +209,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     event.params.share,
     event
   );
-  updateTVL();
+  updateTVL(event);
   updateUsageMetrics(event, event.params.from, event.params.to);
   takeProtocolSnapshots(event);
   takeMarketSnapshots(Address.fromBytes(market.id), event);
@@ -263,7 +263,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.save();
 
   updateBorrowAmount(market);
-  updateTotalBorrows();
+  updateTotalBorrows(event);
   updateMarketStats(
     Address.fromBytes(market.id),
     EventType.BORROW,
@@ -472,7 +472,7 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.save();
 
   updateBorrowAmount(market);
-  updateTotalBorrows();
+  updateTotalBorrows(event);
   updateMarketStats(
     Address.fromBytes(market.id),
     EventType.REPAY,
@@ -492,7 +492,7 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
   }
   const token = getOrCreateToken(Address.fromBytes(market.inputToken));
   updateTokenPrice(event.params.rate, token, market, event.block.number);
-  updateTVL();
+  updateTVL(event);
   takeProtocolSnapshots(event);
   takeMarketSnapshots(Address.fromBytes(market.id), event);
 }
