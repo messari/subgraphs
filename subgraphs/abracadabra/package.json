@@ -4,8 +4,10 @@
     "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.42.4",
-    "@graphprotocol/graph-ts": "0.29.3",
-    "prettier": "^2.7.1"
+    "@graphprotocol/graph-cli": "^0.64.0",
+    "@graphprotocol/graph-ts": "^0.32.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.1"
   }
 }

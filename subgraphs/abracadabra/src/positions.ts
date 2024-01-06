@@ -11,13 +11,14 @@ import {
 } from "../generated/schema";
 import { Cauldron } from "../generated/templates/Cauldron/Cauldron";
 import {
+  ActivityInterval,
   BIGINT_ZERO,
   EventType,
   InterestRateSide,
   PositionSide,
   SECONDS_PER_DAY,
 } from "./common/constants";
-import { getOrCreateUsageMetricsDailySnapshot } from "./common/getters";
+import { getOrCreateActivityHelper } from "./common/getters";
 
 export function getOrCreateAccount(
   accountId: string,
@@ -67,7 +68,9 @@ export function addAccountToProtocol(
   const activeAccountId = account.id.concat("-").concat(eventType);
   let activeAccount = ActiveAccount.load(activeAccountId);
 
-  const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  const activity = getOrCreateActivityHelper(
+    ActivityInterval.DAILY.concat("-").concat(dailyId)
+  );
 
   if (eventType == EventType.DEPOSIT) {
     if (!activeAccount) {
@@ -78,7 +81,7 @@ export function addAccountToProtocol(
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       activeEvent.save();
-      dailySnapshot.dailyActiveDepositors += 1;
+      activity.activeDepositors += 1;
     }
   } else if (eventType == EventType.BORROW) {
     if (!activeAccount) {
@@ -89,7 +92,7 @@ export function addAccountToProtocol(
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       activeEvent.save();
-      dailySnapshot.dailyActiveBorrowers += 1;
+      activity.activeBorrowers += 1;
     }
   } else if (eventType == EventType.LIQUIDATOR) {
     if (!activeAccount) {
@@ -100,7 +103,7 @@ export function addAccountToProtocol(
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       activeEvent.save();
-      dailySnapshot.dailyActiveLiquidators += 1;
+      activity.activeLiquidators += 1;
     }
   } else if (eventType == EventType.LIQUIDATEE) {
     if (!activeAccount) {
@@ -111,19 +114,11 @@ export function addAccountToProtocol(
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       activeEvent.save();
-      dailySnapshot.dailyActiveLiquidatees += 1;
+      activity.activeLiquidatees += 1;
     }
-    protocol.save();
   }
-  dailySnapshot.cumulativeUniqueDepositors =
-    protocol.cumulativeUniqueDepositors;
-  dailySnapshot.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
-  dailySnapshot.cumulativeUniqueLiquidators =
-    protocol.cumulativeUniqueLiquidators;
-  dailySnapshot.cumulativeUniqueLiquidatees =
-    protocol.cumulativeUniqueLiquidatees;
-
-  dailySnapshot.save();
+  protocol.save();
+  activity.save();
 }
 
 export function updatePositions(
