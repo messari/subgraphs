@@ -1,0 +1,30 @@
+{
+  "chain": "metis",
+  "erc20Vaults": [
+    {
+      "name": "MMVT",
+      "address": "0x10dcbee8afa39a847707e16aea5eb34c6b01aba9",
+      "startBlock": 3055518
+    },
+    {
+      "name": "WEMMVT",
+      "address": "0xc09c73f7b32573d178138e76c0e286ba21085c20",
+      "startBlock": 3293103
+    },
+    {
+      "name": "WBMMVT",
+      "address": "0xb89c1b3d9f335b9d8bb16016f3d60160ae71041f",
+      "startBlock": 3293117
+    },
+    {
+      "name": "BMMVT",
+      "address": "0x5A03716bd1f338D7849f5c9581AD5015ce0020B0",
+      "startBlock": 3909172
+    },
+    {
+      "name": "MMVT - Manhattan interest-charging vaults",
+      "address": "0x19Cb63CCbfAC2f28B1fd79923f6aDfC096e6EBB4",
+      "startBlock": 5002395
+    }
+  ]
+}

@@ -115,6 +115,46 @@
       "name": "SAND",
       "address": "0x1dcc1f864a4bd0b8f4ad33594b758b68e9fa872c",
       "startBlock": 26695570
+    },
+    {
+      "name": "xDTMVT",
+      "address": "0xaa19d0e397c964a35e6e80262c692dbfc9c23451",
+      "startBlock": 30826942
+    },
+    {
+      "name": "xLTMVT",
+      "address": "0x11826d20b6a16a22450978642404da95b4640123",
+      "startBlock": 30827145
+    },
+    {
+      "name": "KMMVT",
+      "address": "0xa3b0A659f2147D77A443f70D96b3cC95E7A26390",
+      "startBlock": 33077460
+    },
+    {
+      "name": "MDAPMVT",
+      "address": "0x7d75F83f0aBe2Ece0b9Daf41CCeDdF38Cb66146b",
+      "startBlock": 35472996
+    },
+    {
+      "name": "STMMVT",
+      "address": "0x9A05b116b56304F5f4B3F1D5DA4641bFfFfae6Ab",
+      "startBlock": 38326216
+    },
+    {
+      "name": "GDMVT",
+      "address": "0xF1104493eC315aF2cb52f0c19605443334928D38",
+      "startBlock": 39009012
+    },
+    {
+      "name": "WSTEMVT",
+      "address": "0x3bcbAC61456c9C9582132D1493A00E318EA9C122",
+      "startBlock": 39857454
+    },
+    {
+      "name": "LSMMVT",
+      "address": "0xb1f28350539b06d5a35d016908eef0424bd13c4b",
+      "startBlock": 38326116
     }
   ]
 }

@@ -53,6 +53,9 @@ type Token @entity @regularPolling {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " Id of market if the token is a collateral token "
+  _market: String
 }
 
 enum RewardTokenType {
@@ -291,6 +294,7 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+  _markets: [String!]!
 }
 
 ###############################
@@ -577,6 +581,15 @@ type Market @entity @regularPolling {
 
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
+
+  " Token that can be borrowed from the protocol "
+  _borrowToken: Token!
+
+  " Amount of tokens borrowed from the market "
+  _borrowBalance: BigInt!
+
+  " Cumulative performance fee for the market "
+  _performanceFee: BigInt!
 }
 
 #################################

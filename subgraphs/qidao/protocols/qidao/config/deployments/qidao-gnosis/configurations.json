@@ -10,6 +10,11 @@
       "name": "GNO",
       "address": "0x014a177e9642d1b4e970418f894985dc1b85657f",
       "startBlock": 21666284
+    },
+    {
+      "name": "sxDMVT",
+      "address": "0x79AFAD49e968E7bEA7a23933E294a94E33E60158",
+      "startBlock": 30326925
     }
   ],
   "graftEnabled": false,
