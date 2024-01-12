@@ -658,6 +658,10 @@
           "hosted-service": {
             "slug": "arrakis-finance-optimism",
             "query-id": "arrakis-finance-optimism"
+          },
+          "decentralized-network": {
+            "slug": "arrakis-finance-optimism",
+            "query-id": "6yqMWioX8XNx2aMDYJGnvrVQWNrZfgBzY3ee1RmkXh5Z"
           }
         }
       },
@@ -4000,6 +4004,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-optimism",
             "query-id": "uniswap-v3-optimism"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-optimism",
+            "query-id": "EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9"
           }
         }
       },
@@ -9541,6 +9549,10 @@
           "hosted-service": {
             "slug": "kwenta-optimism",
             "query-id": "kwenta-optimism"
+          },
+          "decentralized-network": {
+            "slug": "kwenta-optimism",
+            "query-id": "5sbJJTTJQQ4kYuVYNBVw9sX8C5juRpVJNLHg7uFugw2e"
           }
         },
         "files": {
