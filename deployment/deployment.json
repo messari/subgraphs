@@ -472,6 +472,10 @@
           "hosted-service": {
             "slug": "aave-v3-optimism",
             "query-id": "aave-v3-optimism"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-optimism",
+            "query-id": "3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi"
           }
         }
       },
@@ -654,6 +658,10 @@
           "hosted-service": {
             "slug": "arrakis-finance-optimism",
             "query-id": "arrakis-finance-optimism"
+          },
+          "decentralized-network": {
+            "slug": "arrakis-finance-optimism",
+            "query-id": "6yqMWioX8XNx2aMDYJGnvrVQWNrZfgBzY3ee1RmkXh5Z"
           }
         }
       },
@@ -1748,6 +1756,10 @@
           "hosted-service": {
             "slug": "dforce-optimism",
             "query-id": "dforce-optimism"
+          },
+          "decentralized-network": {
+            "slug": "dforce-optimism",
+            "query-id": "6AmkakXwadWiZ2jN7oJcFreWmKG1nZrT5P8om52upYPd"
           }
         }
       },
@@ -1882,6 +1894,10 @@
           "hosted-service": {
             "slug": "iron-bank-optimism",
             "query-id": "iron-bank-optimism"
+          },
+          "decentralized-network": {
+            "slug": "iron-bank-optimism",
+            "query-id": "4WKePP5QfwrW6Hfd8YKWHuivivmdxPubuP45BryeGo4g"
           }
         }
       }
@@ -2092,6 +2108,10 @@
           "hosted-service": {
             "slug": "sonne-finance-optimism",
             "query-id": "sonne-finance-optimism"
+          },
+          "decentralized-network": {
+            "slug": "sonne-finance-optimism",
+            "query-id": "DQqb7FiQ1joLhESkAwvAYiuXhwfz4zf6qHmbt7stnec8"
           }
         }
       }
@@ -2452,6 +2472,10 @@
           "hosted-service": {
             "slug": "curve-finance-optimism",
             "query-id": "curve-finance-optimism"
+          },
+          "decentralized-network": {
+            "slug": "curve-finance-optimism",
+            "query-id": "CXDZPduZE6nWuWEkSzWkRoJSSJ6CneSqiDxdnhhURShX"
           }
         }
       },
@@ -2817,6 +2841,10 @@
           "hosted-service": {
             "slug": "mummy-finance-optimism",
             "query-id": "mummy-finance-optimism"
+          },
+          "decentralized-network": {
+            "slug": "mummy-finance-optimism",
+            "query-id": "GvgdFS6dFXCSXwq9PDTdcs5uZzwZYuTrqFjiTRC3jy54"
           }
         },
         "files": {
@@ -3576,6 +3604,10 @@
           "hosted-service": {
             "slug": "saddle-finance-optimism",
             "query-id": "saddle-finance-optimism"
+          },
+          "decentralized-network": {
+            "slug": "saddle-finance-optimism",
+            "query-id": "CFu1DWY9DyiC25WRmGreowMyuvLB27JfNRCa8rKkTDjK"
           }
         }
       }
@@ -3972,6 +4004,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-optimism",
             "query-id": "uniswap-v3-optimism"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-optimism",
+            "query-id": "EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9"
           }
         }
       },
@@ -4666,6 +4702,10 @@
           "hosted-service": {
             "slug": "qidao-optimism",
             "query-id": "qidao-optimism"
+          },
+          "decentralized-network": {
+            "slug": "qidao-optimism",
+            "query-id": "4JbWxzxBNCpAaVz72Gt2UthgiwcWZQLKDBhmSE7wKY2K"
           }
         }
       },
@@ -5716,6 +5756,10 @@
           "hosted-service": {
             "slug": "velodrome-optimism",
             "query-id": "velodrome-optimism"
+          },
+          "decentralized-network": {
+            "slug": "velodrome-optimism",
+            "query-id": "7tA4PY1VmbycJeoVtn2mjQK4NbozgwTuZgrxDTxzEDL1"
           }
         }
       }
@@ -5746,6 +5790,10 @@
           "hosted-service": {
             "slug": "velodrome-v2-optimism",
             "query-id": "velodrome-v2-optimism"
+          },
+          "decentralized-network": {
+            "slug": "velodrome-v2-optimism",
+            "query-id": "A4Y1A82YhSLTn998BVVELC8eWzhi992k4ZitByvssxqA"
           }
         }
       }
@@ -7779,6 +7827,10 @@
           "hosted-service": {
             "slug": "multichain-optimism",
             "query-id": "multichain-optimism"
+          },
+          "decentralized-network": {
+            "slug": "multichain-optimism",
+            "query-id": "FZkvvW6rZJxJk1E3LqhVWHRAb8oWoWZAX563Y94C6GaF"
           }
         },
         "files": {
@@ -7968,6 +8020,10 @@
           "hosted-service": {
             "slug": "stargate-optimism",
             "query-id": "stargate-optimism"
+          },
+          "decentralized-network": {
+            "slug": "stargate-optimism",
+            "query-id": "7NAF7ZtNtJiXkfCFkTSAyFbfLLfUFa55UgK5woxPxZ46"
           }
         }
       },
@@ -8221,6 +8277,10 @@
           "hosted-service": {
             "slug": "across-v2-optimism",
             "query-id": "across-v2-optimism"
+          },
+          "decentralized-network": {
+            "slug": "across-v2-optimism",
+            "query-id": "GY9s64KVsRkW4Q8pCBKQePyDdcUV1TV1ArWFzvMv2qVb"
           }
         },
         "files": {
@@ -8377,6 +8437,10 @@
           "hosted-service": {
             "slug": "hop-protocol-optimism",
             "query-id": "hop-protocol-optimism"
+          },
+          "decentralized-network": {
+            "slug": "hop-protocol-optimism",
+            "query-id": "KoMGmd2d1VMukusmf98SdWCSKH5ZP5UEUDHKrKpY74D"
           }
         },
         "files": {
@@ -8618,6 +8682,10 @@
           "hosted-service": {
             "slug": "optimism-bridge-v2-optimism",
             "query-id": "optimism-bridge-v2-optimism"
+          },
+          "decentralized-network": {
+            "slug": "optimism-bridge-v2-optimism",
+            "query-id": "4aUWDFLz4sVYKZDw4JDJLk8vjify1Rqij7UGFozNxA8k"
           }
         },
         "files": {
@@ -8942,6 +9010,10 @@
           "hosted-service": {
             "slug": "cbridge-optimism",
             "query-id": "cbridge-optimism"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-optimism",
+            "query-id": "GEy4r8C2cMku1TTfjzC751teQZ4dvVxXiW1F6K4fue2K"
           }
         }
       },
@@ -9443,6 +9515,10 @@
           "hosted-service": {
             "slug": "mux-protocol-optimism",
             "query-id": "mux-protocol-optimism"
+          },
+          "decentralized-network": {
+            "slug": "mux-protocol-optimism",
+            "query-id": "7hUM4US9DPz6JqLD6ySqwFmLq4XiAF7cEZLmEesQnYgR"
           }
         },
         "files": {
@@ -9473,6 +9549,10 @@
           "hosted-service": {
             "slug": "kwenta-optimism",
             "query-id": "kwenta-optimism"
+          },
+          "decentralized-network": {
+            "slug": "kwenta-optimism",
+            "query-id": "5sbJJTTJQQ4kYuVYNBVw9sX8C5juRpVJNLHg7uFugw2e"
           }
         },
         "files": {
