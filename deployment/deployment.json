@@ -8146,7 +8146,7 @@
           }
         },
         "files": {
-          "template": "polygon.bridge.template.yaml"
+          "template": "polygon.mainnet.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -8168,7 +8168,7 @@
           }
         },
         "files": {
-          "template": "polygon.bridge.template.yaml"
+          "template": "polygon.polygon.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
