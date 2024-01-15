@@ -104,11 +104,6 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleMarketListed(event: MarketListed): void {
-  log.warning("[handleMarketListed] market: {} tx: {}", [
-    event.params.vToken.toHexString(),
-    event.transaction.hash.toHexString(),
-  ]);
-
   CTokenTemplate.create(event.params.vToken);
   VTokenV2Template.create(event.params.vToken);
 
