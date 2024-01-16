@@ -3,6 +3,7 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getMarket,
   getOrCreateLendingProtocol,
+  getOrCreateStableBorrowerInterestRate,
   getOrCreateToken,
 } from "../common/getters";
 import {
@@ -30,9 +31,10 @@ import {
   updateUsageMetricsHourlySnapshot,
   updateUsageMetricsDailySnapshot,
 } from "../common/snapshot";
-import { BIGINT_MINUS_ONE, UsageType } from "../utils/constants";
+import { BIGINT_MINUS_ONE, INT_TWO, UsageType } from "../utils/constants";
 
 import { _InProgressLiquidate } from "../../generated/schema";
+import { bigIntToBigDecimal } from "../utils/numbers";
 
 export function helperDepositCollateral(
   marketId: Address,
@@ -146,6 +148,7 @@ export function helperPayBackToken(
 
   createRepay(protocol, market, borrowToken, amount, event);
   updateUsage(protocol, from);
+  // Repayment Fee
   updateRevenue(protocol, market, token, closingFee);
   updateDepositBalance(
     protocol,
@@ -224,6 +227,7 @@ export function helperLiquidateVault(
     event
   );
   updateUsage(protocol, liquidator);
+  // Repayment Fee
   updateRevenue(protocol, market, token, closingFee);
   updateDepositBalance(
     protocol,
@@ -343,4 +347,18 @@ export function helperWithdrawCollateral(
   protocol.save();
 
   updateUSDValues(protocol, event);
+}
+
+export function helperUpdatedInterestRate(
+  marketId: Address,
+  interestRate: BigInt
+): void {
+  const market = getMarket(marketId);
+
+  const borrowIR = getOrCreateStableBorrowerInterestRate(market.id);
+  borrowIR.rate = bigIntToBigDecimal(interestRate, INT_TWO);
+  borrowIR.save();
+
+  market.rates = [borrowIR.id];
+  market.save();
 }

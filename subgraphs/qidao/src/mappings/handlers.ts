@@ -12,6 +12,7 @@ import {
   helperDepositCollateral,
   helperLiquidateVault,
   helperPayBackToken,
+  helperUpdatedInterestRate,
   helperWithdrawCollateral,
 } from "./helpers";
 
@@ -23,6 +24,7 @@ import {
   OwnershipTransferred,
   PayBackToken,
   WithdrawCollateral,
+  UpdatedInterestRate,
 } from "../../generated/templates/Vault/ERC20QiStablecoin";
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
@@ -91,4 +93,11 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const from = event.transaction.from;
 
   helperWithdrawCollateral(marketId, amount, from, event);
+}
+
+export function handleUpdatedInterestRate(event: UpdatedInterestRate): void {
+  const marketId = event.address;
+  const interestRate = event.params.interestRate;
+
+  helperUpdatedInterestRate(marketId, interestRate);
 }

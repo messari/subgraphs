@@ -111,7 +111,7 @@ export function getOrCreateToken(
                 token._market!,
               ]);
             } else {
-              decimals = decimalsCall.value;
+              decimals = decimalsCall.value.toI32();
             }
           }
 
@@ -267,13 +267,15 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateStableBorrowerInterestRate(
   marketID: string
 ): InterestRate {
-  const rate = new InterestRate(
-    `${InterestRateSide.BORROWER}-${InterestRateType.STABLE}-${marketID}`
-  );
-  rate.rate = BIGDECIMAL_ZERO;
-  rate.side = InterestRateSide.BORROWER;
-  rate.type = InterestRateType.STABLE;
-  rate.save();
+  const id = `${InterestRateSide.BORROWER}-${InterestRateType.STABLE}-${marketID}`;
+  let rate = InterestRate.load(id);
+  if (!rate) {
+    rate = new InterestRate(id);
+    rate.rate = BIGDECIMAL_ZERO;
+    rate.side = InterestRateSide.BORROWER;
+    rate.type = InterestRateType.STABLE;
+    rate.save();
+  }
   return rate;
 }
 
@@ -318,6 +320,9 @@ export function createERC20Market(
     market._borrowToken = borrowToken.id;
     market._borrowBalance = BIGINT_ZERO;
     market._performanceFee = BIGINT_ZERO;
+    market._interestFee = BIGINT_ZERO;
+    market._lastUpdateTimestamp = BIGINT_ZERO;
+    market._lastUpdateBlockNumber = BIGINT_ZERO;
 
     market.save();
 
@@ -366,6 +371,9 @@ export function createMaticMarket(
     market._borrowToken = borrowToken.id;
     market._borrowBalance = BIGINT_ZERO;
     market._performanceFee = BIGINT_ZERO;
+    market._interestFee = BIGINT_ZERO;
+    market._lastUpdateTimestamp = BIGINT_ZERO;
+    market._lastUpdateBlockNumber = BIGINT_ZERO;
 
     market.save();
 

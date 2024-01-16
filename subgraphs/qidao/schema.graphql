@@ -590,6 +590,15 @@ type Market @entity @regularPolling {
 
   " Cumulative performance fee for the market "
   _performanceFee: BigInt!
+
+  " Cumulative interest fee for the market "
+  _interestFee: BigInt!
+
+  " Field to track the timestamp of the last update "
+  _lastUpdateTimestamp: BigInt!
+
+  " Field to track the blocknumber of the last update "
+  _lastUpdateBlockNumber: BigInt!
 }
 
 #################################

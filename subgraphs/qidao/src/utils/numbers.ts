@@ -11,6 +11,10 @@ export function bigIntToBigDecimal(
   );
 }
 
+export function bigDecimalToBigInt(quantity: BigDecimal): BigInt {
+  return BigInt.fromString(quantity.toString().split(".")[0]);
+}
+
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   let sum = BigDecimal.fromString("0");
   for (let i = 0; i < prices.length; i++) {

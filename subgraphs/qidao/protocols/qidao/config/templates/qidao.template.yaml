@@ -192,6 +192,8 @@ dataSources:
           handler: handleLiquidateVault
         - event: WithdrawCollateral(uint256,uint256)
           handler: handleWithdrawCollateral
+        - event: UpdatedInterestRate(uint256)
+          handler: handleUpdatedInterestRate
       file: ./src/mappings/handlers.ts
   {{/erc20Vaults}}
 # Template is only used for imports

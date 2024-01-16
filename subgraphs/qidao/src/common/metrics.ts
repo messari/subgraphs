@@ -3,6 +3,7 @@ import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   getMarket,
   getOrCreateFinancialsDailySnapshot,
+  getOrCreateStableBorrowerInterestRate,
   getOrCreateToken,
 } from "./getters";
 import {
@@ -14,12 +15,14 @@ import {
   BIGDECIMAL_MINUS_ONE,
   BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   Network,
   PERFORMANCE_MANAGER_ADDRESS,
+  SECONDS_PER_YEAR,
   UsageType,
 } from "../utils/constants";
 import { uppercaseNetwork } from "../utils/strings";
-import { bigIntToBigDecimal } from "../utils/numbers";
+import { bigDecimalToBigInt, bigIntToBigDecimal } from "../utils/numbers";
 
 import {
   Account,
@@ -118,81 +121,90 @@ export function updateUSDValues(
   const allMarkets = protocol._markets;
   for (let i = 0; i < allMarkets.length; i++) {
     const market = getMarket(Address.fromString(allMarkets[i]));
-    const token = getOrCreateToken(
-      Address.fromString(market.inputToken),
-      event
-    );
-    const borrowToken = getOrCreateToken(
-      Address.fromString(market._borrowToken),
-      event
-    );
 
-    market.inputTokenPriceUSD = token.lastPriceUSD!;
-    market.totalValueLockedUSD = bigIntToBigDecimal(
-      market.inputTokenBalance,
-      token.decimals
-    ).times(market.inputTokenPriceUSD);
-    protocolTVL = protocolTVL.plus(market.totalValueLockedUSD);
+    if (event.block.number.minus(market._lastUpdateBlockNumber) > BIGINT_ZERO) {
+      const token = getOrCreateToken(
+        Address.fromString(market.inputToken),
+        event
+      );
+      const borrowToken = getOrCreateToken(
+        Address.fromString(market._borrowToken),
+        event
+      );
 
-    market.totalDepositBalanceUSD = market.totalValueLockedUSD;
-    protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(
-      market.totalDepositBalanceUSD
-    );
-    market.totalBorrowBalanceUSD = bigIntToBigDecimal(
-      market._borrowBalance,
-      borrowToken.decimals
-    ).times(borrowToken.lastPriceUSD!);
-    protocolTotalBorrowBalanceUSD = protocolTotalBorrowBalanceUSD.plus(
-      market.totalBorrowBalanceUSD
-    );
+      market.inputTokenPriceUSD = token.lastPriceUSD!;
+      market.totalValueLockedUSD = bigIntToBigDecimal(
+        market.inputTokenBalance,
+        token.decimals
+      ).times(market.inputTokenPriceUSD);
+      protocolTVL = protocolTVL.plus(market.totalValueLockedUSD);
 
-    if (
-      [
-        Network.ARBITRUM_ONE,
-        Network.MAINNET,
-        Network.MATIC,
-        Network.OPTIMISM,
-      ].includes(uppercaseNetwork(dataSource.network()))
-    ) {
-      const performanceFeeManagerContract = PerformanceFeeManager.bind(
-        Address.fromString(
-          PERFORMANCE_MANAGER_ADDRESS.get(
-            uppercaseNetwork(dataSource.network())
+      market.totalDepositBalanceUSD = market.totalValueLockedUSD;
+      protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(
+        market.totalDepositBalanceUSD
+      );
+      market.totalBorrowBalanceUSD = bigIntToBigDecimal(
+        market._borrowBalance,
+        borrowToken.decimals
+      ).times(borrowToken.lastPriceUSD!);
+      protocolTotalBorrowBalanceUSD = protocolTotalBorrowBalanceUSD.plus(
+        market.totalBorrowBalanceUSD
+      );
+
+      // Performance Fee
+      let performanceFeeDelta = BIGINT_ZERO;
+      if (
+        [
+          Network.ARBITRUM_ONE,
+          Network.MAINNET,
+          Network.MATIC,
+          Network.OPTIMISM,
+        ].includes(uppercaseNetwork(dataSource.network()))
+      ) {
+        const performanceFeeManagerContract = PerformanceFeeManager.bind(
+          Address.fromString(
+            PERFORMANCE_MANAGER_ADDRESS.get(
+              uppercaseNetwork(dataSource.network())
+            )
           )
-        )
-      );
-      const tokenBalancesCall = performanceFeeManagerContract.try_tokenBalances(
-        Address.fromString(market.inputToken)
-      );
-      if (!tokenBalancesCall.reverted) {
-        const performanceFeeDelta = tokenBalancesCall.value.minus(
-          market._performanceFee
         );
-        market._performanceFee = tokenBalancesCall.value;
-        updateRevenue(protocol, market, token, performanceFeeDelta);
-
-        updateMarketHourlySnapshotRevenue(
-          market,
-          token,
-          performanceFeeDelta,
-          event
-        );
-        updateMarketDailySnapshotRevenue(
-          market,
-          token,
-          performanceFeeDelta,
-          event
-        );
-        updateFinancialsDailySnapshotRevenue(
-          protocol,
-          token,
-          performanceFeeDelta,
-          event
-        );
+        const tokenBalancesCall =
+          performanceFeeManagerContract.try_tokenBalances(
+            Address.fromString(market.inputToken)
+          );
+        if (!tokenBalancesCall.reverted) {
+          performanceFeeDelta = tokenBalancesCall.value.minus(
+            market._performanceFee
+          );
+          market._performanceFee = tokenBalancesCall.value;
+        }
       }
-    }
 
-    market.save();
+      // Interest Fee
+      const borrowIR = getOrCreateStableBorrowerInterestRate(market.id);
+      const interestFeePerSecond = bigDecimalToBigInt(
+        bigIntToBigDecimal(market._borrowBalance, borrowToken.decimals)
+          .times(borrowIR.rate)
+          .div(SECONDS_PER_YEAR)
+      );
+      const timestampDelta = event.block.timestamp.minus(
+        market._lastUpdateTimestamp
+      );
+      const interestFeeDelta = interestFeePerSecond.times(timestampDelta);
+      market._interestFee = market._interestFee.plus(interestFeeDelta);
+
+      const feeDelta = performanceFeeDelta.plus(interestFeeDelta);
+      if (feeDelta > BIGINT_ZERO) {
+        updateRevenue(protocol, market, token, feeDelta);
+        updateMarketHourlySnapshotRevenue(market, token, feeDelta, event);
+        updateMarketDailySnapshotRevenue(market, token, feeDelta, event);
+        updateFinancialsDailySnapshotRevenue(protocol, token, feeDelta, event);
+      }
+
+      market._lastUpdateTimestamp = event.block.timestamp;
+      market._lastUpdateBlockNumber = event.block.number;
+      market.save();
+    }
   }
   protocol.totalValueLockedUSD = protocolTVL;
   protocol.totalDepositBalanceUSD = protocolTotalDepositBalanceUSD;
