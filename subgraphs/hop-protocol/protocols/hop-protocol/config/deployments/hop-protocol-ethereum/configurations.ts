@@ -18,6 +18,8 @@ import {
   BaseAmm,
   LineaAmm,
   LineaToken,
+  PolygonZKEVMAmm,
+  PolygonZKEVMToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
@@ -212,6 +214,17 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     }
   }
 
+  getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    if (bridgeAddress == MainnetBridge.ETH) return PolygonZKEVMAmm.ETH;
+    else {
+      log.critical("PolygonZKEVM Pool not found for bridge: {}", [
+        bridgeAddress,
+      ]);
+
+      return "";
+    }
+  }
+
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
     if (chainId == "42161") {
       return this.getArbitrumPoolAddressFromBridgeAddress(bridgeAddress); //Arbitrum
@@ -227,6 +240,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return this.getBasePoolAddressFromBridgeAddress(bridgeAddress); //Base
     } else if (chainId == "59144") {
       return this.getLineaPoolAddressFromBridgeAddress(bridgeAddress); //Linea
+    } else if (chainId == "1101") {
+      return this.getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress); //Polygon zkEVM
     } else {
       log.critical("Chain not found: {}", [chainId]);
       return "";
@@ -299,6 +314,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       OptimismAmm.ETH,
       BaseAmm.ETH,
       LineaAmm.ETH,
+      PolygonZKEVMAmm.ETH,
     ];
   }
 
@@ -312,6 +328,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       ArbitrumNovaToken.ETH,
       BaseToken.ETH,
       LineaToken.ETH,
+      PolygonZKEVMToken.ETH,
     ];
   }
 
@@ -394,6 +411,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
       return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "59144")
       return this.getLineaCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "1101")
+      return this.getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found: {}", [chainId]);
       return "";
@@ -459,6 +478,15 @@ export class HopProtocolEthereumConfigurations implements Configurations {
     if (tokenAddress == MainnetToken.ETH) return LineaToken.ETH;
     else {
       log.critical("Linea CrossToken not found for token: {}", [tokenAddress]);
+      return "";
+    }
+  }
+  getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == MainnetToken.ETH) return PolygonZKEVMToken.ETH;
+    else {
+      log.critical("PolygonZKEVM CrossToken not found for token: {}", [
+        tokenAddress,
+      ]);
       return "";
     }
   }

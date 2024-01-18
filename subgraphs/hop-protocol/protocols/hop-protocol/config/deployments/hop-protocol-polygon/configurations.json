@@ -4,8 +4,8 @@
   "subgraphName": "hop-polygon",
   "deployment": "HOP_PROTOCOL_POLYGON",
   "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": 0,
+  "subgraphId": "QmchHeVaxLfuBt5UZ5NzbhofvrqhMgyrjja9JV6KorBHky",
+  "graftStartBlock": 52139710,
   "amms": [
     {
       "dataSourceName": "HopL2Amm",

@@ -535,6 +535,22 @@ export namespace LineaRewardToken {
   export const ETH = "0xa50395bdeaca7062255109fede012efe63d6d402";
 }
 
+export namespace PolygonZKEVMBridge {
+  export const ETH = "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d";
+}
+export namespace PolygonZKEVMAmm {
+  export const ETH = "0x0a6b1904369fE59E002ad0713ae89d4E3dF5A7Cf";
+}
+export namespace PolygonZKEVMToken {
+  export const ETH = "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9";
+}
+export namespace PolygonZKEVMHToken {
+  export const ETH = "0x652a38FA87f60A122AEF360eEeFcaf6258eDdF6A";
+}
+export namespace PolygonZKEVMRewardToken {
+  export const ETH = "0xfF21e82a4Bc305BCE591530A68628192b5b6B6FD";
+}
+
 export const priceTokens = [
   OptimismToken.USDC,
   OptimismToken.USDT,
@@ -645,6 +661,7 @@ export const HOP_REWARDS = [
   XdaiRewardToken.USDT_B,
   BaseRewardToken.USDC,
   BaseRewardToken.ETH,
+  PolygonZKEVMRewardToken.ETH,
 ];
 export const OP_REWARDS = [
   OptimismRewardToken.SNX_B,
