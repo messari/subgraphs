@@ -195,7 +195,9 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
   getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress: string): string {
     if (tokenAddress == ArbitrumToken.ETH) return PolygonZKEVMToken.ETH;
     else {
-      log.critical("PolygonZKEVM CrossToken not found for token: {}", [tokenAddress]);
+      log.critical("PolygonZKEVM CrossToken not found for token: {}", [
+        tokenAddress,
+      ]);
     }
     return "";
   }

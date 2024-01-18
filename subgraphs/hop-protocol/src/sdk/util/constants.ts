@@ -198,7 +198,7 @@ export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_TEN_TO_SIX = BigInt.fromString("10").pow(6);
 export const EIGHTY_SIX_FOUR_HUNDRED = 86400;
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -223,7 +223,7 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
 );
 
 export const SECONDS_PER_DAY_BI = BigInt.fromI32(SECONDS_PER_DAY);
@@ -536,19 +536,19 @@ export namespace LineaRewardToken {
 }
 
 export namespace PolygonZKEVMBridge {
-  export const ETH = "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d";
+  export const ETH = "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d";
 }
 export namespace PolygonZKEVMAmm {
-  export const ETH = "0x0a6b1904369fE59E002ad0713ae89d4E3dF5A7Cf";
+  export const ETH = "0x0a6b1904369fe59e002ad0713ae89d4e3df5a7cf";
 }
 export namespace PolygonZKEVMToken {
-  export const ETH = "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9";
+  export const ETH = "0x4f9a0e7fd2bf6067db6994cf12e4495df938e6e9";
 }
 export namespace PolygonZKEVMHToken {
-  export const ETH = "0x652a38FA87f60A122AEF360eEeFcaf6258eDdF6A";
+  export const ETH = "0x652a38fa87f60a122aef360eeefcaf6258eddf6a";
 }
 export namespace PolygonZKEVMRewardToken {
-  export const ETH = "0xfF21e82a4Bc305BCE591530A68628192b5b6B6FD";
+  export const ETH = "0xff21e82a4bc305bce591530a68628192b5b6b6fd";
 }
 
 export const priceTokens = [
