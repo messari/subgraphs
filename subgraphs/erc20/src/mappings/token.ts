@@ -1,8 +1,8 @@
-import { Bytes, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigInt, ethereum, log, json, Value } from "@graphprotocol/graph-ts";
 
-import { ERC20, Transfer } from "../../generated/templates/StandardToken/ERC20";
-import { Burn } from "../../generated/templates/BurnableToken/Burnable";
-import { Mint } from "../../generated/templates/MintableToken/Mintable";
+import { ERC20, Transfer } from "../../generated/StandardToken/ERC20";
+import { Burn } from "../../generated/BurnableToken/Burnable";
+import { Mint } from "../../generated/MintableToken/Mintable";
 
 import {
   Token,
@@ -28,9 +28,22 @@ import {
   isNewAccount,
   updateAccountBalanceDailySnapshot,
 } from "./account";
+import { createToken } from "./registry";
+
+function loadToken(address: string): Token {
+  let token = Token.load(address);
+
+  if(token == null){
+    let value = json.fromString(`["${address}", ""]`)
+    createToken(value, Value.fromString(""))
+    token = Token.load(address)
+  }
+
+  return token!;
+}
 
 export function handleTransfer(event: Transfer): void {
-  let token = Token.load(event.address.toHex());
+  let token = loadToken(event.address.toHex());
 
   if (token != null) {
     if (token.name == "") {
@@ -120,7 +133,7 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleBurn(event: Burn): void {
-  let token = Token.load(event.address.toHex());
+  let token = loadToken(event.address.toHex());
 
   if (token != null) {
     let amount = event.params.value;
@@ -155,7 +168,7 @@ export function handleBurn(event: Burn): void {
 }
 
 export function handleMint(event: Mint): void {
-  let token = Token.load(event.address.toHex());
+  let token = loadToken(event.address.toHex());
 
   if (token != null) {
     let amount = event.params.amount;
