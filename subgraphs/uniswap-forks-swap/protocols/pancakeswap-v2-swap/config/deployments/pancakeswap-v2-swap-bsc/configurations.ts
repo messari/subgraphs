@@ -33,6 +33,9 @@ export class PancakeswapV2BscConfigurations implements Configurations {
     return "0xca143ce32fe78f1f7019d7d551a6402fc5350c73";
   }
   getBrokenERC20Tokens(): string[] {
-    return ["0xfbbd78a1bf76e43d5fc8f1f880f72718040acbe5"];
+    return [
+      "0xfbbd78a1bf76e43d5fc8f1f880f72718040acbe5", // 1
+      "0x14111b627d35d3d54505247b4ef1a0754eb02eb7", // ZGLDao
+    ];
   }
 }
