@@ -321,7 +321,7 @@ function handleTransferEvent(
       // It means the receiver is a new holder
       toAddressIsNewHolderNum = BIGINT_ONE;
     }
-    balance = getOrCreateAccountBalance(getOrCreateAccount(destination),token);
+    balance = getOrCreateAccountBalance(getOrCreateAccount(destination), token);
     if (balance.amount == BIGINT_ZERO) {
       // It means the receiver's token balance is 0 before transferal.
       toBalanceIsZeroNum = BIGINT_ONE;
