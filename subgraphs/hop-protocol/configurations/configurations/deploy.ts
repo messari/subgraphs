@@ -4,4 +4,5 @@ export namespace Deploy {
   export const HOP_PROTOCOL_OPTIMISM = 2;
   export const HOP_PROTOCOL_POLYGON = 3;
   export const HOP_PROTOCOL_XDAI = 4;
+  export const HOP_PROTOCOL_POLYGON_ZKEVM = 5;
 }

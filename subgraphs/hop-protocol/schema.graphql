@@ -22,6 +22,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
+  POLYGON_ZKEVM
   GNOSIS
   UBIQ
   SONGBIRD

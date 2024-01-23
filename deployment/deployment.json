@@ -8378,7 +8378,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8404,7 +8404,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8430,7 +8430,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8456,7 +8456,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8482,7 +8482,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8493,6 +8493,28 @@
           "decentralized-network": {
             "slug": "hop-protocol-polygon",
             "query-id": "iLsL5mqiwjQhdGs3XfYBdLhaKdE4yDR73iTg2PSRr1E"
+          }
+        },
+        "files": {
+          "template": "hop-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "hop-protocol-polygon-zkevm": {
+        "network": "polygon-zkevm",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "hop-protocol-polygon-zkevm",
+            "query-id": "hop-protocol-polygon-zkevm"
           }
         },
         "files": {

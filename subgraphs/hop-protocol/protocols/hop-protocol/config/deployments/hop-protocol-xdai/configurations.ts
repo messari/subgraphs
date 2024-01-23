@@ -17,6 +17,7 @@ import {
   ArbitrumNovaAmm,
   BaseToken,
   LineaToken,
+  PolygonZKEVMToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
@@ -79,6 +80,8 @@ export class HopProtocolxDaiConfigurations implements Configurations {
       return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "59144")
       return this.getLineaCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "1101")
+      return this.getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found", []);
       return "";
@@ -195,6 +198,17 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getLineaCrossTokenFromTokenAddress] LineaCrossToken not found for token: {}",
+        [tokenAddress]
+      );
+    }
+    return "";
+  }
+
+  getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == XdaiToken.ETH) return PolygonZKEVMToken.ETH;
+    else {
+      log.critical(
+        "[getPolygonZKEVMCrossTokenFromTokenAddress] PolygonZKEVMCrossToken not found for token: {}",
         [tokenAddress]
       );
     }
@@ -340,6 +354,9 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
+  getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress: string): string {
     return bridgeAddress;
   }
 

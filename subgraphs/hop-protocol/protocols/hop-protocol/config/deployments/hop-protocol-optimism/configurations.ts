@@ -17,6 +17,7 @@ import {
   ArbitrumNovaAmm,
   BaseToken,
   LineaToken,
+  PolygonZKEVMToken,
 } from "../../../../../src/sdk/util/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 export class HopProtocolOptimismConfigurations implements Configurations {
@@ -33,6 +34,9 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
+  getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress: string): string {
     return bridgeAddress;
   }
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
@@ -113,6 +117,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
       return this.getBaseCrossTokenFromTokenAddress(tokenAddress);
     else if (chainId == "59144")
       return this.getLineaCrossTokenFromTokenAddress(tokenAddress);
+    else if (chainId == "1101")
+      return this.getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress);
     else {
       log.critical("Chain not found: {}", [chainId]);
       return "";
@@ -201,6 +207,16 @@ export class HopProtocolOptimismConfigurations implements Configurations {
     if (tokenAddress == OptimismToken.ETH) return LineaToken.ETH;
     else {
       log.critical("Linea CrossToken not found for token: {}", [tokenAddress]);
+    }
+    return "";
+  }
+
+  getPolygonZKEVMCrossTokenFromTokenAddress(tokenAddress: string): string {
+    if (tokenAddress == OptimismToken.ETH) return PolygonZKEVMToken.ETH;
+    else {
+      log.critical("PolygonZKEVM CrossToken not found for token: {}", [
+        tokenAddress,
+      ]);
     }
     return "";
   }
