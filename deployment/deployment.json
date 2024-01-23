@@ -8515,6 +8515,10 @@
           "hosted-service": {
             "slug": "hop-protocol-polygon-zkevm",
             "query-id": "hop-protocol-polygon-zkevm"
+          },
+          "decentralized-network": {
+            "slug": "hop-protocol-polygon-zkevm",
+            "query-id": "EkkvCmBiEPiJ5LkaSPxpuAmMouSUN5FZrdrKu7nBY5p9"
           }
         },
         "files": {
