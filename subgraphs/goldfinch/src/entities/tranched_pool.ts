@@ -602,7 +602,10 @@ export function updatePoolRewardsClaimable(
   );
   const poolTokenIds = tranchedPool.tokens;
   for (let i = 0; i < poolTokenIds.length; i++) {
-    const poolToken = assert(PoolToken.load(poolTokenIds[i]));
+    const poolToken = PoolToken.load(poolTokenIds[i]);
+    if (!poolToken) {
+      continue;
+    }
     poolToken.rewardsClaimable =
       backerRewardsContract.poolTokenClaimableRewards(
         BigInt.fromString(poolToken.id)
@@ -624,7 +627,10 @@ export function updatePoolTokensRedeemable(tranchedPool: TranchedPool): void {
   );
   const poolTokenIds = tranchedPool.tokens;
   for (let i = 0; i < poolTokenIds.length; i++) {
-    const poolToken = assert(PoolToken.load(poolTokenIds[i]));
+    const poolToken = PoolToken.load(poolTokenIds[i]);
+    if (!poolToken) {
+      continue;
+    }
     const availableToWithdrawResult =
       tranchedPoolContract.try_availableToWithdraw(
         BigInt.fromString(poolToken.id)
