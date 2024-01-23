@@ -35,7 +35,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getPoolAddressFromTokenAddress] Pool not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
       return "";
     }
@@ -122,7 +122,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else {
       log.critical(
         "[getArbitrumCrossTokenFromTokenAddress] ArbitrumCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -142,7 +142,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else {
       log.critical(
         "[getPolygonCrossTokenFromTokenAddress] PolygonCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -160,7 +160,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else {
       log.critical(
         "[getOptimismCrossTokenFromTokenAddress] OptimismCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -175,7 +175,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getMainnetCrossTokenFromTokenAddress] MainnetCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -187,7 +187,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getBaseCrossTokenFromTokenAddress] BaseCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -198,7 +198,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getLineaCrossTokenFromTokenAddress] LineaCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -209,7 +209,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getPolygonZKEVMCrossTokenFromTokenAddress] PolygonZKEVMCrossToken not found for token: {}",
-        [tokenAddress],
+        [tokenAddress]
       );
     }
     return "";
@@ -229,7 +229,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     } else {
       log.critical(
         "[getTokenAddressFromBridgeAddress] Token not found for bridge: {}",
-        [bridgeAddress],
+        [bridgeAddress]
       );
       return [""];
     }
@@ -246,7 +246,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     else {
       log.critical(
         "[getTokenAddressFromPoolAddress] Token not found for pool: {}",
-        [poolAddress],
+        [poolAddress]
       );
       return [""];
     }
@@ -354,6 +354,9 @@ export class HopProtocolxDaiConfigurations implements Configurations {
     return bridgeAddress;
   }
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
+  getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress: string): string {
     return bridgeAddress;
   }
 

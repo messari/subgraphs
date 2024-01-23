@@ -31,6 +31,7 @@ export namespace Network {
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
+  export const POLYGON_ZKEVM = "POLYGON_ZKEVM";
   export const XDAI = "XDAI"; // aka Gnosis Chain
 
   // other networks
@@ -198,7 +199,7 @@ export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_TEN_TO_SIX = BigInt.fromString("10").pow(6);
 export const EIGHTY_SIX_FOUR_HUNDRED = 86400;
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -223,7 +224,7 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 
 export const SECONDS_PER_DAY_BI = BigInt.fromI32(SECONDS_PER_DAY);

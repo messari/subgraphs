@@ -36,6 +36,9 @@ export class HopProtocolPolygonConfigurations implements Configurations {
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
     return bridgeAddress;
   }
+  getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+    return bridgeAddress;
+  }
 
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
     return bridgeAddress || chainId;
