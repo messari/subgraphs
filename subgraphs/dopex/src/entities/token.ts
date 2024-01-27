@@ -1,4 +1,10 @@
-import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/BasicWeeklyCalls/ERC20";
 import { Token, RewardToken } from "../../generated/schema";
 import { getUsdPricePerToken } from "../prices";
@@ -12,7 +18,7 @@ import {
 export function getOrCreateToken(
   event: ethereum.Event,
   tokenAddress: Address,
-  getPrice: boolean = true
+  getPrice: boolean = true,
 ): Token {
   let token = Token.load(tokenAddress);
 
@@ -56,7 +62,7 @@ export function getOrCreateToken(
 export function updateTokenPrice(
   event: ethereum.Event,
   token: Token,
-  tokenPriceUSD: BigDecimal
+  tokenPriceUSD: BigDecimal,
 ): void {
   token.lastPriceUSD = tokenPriceUSD;
   token.lastPriceBlockNumber = event.block.number;
@@ -65,7 +71,7 @@ export function updateTokenPrice(
 
 export function getOrCreateRewardToken(
   event: ethereum.Event,
-  address: Address
+  address: Address,
 ): RewardToken {
   const id = Bytes.fromI32(INT_ZERO).concat(address);
   let rewardToken = RewardToken.load(id);
@@ -101,10 +107,19 @@ function fetchTokenSymbol(tokenAddress: Address): string {
 
 function fetchTokenDecimals(tokenAddress: Address): number {
   const tokenContract = ERC20.bind(tokenAddress);
-  const call = tokenContract.try_decimals();
+  const call = tokenContract.tryCall("decimals", "decimals():(uint8)", []);
   if (call.reverted) {
     return 0;
   } else {
-    return call.value;
+    if (
+      call.value.kind == ethereum.ValueKind.INT ||
+      call.value.kind == ethereum.ValueKind.UINT
+    ) {
+      // types(uint8).max=255
+      if (call.value.toBigInt().le(BigInt.fromI32(255))) {
+        return call.value;
+      }
+    }
+    return 0;
   }
 }
