@@ -92,6 +92,9 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
     return BigDecimal.fromString("100000");
   }
   getBrokenERC20Tokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList([
+      "0x000000000000b91b6956fead1dda24c66aa6b972",
+      "0x0000000000e586517bccb5ec52e70119299d2c9c",
+    ]);
   }
 }
