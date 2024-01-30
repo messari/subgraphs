@@ -31,6 +31,9 @@ import {
   BIGINT_ZERO,
   InterestRateSide,
   PositionSide,
+  SECONDS_PER_HOUR,
+  SECONDS_PER_DAY,
+  ActivityInterval,
 } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import {
@@ -39,18 +42,13 @@ import {
   getMarket,
   getLiquidateEvent,
   getMIMAddress,
-  getOrCreateUsageMetricsHourlySnapshot,
-  getOrCreateUsageMetricsDailySnapshot,
-  getOrCreateMarketHourlySnapshot,
-  getOrCreateMarketDailySnapshot,
-  getOrCreateFinancials,
+  getOrCreateActivityHelper,
 } from "./common/getters";
 import { Cauldron as CauldronDataSource } from "../generated/templates";
 import {
   updateUsageMetrics,
   updateTVL,
   updateMarketStats,
-  updateMarketMetrics,
   updateFinancials,
   updateTotalBorrows,
   updateBorrowAmount,
@@ -60,6 +58,7 @@ import {
   createLiquidateEvent,
   updateTokenPrice,
 } from "./common/setters";
+import { takeMarketSnapshots, takeProtocolSnapshots } from "./common/snapshots";
 import {
   addAccountToProtocol,
   getLiquidatePosition,
@@ -70,12 +69,11 @@ import {
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
   if (ABRA_ACCOUNTS.indexOf(account) > NEG_INT_ONE) {
-    createMarket(
-      event.params.cloneAddress.toHexString(),
-      event.block.number,
-      event.block.timestamp
-    );
+    const marketID = event.params.cloneAddress.toHexString();
+    createMarket(marketID, event.block.number, event.block.timestamp);
     CauldronDataSource.create(event.params.cloneAddress);
+    takeProtocolSnapshots(event);
+    takeMarketSnapshots(marketID, event);
   }
 }
 
@@ -140,9 +138,10 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     event.params.share,
     event
   );
-  updateTVL(event);
-  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateTVL();
   updateUsageMetrics(event, event.params.from, event.params.to);
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(market.id, event);
 }
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
@@ -210,9 +209,10 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     event.params.share,
     event
   );
-  updateTVL(event);
-  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateTVL();
   updateUsageMetrics(event, event.params.from, event.params.to);
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(market.id, event);
 }
 
 export function handleLogBorrow(event: LogBorrow): void {
@@ -263,7 +263,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.save();
 
   updateBorrowAmount(market);
-  updateTotalBorrows(event);
+  updateTotalBorrows();
   updateMarketStats(
     market.id,
     EventType.BORROW,
@@ -271,8 +271,9 @@ export function handleLogBorrow(event: LogBorrow): void {
     event.params.amount,
     event
   );
-  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(market.id, event);
 }
 
 // Liquidation steps
@@ -308,21 +309,19 @@ export function handleLiquidation(event: LogRepay): void {
   if (!market) {
     return;
   }
-  const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
-  const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
-    event,
-    market.id
+
+  const hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const hourlyActivity = getOrCreateActivityHelper(
+    ActivityInterval.HOURLY.concat("-").concat(hourlyId.toString())
   );
-  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
-  if (!marketHourlySnapshot || !marketDailySnapshot) {
-    return;
-  }
+  const dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const dailyActivity = getOrCreateActivityHelper(
+    ActivityInterval.DAILY.concat("-").concat(dailyId.toString())
+  );
 
   // update market prices
   updateAllTokenPrices(event.block.number);
 
-  const financialsDailySnapshot = getOrCreateFinancials(event);
   const collateralToken = getOrCreateToken(
     Address.fromString(market.inputToken)
   );
@@ -377,11 +376,11 @@ export function handleLiquidation(event: LogRepay): void {
   );
   liquidateEvent.save();
 
-  usageHourlySnapshot.hourlyLiquidateCount += 1;
-  usageHourlySnapshot.save();
+  hourlyActivity.liquidateCount += 1;
+  hourlyActivity.save();
 
-  usageDailySnapshot.dailyLiquidateCount += 1;
-  usageDailySnapshot.save();
+  dailyActivity.liquidateCount += 1;
+  dailyActivity.save();
 
   liquidateeAccount.liquidateCount = liquidateeAccount.liquidateCount + 1;
   liquidateeAccount.save();
@@ -401,29 +400,18 @@ export function handleLiquidation(event: LogRepay): void {
     protocol
   );
 
-  marketHourlySnapshot.hourlyLiquidateUSD =
-    marketHourlySnapshot.hourlyLiquidateUSD.plus(collateralAmountUSD);
-  marketDailySnapshot.dailyLiquidateUSD =
-    marketDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
-  financialsDailySnapshot.dailyLiquidateUSD =
-    financialsDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
-
   const marketCumulativeLiquidateUSD =
     market.cumulativeLiquidateUSD.plus(collateralAmountUSD);
   market.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
-  marketHourlySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
-  marketDailySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
-  marketHourlySnapshot.save();
-  marketDailySnapshot.save();
   market.save();
 
   const protocolCumulativeLiquidateUSD =
     protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
-  financialsDailySnapshot.cumulativeLiquidateUSD =
-    protocolCumulativeLiquidateUSD;
   protocol.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
   protocol.save();
-  financialsDailySnapshot.save();
+
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(market.id, event);
 }
 
 export function handleLogRepay(event: LogRepay): void {
@@ -486,7 +474,7 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.save();
 
   updateBorrowAmount(market);
-  updateTotalBorrows(event);
+  updateTotalBorrows();
   updateMarketStats(
     market.id,
     EventType.REPAY,
@@ -494,8 +482,9 @@ export function handleLogRepay(event: LogRepay): void {
     event.params.part,
     event
   ); // smart contract code subs event.params.part from totalBorrow
-  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(market.id, event);
 }
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
@@ -505,10 +494,13 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
   }
   const token = getOrCreateToken(Address.fromString(market.inputToken));
   updateTokenPrice(event.params.rate, token, market, event.block.number);
-  updateTVL(event);
+  updateTVL();
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(market.id, event);
 }
 
 export function handleLogAccrue(event: LogAccrue): void {
+  const marketID = event.address.toHexString();
   const mimPriceUSD = getOrCreateToken(
     Address.fromString(getMIMAddress(dataSource.network()))
   ).lastPriceUSD;
@@ -516,7 +508,9 @@ export function handleLogAccrue(event: LogAccrue): void {
     event.params.accruedAmount,
     DEFAULT_DECIMALS
   ).times(mimPriceUSD!);
-  updateFinancials(event, feesUSD, event.address.toHexString());
+  updateFinancials(event, feesUSD, marketID);
+  takeProtocolSnapshots(event);
+  takeMarketSnapshots(marketID, event);
 }
 
 // updates all input token prices using the price oracle

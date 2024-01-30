@@ -1,0 +1,33 @@
+{
+  "network": "polygon-zkevm",
+  "isMainnet": false,
+  "subgraphName": "hop-polygon-zkevm",
+  "deployment": "HOP_PROTOCOL_POLYGON_ZKEVM",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0,
+  "amms": [
+    {
+      "dataSourceName": "HopL2Amm",
+      "token": "ETH",
+      "address": "0x0a6b1904369fE59E002ad0713ae89d4E3dF5A7Cf",
+      "startBlock": 9014476
+    }
+  ],
+  "bridges": [
+    {
+      "dataSourceName": "Bridge",
+      "token": "ETH",
+      "address": "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d",
+      "startBlock": 9014486
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "ETH",
+      "address": "0xfF21e82a4Bc305BCE591530A68628192b5b6B6FD",
+      "startBlock": 9037446
+    }
+  ]
+}

@@ -31,6 +31,7 @@ export namespace Network {
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
+  export const POLYGON_ZKEVM = "POLYGON_ZKEVM";
   export const XDAI = "XDAI"; // aka Gnosis Chain
 
   // other networks
@@ -535,6 +536,22 @@ export namespace LineaRewardToken {
   export const ETH = "0xa50395bdeaca7062255109fede012efe63d6d402";
 }
 
+export namespace PolygonZKEVMBridge {
+  export const ETH = "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d";
+}
+export namespace PolygonZKEVMAmm {
+  export const ETH = "0x0a6b1904369fe59e002ad0713ae89d4e3df5a7cf";
+}
+export namespace PolygonZKEVMToken {
+  export const ETH = "0x4f9a0e7fd2bf6067db6994cf12e4495df938e6e9";
+}
+export namespace PolygonZKEVMHToken {
+  export const ETH = "0x652a38fa87f60a122aef360eeefcaf6258eddf6a";
+}
+export namespace PolygonZKEVMRewardToken {
+  export const ETH = "0xff21e82a4bc305bce591530a68628192b5b6b6fd";
+}
+
 export const priceTokens = [
   OptimismToken.USDC,
   OptimismToken.USDT,
@@ -645,6 +662,7 @@ export const HOP_REWARDS = [
   XdaiRewardToken.USDT_B,
   BaseRewardToken.USDC,
   BaseRewardToken.ETH,
+  PolygonZKEVMRewardToken.ETH,
 ];
 export const OP_REWARDS = [
   OptimismRewardToken.SNX_B,

@@ -83,6 +83,11 @@ export namespace PositionSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace ActivityInterval {
+  export const HOURLY = "HOURLY";
+  export const DAILY = "DAILY";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////

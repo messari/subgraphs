@@ -13,6 +13,7 @@ export interface Configurations {
   getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string;
   getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string;
   getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string;
+  getPolygonZKEVMPoolAddressFromBridgeAddress(bridgeAddress: string): string;
   getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string;
   getCrossTokenAddress(chainId: string, tokenAddress: string): string;
   getXdaiCrossTokenFromTokenAddress(tokenAddress: string): string;

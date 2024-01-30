@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 {{#graftEnabled}}
@@ -28,8 +28,12 @@ dataSources:
       abis:
         - name: Comptroller
           file: ./abis/venus/Comptroller.json
+        - name: ComptrollerV2
+          file: ./abis/venus/ComptrollerV2.json
         - name: CToken
           file: ./abis/CToken.json
+        - name: VTokenV2
+          file: ./abis/venus/VTokenV2.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: PriceOracle
@@ -53,6 +57,44 @@ dataSources:
         - event: VenusSpeedUpdated(indexed address,uint256)
           handler: handleVenusSpeedUpdated
       file: ./protocols/venus/src/mapping.ts
+  - kind: ethereum/contract
+    name: ComptrollerV2
+    network: {{ network }}
+    source:
+      address: "{{ factoryAddress }}"
+      abi: ComptrollerV2
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - Market
+        - Token
+      abis:
+        - name: Comptroller
+          file: ./abis/venus/Comptroller.json
+        - name: ComptrollerV2
+          file: ./abis/venus/ComptrollerV2.json
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: VTokenV2
+          file: ./abis/venus/VTokenV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+      eventHandlers:
+        - event: MarketListed(indexed address)
+          handler: handleMarketListed
+        - event: MarketEntered(indexed address,indexed address)
+          handler: handleMarketEntered
+        - event: MarketExited(indexed address,indexed address)
+          handler: handleMarketExited
+        - event: NewCollateralFactor(indexed address,uint256,uint256)
+          handler: handleNewCollateralFactor
+      file: ./protocols/venus/src/mapping.ts
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -72,8 +114,12 @@ templates:
       abis:
         - name: CToken
           file: ./abis/CToken.json
+        - name: VTokenV2
+          file: ./abis/venus/VTokenV2.json
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/venus/Comptroller.json
+        - name: ComptrollerV2
+          file: ./abis/venus/ComptrollerV2.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: PriceOracle
@@ -95,4 +141,38 @@ templates:
           handler: handleNewReserveFactor
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      file: ./protocols/venus/src/mapping.ts
+  - name: VTokenV2
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: VTokenV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+      abis:
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: VTokenV2
+          file: ./abis/venus/VTokenV2.json
+        - name: Comptroller
+          file: ./abis/venus/Comptroller.json
+        - name: ComptrollerV2
+          file: ./abis/venus/ComptrollerV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256,uint256)
+          handler: handleRedeem
       file: ./protocols/venus/src/mapping.ts
