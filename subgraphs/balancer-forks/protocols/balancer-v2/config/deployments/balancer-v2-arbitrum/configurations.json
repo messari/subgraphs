@@ -16,6 +16,41 @@
   "inflationInterval": "NONE",
 
   "usesBalancerTokenAdmin": false,
+  "useSwapBasedPriceLib": true,
+
+  "stableAssets": [
+    {
+      "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "symbol": "USDT"
+    }
+  ],
+
+  "pricingAssets": [
+    {
+      "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "symbol": "WETH"
+    },
+    {
+      "address": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+      "symbol": "WBTC"
+    },
+    {
+      "address": "0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8",
+      "symbol": "BAL"
+    },
+    {
+      "address": "0xa0b862F60edEf4452F25B4160F177db44DeB6Cf1",
+      "symbol": "GNO"
+    }
+  ],
 
   "graftEnabled": false,
   "subgraphId": "",

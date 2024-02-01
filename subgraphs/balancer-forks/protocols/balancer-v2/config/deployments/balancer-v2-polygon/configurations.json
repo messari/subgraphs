@@ -15,7 +15,93 @@
   "protocolTokenStartingInflationPerIntervalUnit": 0,
   "inflationInterval": "NONE",
 
+  "useSwapBasedPriceLib": true,
   "usesBalancerTokenAdmin": false,
+
+  "stableAssets": [
+    {
+      "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+      "symbol": "USDT"
+    }
+  ],
+  "pricingAssets": [
+    {
+      "address": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+      "symbol": "WMATIC"
+    },
+    {
+      "address": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+      "symbol": "WETH"
+    },
+    {
+      "address": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+      "symbol": "WBTC"
+    },
+    {
+      "address": "0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3",
+      "symbol": "BAL"
+    },
+    {
+      "address": "0x3d468ab2329f296e1b9d8476bb54dd77d8c2320f",
+      "symbol": "B-80BAL-20WETH"
+    },
+    {
+      "address": "0x48e6b98ef6329f8f0a30ebb8c7c960330d648085",
+      "symbol": "bb-am-USD"
+    },
+    {
+      "address": "0x6f7C932e7684666C9fd1d44527765433e01fF61d",
+      "symbol": "MKR"
+    },
+    {
+      "address": "0x5FFD62D3C3eE2E81C00A7b9079FB248e7dF024A8",
+      "symbol": "GNO"
+    }
+  ],
+  "fxAssets": [
+    {
+      "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0xDC3326e71D45186F113a2F448984CA0e8D201995",
+      "symbol": "XSGD"
+    },
+    {
+      "address": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0xE111178A87A3BFf0c8d18DECBa5798827539Ae99",
+      "symbol": "EURS"
+    }
+  ],
+  "fxAggregators": [
+    {
+      "address": "0xf9c53A834F60cBbE40E27702276fBc0819B3aFAD",
+      "symbol": "USDC-USD"
+    },
+    {
+      "address": "0x45ede0Ea5cBbE380C663C7C3015Cc7c986669FEc",
+      "symbol": "XSGD-USD"
+    },
+    {
+      "address": "0x62439095489Eb5dE4572de632248682c09a05Ad4",
+      "symbol": "DAI-USD"
+    },
+    {
+      "address": "0x310990E8091b5cF083fA55F500F140CFBb959016",
+      "symbol": "EURS-USD"
+    }
+  ],
 
   "graftEnabled": false,
   "subgraphId": "",

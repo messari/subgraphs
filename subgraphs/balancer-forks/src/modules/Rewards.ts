@@ -1,10 +1,9 @@
 import {
+  getOrCreateToken,
   getOrCreateRewardToken,
   getOrCreateLiquidityPool,
-  getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { readValue } from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -61,11 +60,7 @@ export function updateControllerRewards(
       gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
       constants.BIGINT_ZERO
     )
-    .divDecimal(
-      constants.BIGINT_TEN.pow(
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      ).toBigDecimal()
-    );
+    .divDecimal(utils.exponentToBigDecimal(constants.DEFAULT_DECIMALS.toI32()));
 
   // This essentially checks if the gauge is a GaugeController gauge instead of a childChainLiquidityGaugeFactory contract.
   if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) {
@@ -179,13 +174,11 @@ export function updateRewardTokenEmissions(
   }
   const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const rewardTokenPrice = getOrCreateToken(rewardTokenAddress, block.number);
+  const rewardTokenPrice = getOrCreateToken(rewardTokenAddress, block, true);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .divDecimal(
-      constants.BIGINT_TEN.pow(rewardTokenPrice.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(utils.exponentToBigDecimal(rewardTokenPrice.decimals))
     .times(rewardTokenPrice.lastPriceUSD!);
 
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
@@ -197,7 +190,7 @@ export function updateRewardTokenEmissions(
 export function getPoolFromGauge(gaugeAddress: Address): Address | null {
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  const poolAddress = readValue<Address>(
+  const poolAddress = utils.readValue<Address>(
     gaugeContract.try_lp_token(),
     constants.NULL.TYPE_ADDRESS
   );

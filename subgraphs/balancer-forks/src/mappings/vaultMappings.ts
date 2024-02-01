@@ -47,7 +47,7 @@ export function handleTokensRegistered(event: TokensRegistered): void {
     // Exception: StablePoolFactory added poolAddress in event params token
     if (tokens.at(idx).equals(poolAddress)) continue;
 
-    inputTokens.push(getOrCreateToken(tokens.at(idx), event.block.number).id);
+    inputTokens.push(getOrCreateToken(tokens.at(idx), event.block).id);
   }
 
   pool.inputTokens = inputTokens;
@@ -74,7 +74,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
 
   const total: BigInt = deltas.reduce<BigInt>(
     (sum, amount) => sum.plus(amount),
-    new BigInt(0)
+    constants.BIGINT_ZERO
   );
 
   if (total.gt(constants.BIGINT_ZERO)) {

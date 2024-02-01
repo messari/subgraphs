@@ -5,7 +5,7 @@
   "defaultNetwork": "Network.OPTIMISM",
 
   "vaultAddress": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-  "vaultStartBlock": 154627,
+  "vaultStartBlock": 7003431,
 
   "gaugeControllerAddress": "0x2E96068b3D5B5BAE3D7515da4A1D2E52d08A2647",
   "gaugeControllerStartBlock": 9052485,
@@ -15,6 +15,49 @@
   "protocolTokenAddress": "0x97513e975a7fA9072c72C92d8000B0dB90b163c5",
   "protocolTokenStartingInflationPerIntervalUnit": 0,
   "inflationInterval": "TIMESTAMP",
+
+  "useSwapBasedPriceLib": false,
+
+  "stableAssets": [
+    {
+      "address": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
+      "symbol": "USDC"
+    },
+    {
+      "address": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+      "symbol": "DAI"
+    },
+    {
+      "address": "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
+      "symbol": "USDT"
+    }
+  ],
+  "pricingAssets": [
+    {
+      "address": "0x4200000000000000000000000000000000000006",
+      "symbol": "WETH"
+    },
+    {
+      "address": "0x1f32b1c2345538c0c6f582fcb022739c4a194ebb",
+      "symbol": "wstETH"
+    },
+    {
+      "address": "0x13bc6df7189f7997b4977322f2142aa4bb18efae",
+      "symbol": "bb-a-USD"
+    },
+    {
+      "address": "0xfe8b128ba8c78aabc59d4c64cee7ff28e9379921",
+      "symbol": "BAL"
+    },
+    {
+      "address": "0x68f180fcce6836688e9084f035309e29bf0a2095",
+      "symbol": "WBTC"
+    },
+    {
+      "address": "0x4200000000000000000000000000000000000042",
+      "symbol": "OP"
+    }
+  ],
 
   "graftEnabled": false,
   "subgraphId": "",
