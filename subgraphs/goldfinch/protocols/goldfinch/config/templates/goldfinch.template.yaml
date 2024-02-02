@@ -8,6 +8,8 @@ schema:
 description: ...
 features:
   - grafting
+indexerHints:
+  prune: auto
 graft:
   base: {{subgraphId}} # Subgraph ID of base subgraph
   block: {{graftStartBlock}} # Block number

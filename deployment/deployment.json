@@ -2638,7 +2638,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.4.3",
+          "subgraph": "1.4.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3908,6 +3908,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-base",
             "query-id": "uniswap-v3-base"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-base",
+            "query-id": "FUbEPQw1oMghy39fwWBFY5fE6MXPXZQtjncQy2cXdrNS"
           }
         }
       },
@@ -3930,6 +3934,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-bsc",
             "query-id": "uniswap-v3-bsc"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-bsc",
+            "query-id": "8f1KyiuNYiNGrjagzEVpf6k6KkPG517prtjdrJihgHw"
           }
         }
       },
