@@ -7773,10 +7773,6 @@
           "hosted-service": {
             "slug": "multichain-bsc",
             "query-id": "multichain-bsc"
-          },
-          "decentralized-network": {
-            "slug": "multichain-bsc",
-            "query-id": "zGuPrsVqtY5ehJDCmweb9ZnBrae3tSQWRux8Mz1M4Gn"
           }
         },
         "files": {
