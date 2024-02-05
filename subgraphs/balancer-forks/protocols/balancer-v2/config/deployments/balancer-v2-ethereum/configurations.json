@@ -19,7 +19,7 @@
   "balancerTokenAdminStartBlock": 14456738,
   "usesBalancerTokenAdmin": true,
 
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmRD5cEyRossPmz2AdYjeoa1KPLgS7wu5v5oF9uGDd81HC",
   "graftStartBlock": "16637574"
 }
