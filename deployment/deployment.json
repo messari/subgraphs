@@ -2170,6 +2170,10 @@
           "hosted-service": {
             "slug": "venus-protocol-bsc",
             "query-id": "venus-protocol-bsc"
+          },
+          "decentralized-network": {
+            "slug": "venus-protocol-bsc",
+            "query-id": "CwswJ7sfENafqgAYU1upn3hQgoEV2CXXRZRJ7XtgJrKG"
           }
         }
       }
@@ -3730,6 +3734,10 @@
           "hosted-service": {
             "slug": "spark-lend-gnosis",
             "query-id": "spark-lend-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "spark-lend-gnosis",
+            "query-id": "Bw4RH37UbbGEhHo4FaWwT1dn9QJzm1XSZCyK1cbr6ZKM"
           }
         }
       }
@@ -3820,6 +3828,10 @@
           "hosted-service": {
             "slug": "radiant-capital-v2-bsc",
             "query-id": "radiant-capital-v2-bsc"
+          },
+          "decentralized-network": {
+            "slug": "radiant-capital-v2-bsc",
+            "query-id": "cM9BYtdT8aVBX8JEbi9SQjV2Ft8onEh6qwZHxCUyAAh"
           }
         }
       }
@@ -3940,6 +3952,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-base",
             "query-id": "uniswap-v3-base"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-base",
+            "query-id": "FUbEPQw1oMghy39fwWBFY5fE6MXPXZQtjncQy2cXdrNS"
           }
         }
       },
@@ -3962,6 +3978,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-bsc",
             "query-id": "uniswap-v3-bsc"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-bsc",
+            "query-id": "8f1KyiuNYiNGrjagzEVpf6k6KkPG517prtjdrJihgHw"
           }
         }
       },
@@ -4096,6 +4116,10 @@
           "hosted-service": {
             "slug": "pancakeswap-v3-bsc",
             "query-id": "pancakeswap-v3-bsc"
+          },
+          "decentralized-network": {
+            "slug": "pancakeswap-v3-bsc",
+            "query-id": "A1BC1hzDsK4NTeXBpKQnDBphngpYZAwDUF7dEBfa3jHK"
           }
         }
       },
@@ -4612,6 +4636,10 @@
           "hosted-service": {
             "slug": "qidao-bsc",
             "query-id": "qidao-bsc"
+          },
+          "decentralized-network": {
+            "slug": "qidao-bsc",
+            "query-id": "4DcztqYL7UG5bjdisWWvnj3m4NtK5J3bs89scihAkicr"
           }
         }
       },
@@ -5172,6 +5200,10 @@
           "hosted-service": {
             "slug": "sushiswap-bsc",
             "query-id": "sushiswap-bsc"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-bsc",
+            "query-id": "7QyoZFgo1bYvTD7bmdBxsjFLjmeDLgBT3nC3H8y6yuKZ"
           }
         }
       },
@@ -7459,6 +7491,10 @@
           "hosted-service": {
             "slug": "tornado-cash-classic-bsc",
             "query-id": "tornado-cash-classic-bsc"
+          },
+          "decentralized-network": {
+            "slug": "tornado-cash-classic-bsc",
+            "query-id": "3wAcWMmwNSv9CVfT4HFFWAvawCq621JPKfg1tniwdW7a"
           }
         },
         "files": {
@@ -7737,6 +7773,10 @@
           "hosted-service": {
             "slug": "multichain-bsc",
             "query-id": "multichain-bsc"
+          },
+          "decentralized-network": {
+            "slug": "multichain-bsc",
+            "query-id": "zGuPrsVqtY5ehJDCmweb9ZnBrae3tSQWRux8Mz1M4Gn"
           }
         },
         "files": {
@@ -7982,6 +8022,10 @@
           "hosted-service": {
             "slug": "stargate-bsc",
             "query-id": "stargate-bsc"
+          },
+          "decentralized-network": {
+            "slug": "stargate-bsc",
+            "query-id": "6sRx6JNkjz66id39jCK3GMiVnPVuyuv2ntwQVpDzmjRF"
           }
         }
       },
@@ -8108,6 +8152,10 @@
           "hosted-service": {
             "slug": "stargate-base",
             "query-id": "stargate-base"
+          },
+          "decentralized-network": {
+            "slug": "stargate-base",
+            "query-id": "4amk8rvTHgxSobsFKsr5jheHsDzLcwyqc8vHhNC1xhGt"
           }
         }
       }
@@ -8164,6 +8212,10 @@
           "hosted-service": {
             "slug": "orbit-bsc",
             "query-id": "orbit-bsc"
+          },
+          "decentralized-network": {
+            "slug": "orbit-bsc",
+            "query-id": "8XNHKT5X8DgsdL6hKe6tK5FnkBRR4TtS2YH23db5D6VH"
           }
         }
       },
@@ -8186,6 +8238,10 @@
           "hosted-service": {
             "slug": "orbit-celo",
             "query-id": "orbit-celo"
+          },
+          "decentralized-network": {
+            "slug": "orbit-celo",
+            "query-id": "DdGECh8tM63FEsT96AjxfhxkE5wTBeBPdnh3qkUYpcvY"
           }
         }
       },
@@ -8637,6 +8693,10 @@
           "hosted-service": {
             "slug": "portal-bsc",
             "query-id": "portal-bsc"
+          },
+          "decentralized-network": {
+            "slug": "portal-bsc",
+            "query-id": "FCd8kxMGFkk3AGEHeYRngeHvBsuTpQo7XBLu6XoyDctr"
           }
         },
         "files": {
@@ -9533,6 +9593,10 @@
           "hosted-service": {
             "slug": "mux-protocol-bsc",
             "query-id": "mux-protocol-bsc"
+          },
+          "decentralized-network": {
+            "slug": "mux-protocol-bsc",
+            "query-id": "3zRKcHbGqvMe6BG6fiLiaKx3y41ytzjw4jetbh5Q2fx1"
           }
         },
         "files": {
