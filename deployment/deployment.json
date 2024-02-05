@@ -76,6 +76,10 @@
           "hosted-service": {
             "slug": "abracadabra-money-bsc",
             "query-id": "abracadabra-money-bsc"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-bsc",
+            "query-id": "6bFCfHn5Uuv5fH7PxKL12dzWh3zz7fkQ46EnMa7nZUj2"
           }
         }
       },
@@ -546,6 +550,10 @@
           "hosted-service": {
             "slug": "aave-v3-base",
             "query-id": "aave-v3-base"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-base",
+            "query-id": "D7mapexM5ZsQckLJai2FawTKXJ7CqYGKM8PErnS3cJi9"
           }
         }
       }
@@ -576,6 +584,10 @@
           "hosted-service": {
             "slug": "alpaca-finance-lending-bsc",
             "query-id": "alpaca-finance-lending-bsc"
+          },
+          "decentralized-network": {
+            "slug": "alpaca-finance-lending-bsc",
+            "query-id": "ED3ayhcLA7h7DCGwbysgcxtfMEcoeYCdMEsdZJeoaUFS"
           }
         }
       },
@@ -782,7 +794,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1176,6 +1188,10 @@
           "hosted-service": {
             "slug": "belt-finance-bsc",
             "query-id": "belt-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "belt-finance-bsc",
+            "query-id": "3QXbMNCJVD9pftwaGC9CZuSPNsS4RGe4WWnR4MeU9Rxh"
           }
         }
       }
@@ -1458,6 +1474,10 @@
           "hosted-service": {
             "slug": "biswap-bsc",
             "query-id": "biswap-bsc"
+          },
+          "decentralized-network": {
+            "slug": "biswap-bsc",
+            "query-id": "EnAR2ancKqJqpCU6cJ8aq9xHquTSWsK2wQWVfdDSwacN"
           }
         }
       }
@@ -1578,6 +1598,10 @@
           "hosted-service": {
             "slug": "cream-finance-bsc",
             "query-id": "cream-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "cream-finance-bsc",
+            "query-id": "Dd2ak11qC4mS2spUXzJm5v9EtVNJqmBC9rLzbckTwfN1"
           }
         }
       },
@@ -1708,6 +1732,10 @@
           "hosted-service": {
             "slug": "dforce-bsc",
             "query-id": "dforce-bsc"
+          },
+          "decentralized-network": {
+            "slug": "dforce-bsc",
+            "query-id": "DKu1HqTTi26uLZKAmvDbqyAvcnFAjXEuRJmF35RLpyFg"
           }
         }
       },
@@ -2528,6 +2556,10 @@
           "hosted-service": {
             "slug": "ellipsis-finance-bsc",
             "query-id": "ellipsis-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "ellipsis-finance-bsc",
+            "query-id": "3oK7vysHSCqXkQ5L3G6S4ifBG3Xr5mjkEEzZKtGEg5x1"
           }
         }
       }
@@ -2638,7 +2670,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.4.3",
+          "subgraph": "1.4.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -4818,6 +4850,10 @@
           "hosted-service": {
             "slug": "apeswap-bsc",
             "query-id": "apeswap-bsc"
+          },
+          "decentralized-network": {
+            "slug": "apeswap-bsc",
+            "query-id": "4u1aTvzBMjBdm7aK7uQmjffhoPc6Ceu3w2nTfq6vUQnb"
           }
         }
       },
@@ -8866,6 +8902,10 @@
           "hosted-service": {
             "slug": "cbridge-bsc",
             "query-id": "cbridge-bsc"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-bsc",
+            "query-id": "9ryiazBA4UJu1g2rbunQ42wqxvhdZP648p2jiBMjcoZc"
           }
         }
       },
@@ -9605,6 +9645,10 @@
           "hosted-service": {
             "slug": "level-finance-bsc",
             "query-id": "level-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "level-finance-bsc",
+            "query-id": "97TRgysfrSPH7sumNXSasdjhKBnDwig2JKE7PwB4W2J8"
           }
         },
         "files": {
@@ -9950,6 +9994,10 @@
           "hosted-service": {
             "slug": "eigenlayer-ethereum",
             "query-id": "eigenlayer-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "eigenlayer-ethereum",
+            "query-id": "68g9WSC4QTUJmMpuSbgLNENrcYha4mPmXhWGCoupM7kB"
           }
         }
       }
