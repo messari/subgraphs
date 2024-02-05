@@ -8544,13 +8544,17 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
           "hosted-service": {
             "slug": "hop-protocol-polygon-zkevm",
             "query-id": "hop-protocol-polygon-zkevm"
+          },
+          "decentralized-network": {
+            "slug": "hop-protocol-polygon-zkevm",
+            "query-id": "EkkvCmBiEPiJ5LkaSPxpuAmMouSUN5FZrdrKu7nBY5p9"
           }
         },
         "files": {
