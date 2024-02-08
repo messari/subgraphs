@@ -76,6 +76,10 @@
           "hosted-service": {
             "slug": "abracadabra-money-bsc",
             "query-id": "abracadabra-money-bsc"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-bsc",
+            "query-id": "6bFCfHn5Uuv5fH7PxKL12dzWh3zz7fkQ46EnMa7nZUj2"
           }
         }
       },
@@ -424,6 +428,10 @@
           "hosted-service": {
             "slug": "aave-v3-harmony",
             "query-id": "aave-v3-harmony"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-harmony",
+            "query-id": "G1BNHqmteZiUwSEacfXG2nzMm13KLNo5xoxv62ErAyQv"
           }
         }
       },
@@ -546,6 +554,10 @@
           "hosted-service": {
             "slug": "aave-v3-base",
             "query-id": "aave-v3-base"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-base",
+            "query-id": "D7mapexM5ZsQckLJai2FawTKXJ7CqYGKM8PErnS3cJi9"
           }
         }
       }
@@ -576,6 +588,10 @@
           "hosted-service": {
             "slug": "alpaca-finance-lending-bsc",
             "query-id": "alpaca-finance-lending-bsc"
+          },
+          "decentralized-network": {
+            "slug": "alpaca-finance-lending-bsc",
+            "query-id": "ED3ayhcLA7h7DCGwbysgcxtfMEcoeYCdMEsdZJeoaUFS"
           }
         }
       },
@@ -782,7 +798,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1176,6 +1192,10 @@
           "hosted-service": {
             "slug": "belt-finance-bsc",
             "query-id": "belt-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "belt-finance-bsc",
+            "query-id": "3QXbMNCJVD9pftwaGC9CZuSPNsS4RGe4WWnR4MeU9Rxh"
           }
         }
       }
@@ -1334,6 +1354,10 @@
           "hosted-service": {
             "slug": "bastion-protocol-aurora",
             "query-id": "bastion-protocol-aurora"
+          },
+          "decentralized-network": {
+            "slug": "bastion-protocol-aurora",
+            "query-id": "BD4rW7Ga5YQ3x68tALbi8vsXNodd6LrvFeaVocdJt3bD"
           }
         }
       }
@@ -1458,6 +1482,10 @@
           "hosted-service": {
             "slug": "biswap-bsc",
             "query-id": "biswap-bsc"
+          },
+          "decentralized-network": {
+            "slug": "biswap-bsc",
+            "query-id": "EnAR2ancKqJqpCU6cJ8aq9xHquTSWsK2wQWVfdDSwacN"
           }
         }
       }
@@ -1488,6 +1516,10 @@
           "hosted-service": {
             "slug": "burrow-near",
             "query-id": "burrow-near"
+          },
+          "decentralized-network": {
+            "slug": "burrow-near",
+            "query-id": "5W5fhZAq6QABBijKo7wqYps7TLzqAqS2mU1C1rhktvtg"
           }
         }
       }
@@ -1578,6 +1610,10 @@
           "hosted-service": {
             "slug": "cream-finance-bsc",
             "query-id": "cream-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "cream-finance-bsc",
+            "query-id": "Dd2ak11qC4mS2spUXzJm5v9EtVNJqmBC9rLzbckTwfN1"
           }
         }
       },
@@ -1708,6 +1744,10 @@
           "hosted-service": {
             "slug": "dforce-bsc",
             "query-id": "dforce-bsc"
+          },
+          "decentralized-network": {
+            "slug": "dforce-bsc",
+            "query-id": "DKu1HqTTi26uLZKAmvDbqyAvcnFAjXEuRJmF35RLpyFg"
           }
         }
       },
@@ -1928,6 +1968,10 @@
           "hosted-service": {
             "slug": "moonwell-moonbeam",
             "query-id": "moonwell-moonbeam"
+          },
+          "decentralized-network": {
+            "slug": "moonwell-moonbeam",
+            "query-id": "DQhrdUHwspQf3hSjDtyfS6uqq9YiKoLF3Ut3U9os2HK"
           }
         }
       },
@@ -1950,6 +1994,10 @@
           "hosted-service": {
             "slug": "moonwell-moonriver",
             "query-id": "moonwell-moonriver"
+          },
+          "decentralized-network": {
+            "slug": "moonwell-moonriver",
+            "query-id": "8ayELti1UNCNCWuvwSwapjh4mvvCejeXsk4PmsWBmQ82"
           }
         }
       }
@@ -2142,6 +2190,10 @@
           "hosted-service": {
             "slug": "venus-protocol-bsc",
             "query-id": "venus-protocol-bsc"
+          },
+          "decentralized-network": {
+            "slug": "venus-protocol-bsc",
+            "query-id": "CwswJ7sfENafqgAYU1upn3hQgoEV2CXXRZRJ7XtgJrKG"
           }
         }
       }
@@ -2306,6 +2358,10 @@
           "hosted-service": {
             "slug": "curve-finance-aurora",
             "query-id": "curve-finance-aurora"
+          },
+          "decentralized-network": {
+            "slug": "curve-finance-aurora",
+            "query-id": "9zXFpPQHyTmXXygtNPwjBS6d4SMGzv7qMiha4bJ3fbyB"
           }
         }
       },
@@ -2428,6 +2484,10 @@
           "hosted-service": {
             "slug": "curve-finance-harmony",
             "query-id": "curve-finance-harmony"
+          },
+          "decentralized-network": {
+            "slug": "curve-finance-harmony",
+            "query-id": "6gnHHn7562tDjCrrnSiMiR1H1NndrannPQ7LcYxMgF9t"
           }
         }
       },
@@ -2528,6 +2588,10 @@
           "hosted-service": {
             "slug": "ellipsis-finance-bsc",
             "query-id": "ellipsis-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "ellipsis-finance-bsc",
+            "query-id": "3oK7vysHSCqXkQ5L3G6S4ifBG3Xr5mjkEEzZKtGEg5x1"
           }
         }
       }
@@ -2638,7 +2702,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.4.3",
+          "subgraph": "1.4.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3698,6 +3762,10 @@
           "hosted-service": {
             "slug": "spark-lend-gnosis",
             "query-id": "spark-lend-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "spark-lend-gnosis",
+            "query-id": "Bw4RH37UbbGEhHo4FaWwT1dn9QJzm1XSZCyK1cbr6ZKM"
           }
         }
       }
@@ -3788,6 +3856,10 @@
           "hosted-service": {
             "slug": "radiant-capital-v2-bsc",
             "query-id": "radiant-capital-v2-bsc"
+          },
+          "decentralized-network": {
+            "slug": "radiant-capital-v2-bsc",
+            "query-id": "cM9BYtdT8aVBX8JEbi9SQjV2Ft8onEh6qwZHxCUyAAh"
           }
         }
       }
@@ -3908,6 +3980,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-base",
             "query-id": "uniswap-v3-base"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-base",
+            "query-id": "FUbEPQw1oMghy39fwWBFY5fE6MXPXZQtjncQy2cXdrNS"
           }
         }
       },
@@ -3930,6 +4006,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-bsc",
             "query-id": "uniswap-v3-bsc"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-bsc",
+            "query-id": "8f1KyiuNYiNGrjagzEVpf6k6KkPG517prtjdrJihgHw"
           }
         }
       },
@@ -4064,6 +4144,10 @@
           "hosted-service": {
             "slug": "pancakeswap-v3-bsc",
             "query-id": "pancakeswap-v3-bsc"
+          },
+          "decentralized-network": {
+            "slug": "pancakeswap-v3-bsc",
+            "query-id": "A1BC1hzDsK4NTeXBpKQnDBphngpYZAwDUF7dEBfa3jHK"
           }
         }
       },
@@ -4580,6 +4664,10 @@
           "hosted-service": {
             "slug": "qidao-bsc",
             "query-id": "qidao-bsc"
+          },
+          "decentralized-network": {
+            "slug": "qidao-bsc",
+            "query-id": "4DcztqYL7UG5bjdisWWvnj3m4NtK5J3bs89scihAkicr"
           }
         }
       },
@@ -4680,6 +4768,10 @@
           "hosted-service": {
             "slug": "qidao-moonriver",
             "query-id": "qidao-moonriver"
+          },
+          "decentralized-network": {
+            "slug": "qidao-moonriver",
+            "query-id": "HzDP5zXKyjnEJP9TnFirk3qA24SUp4AfzKUBSRcBekgz"
           }
         }
       },
@@ -4754,6 +4846,10 @@
           "hosted-service": {
             "slug": "qidao-harmony",
             "query-id": "qidao-harmony"
+          },
+          "decentralized-network": {
+            "slug": "qidao-harmony",
+            "query-id": "DCEQvXCiqtpMybQLL4YAgdCzqHzRH6wFFnCDnnLBBuvf"
           }
         }
       }
@@ -4818,6 +4914,10 @@
           "hosted-service": {
             "slug": "apeswap-bsc",
             "query-id": "apeswap-bsc"
+          },
+          "decentralized-network": {
+            "slug": "apeswap-bsc",
+            "query-id": "4u1aTvzBMjBdm7aK7uQmjffhoPc6Ceu3w2nTfq6vUQnb"
           }
         }
       },
@@ -4990,6 +5090,10 @@
           "hosted-service": {
             "slug": "solarbeam-moonriver",
             "query-id": "solarbeam-moonriver"
+          },
+          "decentralized-network": {
+            "slug": "solarbeam-moonriver",
+            "query-id": "EoN2oon5KNH6XL1xSQCRsLHFPSZ2xLJD9DApizNtfGWo"
           }
         }
       }
@@ -5136,6 +5240,10 @@
           "hosted-service": {
             "slug": "sushiswap-bsc",
             "query-id": "sushiswap-bsc"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-bsc",
+            "query-id": "7QyoZFgo1bYvTD7bmdBxsjFLjmeDLgBT3nC3H8y6yuKZ"
           }
         }
       },
@@ -5210,6 +5318,10 @@
           "hosted-service": {
             "slug": "sushiswap-fuse",
             "query-id": "sushiswap-fuse"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-fuse",
+            "query-id": "7MhgrLAB5B4D6PLDjF9Stx7fzS54MA3d5oi9dT3fHxbz"
           }
         }
       },
@@ -5258,6 +5370,10 @@
           "hosted-service": {
             "slug": "sushiswap-harmony",
             "query-id": "sushiswap-harmony"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-harmony",
+            "query-id": "96NBskquxSxSDV8W42g3nmzECziCvhftSXFFpbY4geaC"
           }
         }
       },
@@ -5306,6 +5422,10 @@
           "hosted-service": {
             "slug": "sushiswap-moonbeam",
             "query-id": "sushiswap-moonbeam"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-moonbeam",
+            "query-id": "8oFzyJBeHoojoe23u3YYNruTZsqgn91q44U8hrFocbtp"
           }
         }
       },
@@ -5328,6 +5448,10 @@
           "hosted-service": {
             "slug": "sushiswap-moonriver",
             "query-id": "sushiswap-moonriver"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-moonriver",
+            "query-id": "EuYBux3ZPq1v3Uipo837WDq6WrK4AB3LGD6w78edRHib"
           }
         }
       },
@@ -7423,6 +7547,10 @@
           "hosted-service": {
             "slug": "tornado-cash-classic-bsc",
             "query-id": "tornado-cash-classic-bsc"
+          },
+          "decentralized-network": {
+            "slug": "tornado-cash-classic-bsc",
+            "query-id": "3wAcWMmwNSv9CVfT4HFFWAvawCq621JPKfg1tniwdW7a"
           }
         },
         "files": {
@@ -7946,6 +8074,10 @@
           "hosted-service": {
             "slug": "stargate-bsc",
             "query-id": "stargate-bsc"
+          },
+          "decentralized-network": {
+            "slug": "stargate-bsc",
+            "query-id": "6sRx6JNkjz66id39jCK3GMiVnPVuyuv2ntwQVpDzmjRF"
           }
         }
       },
@@ -8072,6 +8204,10 @@
           "hosted-service": {
             "slug": "stargate-base",
             "query-id": "stargate-base"
+          },
+          "decentralized-network": {
+            "slug": "stargate-base",
+            "query-id": "4amk8rvTHgxSobsFKsr5jheHsDzLcwyqc8vHhNC1xhGt"
           }
         }
       }
@@ -8128,6 +8264,10 @@
           "hosted-service": {
             "slug": "orbit-bsc",
             "query-id": "orbit-bsc"
+          },
+          "decentralized-network": {
+            "slug": "orbit-bsc",
+            "query-id": "8XNHKT5X8DgsdL6hKe6tK5FnkBRR4TtS2YH23db5D6VH"
           }
         }
       },
@@ -8150,6 +8290,10 @@
           "hosted-service": {
             "slug": "orbit-celo",
             "query-id": "orbit-celo"
+          },
+          "decentralized-network": {
+            "slug": "orbit-celo",
+            "query-id": "DdGECh8tM63FEsT96AjxfhxkE5wTBeBPdnh3qkUYpcvY"
           }
         }
       },
@@ -8303,6 +8447,10 @@
           "hosted-service": {
             "slug": "across-v2-boba",
             "query-id": "across-v2-boba"
+          },
+          "decentralized-network": {
+            "slug": "across-v2-boba",
+            "query-id": "4SbLL5ZptwGU9Eor3SaoV3UZw12KPiZRKkwBEbKDenjP"
           }
         },
         "files": {
@@ -8508,13 +8656,17 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
           "hosted-service": {
             "slug": "hop-protocol-polygon-zkevm",
             "query-id": "hop-protocol-polygon-zkevm"
+          },
+          "decentralized-network": {
+            "slug": "hop-protocol-polygon-zkevm",
+            "query-id": "EkkvCmBiEPiJ5LkaSPxpuAmMouSUN5FZrdrKu7nBY5p9"
           }
         },
         "files": {
@@ -8597,6 +8749,10 @@
           "hosted-service": {
             "slug": "portal-bsc",
             "query-id": "portal-bsc"
+          },
+          "decentralized-network": {
+            "slug": "portal-bsc",
+            "query-id": "FCd8kxMGFkk3AGEHeYRngeHvBsuTpQo7XBLu6XoyDctr"
           }
         },
         "files": {
@@ -8796,6 +8952,10 @@
           "hosted-service": {
             "slug": "cbridge-aurora",
             "query-id": "cbridge-aurora"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-aurora",
+            "query-id": "5uW7hwPPaHVEY7qqx5S9CV156YE7Dvjt2AAPiJ4mn12h"
           }
         }
       },
@@ -8844,6 +9004,10 @@
           "hosted-service": {
             "slug": "cbridge-boba",
             "query-id": "cbridge-boba"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-boba",
+            "query-id": "AZd3VzvnYoxBKAWjbZB4snZgow9SnyTTxaxad3YPxbvh"
           }
         }
       },
@@ -8866,6 +9030,10 @@
           "hosted-service": {
             "slug": "cbridge-bsc",
             "query-id": "cbridge-bsc"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-bsc",
+            "query-id": "9ryiazBA4UJu1g2rbunQ42wqxvhdZP648p2jiBMjcoZc"
           }
         }
       },
@@ -8966,6 +9134,10 @@
           "hosted-service": {
             "slug": "cbridge-harmony",
             "query-id": "cbridge-harmony"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-harmony",
+            "query-id": "8gXopvmmYABDCCrWuafAkYuRB4bpJ7XcbgGmN8AcMJDg"
           }
         }
       },
@@ -8988,6 +9160,10 @@
           "hosted-service": {
             "slug": "cbridge-moonbeam",
             "query-id": "cbridge-moonbeam"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-moonbeam",
+            "query-id": "6F1ia9A6Vmanbzk2T3EAAev5Q9TKyF1oxu6JiUKbPdnL"
           }
         }
       },
@@ -9010,6 +9186,10 @@
           "hosted-service": {
             "slug": "cbridge-moonriver",
             "query-id": "cbridge-moonriver"
+          },
+          "decentralized-network": {
+            "slug": "cbridge-moonriver",
+            "query-id": "FuFD3UqnCWhQoarNsvdY8AW5exnKXxiizJRXVakvniHX"
           }
         }
       },
@@ -9489,6 +9669,10 @@
           "hosted-service": {
             "slug": "mux-protocol-bsc",
             "query-id": "mux-protocol-bsc"
+          },
+          "decentralized-network": {
+            "slug": "mux-protocol-bsc",
+            "query-id": "3zRKcHbGqvMe6BG6fiLiaKx3y41ytzjw4jetbh5Q2fx1"
           }
         },
         "files": {
@@ -9605,6 +9789,10 @@
           "hosted-service": {
             "slug": "level-finance-bsc",
             "query-id": "level-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "level-finance-bsc",
+            "query-id": "97TRgysfrSPH7sumNXSasdjhKBnDwig2JKE7PwB4W2J8"
           }
         },
         "files": {
@@ -9950,6 +10138,10 @@
           "hosted-service": {
             "slug": "eigenlayer-ethereum",
             "query-id": "eigenlayer-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "eigenlayer-ethereum",
+            "query-id": "68g9WSC4QTUJmMpuSbgLNENrcYha4mPmXhWGCoupM7kB"
           }
         }
       }
