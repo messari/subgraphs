@@ -157,6 +157,8 @@ export function handleLiquidate(event: EventData): void {
           }
         }
       }
+    } else {
+      log.warning("No `msg` argument found in liquidation event.args", []);
     }
   }
 
