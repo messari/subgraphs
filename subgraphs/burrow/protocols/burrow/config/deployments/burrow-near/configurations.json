@@ -3,6 +3,6 @@
   "contract": "contract.main.burrow.near",
   "startBlock": 62303110,
   "graftEnabled": false,
-  "subgraphId": "QmTci7b96WcAMvp8qohiHjHuGJK9z4UpjVqey313GYa3y4",
-  "graftStartBlock": 66417660
+  "subgraphId": "QmTCx2gua6tEZEAWDpeyEMsyE9wWtjHcKTXQYUBZnRgu98",
+  "graftStartBlock": 111661867
 }

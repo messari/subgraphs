@@ -119,42 +119,46 @@ export function handleLiquidate(event: EventData): void {
     token_out_amount: string[] = new Array<string>();
   if (args) {
     let msg = args.get("msg");
-    msg = json.fromString(msg!.toString());
-    const exec = msg.toObject().get("Execute");
-    const actions = exec!.toObject().get("actions");
-    const actionsArr = actions!.toArray();
+    if (msg) {
+      msg = json.fromString(msg.toString());
+      const exec = msg.toObject().get("Execute");
+      const actions = exec!.toObject().get("actions");
+      const actionsArr = actions!.toArray();
 
-    for (let i = 0; i < actionsArr.length; i++) {
-      if (actionsArr[i].kind == JSONValueKind.OBJECT) {
-        const a = actionsArr[i].toObject();
-        const liqCall = a.get("Liquidate");
-        if (liqCall) {
-          /* -------------------------------------------------------------------------- */
-          /*                       Repaid asset: id & amount                            */
-          /* -------------------------------------------------------------------------- */
-          const in_assets = liqCall.toObject().get("in_assets");
-          const in_assets_array = in_assets!.toArray();
-          for (let i = 0; i < in_assets_array.length; i++) {
-            const asset = in_assets_array[i].toObject();
-            const asset_id = asset.get("token_id")!.toString();
-            const asset_amt = asset.get("amount")!.toString();
-            token_in.push(asset_id);
-            token_in_amount.push(asset_amt);
-          }
-          /* -------------------------------------------------------------------------- */
-          /*                            Collateral asset: id & amount                   */
-          /* -------------------------------------------------------------------------- */
-          const out_assets = liqCall.toObject().get("out_assets");
-          const out_assets_array = out_assets!.toArray();
-          for (let i = 0; i < out_assets_array.length; i++) {
-            const asset = out_assets_array[i].toObject();
-            const asset_id = asset.get("token_id");
-            const asset_amt = asset.get("amount");
-            token_out.push(asset_id!.toString());
-            token_out_amount.push(asset_amt!.toString());
+      for (let i = 0; i < actionsArr.length; i++) {
+        if (actionsArr[i].kind == JSONValueKind.OBJECT) {
+          const a = actionsArr[i].toObject();
+          const liqCall = a.get("Liquidate");
+          if (liqCall) {
+            /* -------------------------------------------------------------------------- */
+            /*                       Repaid asset: id & amount                            */
+            /* -------------------------------------------------------------------------- */
+            const in_assets = liqCall.toObject().get("in_assets");
+            const in_assets_array = in_assets!.toArray();
+            for (let i = 0; i < in_assets_array.length; i++) {
+              const asset = in_assets_array[i].toObject();
+              const asset_id = asset.get("token_id")!.toString();
+              const asset_amt = asset.get("amount")!.toString();
+              token_in.push(asset_id);
+              token_in_amount.push(asset_amt);
+            }
+            /* -------------------------------------------------------------------------- */
+            /*                            Collateral asset: id & amount                   */
+            /* -------------------------------------------------------------------------- */
+            const out_assets = liqCall.toObject().get("out_assets");
+            const out_assets_array = out_assets!.toArray();
+            for (let i = 0; i < out_assets_array.length; i++) {
+              const asset = out_assets_array[i].toObject();
+              const asset_id = asset.get("token_id");
+              const asset_amt = asset.get("amount");
+              token_out.push(asset_id!.toString());
+              token_out_amount.push(asset_amt!.toString());
+            }
           }
         }
       }
+    } else {
+      log.warning("No `msg` argument found in liquidation event.args", []);
     }
   }
 
