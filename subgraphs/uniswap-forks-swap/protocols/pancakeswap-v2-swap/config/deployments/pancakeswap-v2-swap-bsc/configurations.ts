@@ -36,6 +36,7 @@ export class PancakeswapV2BscConfigurations implements Configurations {
     return [
       "0xfbbd78a1bf76e43d5fc8f1f880f72718040acbe5", // 1
       "0x14111b627d35d3d54505247b4ef1a0754eb02eb7", // ZGLDao
+      "0x5285d9d9f784bce2aa7b82cf318d632d423c1047", // Magic
     ];
   }
 }
