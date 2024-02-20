@@ -13,7 +13,7 @@ import {
 } from "./initializers";
 import * as constants from "../common/constants";
 import { PoolFeesType, PoolTokensType } from "./types";
-import { Token, LiquidityPool } from "../../generated/schema";
+import { Token } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/Vault/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
