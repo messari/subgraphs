@@ -129,8 +129,6 @@ export function getOrCreatePool(
     pool.sharePriceAmount = BIGINT_ZERO;
     pool.sharePriceUSD = BIGDECIMAL_ZERO;
 
-    pool.traders = [];
-
     pool._lastDailySnapshotTimestamp = BIGINT_ZERO;
     pool._lastHourlySnapshotTimestamp = BIGINT_ZERO;
 
@@ -159,10 +157,6 @@ export function getOrCreateAccount(
 
     trader.createdTimestamp = event.block.timestamp;
     trader.createdBlockNumber = event.block.number;
-
-    trader.buys = [];
-    trader.sells = [];
-    trader.subjects = [];
   }
   return trader;
 }

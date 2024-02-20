@@ -6,7 +6,6 @@ import {
   getOrCreateToken,
 } from "../common/getters";
 import {
-  updateConnection,
   updateRevenue,
   updateShares,
   updateTVL,
@@ -41,7 +40,7 @@ export function handleTrade(event: Trade): void {
     event
   );
 
-  const tradeID = createTrade(
+  createTrade(
     token,
     traderAddress,
     subjectAddress,
@@ -58,8 +57,16 @@ export function handleTrade(event: Trade): void {
   updateRevenue(token, protocol, pool, subjectFeeAmount, protocolFeeAmount);
   updateVolume(token, protocol, pool, account, sharePriceAmount, isBuy);
   updateShares(token, pool, sharePriceAmount, supply);
-  updateUsage(protocol, pool, account, isBuy, tradeID);
-  updateConnection(token, connection, shares, sharePriceAmount, isBuy);
+  updateUsage(
+    protocol,
+    pool,
+    token,
+    account,
+    connection,
+    shares,
+    sharePriceAmount,
+    isBuy
+  );
 
   takeProtocolSnapshots(protocol, event);
   takePoolSnapshots(pool, event);
