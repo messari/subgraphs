@@ -31,17 +31,17 @@ import { getProtocol } from "./protocol";
 export function createMarket(
   id: Bytes,
   marketStruct: CreateMarketMarketParamsStruct | null,
-  event: ethereum.Event
+  event: ethereum.Event,
 ): Market {
   const market = new Market(id);
 
   const collateralToken = new TokenManager(
     marketStruct ? marketStruct.collateralToken : Address.zero(),
-    event
+    event,
   );
   const loanToken = new TokenManager(
     marketStruct ? marketStruct.loanToken : Address.zero(),
-    event
+    event,
   );
 
   market.protocol = getProtocol().id;

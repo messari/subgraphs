@@ -41,7 +41,7 @@ export function loadMetaMorphoMarketFromId(id: Bytes): MetaMorphoMarket {
 }
 export function loadMetaMorphoMarket(
   address: Address,
-  marketId: Bytes
+  marketId: Bytes,
 ): MetaMorphoMarket {
   const mmMarket = MetaMorphoMarket.load(address.concat(marketId));
   if (!mmMarket) {
@@ -81,7 +81,7 @@ export function updateMMRate(address: Address): void {
     const positionManager = new PositionManager(
       new AccountManager(address).getAccount(),
       market,
-      PositionSide.SUPPLIER
+      PositionSide.SUPPLIER,
     );
     const currentPosition = positionManager.getPosition();
 
@@ -89,10 +89,10 @@ export function updateMMRate(address: Address): void {
       const totalSupply = toAssetsDown(
         currentPosition.shares!,
         market.totalSupplyShares,
-        market.totalSupply
+        market.totalSupply,
       );
       accumulator = accumulator.plus(
-        totalSupply.toBigDecimal().times(marketSupplyRate!.rate)
+        totalSupply.toBigDecimal().times(marketSupplyRate!.rate),
       );
       total = total.plus(totalSupply.toBigDecimal());
     }

@@ -60,7 +60,7 @@ export class PositionManager {
   }
   addCollateralPosition(
     event: ethereum.Event,
-    amountSupplied: BigInt
+    amountSupplied: BigInt,
   ): Position {
     let positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
@@ -79,7 +79,7 @@ export class PositionManager {
       position = this._createPosition(
         positionID,
         event,
-        TransactionType.DEPOSIT_COLLATERAL
+        TransactionType.DEPOSIT_COLLATERAL,
       );
     }
 
@@ -115,14 +115,14 @@ export class PositionManager {
       position = this._createPosition(
         positionID,
         event,
-        TransactionType.DEPOSIT_COLLATERAL
+        TransactionType.DEPOSIT_COLLATERAL,
       );
     }
 
     const amountSupplied = toAssetsDown(
       sharesSupplied,
       this._market.totalSupplyShares,
-      this._market.totalSupply
+      this._market.totalSupply,
     );
     position.shares = position.shares
       ? position.shares!.plus(sharesSupplied)
@@ -131,7 +131,7 @@ export class PositionManager {
     const totalSupply = toAssetsDown(
       position.shares!,
       this._market.totalSupplyShares,
-      this._market.totalSupply
+      this._market.totalSupply,
     );
 
     position.balance = totalSupply;
@@ -166,14 +166,14 @@ export class PositionManager {
       position = this._createPosition(
         positionID,
         event,
-        TransactionType.BORROW
+        TransactionType.BORROW,
       );
     }
 
     const amountBorrowed = toAssetsUp(
       sharesBorrowed,
       this._market.totalBorrowShares,
-      this._market.totalBorrow
+      this._market.totalBorrow,
     );
     position.shares = position.shares
       ? position.shares!.plus(sharesBorrowed)
@@ -182,7 +182,7 @@ export class PositionManager {
     const totalBorrow = toAssetsUp(
       position.shares!,
       this._market.totalBorrowShares,
-      this._market.totalBorrow
+      this._market.totalBorrow,
     );
 
     position.balance = totalBorrow;
@@ -202,7 +202,7 @@ export class PositionManager {
 
   reduceCollateralPosition(
     event: ethereum.Event,
-    amountWithdrawn: BigInt
+    amountWithdrawn: BigInt,
   ): Position {
     const positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
@@ -263,14 +263,14 @@ export class PositionManager {
     const amountRepaid = toAssetsDown(
       sharesRepaid,
       this._market.totalBorrowShares,
-      this._market.totalBorrow
+      this._market.totalBorrow,
     );
     position.shares = position.shares!.minus(sharesRepaid);
 
     const totalBorrow = toAssetsUp(
       position.shares!,
       this._market.totalBorrowShares,
-      this._market.totalBorrow
+      this._market.totalBorrow,
     );
 
     position.balance = totalBorrow;
@@ -291,7 +291,7 @@ export class PositionManager {
 
   reduceSupplyPosition(
     event: ethereum.Event,
-    sharesWithdrawn: BigInt
+    sharesWithdrawn: BigInt,
   ): Position {
     const positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
@@ -315,14 +315,14 @@ export class PositionManager {
     const amountWithdrawn = toAssetsDown(
       sharesWithdrawn,
       this._market.totalSupplyShares,
-      this._market.totalSupply
+      this._market.totalSupply,
     );
     position.shares = position.shares!.minus(sharesWithdrawn);
 
     const totalSupply = toAssetsDown(
       position.shares!,
       this._market.totalSupplyShares,
-      this._market.totalSupply
+      this._market.totalSupply,
     );
 
     position.balance = totalSupply;
@@ -346,7 +346,7 @@ export class PositionManager {
       this._position!.id.concat("-")
         .concat(event.transaction.hash.toHexString())
         .concat("-")
-        .concat(event.logIndex.toString())
+        .concat(event.logIndex.toString()),
     );
     const token = new TokenManager(this._position!.asset, event);
     const mantissaFactorBD = exponentToBigDecimal(token.getDecimals());
@@ -381,7 +381,7 @@ export class PositionManager {
 
   private _countDailyActivePosition(
     counter: _PositionCounter,
-    event: ethereum.Event
+    event: ethereum.Event,
   ): void {
     const lastDay = counter.lastTimestamp.toI32() / SECONDS_PER_DAY;
     const currentDay = event.block.timestamp.toI32() / SECONDS_PER_DAY;
@@ -400,7 +400,7 @@ export class PositionManager {
   _createPosition(
     positionID: string,
     event: ethereum.Event,
-    transactionType: string
+    transactionType: string,
   ): Position {
     const position = new Position(positionID);
     position.account = this._account.id;

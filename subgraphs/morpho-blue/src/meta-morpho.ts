@@ -61,7 +61,7 @@ import { TokenManager } from "./sdk/token";
 import { toMetaMorphoAssetsUp } from "./utils/metaMorphoUtils";
 
 export function handleSubmitMarketRemoval(
-  event: SubmitMarketRemovalEvent
+  event: SubmitMarketRemovalEvent,
 ): void {
   const mm = loadMetaMorpho(event.address);
   const mmMarket = loadMetaMorphoMarket(event.address, event.params.id);
@@ -71,7 +71,7 @@ export function handleSubmitMarketRemoval(
   // TODO: add pending removal entity
 }
 export function handleRevokePendingMarketRemoval(
-  event: RevokePendingMarketRemovalEvent
+  event: RevokePendingMarketRemovalEvent,
 ): void {
   const mmMarket = loadMetaMorphoMarket(event.address, event.params.id);
   mmMarket.removableAt = BigInt.zero();
@@ -79,7 +79,7 @@ export function handleRevokePendingMarketRemoval(
 }
 
 export function handleReallocateWithdraw(
-  event: ReallocateWithdrawEvent
+  event: ReallocateWithdrawEvent,
 ): void {}
 
 export function handleReallocateSupply(event: ReallocateSupplyEvent): void {}
@@ -101,7 +101,7 @@ export function handleAccrueInterest(event: AccrueInterestEvent): void {
     event.params.feeShares,
     mm.totalShares,
     mm.lastTotalAssets,
-    token.getDecimals() as u8
+    token.getDecimals() as u8,
   );
   mm.feeAccruedAssets = mm.feeAccruedAssets.plus(feeAssets);
   mm.save();
@@ -118,7 +118,7 @@ export function handleAccrueInterest(event: AccrueInterestEvent): void {
     return;
   }
   feeRecipient.feeAccrued = feeRecipient.feeAccrued.plus(
-    event.params.feeShares
+    event.params.feeShares,
   );
   feeRecipient.feeAccruedAssets = feeRecipient.feeAccruedAssets.plus(feeAssets);
   feeRecipient.save();
@@ -134,7 +134,7 @@ export function handleAccrueInterest(event: AccrueInterestEvent): void {
   position.lastAssetsBalance = position.lastAssetsBalance.plus(feeAssets);
   position.lastAssetsBalanceUSD = new TokenManager(
     mm.asset,
-    event
+    event,
   ).getAmountUSD(position.lastAssetsBalance);
   position.shares = position.shares.plus(event.params.feeShares);
   position.save();
@@ -165,7 +165,7 @@ export function handleDeposit(event: DepositEvent): void {
   position.save();
 
   const deposit = new MetaMorphoDeposit(
-    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32()))
+    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32())),
   );
   deposit.hash = event.transaction.hash;
   deposit.nonce = event.transaction.nonce;
@@ -177,7 +177,7 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.timestamp = event.block.timestamp;
   deposit.account = position.account;
   deposit.accountActor = new AccountManager(
-    event.params.sender
+    event.params.sender,
   ).getAccount().id;
   deposit.asset = mm.asset;
   deposit.amount = event.params.assets;
@@ -189,17 +189,17 @@ export function handleDeposit(event: DepositEvent): void {
 }
 
 export function handleEIP712DomainChanged(
-  event: EIP712DomainChangedEvent
+  event: EIP712DomainChangedEvent,
 ): void {}
 
 export function handleOwnershipTransferStarted(
-  event: OwnershipTransferStartedEvent
+  event: OwnershipTransferStartedEvent,
 ): void {
   // TODO: use pending owner entity
 }
 
 export function handleOwnershipTransferred(
-  event: OwnershipTransferredEvent
+  event: OwnershipTransferredEvent,
 ): void {
   const mm = loadMetaMorpho(event.address);
   mm.owner = event.params.newOwner;
@@ -231,7 +231,7 @@ export function handleRevokePendingCap(event: RevokePendingCapEvent): void {
 }
 
 export function handleRevokePendingGuardian(
-  event: RevokePendingGuardianEvent
+  event: RevokePendingGuardianEvent,
 ): void {
   const mm = loadMetaMorpho(event.address);
   if (!mm.currentPendingGuardian) {
@@ -255,7 +255,7 @@ export function handleRevokePendingGuardian(
 }
 
 export function handleRevokePendingTimelock(
-  event: RevokePendingTimelockEvent
+  event: RevokePendingTimelockEvent,
 ): void {
   const mm = loadMetaMorpho(event.address);
   if (mm.currentPendingTimelock === null) {
@@ -344,7 +344,7 @@ export function handleSetFeeRecipient(event: SetFeeRecipientEvent): void {
   if (!feeRecipient) {
     feeRecipient = new FeeRecipient(event.params.newFeeRecipient);
     feeRecipient.account = new AccountManager(
-      event.params.newFeeRecipient
+      event.params.newFeeRecipient,
     ).getAccount().id;
     feeRecipient.isCurrentFeeRecipient = true;
     feeRecipient.metaMorpho = mm.id;
@@ -367,7 +367,7 @@ export function handleSetGuardian(event: SetGuardianEvent): void {
       return;
     }
     pendingGuardian.status = pendingGuardian.guardian.equals(
-      event.params.guardian
+      event.params.guardian,
     )
       ? PendingValueStatus.ACCEPTED
       : PendingValueStatus.OVERRIDDEN;
@@ -386,7 +386,7 @@ export function handleSetIsAllocator(event: SetIsAllocatorEvent): void {
   if (!allocator) {
     allocator = new MetaMorphoAllocator(allocatorId);
     allocator.account = new AccountManager(
-      event.params.allocator
+      event.params.allocator,
     ).getAccount().id;
     allocator.metaMorpho = mm.id;
   }
@@ -394,7 +394,7 @@ export function handleSetIsAllocator(event: SetIsAllocatorEvent): void {
   allocator.save();
 
   const allocatorSet = new AllocatorSet(
-    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32()))
+    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32())),
   );
   allocatorSet.hash = event.transaction.hash;
   allocatorSet.nonce = event.transaction.nonce;
@@ -424,7 +424,7 @@ export function handleSetSupplyQueue(event: SetSupplyQueueEvent): void {
     const mmMarket = loadMetaMorphoMarket(
       event.address,
       // The event contains a list of market ids, not MetaMorphoMarket ids
-      event.params.newSupplyQueue[i]
+      event.params.newSupplyQueue[i],
     );
     if (!mmMarket.isInSupplyQueue) {
       addedMarkets.push(mmMarket.id);
@@ -447,7 +447,7 @@ export function handleSetSupplyQueue(event: SetSupplyQueueEvent): void {
     event.address
       .concat(Bytes.fromI32(event.block.timestamp.toI32()))
       .concat(Bytes.fromI32(event.logIndex.toI32()))
-      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32())),
   );
   newQueue.queueType = QueueType.SUPPLY_QUEUE;
   newQueue.caller = new AccountManager(event.params.caller).getAccount().id;
@@ -474,7 +474,7 @@ export function handleSetTimelock(event: SetTimelockEvent): void {
       return;
     }
     pendingTimelock.status = pendingTimelock.timelock.equals(
-      event.params.newTimelock
+      event.params.newTimelock,
     )
       ? PendingValueStatus.ACCEPTED
       : PendingValueStatus.OVERRIDDEN;
@@ -495,7 +495,7 @@ export function handleSetWithdrawQueue(event: SetWithdrawQueueEvent): void {
     const mmMarket = loadMetaMorphoMarket(
       event.address,
       // The event contains a list of market ids, not MetaMorphoMarket ids
-      event.params.newWithdrawQueue[i]
+      event.params.newWithdrawQueue[i],
     );
     seen.set(mmMarket.id, true);
     newWithdrawQueue.push(mmMarket.id);
@@ -515,7 +515,7 @@ export function handleSetWithdrawQueue(event: SetWithdrawQueueEvent): void {
     event.address
       .concat(Bytes.fromI32(event.block.timestamp.toI32()))
       .concat(Bytes.fromI32(event.logIndex.toI32()))
-      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32())),
   );
   newQueue.queueType = QueueType.WITHDRAW_QUEUE;
   newQueue.caller = new AccountManager(event.params.caller).getAccount().id;
@@ -586,7 +586,7 @@ export function handleSubmitGuardian(event: SubmitGuardianEvent): void {
   const pendingGuardian = new PendingGuardian(id);
   pendingGuardian.metaMorpho = mm.id;
   pendingGuardian.guardian = new AccountManager(
-    event.params.newGuardian
+    event.params.newGuardian,
   ).getAccount().id;
   pendingGuardian.submittedAt = event.block.timestamp;
   pendingGuardian.validAt = event.block.timestamp.plus(mm.timelock);
@@ -601,7 +601,7 @@ export function handleSubmitTimelock(event: SubmitTimelockEvent): void {
   const mm = loadMetaMorpho(event.address);
   if (mm.currentPendingTimelock) {
     const prevPendingTimelock = PendingTimelock.load(
-      mm.currentPendingTimelock!
+      mm.currentPendingTimelock!,
     )!;
     if (!prevPendingTimelock) {
       log.critical("PendingTimelock {} not found", [
@@ -616,7 +616,7 @@ export function handleSubmitTimelock(event: SubmitTimelockEvent): void {
     event.address
       .concat(Bytes.fromI32(event.block.timestamp.toI32()))
       .concat(Bytes.fromI32(event.logIndex.toI32()))
-      .concat(Bytes.fromI32(event.transactionLogIndex.toI32()))
+      .concat(Bytes.fromI32(event.transactionLogIndex.toI32())),
   );
   pendingTimelock.timelock = event.params.newTimelock;
   pendingTimelock.metaMorpho = mm.id;
@@ -654,7 +654,7 @@ export function handleTransfer(event: TransferEvent): void {
     fromPosition.shares,
     mm.totalShares,
     mm.lastTotalAssets,
-    token.getDecimals() as u8
+    token.getDecimals() as u8,
   );
   fromPosition.lastAssetsBalance = fromAssets;
   fromPosition.lastAssetsBalanceUSD = token.getAmountUSD(fromAssets);
@@ -674,7 +674,7 @@ export function handleTransfer(event: TransferEvent): void {
   toPosition.save();
 
   const transfer = new MetaMorphoTransfer(
-    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32()))
+    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32())),
   );
   transfer.hash = event.transaction.hash;
   transfer.nonce = event.transaction.nonce;
@@ -699,7 +699,7 @@ export function handleTransfer(event: TransferEvent): void {
 export function handleTransferRewards(event: SkimEvent): void {}
 
 export function handleUpdateLastTotalAssets(
-  event: UpdateLastTotalAssetsEvent
+  event: UpdateLastTotalAssetsEvent,
 ): void {
   const mm = loadMetaMorpho(event.address);
   mm.lastTotalAssets = event.params.updatedTotalAssets;
@@ -723,14 +723,14 @@ export function handleWithdraw(event: WithdrawEvent): void {
     position.shares,
     mm.totalShares,
     mm.lastTotalAssets,
-    asset.getDecimals() as u8
+    asset.getDecimals() as u8,
   );
   position.lastAssetsBalance = totalAssets;
   position.lastAssetsBalanceUSD = asset.getAmountUSD(totalAssets);
   position.save();
 
   const withdraw = new MetaMorphoWithdraw(
-    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32()))
+    event.transaction.hash.concat(Bytes.fromI32(event.logIndex.toI32())),
   );
   withdraw.hash = event.transaction.hash;
   withdraw.nonce = event.transaction.nonce;
@@ -742,7 +742,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
   withdraw.timestamp = event.block.timestamp;
   withdraw.account = position.account;
   withdraw.accountActor = new AccountManager(
-    event.params.sender
+    event.params.sender,
   ).getAccount().id;
   withdraw.asset = mm.asset;
   withdraw.amount = event.params.assets;

@@ -74,7 +74,7 @@ export class DataManager {
   getOrUpdateRate(
     rateSide: string,
     rateType: string,
-    interestRate: BigDecimal
+    interestRate: BigDecimal,
   ): InterestRate {
     const interestRateID = rateSide
       .concat("-")
@@ -107,7 +107,7 @@ export class DataManager {
   getOrUpdateFee(
     feeType: string,
     flatFee: BigDecimal | null = null,
-    rate: BigDecimal | null = null
+    rate: BigDecimal | null = null,
   ): Fee {
     let fee = Fee.load(feeType);
     if (!fee) {
@@ -161,7 +161,7 @@ export class DataManager {
     borrowPosition: Position,
     collateralPosition: Position,
     repaid: BigInt,
-    seized: BigInt
+    seized: BigInt,
   ): Liquidate {
     const id = this._event.transaction.hash
       .concatI32(this._event.logIndex.toI32())
@@ -170,7 +170,7 @@ export class DataManager {
     const token = new TokenManager(this._market.borrowedToken, this._event);
     const collateralToken = new TokenManager(
       this._market.inputToken,
-      this._event
+      this._event,
     );
 
     const liquidate = new Liquidate(id);
@@ -215,7 +215,7 @@ export class DataManager {
     const deposit = new Deposit(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.DEPOSIT)
+        .concatI32(Transaction.DEPOSIT),
     );
     deposit.isCollateral = true;
 
@@ -238,7 +238,7 @@ export class DataManager {
     this._updateTransactionData(
       TransactionType.DEPOSIT_COLLATERAL,
       amount,
-      amountUSD
+      amountUSD,
     );
     this._updateUsageData(TransactionType.DEPOSIT_COLLATERAL, position.account);
 
@@ -253,7 +253,7 @@ export class DataManager {
     const deposit = new Deposit(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.DEPOSIT)
+        .concatI32(Transaction.DEPOSIT),
     );
     deposit.isCollateral = false;
 
@@ -287,7 +287,7 @@ export class DataManager {
     const withdraw = new Withdraw(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.WITHDRAW)
+        .concatI32(Transaction.WITHDRAW),
     );
     withdraw.hash = this._event.transaction.hash;
     withdraw.nonce = this._event.transaction.nonce;
@@ -311,12 +311,12 @@ export class DataManager {
     this._updateTransactionData(
       TransactionType.WITHDRAW_COLLATERAL,
       amount,
-      amountUSD
+      amountUSD,
     );
 
     this._updateUsageData(
       TransactionType.WITHDRAW_COLLATERAL,
-      position.account
+      position.account,
     );
 
     return withdraw;
@@ -330,7 +330,7 @@ export class DataManager {
     const withdraw = new Withdraw(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.WITHDRAW)
+        .concatI32(Transaction.WITHDRAW),
     );
     withdraw.hash = this._event.transaction.hash;
     withdraw.nonce = this._event.transaction.nonce;
@@ -366,7 +366,7 @@ export class DataManager {
     const borrow = new Borrow(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.BORROW)
+        .concatI32(Transaction.BORROW),
     );
     borrow.hash = this._event.transaction.hash;
     borrow.nonce = this._event.transaction.nonce;
@@ -394,7 +394,7 @@ export class DataManager {
   createRepay(
     position: Position,
     amount: BigInt,
-    shares: BigInt
+    shares: BigInt,
   ): Repay | null {
     const token = new TokenManager(this._market.borrowedToken, this._event);
 
@@ -403,7 +403,7 @@ export class DataManager {
     const repay = new Repay(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.REPAY)
+        .concatI32(Transaction.REPAY),
     );
 
     repay.hash = this._event.transaction.hash;
@@ -441,7 +441,7 @@ export class DataManager {
     const flashloan = new Flashloan(
       this._event.transaction.hash
         .concatI32(this._event.logIndex.toI32())
-        .concatI32(Transaction.FLASHLOAN)
+        .concatI32(Transaction.FLASHLOAN),
     );
     flashloan.hash = this._event.transaction.hash;
     flashloan.nonce = this._event.transaction.nonce;
@@ -510,10 +510,10 @@ export class DataManager {
         continue;
       }
       totalValueLockedUSD = totalValueLockedUSD.plus(
-        _market.totalValueLockedUSD
+        _market.totalValueLockedUSD,
       );
       totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
-        _market.totalBorrowBalanceUSD
+        _market.totalBorrowBalanceUSD,
       );
     }
     this._protocol.totalValueLockedUSD = totalValueLockedUSD;
@@ -525,7 +525,7 @@ export class DataManager {
   // Update the protocol revenue
   addProtocolRevenue(
     protocolRevenueDelta: BigDecimal,
-    fee: Fee | null = null
+    fee: Fee | null = null,
   ): void {
     this._updateRevenue(protocolRevenueDelta, BigDecimal.zero());
 
@@ -535,11 +535,11 @@ export class DataManager {
 
     const marketRevDetails = this.getOrCreateRevenueDetail(
       this._market.id,
-      true
+      true,
     );
     const protocolRevenueDetail = this.getOrCreateRevenueDetail(
       this._protocol.id,
-      false
+      false,
     );
 
     this._insertInOrder(marketRevDetails, protocolRevenueDelta, fee.id);
@@ -551,7 +551,7 @@ export class DataManager {
   // Update the protocol revenue
   addSupplyRevenue(
     supplyRevenueDelta: BigDecimal,
-    fee: Fee | null = null
+    fee: Fee | null = null,
   ): void {
     this._updateRevenue(BigDecimal.zero(), supplyRevenueDelta);
 
@@ -561,11 +561,11 @@ export class DataManager {
 
     const marketRevDetails = this.getOrCreateRevenueDetail(
       this._market.id,
-      true
+      true,
     );
     const protocolRevenueDetail = this.getOrCreateRevenueDetail(
       this._protocol.id,
-      false
+      false,
     );
 
     this._insertInOrder(marketRevDetails, supplyRevenueDelta, fee.id);
@@ -574,7 +574,7 @@ export class DataManager {
 
   private _updateRevenue(
     protocolRevenueDelta: BigDecimal,
-    supplyRevenueDelta: BigDecimal
+    supplyRevenueDelta: BigDecimal,
   ): void {
     const totalRevenueDelta = protocolRevenueDelta.plus(supplyRevenueDelta);
 
@@ -593,7 +593,7 @@ export class DataManager {
       this._protocol.cumulativeTotalRevenueUSD.plus(totalRevenueDelta);
     this._protocol.cumulativeProtocolSideRevenueUSD =
       this._protocol.cumulativeProtocolSideRevenueUSD.plus(
-        protocolRevenueDelta
+        protocolRevenueDelta,
       );
     this._protocol.cumulativeSupplySideRevenueUSD =
       this._protocol.cumulativeSupplySideRevenueUSD.plus(supplyRevenueDelta);
@@ -613,7 +613,7 @@ export class DataManager {
       transactionType,
       false,
       0,
-      this._market.id
+      this._market.id,
     );
     if (transactionType == TransactionType.DEPOSIT) {
       this._market.cumulativeUniqueDepositors += activityCounter(
@@ -621,13 +621,13 @@ export class DataManager {
         transactionType,
         true,
         0,
-        this._market.id
+        this._market.id,
       );
       this._protocol.cumulativeUniqueDepositors += activityCounter(
         account,
         transactionType,
         true,
-        0
+        0,
       );
     }
     if (transactionType == TransactionType.BORROW) {
@@ -636,13 +636,13 @@ export class DataManager {
         transactionType,
         true,
         0,
-        this._market.id
+        this._market.id,
       );
       this._protocol.cumulativeUniqueBorrowers += activityCounter(
         account,
         transactionType,
         true,
-        0
+        0,
       );
     }
     if (transactionType == TransactionType.LIQUIDATOR) {
@@ -651,13 +651,13 @@ export class DataManager {
         transactionType,
         true,
         0,
-        this._market.id
+        this._market.id,
       );
       this._protocol.cumulativeUniqueLiquidators += activityCounter(
         account,
         transactionType,
         true,
-        0
+        0,
       );
     }
     if (transactionType == TransactionType.LIQUIDATEE) {
@@ -666,13 +666,13 @@ export class DataManager {
         transactionType,
         true,
         0,
-        this._market.id
+        this._market.id,
       );
       this._protocol.cumulativeUniqueLiquidatees += activityCounter(
         account,
         transactionType,
         true,
-        0
+        0,
       );
     }
     if (transactionType == TransactionType.TRANSFER)
@@ -681,7 +681,7 @@ export class DataManager {
         transactionType,
         true,
         0,
-        this._market.id
+        this._market.id,
       );
     if (transactionType == TransactionType.FLASHLOAN)
       this._market.cumulativeUniqueFlashloaners += activityCounter(
@@ -689,7 +689,7 @@ export class DataManager {
         transactionType,
         true,
         0,
-        this._market.id
+        this._market.id,
       );
 
     this._protocol.save();
@@ -706,7 +706,7 @@ export class DataManager {
   private _updateTransactionData(
     transactionType: string,
     amount: BigInt,
-    amountUSD: BigDecimal
+    amountUSD: BigDecimal,
   ): void {
     if (
       transactionType == TransactionType.DEPOSIT ||
@@ -768,7 +768,7 @@ export class DataManager {
   private _insertInOrder(
     details: RevenueDetail,
     amountUSD: BigDecimal,
-    associatedSource: string
+    associatedSource: string,
   ): void {
     if (details.sources.length == 0) {
       details.sources = [associatedSource];
@@ -840,28 +840,28 @@ export class DataManager {
 
     const marketStruct = new IRM__borrowRateViewInputMarketStruct();
     marketStruct.push(
-      ethereum.Value.fromUnsignedBigInt(this._market.totalSupply)
+      ethereum.Value.fromUnsignedBigInt(this._market.totalSupply),
     );
     marketStruct.push(
-      ethereum.Value.fromUnsignedBigInt(this._market.totalSupplyShares)
+      ethereum.Value.fromUnsignedBigInt(this._market.totalSupplyShares),
     );
     marketStruct.push(
-      ethereum.Value.fromUnsignedBigInt(this._market.totalBorrow)
+      ethereum.Value.fromUnsignedBigInt(this._market.totalBorrow),
     );
     marketStruct.push(
-      ethereum.Value.fromUnsignedBigInt(this._market.totalBorrowShares)
+      ethereum.Value.fromUnsignedBigInt(this._market.totalBorrowShares),
     );
     marketStruct.push(
-      ethereum.Value.fromUnsignedBigInt(this._market.lastUpdate)
+      ethereum.Value.fromUnsignedBigInt(this._market.lastUpdate),
     );
     marketStruct.push(ethereum.Value.fromUnsignedBigInt(this._market.fee));
 
     const marketParams = new IRM__borrowRateViewInputMarketParamsStruct();
     marketParams.push(
-      ethereum.Value.fromAddress(Address.fromBytes(this._market.borrowedToken))
+      ethereum.Value.fromAddress(Address.fromBytes(this._market.borrowedToken)),
     );
     marketParams.push(
-      ethereum.Value.fromAddress(Address.fromBytes(this._market.inputToken))
+      ethereum.Value.fromAddress(Address.fromBytes(this._market.inputToken)),
     );
     const oracle = Oracle.load(this._market.oracle);
     if (!oracle) {
@@ -871,11 +871,11 @@ export class DataManager {
       return;
     }
     marketParams.push(
-      ethereum.Value.fromAddress(Address.fromBytes(oracle.oracleAddress))
+      ethereum.Value.fromAddress(Address.fromBytes(oracle.oracleAddress)),
     );
 
     marketParams.push(
-      ethereum.Value.fromAddress(Address.fromBytes(this._market.irm))
+      ethereum.Value.fromAddress(Address.fromBytes(this._market.irm)),
     );
     marketParams.push(ethereum.Value.fromUnsignedBigInt(this._market.lltv));
 
@@ -895,7 +895,7 @@ export class DataManager {
         .div(BIGDECIMAL_WAD);
 
       const feesPercent = BigDecimal.fromString("1").minus(
-        this._market.fee.toBigDecimal().div(BIGDECIMAL_WAD)
+        this._market.fee.toBigDecimal().div(BIGDECIMAL_WAD),
       );
       const supplyRate = borrowRate.times(utilization).times(feesPercent);
 

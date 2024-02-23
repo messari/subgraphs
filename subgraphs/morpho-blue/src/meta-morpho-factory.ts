@@ -19,7 +19,7 @@ export function handleCreateMetaMorpho(event: CreateMetaMorphoEvent): void {
   metaMorpho.asset = new TokenManager(event.params.asset, event).getToken().id;
 
   metaMorpho.owner = new AccountManager(
-    event.params.initialOwner
+    event.params.initialOwner,
   ).getAccount().id;
 
   metaMorpho.timelock = event.params.initialTimelock;
@@ -45,7 +45,7 @@ export function handleCreateMetaMorpho(event: CreateMetaMorphoEvent): void {
   metaMorpho.rate = rate.id;
 
   metaMorpho.account = new AccountManager(
-    event.params.metaMorpho
+    event.params.metaMorpho,
   ).getAccount().id;
 
   metaMorpho.save();

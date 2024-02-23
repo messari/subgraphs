@@ -13,14 +13,14 @@ import {
 const MORPHO_BLUE_ADDRESS = new Map<string, Address>();
 MORPHO_BLUE_ADDRESS.set(
   "mainnet",
-  Address.fromString("0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb")
+  Address.fromString("0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"),
 );
 
 let protocol: LendingProtocol | null = null;
 export function getProtocol(): LendingProtocol {
   if (protocol !== null) return protocol!;
   protocol = LendingProtocol.load(
-    MORPHO_BLUE_ADDRESS.get(dataSource.network())
+    MORPHO_BLUE_ADDRESS.get(dataSource.network()),
   );
   if (protocol) return protocol!;
   protocol = initBlue();
@@ -29,7 +29,7 @@ export function getProtocol(): LendingProtocol {
 
 function initBlue(): LendingProtocol {
   const protocol = new LendingProtocol(
-    MORPHO_BLUE_ADDRESS.get(dataSource.network())
+    MORPHO_BLUE_ADDRESS.get(dataSource.network()),
   );
   protocol.protocol = "Morpho";
   protocol.name = "Morpho Blue";

@@ -36,7 +36,7 @@ export class TokenManager {
   constructor(
     tokenAddress: Bytes,
     event: ethereum.Event,
-    tokenType: string | null = null
+    tokenType: string | null = null,
   ) {
     let _token = Token.load(tokenAddress);
     if (!_token) {
@@ -44,7 +44,7 @@ export class TokenManager {
       _token.name = this.fetchTokenName(Address.fromBytes(tokenAddress));
       _token.symbol = this.fetchTokenSymbol(Address.fromBytes(tokenAddress));
       _token.decimals = this.fetchTokenDecimals(
-        Address.fromBytes(tokenAddress)
+        Address.fromBytes(tokenAddress),
       );
       if (tokenType) {
         _token.type = tokenType;
@@ -66,7 +66,7 @@ export class TokenManager {
 
   updatePrice(): BigDecimal {
     this._token.lastPriceUSD = fetchUsdTokenPrice(
-      Address.fromBytes(this._token.id)
+      Address.fromBytes(this._token.id),
     );
 
     this._token.lastPriceBlockNumber = this.event.block.number;

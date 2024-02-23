@@ -4,7 +4,7 @@ export function toMetaMorphoAssetsUp(
   shares: BigInt,
   totalShares: BigInt,
   totalAssets: BigInt,
-  underlyingDecimals: u8
+  underlyingDecimals: u8,
 ): BigInt {
   const sharesOffset = underlyingDecimals > 18 ? 0 : 18 - underlyingDecimals;
   return shares
