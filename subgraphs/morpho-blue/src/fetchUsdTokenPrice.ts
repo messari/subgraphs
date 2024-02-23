@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-checksum-addresses */
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 import { ChainlinkPriceFeed } from "../generated/MorphoBlue/ChainlinkPriceFeed";

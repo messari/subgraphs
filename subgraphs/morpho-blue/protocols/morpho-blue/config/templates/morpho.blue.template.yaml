@@ -65,15 +65,15 @@ dataSources:
           handler: handleEnableLltv
         - event: FlashLoan(indexed address,indexed address,uint256)
           handler: handleFlashLoan
-        - event: IncrementNonce(indexed address,indexed address,uint256)
-          handler: handleIncrementNonce
+        # - event: IncrementNonce(indexed address,indexed address,uint256)
+        #   handler: handleIncrementNonce
         - event: Liquidate(indexed bytes32,indexed address,indexed
             address,uint256,uint256,uint256,uint256,uint256)
           handler: handleLiquidate
         - event: Repay(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleRepay
-        - event: SetAuthorization(indexed address,indexed address,indexed address,bool)
-          handler: handleSetAuthorization
+        # - event: SetAuthorization(indexed address,indexed address,indexed address,bool)
+        #   handler: handleSetAuthorization
         - event: SetFee(indexed bytes32,uint256)
           handler: handleSetFee
         - event: SetFeeRecipient(indexed address)
@@ -185,20 +185,20 @@ templates:
       eventHandlers:
         - event: AccrueInterest(uint256,uint256)
           handler: handleAccrueInterest
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
+        # - event: Approval(indexed address,indexed address,uint256)
+        #   handler: handleApproval
         - event: Deposit(indexed address,indexed address,uint256,uint256)
           handler: handleDeposit
-        - event: EIP712DomainChanged()
-          handler: handleEIP712DomainChanged
-        - event: OwnershipTransferStarted(indexed address,indexed address)
-          handler: handleOwnershipTransferStarted
+        # - event: EIP712DomainChanged()
+        #   handler: handleEIP712DomainChanged
+        # - event: OwnershipTransferStarted(indexed address,indexed address)
+        #   handler: handleOwnershipTransferStarted
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: ReallocateSupply(indexed address,indexed bytes32,uint256,uint256)
-          handler: handleReallocateSupply
-        - event: ReallocateWithdraw(indexed address,indexed bytes32,uint256,uint256)
-          handler: handleReallocateWithdraw
+        # - event: ReallocateSupply(indexed address,indexed bytes32,uint256,uint256)
+        #   handler: handleReallocateSupply
+        # - event: ReallocateWithdraw(indexed address,indexed bytes32,uint256,uint256)
+        #   handler: handleReallocateWithdraw
         - event: RevokePendingCap(indexed address,indexed bytes32)
           handler: handleRevokePendingCap
         - event: RevokePendingGuardian(indexed address)
@@ -219,16 +219,16 @@ templates:
           handler: handleSetGuardian
         - event: SetIsAllocator(indexed address,bool)
           handler: handleSetIsAllocator
-        - event: SetSkimRecipient(indexed address)
-          handler: handleSetSkimRecipient
+        # - event: SetSkimRecipient(indexed address)
+        #   handler: handleSetSkimRecipient
         - event: SetSupplyQueue(indexed address,bytes32[])
           handler: handleSetSupplyQueue
         - event: SetTimelock(indexed address,uint256)
           handler: handleSetTimelock
         - event: SetWithdrawQueue(indexed address,bytes32[])
           handler: handleSetWithdrawQueue
-        - event: Skim(indexed address,indexed address,uint256)
-          handler: handleSkim
+        # - event: Skim(indexed address,indexed address,uint256)
+        #   handler: handleSkim
         - event: SubmitCap(indexed address,indexed bytes32,uint256)
           handler: handleSubmitCap
         - event: SubmitGuardian(indexed address)
@@ -273,8 +273,8 @@ templates:
         - name: REth
           file: ./abis/REth.json
       callHandlers:
-        - function: confirmAggregator(address)
-          handler: handleConfirmAggregator
+        # - function: confirmAggregator(address)
+        #   handler: handleConfirmAggregator
       file: ./src/chainlink.ts
   - kind: ethereum
     name: ChainlinkPriceFeed
@@ -303,6 +303,6 @@ templates:
         - name: REth
           file: ./abis/REth.json
       eventHandlers:
-        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
-          handler: handleAnswerUpdated
+        # - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+        #   handler: handleAnswerUpdated
       file: ./src/chainlink.ts

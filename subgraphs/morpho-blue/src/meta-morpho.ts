@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 
 import {

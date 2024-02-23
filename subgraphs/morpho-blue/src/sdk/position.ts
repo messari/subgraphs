@@ -48,7 +48,7 @@ export class PositionManager {
   }
 
   getPosition(): Position | null {
-    let positionCounter = _PositionCounter.load(this._counterID);
+    const positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
       return null;
     }
@@ -204,7 +204,7 @@ export class PositionManager {
     event: ethereum.Event,
     amountWithdrawn: BigInt
   ): Position {
-    let positionCounter = _PositionCounter.load(this._counterID);
+    const positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
       log.critical("[subtractPosition] position counter {} not found", [
         this._counterID.toString(),
@@ -215,7 +215,7 @@ export class PositionManager {
       .concat("-")
       .concat(positionCounter.nextCount.toString());
 
-    let position = Position.load(positionID);
+    const position = Position.load(positionID);
 
     if (!position) {
       log.critical("[subtractPosition] position {} not found", [
@@ -241,7 +241,7 @@ export class PositionManager {
     return this._position!;
   }
   reduceBorrowPosition(event: ethereum.Event, sharesRepaid: BigInt): Position {
-    let positionCounter = _PositionCounter.load(this._counterID);
+    const positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
       log.critical("[subtractPosition] position counter {} not found", [
         this._counterID.toString(),
@@ -252,7 +252,7 @@ export class PositionManager {
       .concat("-")
       .concat(positionCounter.nextCount.toString());
 
-    let position = Position.load(positionID);
+    const position = Position.load(positionID);
 
     if (!position) {
       log.critical("[subtractPosition] position {} not found", [
@@ -293,7 +293,7 @@ export class PositionManager {
     event: ethereum.Event,
     sharesWithdrawn: BigInt
   ): Position {
-    let positionCounter = _PositionCounter.load(this._counterID);
+    const positionCounter = _PositionCounter.load(this._counterID);
     if (!positionCounter) {
       log.critical("[subtractPosition] position counter {} not found", [
         this._counterID.toString(),
@@ -304,7 +304,7 @@ export class PositionManager {
       .concat("-")
       .concat(positionCounter.nextCount.toString());
 
-    let position = Position.load(positionID);
+    const position = Position.load(positionID);
 
     if (!position) {
       log.critical("[subtractPosition] position {} not found", [

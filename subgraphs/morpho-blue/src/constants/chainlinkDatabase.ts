@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-checksum-addresses */
 import { Address } from "@graphprotocol/graph-ts";
 
 export class ChainlinkFeed {

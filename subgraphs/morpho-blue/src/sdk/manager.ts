@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Address,
   BigDecimal,
@@ -57,7 +58,7 @@ export class DataManager {
 
   constructor(marketID: Bytes, event: ethereum.Event) {
     this._protocol = getProtocol();
-    let _market = getMarket(marketID);
+    const _market = getMarket(marketID);
 
     this._inputToken = new TokenManager(_market.inputToken, event);
     this._borrowedToken = new TokenManager(_market.borrowedToken, event);
@@ -900,7 +901,7 @@ export class DataManager {
 
       const supplyRateId = this._market.id.toHexString() + "-supply";
 
-      let supplyRateSnapshot = InterestRate.load(supplyRateId);
+      const supplyRateSnapshot = InterestRate.load(supplyRateId);
       if (!supplyRateSnapshot) {
         log.critical("[updateInterestRates] Supply rate not found: {}", [
           supplyRateId,
@@ -912,7 +913,7 @@ export class DataManager {
 
       const borrowRateId = this._market.id.toHexString() + "-borrow";
 
-      let borrowRateSnapshot = InterestRate.load(borrowRateId);
+      const borrowRateSnapshot = InterestRate.load(borrowRateId);
       if (!borrowRateSnapshot) {
         log.critical("[updateInterestRates] Borrow rate not found: {}", [
           borrowRateId,
