@@ -1,0 +1,308 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MorphoBlue
+    network: {{ network }}
+    source:
+      address: "{{ morpho.address }}"
+      abi: MorphoBlue
+      startBlock: {{ morpho.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AccrueInterest
+        - Borrow
+        - CreateMarket
+        - EnableIrm
+        - EnableLltv
+        - FlashLoan
+        - IncrementNonce
+        - Liquidate
+        - Repay
+        - SetAuthorization
+        - SetFee
+        - SetFeeRecipient
+        - SetOwner
+        - Supply
+        - SupplyCollateral
+        - Withdraw
+        - WithdrawCollateral
+      abis:
+        - name: MorphoBlue
+          file: ./abis/MorphoBlue.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC4626
+          file: ./abis/ERC4626.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: IRM
+          file: ./abis/IRM.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/ChainlinkPriceFeed.json
+        - name: WstEth
+          file: ./abis/WstEth.json
+        - name: REth
+          file: ./abis/REth.json
+      eventHandlers:
+        - event: AccrueInterest(indexed bytes32,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: Borrow(indexed bytes32,address,indexed address,indexed address,uint256,uint256)
+          handler: handleBorrow
+        - event: CreateMarket(indexed bytes32,(address,address,address,address,uint256))
+          handler: handleCreateMarket
+        - event: EnableIrm(indexed address)
+          handler: handleEnableIrm
+        - event: EnableLltv(uint256)
+          handler: handleEnableLltv
+        - event: FlashLoan(indexed address,indexed address,uint256)
+          handler: handleFlashLoan
+        - event: IncrementNonce(indexed address,indexed address,uint256)
+          handler: handleIncrementNonce
+        - event: Liquidate(indexed bytes32,indexed address,indexed
+            address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLiquidate
+        - event: Repay(indexed bytes32,indexed address,indexed address,uint256,uint256)
+          handler: handleRepay
+        - event: SetAuthorization(indexed address,indexed address,indexed address,bool)
+          handler: handleSetAuthorization
+        - event: SetFee(indexed bytes32,uint256)
+          handler: handleSetFee
+        - event: SetFeeRecipient(indexed address)
+          handler: handleSetFeeRecipient
+        - event: SetOwner(indexed address)
+          handler: handleSetOwner
+        - event: Supply(indexed bytes32,indexed address,indexed address,uint256,uint256)
+          handler: handleSupply
+        - event: SupplyCollateral(indexed bytes32,indexed address,indexed address,uint256)
+          handler: handleSupplyCollateral
+        - event: Withdraw(indexed bytes32,address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: WithdrawCollateral(indexed bytes32,address,indexed address,indexed address,uint256)
+          handler: handleWithdrawCollateral
+      file: ./src/morpho-blue.ts
+  - kind: ethereum
+    name: MetaMorphoFactory
+    network: {{ network }}
+    source:
+      address: "{{ factory.address }}"
+      abi: MetaMorphoFactory
+      startBlock: {{ factory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CreateMetaMorpho
+      abis:
+        - name: MetaMorphoFactory
+          file: ./abis/MetaMorphoFactory.json
+        - name: MorphoBlue
+          file: ./abis/MorphoBlue.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC4626
+          file: ./abis/ERC4626.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: IRM
+          file: ./abis/IRM.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/ChainlinkPriceFeed.json
+        - name: WstEth
+          file: ./abis/WstEth.json
+        - name: REth
+          file: ./abis/REth.json
+      eventHandlers:
+        - event: CreateMetaMorpho(indexed address,indexed address,address,uint256,indexed
+            address,string,string,bytes32)
+          handler: handleCreateMetaMorpho
+      file: ./src/meta-morpho-factory.ts
+templates:
+  - kind: ethereum
+    name: MetaMorpho
+    network: mainnet
+    source:
+      abi: MetaMorpho
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - MetaMorphoAccrueInterest
+        - Approval
+        - Deposit
+        - EIP712DomainChanged
+        - OwnershipTransferStarted
+        - OwnershipTransferred
+        - ReallocateSupply
+        - ReallocateWithdraw
+        - RevokePendingCap
+        - RevokePendingGuardian
+        - RevokePendingMarketRemoval
+        - RevokePendingTimelock
+        - SetCap
+        - SetCurator
+        - MetaMorphoSetFee
+        - MetaMorphoSetFeeRecipient
+        - SetGuardian
+        - SetIsAllocator
+        - SetSkimRecipient
+        - SetSupplyQueue
+        - SetTimelock
+        - SetWithdrawQueue
+        - Skim
+        - SubmitCap
+        - SubmitGuardian
+        - SubmitMarketRemoval
+        - SubmitTimelock
+        - Transfer
+        - UpdateLastTotalAssets
+        - MetaMorphoWithdraw
+      abis:
+        - name: MetaMorpho
+          file: ./abis/MetaMorpho.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/ChainlinkPriceFeed.json
+        - name: WstEth
+          file: ./abis/WstEth.json
+        - name: ERC4626
+          file: ./abis/ERC4626.json
+        - name: REth
+          file: ./abis/REth.json
+      eventHandlers:
+        - event: AccrueInterest(uint256,uint256)
+          handler: handleAccrueInterest
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: EIP712DomainChanged()
+          handler: handleEIP712DomainChanged
+        - event: OwnershipTransferStarted(indexed address,indexed address)
+          handler: handleOwnershipTransferStarted
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: ReallocateSupply(indexed address,indexed bytes32,uint256,uint256)
+          handler: handleReallocateSupply
+        - event: ReallocateWithdraw(indexed address,indexed bytes32,uint256,uint256)
+          handler: handleReallocateWithdraw
+        - event: RevokePendingCap(indexed address,indexed bytes32)
+          handler: handleRevokePendingCap
+        - event: RevokePendingGuardian(indexed address)
+          handler: handleRevokePendingGuardian
+        - event: RevokePendingMarketRemoval(indexed address,indexed bytes32)
+          handler: handleRevokePendingMarketRemoval
+        - event: RevokePendingTimelock(indexed address)
+          handler: handleRevokePendingTimelock
+        - event: SetCap(indexed address,indexed bytes32,uint256)
+          handler: handleSetCap
+        - event: SetCurator(indexed address)
+          handler: handleSetCurator
+        - event: SetFee(indexed address,uint256)
+          handler: handleSetFee
+        - event: SetFeeRecipient(indexed address)
+          handler: handleSetFeeRecipient
+        - event: SetGuardian(indexed address,indexed address)
+          handler: handleSetGuardian
+        - event: SetIsAllocator(indexed address,bool)
+          handler: handleSetIsAllocator
+        - event: SetSkimRecipient(indexed address)
+          handler: handleSetSkimRecipient
+        - event: SetSupplyQueue(indexed address,bytes32[])
+          handler: handleSetSupplyQueue
+        - event: SetTimelock(indexed address,uint256)
+          handler: handleSetTimelock
+        - event: SetWithdrawQueue(indexed address,bytes32[])
+          handler: handleSetWithdrawQueue
+        - event: Skim(indexed address,indexed address,uint256)
+          handler: handleSkim
+        - event: SubmitCap(indexed address,indexed bytes32,uint256)
+          handler: handleSubmitCap
+        - event: SubmitGuardian(indexed address)
+          handler: handleSubmitGuardian
+        - event: SubmitMarketRemoval(indexed address,indexed bytes32)
+          handler: handleSubmitMarketRemoval
+        - event: SubmitTimelock(uint256)
+          handler: handleSubmitTimelock
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: UpdateLastTotalAssets(uint256)
+          handler: handleUpdateLastTotalAssets
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+      file: ./src/meta-morpho.ts
+  - kind: ethereum
+    name: ChainlinkAggregatorProxy
+    network: mainnet
+    source:
+      abi: ChainlinkAggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ConfirmAggregator
+      abis:
+        - name: ChainlinkAggregatorProxy
+          file: ./abis/chainlink/ChainlinkAggregatorProxy.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC4626
+          file: ./abis/ERC4626.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/ChainlinkPriceFeed.json
+        - name: WstEth
+          file: ./abis/WstEth.json
+        - name: REth
+          file: ./abis/REth.json
+      callHandlers:
+        - function: confirmAggregator(address)
+          handler: handleConfirmAggregator
+      file: ./src/chainlink.ts
+  - kind: ethereum
+    name: ChainlinkPriceFeed
+    network: mainnet
+    source:
+      abi: ChainlinkPriceFeed
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AnswerUpdated
+      abis:
+        - name: ChainlinkAggregatorProxy
+          file: ./abis/chainlink/ChainlinkAggregatorProxy.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/ChainlinkPriceFeed.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC4626
+          file: ./abis/ERC4626.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: REth
+          file: ./abis/REth.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleAnswerUpdated
+      file: ./src/chainlink.ts

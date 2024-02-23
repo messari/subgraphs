@@ -1,0 +1,11 @@
+{
+  "network": "mainnet",
+  "morpho": {
+    "startBlock": 18883124,
+    "address": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  },
+  "factory": {
+    "startBlock": 18925584,
+    "address": "0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101"
+  }
+}
