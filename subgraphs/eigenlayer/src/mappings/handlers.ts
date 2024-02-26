@@ -305,13 +305,11 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
   const withdrawalRoot = event.params.withdrawalRoot;
 
   let withdraw = getWithdraw(depositorAddress, withdrawalRoot);
-
   if (!withdraw) {
     log.warning(
-      "[getWithdraw] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
+      "[handleWithdrawalCompleted] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
       [depositorAddress.toHexString(), withdrawalRoot.toHexString()]
     );
-
     return;
   }
 
