@@ -10124,7 +10124,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.1.1",
-          "subgraph": "1.2.0",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {

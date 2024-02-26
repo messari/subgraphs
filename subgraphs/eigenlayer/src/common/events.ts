@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import { getOrCreateAccount, getOrCreateToken } from "./getters";
@@ -114,10 +114,6 @@ export function getWithdraw(
     }
   }
 
-  log.warning(
-    "[getWithdraw] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
-    [accountAddress.toHexString(), withdrawalRoot.toHexString()]
-  );
   return null;
 }
 
