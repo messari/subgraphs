@@ -297,6 +297,8 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("12.5");
   } else if (NetworkConfigs.getNetwork() == Network.MATIC) {
     return BigDecimal.fromString("2");
+  } else if (NetworkConfigs.getNetwork() == Network.POLYGON_ZKEVM) {
+    return BigDecimal.fromString("2");
   } else if (NetworkConfigs.getNetwork() == Network.XDAI) {
     return BigDecimal.fromString("5");
   } else if (NetworkConfigs.getNetwork() == Network.MOONBEAM) {
