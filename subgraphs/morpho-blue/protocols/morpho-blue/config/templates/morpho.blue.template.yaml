@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: MorphoBlue
-    network: { { network } }
+    network: {{ network }}
     source:
       address: "{{ morpho.address }}"
       abi: MorphoBlue
-      startBlock: { { morpho.startBlock } }
+      startBlock: {{ morpho.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -91,11 +91,11 @@ dataSources:
       file: ./src/morpho-blue.ts
   - kind: ethereum
     name: MetaMorphoFactory
-    network: { { network } }
+    network: {{ network }}
     source:
       address: "{{ factory.address }}"
       abi: MetaMorphoFactory
-      startBlock: { { factory.startBlock } }
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
