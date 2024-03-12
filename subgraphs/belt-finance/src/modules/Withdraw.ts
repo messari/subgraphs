@@ -39,7 +39,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.vault = vault.id;
     withdrawTransaction.protocol = constants.PROTOCOL_ID.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
+    withdrawTransaction.to = transaction.to ? transaction.to!.toHexString() : constants.NULL.TYPE_STRING;
     withdrawTransaction.from = transaction.from.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
