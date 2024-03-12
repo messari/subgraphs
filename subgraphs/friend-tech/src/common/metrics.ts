@@ -1,7 +1,7 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 
-import { INT_ONE } from "./constants";
-import { addToArrayAtIndex, bigIntToBigDecimal } from "./utils";
+import { BIGDECIMAL_ZERO, INT_ONE, INT_ZERO } from "./constants";
+import { bigIntToBigDecimal } from "./utils";
 
 import {
   Account,
@@ -140,46 +140,8 @@ export function updateShares(
 export function updateUsage(
   protocol: Protocol,
   pool: Pool,
-  account: Account,
-  isBuy: boolean,
-  tradeID: Bytes
-): void {
-  if (!account.buys.length && !account.sells.length) {
-    protocol.cumulativeUniqueUsers += INT_ONE;
-  }
-
-  if (isBuy) {
-    if (!account.buys.length) {
-      protocol.cumulativeUniqueBuyers += INT_ONE;
-    }
-    account.buys = addToArrayAtIndex(account.buys, tradeID);
-    account.cumulativeBuyCount += INT_ONE;
-    pool.cumulativeBuyCount += INT_ONE;
-    protocol.cumulativeBuyCount += INT_ONE;
-  } else {
-    if (!account.sells.length) {
-      protocol.cumulativeUniqueSellers += INT_ONE;
-    }
-    account.sells = addToArrayAtIndex(account.sells, tradeID);
-    account.cumulativeSellCount += INT_ONE;
-    pool.cumulativeSellCount += INT_ONE;
-    protocol.cumulativeSellCount += INT_ONE;
-  }
-  account.cumulativeTransactionCount += INT_ONE;
-  pool.cumulativeTransactionCount += INT_ONE;
-  protocol.cumulativeTransactionCount += INT_ONE;
-
-  if (!pool.traders.includes(account.id)) {
-    pool.cumulativeUniqueUsers += INT_ONE;
-    pool.traders = addToArrayAtIndex(pool.traders, account.id);
-  }
-  if (!account.subjects.includes(pool.id)) {
-    account.subjects = addToArrayAtIndex(account.subjects, account.id);
-  }
-}
-
-export function updateConnection(
   token: Token,
+  account: Account,
   connection: Connection,
   shares: BigInt,
   amount: BigInt,
@@ -187,16 +149,41 @@ export function updateConnection(
 ): void {
   const amountUSD = bigIntToBigDecimal(amount).times(token.lastPriceUSD!);
 
+  if (
+    account.cumulativeBuyCount == INT_ZERO &&
+    account.cumulativeSellCount == INT_ZERO
+  ) {
+    protocol.cumulativeUniqueUsers += INT_ONE;
+  }
+  if (
+    connection.cumulativeBuyVolumeUSD == BIGDECIMAL_ZERO &&
+    connection.cumulativeSellVolumeUSD == BIGDECIMAL_ZERO
+  ) {
+    pool.cumulativeUniqueUsers += INT_ONE;
+  }
+
   if (isBuy) {
+    if (account.cumulativeBuyCount == INT_ZERO) {
+      protocol.cumulativeUniqueBuyers += INT_ONE;
+    }
     connection.shares = connection.shares.plus(shares);
     connection.cumulativeBuyVolumeUSD =
       connection.cumulativeBuyVolumeUSD.plus(amountUSD);
     connection.cumulativeBuyCount += INT_ONE;
+    account.cumulativeBuyCount += INT_ONE;
+    pool.cumulativeBuyCount += INT_ONE;
+    protocol.cumulativeBuyCount += INT_ONE;
   } else {
+    if (account.cumulativeSellCount == INT_ZERO) {
+      protocol.cumulativeUniqueSellers += INT_ONE;
+    }
     connection.shares = connection.shares.minus(shares);
     connection.cumulativeSellVolumeUSD =
       connection.cumulativeSellVolumeUSD.plus(amountUSD);
     connection.cumulativeSellCount += INT_ONE;
+    account.cumulativeSellCount += INT_ONE;
+    pool.cumulativeSellCount += INT_ONE;
+    protocol.cumulativeSellCount += INT_ONE;
   }
   connection.cumulativeTotalVolumeUSD = connection.cumulativeBuyVolumeUSD.plus(
     connection.cumulativeSellVolumeUSD
@@ -205,4 +192,7 @@ export function updateConnection(
     connection.cumulativeSellVolumeUSD
   );
   connection.cumulativeTransactionCount += INT_ONE;
+  account.cumulativeTransactionCount += INT_ONE;
+  pool.cumulativeTransactionCount += INT_ONE;
+  protocol.cumulativeTransactionCount += INT_ONE;
 }

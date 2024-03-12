@@ -445,9 +445,6 @@ type Pool @entity @regularPolling {
 
   ##### Connections #####
 
-  " Traders that have bought subject shares "
-  traders: [Account!]!
-
   " Info about the connection between a trader and a subject "
   connections: [Connection!]! @derivedFrom(field: "subject")
 
@@ -767,29 +764,8 @@ type Account @entity @regularPolling {
   " Creation block number "
   createdBlockNumber: BigInt!
 
-  " All buy events for this account. "
-  buys: [Trade!]!
-
-  " All sell events for this account. "
-  sells: [Trade!]!
-
-  " Subjects that have been bought by the trader "
-  subjects: [Pool!]!
-
   " Info about the connection between a trader and a subject "
   connections: [Connection!]! @derivedFrom(field: "trader")
-}
-
-# Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity @regularPolling {
-  " {daily/hourly}-{ Days since Unix epoch }-{ Address of the account } "
-  id: Bytes!
-
-  " All buy events for this account. "
-  buys: [Trade!]!
-
-  " All sell events for this account. "
-  sells: [Trade!]!
 }
 
 #######################

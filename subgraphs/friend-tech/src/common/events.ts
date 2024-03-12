@@ -17,7 +17,7 @@ export function createTrade(
   tradeAmount: BigInt,
   isBuy: boolean,
   event: ethereum.Event
-): Bytes {
+): void {
   const sharePriceUSD = bigIntToBigDecimal(
     sharePriceAmount,
     token.decimals
@@ -63,6 +63,4 @@ export function createTrade(
   tradeEvent.blockNumber = event.block.number;
   tradeEvent.timestamp = event.block.timestamp;
   tradeEvent.save();
-
-  return tradeEvent.id;
 }

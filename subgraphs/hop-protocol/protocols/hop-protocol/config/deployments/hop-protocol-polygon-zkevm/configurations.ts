@@ -244,7 +244,7 @@ export class HopProtocolPolygonZKEVMConfigurations implements Configurations {
     return [];
   }
   getEthTokens(): string[] {
-    return [PolygonZKEVMToken.ETH, PolygonZKEVMToken.ETH];
+    return [PolygonZKEVMToken.ETH, PolygonZKEVMHToken.ETH];
   }
   getMaticTokens(): string[] {
     return [];

@@ -3,6 +3,7 @@ import { HopProtocolEthereumConfigurations } from "../../protocols/hop-protocol/
 import { HopProtocolOptimismConfigurations } from "../../protocols/hop-protocol/config/deployments/hop-protocol-optimism/configurations";
 import { HopProtocolxDaiConfigurations } from "../../protocols/hop-protocol/config/deployments/hop-protocol-xdai/configurations";
 import { HopProtocolPolygonConfigurations } from "../../protocols/hop-protocol/config/deployments/hop-protocol-polygon/configurations";
+import { HopProtocolPolygonZKEVMConfigurations } from "../../protocols/hop-protocol/config/deployments/hop-protocol-polygon-zkevm/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -23,6 +24,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.HOP_PROTOCOL_POLYGON: {
       return new HopProtocolPolygonConfigurations();
+    }
+    case Deploy.HOP_PROTOCOL_POLYGON_ZKEVM: {
+      return new HopProtocolPolygonZKEVMConfigurations();
     }
     default: {
       log.critical(

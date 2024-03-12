@@ -304,101 +304,111 @@ export function handleWithdrawalCompleted(event: WithdrawalCompleted): void {
   const depositorAddress = event.params.depositor;
   const withdrawalRoot = event.params.withdrawalRoot;
 
-  const withdraw = getWithdraw(depositorAddress, withdrawalRoot);
-  if (!withdraw) return;
-
-  const withdrawID = withdraw.id;
-  const poolID = withdraw.pool;
-  const tokenID = withdraw.token;
-  const accountID = withdraw.depositor;
-
-  let amount = BIGINT_ZERO;
-  const receipt = event.receipt;
-  if (!receipt) {
-    log.error("[handleWithdrawalCompleted] No event receipt. Tx: {}", [
-      event.transaction.hash.toHexString(),
-    ]);
-    return;
-  }
-  const logs = receipt.logs;
-  if (!logs) {
-    log.error("[handleWithdrawalCompleted] No logs for event receipt. Tx: {}", [
-      event.transaction.hash.toHexString(),
-    ]);
+  let withdraw = getWithdraw(depositorAddress, withdrawalRoot);
+  if (!withdraw) {
+    log.warning(
+      "[handleWithdrawalCompleted] queued withdraw transaction not found for depositor: {} and withdrawalRoot: {}",
+      [depositorAddress.toHexString(), withdrawalRoot.toHexString()]
+    );
     return;
   }
 
-  for (let i = 0; i < logs.length; i++) {
-    const thisLog = logs.at(i);
-    const logTopicSignature = thisLog.topics.at(INT_ZERO);
+  do {
+    const withdrawID = withdraw!.id;
+    const poolID = withdraw!.pool;
+    const tokenID = withdraw!.token;
+    const accountID = withdraw!.depositor;
 
-    if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
-      const logTopicFrom = ethereum
-        .decode("address", thisLog.topics.at(INT_ONE))!
-        .toAddress();
+    const receipt = event.receipt;
+    if (!receipt) {
+      log.error("[handleWithdrawalCompleted] No event receipt. Tx: {}", [
+        event.transaction.hash.toHexString(),
+      ]);
+      return;
+    }
+    const logs = receipt.logs;
+    if (!logs) {
+      log.error(
+        "[handleWithdrawalCompleted] No logs for event receipt. Tx: {}",
+        [event.transaction.hash.toHexString()]
+      );
+      return;
+    }
 
-      if (logTopicFrom.equals(Address.fromBytes(poolID))) {
-        const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
-        if (!decoded) continue;
+    let amount = BIGINT_ZERO;
 
-        const logData = decoded.toTuple();
-        amount = logData[INT_ZERO].toBigInt();
-        break;
+    for (let i = 0; i < logs.length; i++) {
+      const thisLog = logs.at(i);
+      const logTopicSignature = thisLog.topics.at(INT_ZERO);
+
+      if (logTopicSignature.equals(TRANSFER_SIGNATURE)) {
+        const logTopicFrom = ethereum
+          .decode("address", thisLog.topics.at(INT_ONE))!
+          .toAddress();
+
+        if (logTopicFrom.equals(Address.fromBytes(poolID))) {
+          const decoded = ethereum.decode(TRANSFER_DATA_TYPE, thisLog.data);
+          if (!decoded) continue;
+
+          const logData = decoded.toTuple();
+          amount = logData[INT_ZERO].toBigInt();
+          break;
+        }
       }
     }
-  }
 
-  updateUsage(
-    Address.fromBytes(poolID),
-    Address.fromBytes(tokenID),
-    Address.fromBytes(accountID),
-    false,
-    amount,
-    withdrawID,
-    event
-  );
+    updateUsage(
+      Address.fromBytes(poolID),
+      Address.fromBytes(tokenID),
+      Address.fromBytes(accountID),
+      false,
+      amount,
+      withdrawID,
+      event
+    );
 
-  const poolBalance = getPoolBalance(Address.fromBytes(poolID));
+    const poolBalance = getPoolBalance(Address.fromBytes(poolID));
 
-  updateTVL(
-    Address.fromBytes(poolID),
-    Address.fromBytes(tokenID),
-    poolBalance,
-    event
-  );
-  updateVolume(
-    Address.fromBytes(poolID),
-    Address.fromBytes(tokenID),
-    false,
-    amount,
-    event
-  );
-  updatePoolHourlySnapshot(Address.fromBytes(poolID), event);
-  updatePoolDailySnapshot(
-    Address.fromBytes(poolID),
-    Address.fromBytes(tokenID),
-    false,
-    amount,
-    event
-  );
-  updateUsageMetricsHourlySnapshot(Address.fromBytes(accountID), event);
-  updateUsageMetricsDailySnapshot(
-    Address.fromBytes(accountID),
-    false,
-    withdrawID,
-    event
-  );
-  updateFinancialsDailySnapshot(
-    Address.fromBytes(tokenID),
-    false,
-    amount,
-    event
-  );
-  updateWithdraw(
-    Address.fromBytes(accountID),
-    Address.fromBytes(tokenID),
-    withdrawID,
-    amount,
-    event
-  );
+    updateTVL(
+      Address.fromBytes(poolID),
+      Address.fromBytes(tokenID),
+      poolBalance,
+      event
+    );
+    updateVolume(
+      Address.fromBytes(poolID),
+      Address.fromBytes(tokenID),
+      false,
+      amount,
+      event
+    );
+    updatePoolHourlySnapshot(Address.fromBytes(poolID), event);
+    updatePoolDailySnapshot(
+      Address.fromBytes(poolID),
+      Address.fromBytes(tokenID),
+      false,
+      amount,
+      event
+    );
+    updateUsageMetricsHourlySnapshot(Address.fromBytes(accountID), event);
+    updateUsageMetricsDailySnapshot(
+      Address.fromBytes(accountID),
+      false,
+      withdrawID,
+      event
+    );
+    updateFinancialsDailySnapshot(
+      Address.fromBytes(tokenID),
+      false,
+      amount,
+      event
+    );
+    updateWithdraw(
+      Address.fromBytes(accountID),
+      Address.fromBytes(tokenID),
+      withdrawID,
+      amount,
+      event
+    );
+  } while ((withdraw = getWithdraw(depositorAddress, withdrawalRoot)));
 }
