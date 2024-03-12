@@ -59,6 +59,31 @@ type Token @entity @regularPolling {
   type: TokenType
 }
 
+enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
+  DEPOSIT
+
+  " For reward tokens awarded to borrowers of variable debt "
+  VARIABLE_BORROW
+
+  " For reward tokens awarded to borrowers of stable debt "
+  STABLE_BORROW
+
+  " For reward tokens awarded to stakers "
+  STAKE
+}
+
+type RewardToken @entity(immutable: true) @regularPolling {
+  " { Reward token type }-{ Smart contract address of the reward token } "
+  id: ID!
+
+  " Reference to the actual token "
+  token: Token!
+
+  " The type of the reward token "
+  type: RewardTokenType!
+}
+
 enum LendingType {
   " Collateralized Debt Position (CDP) protocols have singular isolated positions created by users. We aggregate them to give a single view of a market "
   CDP
@@ -314,6 +339,9 @@ interface Protocol {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
   " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
@@ -389,6 +417,9 @@ type LendingProtocol implements Protocol @entity @regularPolling {
   " The way a positions can be collateralized "
   collateralizationType: CollateralizationType
 
+  " Tokens that can be minted. Only applies to CDP (usually stable coins) "
+  mintedTokens: [Token!]
+
   ##### Quantitative Data #####
 
   " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
@@ -408,6 +439,9 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
+
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -438,6 +472,9 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
+
+  " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
+  mintedTokenSupplies: [BigInt!]
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -657,6 +694,12 @@ type FinancialsDailySnapshot @entity @dailySnapshot {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
+  " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
+  mintedTokenSupplies: [BigInt!]
+
   ##### Revenue #####
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
@@ -772,6 +815,20 @@ type Market @entity @regularPolling {
   relation: Bytes
   # TODO: should we keep this?
 
+  ##### Incentives #####
+
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total supply of output tokens that are staked. Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
   ##### Quantitative Data #####
 
   " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
@@ -782,6 +839,18 @@ type Market @entity @regularPolling {
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
+
+  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
+  outputToken: Token
+
+  " Total supply of output token (same order as outputTokens) "
+  outputTokenSupply: BigInt
+
+  " Prices in USD of the output token (same order as outputTokens) "
+  outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
+  exchangeRate: BigDecimal
 
   " All interest rates for this input token. Should be in APR format "
   rates: [InterestRate!]
@@ -798,14 +867,23 @@ type Market @entity @regularPolling {
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
 
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
+
   " Last updated timestamp of supply/borrow index. "
   indexLastUpdatedTimestamp: BigInt
 
   " Index used by the protocol to calculate interest generated on the supply token (ie, liquidityIndex in Aave)"
   supplyIndex: BigInt
 
+  " Allowed limit to how much of the underlying asset can be supplied to this market. "
+  supplyCap: BigInt
+
   " Index used by the protocol to calculate the interest paid on the borrowed token (ie, variableBorrowIndex in Aave))"
   borrowIndex: BigInt
+
+  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
+  borrowCap: BigInt
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -987,6 +1065,20 @@ type MarketDailySnapshot @entity @dailySnapshot {
   " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
   relation: Bytes
 
+  ##### Incentives #####
+
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total supply of output tokens that are staked. Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
   ##### Quantitative Data #####
 
   " Amount of input token in the market (same order as inputTokens) "
@@ -1015,6 +1107,15 @@ type MarketDailySnapshot @entity @dailySnapshot {
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
+
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
+
+  " Allowed limit to how much of the underlying asset can be supplied to this market. "
+  supplyCap: BigInt
+
+  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
+  borrowCap: BigInt
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1192,6 +1293,20 @@ type MarketHourlySnapshot @entity @hourlySnapshot {
 
   " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
   relation: Bytes
+
+  ##### Incentives #####
+
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total supply of output tokens that are staked. Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
 
   ##### Quantitative Data #####
 
