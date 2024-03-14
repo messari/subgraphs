@@ -3379,7 +3379,7 @@
     "deployments": {
       "morpho-blue-ethereum": {
         "network": "ethereum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.1.0",
           "subgraph": "1.0.0",
