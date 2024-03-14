@@ -1,0 +1,14 @@
+{
+  "name": "morpho-blue",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.68.3",
+    "@graphprotocol/graph-ts": "^0.33.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}
