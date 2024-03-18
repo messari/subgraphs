@@ -177,7 +177,7 @@ export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BigInt.fromI32(100));
 
 export const BIGDECIMAL_WAD = new BigDecimal(
-  BigInt.fromString("1000000000000000000")
+  BigInt.fromString("1000000000000000000"),
 );
 
 /////////////////////
@@ -220,7 +220,7 @@ export function bigDecimalToBigInt(x: BigDecimal): BigInt {
 export function BDChangeDecimals(
   x: BigDecimal,
   from: i32,
-  to: i32
+  to: i32,
 ): BigDecimal {
   if (to > from) {
     // increase number of decimals
@@ -239,7 +239,7 @@ export function BDChangeDecimals(
 export function insert<Type>(
   arr: Array<Type>,
   value: Type,
-  index: i32 = -1
+  index: i32 = -1,
 ): Array<Type> {
   if (arr.length == 0) {
     return [value];
@@ -265,7 +265,7 @@ export function activityCounter(
   transactionType: string,
   useTransactionType: boolean,
   intervalID: i32, // 0 = no intervalID
-  marketID: Bytes | null = null
+  marketID: Bytes | null = null,
 ): i32 {
   let activityID = account
     .toHexString()
@@ -296,7 +296,7 @@ export function activityCounter(
 export function txSignerCounter(
   signer: Bytes,
   intervalID: i32,
-  marketID: Bytes | null = null
+  marketID: Bytes | null = null,
 ): i32 {
   let id = signer.concat(Bytes.fromUTF8("-")).concat(Bytes.fromI32(intervalID));
   if (marketID) id = id.concat(Bytes.fromUTF8("-")).concat(marketID);

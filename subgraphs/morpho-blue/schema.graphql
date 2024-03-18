@@ -1655,7 +1655,7 @@ type _ActiveAccount @entity(immutable: true) {
 
 # Helper entity for calculating daily/hourly active users
 type _TxSigner @entity(immutable: true) {
-  " { daily/hourly }-{ Address of the account }-{ Optional: Transaction Type }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
+  " { Address of the account }-{ Days since Unix epoch - 0 for all time value }-{ Optional: Market Address } "
   id: ID!
 }
 
