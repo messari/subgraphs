@@ -48,6 +48,7 @@ function initBlue(): LendingProtocol {
   protocol.cumulativeUniqueBorrowers = INT_ZERO;
   protocol.cumulativeUniqueLiquidators = INT_ZERO;
   protocol.cumulativeUniqueLiquidatees = INT_ZERO;
+  protocol.cumulativeUniqueTxSigners = INT_ZERO;
 
   protocol.totalValueLockedUSD = BigDecimal.zero();
   protocol.cumulativeSupplySideRevenueUSD = BigDecimal.zero();

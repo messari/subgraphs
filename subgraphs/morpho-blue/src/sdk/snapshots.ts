@@ -27,6 +27,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   TransactionType,
+  txSignerCounter,
 } from "./constants";
 
 /**
@@ -153,6 +154,7 @@ export class SnapshotManager {
       snapshot.dailyActiveLiquidatees = INT_ZERO;
       snapshot.dailyActiveTransferrers = INT_ZERO;
       snapshot.dailyActiveFlashloaners = INT_ZERO;
+      snapshot.dailyActiveTxSigners = INT_ZERO;
       snapshot.dailyDepositCount = INT_ZERO;
       snapshot.dailyWithdrawCount = INT_ZERO;
       snapshot.dailyBorrowCount = INT_ZERO;
@@ -257,6 +259,7 @@ export class SnapshotManager {
       snapshot.dailyActiveBorrowers = INT_ZERO;
       snapshot.dailyActiveLiquidators = INT_ZERO;
       snapshot.dailyActiveLiquidatees = INT_ZERO;
+      snapshot.dailyActiveTxSigners = INT_ZERO;
       snapshot.dailyTransactionCount = INT_ZERO;
       snapshot.dailyDepositCount = INT_ZERO;
       snapshot.dailyWithdrawCount = INT_ZERO;
@@ -276,6 +279,8 @@ export class SnapshotManager {
       this.protocol.cumulativeUniqueLiquidators;
     snapshot.cumulativeUniqueLiquidatees =
       this.protocol.cumulativeUniqueLiquidatees;
+    snapshot.cumulativeUniqueTxSigners =
+      this.protocol.cumulativeUniqueTxSigners;
     snapshot.cumulativePositionCount = this.protocol.cumulativePositionCount;
     snapshot.openPositionCount = this.protocol.openPositionCount;
     snapshot.totalPoolCount = this.protocol.totalPoolCount;
@@ -304,6 +309,8 @@ export class SnapshotManager {
       snapshot.hourlyLiquidateCount = INT_ZERO;
     }
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
+    snapshot.cumulativeUniqueTxSigners =
+      this.protocol.cumulativeUniqueTxSigners;
     snapshot.blockNumber = this.event.block.number;
     snapshot.timestamp = this.event.block.timestamp;
 
@@ -315,25 +322,29 @@ export class SnapshotManager {
   ///// Updaters /////
   ////////////////////
 
-  updateUsageData(transactionType: string, account: Bytes): void {
+  updateUsageData(
+    transactionType: string,
+    account: Bytes,
+    txSigner: Bytes
+  ): void {
     this.usageDailySnapshot.dailyActiveUsers += activityCounter(
       account,
       transactionType,
       false,
-      this.marketDailySnapshot.days,
+      this.marketDailySnapshot.days
     );
     this.marketDailySnapshot.dailyActiveUsers += activityCounter(
       account,
       transactionType,
       false,
       this.marketDailySnapshot.days,
-      this.market.id,
+      this.market.id
     );
     this.usageHourlySnapshot.hourlyActiveUsers += activityCounter(
       account,
       transactionType,
       false,
-      this.marketHourlySnapshot.hours,
+      this.marketHourlySnapshot.hours
     );
     if (
       transactionType === TransactionType.DEPOSIT ||
@@ -343,14 +354,14 @@ export class SnapshotManager {
         account,
         transactionType,
         true,
-        this.marketDailySnapshot.days,
+        this.marketDailySnapshot.days
       );
       this.marketDailySnapshot.dailyActiveDepositors += activityCounter(
         account,
         transactionType,
         true,
         this.marketDailySnapshot.days,
-        this.market.id,
+        this.market.id
       );
     }
     if (transactionType === TransactionType.BORROW) {
@@ -358,13 +369,13 @@ export class SnapshotManager {
         account,
         transactionType,
         true,
-        this.marketDailySnapshot.days,
+        this.marketDailySnapshot.days
       );
       this.marketDailySnapshot.dailyActiveBorrowers += activityCounter(
         account,
         transactionType,
         true,
-        this.marketDailySnapshot.days,
+        this.marketDailySnapshot.days
       );
     }
     if (transactionType === TransactionType.LIQUIDATOR) {
@@ -372,14 +383,14 @@ export class SnapshotManager {
         account,
         transactionType,
         true,
-        this.marketDailySnapshot.days,
+        this.marketDailySnapshot.days
       );
       this.marketDailySnapshot.dailyActiveLiquidators += activityCounter(
         account,
         transactionType,
         true,
         this.marketDailySnapshot.days,
-        this.market.id,
+        this.market.id
       );
     }
     if (transactionType === TransactionType.LIQUIDATEE) {
@@ -387,14 +398,14 @@ export class SnapshotManager {
         account,
         transactionType,
         true,
-        this.marketDailySnapshot.days,
+        this.marketDailySnapshot.days
       );
       this.marketDailySnapshot.dailyActiveLiquidatees += activityCounter(
         account,
         transactionType,
         true,
         this.marketDailySnapshot.days,
-        this.market.id,
+        this.market.id
       );
     }
     if (transactionType === TransactionType.FLASHLOAN)
@@ -403,8 +414,18 @@ export class SnapshotManager {
         transactionType,
         true,
         this.marketDailySnapshot.days,
-        this.market.id,
+        this.market.id
       );
+
+    this.usageDailySnapshot.dailyActiveTxSigners += txSignerCounter(
+      txSigner,
+      this.marketDailySnapshot.days
+    );
+    this.marketDailySnapshot.dailyActiveTxSigners += txSignerCounter(
+      txSigner,
+      this.marketDailySnapshot.days,
+      this.market.id
+    );
 
     this.marketDailySnapshot.save();
     this.usageDailySnapshot.save();
@@ -414,7 +435,7 @@ export class SnapshotManager {
   updateTransactionData(
     transactionType: string,
     amount: BigInt,
-    amountUSD: BigDecimal,
+    amountUSD: BigDecimal
   ): void {
     if (
       transactionType === TransactionType.DEPOSIT ||
@@ -505,7 +526,7 @@ export class SnapshotManager {
 
   updateRevenue(
     protocolRevenueDelta: BigDecimal,
-    supplyRevenueDelta: BigDecimal,
+    supplyRevenueDelta: BigDecimal
   ): void {
     const totalRevenueDelta = protocolRevenueDelta.plus(supplyRevenueDelta);
 
@@ -514,11 +535,11 @@ export class SnapshotManager {
       this.marketHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueDelta);
     this.marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
       this.marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-        protocolRevenueDelta,
+        protocolRevenueDelta
       );
     this.marketHourlySnapshot.hourlySupplySideRevenueUSD =
       this.marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-        supplyRevenueDelta,
+        supplyRevenueDelta
       );
     this.marketHourlySnapshot.save();
 
@@ -527,11 +548,11 @@ export class SnapshotManager {
       this.marketDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
     this.marketDailySnapshot.dailyProtocolSideRevenueUSD =
       this.marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        protocolRevenueDelta,
+        protocolRevenueDelta
       );
     this.marketDailySnapshot.dailySupplySideRevenueUSD =
       this.marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-        supplyRevenueDelta,
+        supplyRevenueDelta
       );
     this.marketDailySnapshot.save();
 
@@ -540,7 +561,7 @@ export class SnapshotManager {
       this.financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
     this.financialSnapshot.dailyProtocolSideRevenueUSD =
       this.financialSnapshot.dailyProtocolSideRevenueUSD.plus(
-        protocolRevenueDelta,
+        protocolRevenueDelta
       );
     this.financialSnapshot.dailySupplySideRevenueUSD =
       this.financialSnapshot.dailySupplySideRevenueUSD.plus(supplyRevenueDelta);
@@ -587,19 +608,19 @@ export class SnapshotManager {
 
   private getSnapshotRevenueDetail(
     currID: Bytes,
-    timeSuffix: i32,
+    timeSuffix: i32
   ): Bytes | null {
     const currDetails = RevenueDetail.load(currID);
     if (!currDetails) {
       log.error(
         "[getRevenueDetailSnapshot] Cannot find revenue details id: {}",
-        [currID.toHexString()],
+        [currID.toHexString()]
       );
       return null;
     }
 
     const newDetails = new RevenueDetail(
-      currDetails.id.concat(Bytes.fromI32(timeSuffix)),
+      currDetails.id.concat(Bytes.fromI32(timeSuffix))
     );
     newDetails.sources = currDetails.sources;
     newDetails.amountsUSD = currDetails.amountsUSD;

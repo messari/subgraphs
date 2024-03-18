@@ -108,6 +108,7 @@ export function createMarket(
   market.cumulativeUniqueLiquidatees = INT_ZERO;
   market.cumulativeUniqueTransferrers = INT_ZERO;
   market.cumulativeUniqueFlashloaners = INT_ZERO;
+  market.cumulativeUniqueTxSigners = INT_ZERO;
 
   market.positionCount = INT_ZERO;
   market.openPositionCount = INT_ZERO;
