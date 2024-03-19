@@ -14,7 +14,6 @@
 - [AssemblyScript API](https://thegraph.com/docs/en/developer/assemblyscript-api/)
 - [Grafting a subgraph](https://thegraph.com/docs/en/cookbook/grafting/)
 - [Unit Test Using Matchstick](https://thegraph.com/docs/en/developer/matchstick/)
-- [Building a Subgraph for Sushiswap](https://docs.simplefi.finance/subgraph-development-documentation/sushiswap-subgraph-development)
 - [Building a Subgraph for Loopring](https://www.youtube.com/watch?v=SNmzhwlQqgU)
   - Using templates (dynamic data sources)
   - Indexing proxies
