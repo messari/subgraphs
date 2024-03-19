@@ -29,6 +29,7 @@ export namespace Network {
 
   export const METIS = "ANDROMEDA";
   export const BASE = "BASE";
+  export const SCROLL = "SCROLL";
 }
 
 export namespace ProtocolType {

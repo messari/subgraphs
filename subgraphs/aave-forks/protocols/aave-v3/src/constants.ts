@@ -85,6 +85,21 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Address.fromString("0xe20fcbdbffc4dd138ce8b2e6fbb6cb49777ad64d"),
       Network.BASE
     );
+  } else if (equalsIgnoreCase(network, Network.GNOSIS)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x36616cf17557639614c1cddb356b1b83fc0b2132"),
+      Network.GNOSIS
+    );
+  } else if (equalsIgnoreCase(network, Network.BSC)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0xff75b6da14ffbbfd355daf7a2731456b3562ba6d"),
+      Network.BSC
+    );
+  } else if (equalsIgnoreCase(network, Network.SCROLL)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x69850d0b276776781c063771b161bd8894bcdd04"),
+      Network.SCROLL
+    );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
       network,
