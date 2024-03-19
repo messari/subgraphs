@@ -1,0 +1,11 @@
+{
+  "deployment": "SPOOKYSWAP_FANTOM",
+  "network": "fantom",
+  "factory": {
+    "address": "0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3",
+    "startBlock": 3795376
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 31025565
+}

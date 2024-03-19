@@ -6,4 +6,5 @@ export namespace Deploy {
   export const QUICKSWAP_POLYGON = 1;
   export const PANCAKESWAP_V2_BSC = 2;
   export const BASESWAP_BASE = 3;
+  export const SPOOKYSWAP_FANTOM = 4;
 }

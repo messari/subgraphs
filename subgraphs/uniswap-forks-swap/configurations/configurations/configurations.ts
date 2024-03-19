@@ -7,6 +7,7 @@ import { UniswapV2MainnetConfigurations } from "../../protocols/uniswap-v2-swap/
 import { QuickswapMaticConfigurations } from "../../protocols/quickswap-swap/config/deployments/quickswap-swap-polygon/configurations";
 import { PancakeswapV2BscConfigurations } from "../../protocols/pancakeswap-v2-swap/config/deployments/pancakeswap-v2-swap-bsc/configurations";
 import { BaseswapBaseConfigurations } from "../../protocols/baseswap-swap/config/deployments/baseswap-swap-base/configurations";
+import { SpookyswapFantomConfigurations } from "../../protocols/spookyswap-swap/config/deployments/spookyswap-swap-fantom/configurations";
 
 // This function is called to load in the proper configurations for a protocol/network deployment.
 // To add a new deployment, add a value to the `Deploy` namespace and add a new configuration class to the network specific typescript file in the `protocols` folder.
@@ -25,10 +26,13 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     case Deploy.BASESWAP_BASE: {
       return new BaseswapBaseConfigurations();
     }
+    case Deploy.SPOOKYSWAP_FANTOM: {
+      return new SpookyswapFantomConfigurations();
+    }
     default: {
       log.critical(
         "No configurations found for deployment protocol/network",
-        []
+        [],
       );
       return new UniswapV2MainnetConfigurations();
     }
