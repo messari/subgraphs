@@ -1,21 +1,21 @@
 {
   "dependencies": {
-    "minimist": "^1.2.6",
+    "minimist": "^1.2.8",
     "mustache": "^4.2.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-ts": "^0.28.0",
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "eslint": "^8.23.1",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-rulesdir": "^0.2.1",
+    "@graphprotocol/graph-ts": "^0.28.1",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-rulesdir": "^0.2.2",
     "ethereum-address": "^0.0.4",
     "folderslint": "^1.2.0",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.4"
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
+    "prettier": "^2.8.8",
+    "typescript": "^4.9.5"
   },
   "lint-staged": {
     "subgraphs/**/*.ts": "npm run lint",
