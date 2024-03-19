@@ -44,6 +44,7 @@ import {
   INT_ONE,
   Transaction,
   TransactionType,
+  txSignerCounter,
 } from "./constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
@@ -162,6 +163,7 @@ export class DataManager {
     collateralPosition: Position,
     repaid: BigInt,
     seized: BigInt,
+    txSigner: Bytes,
   ): Liquidate {
     const id = this._event.transaction.hash
       .concatI32(this._event.logIndex.toI32())
@@ -202,12 +204,20 @@ export class DataManager {
     liquidate.save();
 
     this._updateTransactionData(TransactionType.LIQUIDATE, seized, seizedUSD);
-    this._updateUsageData(TransactionType.LIQUIDATE, borrowPosition.account);
+    this._updateUsageData(
+      TransactionType.LIQUIDATE,
+      borrowPosition.account,
+      txSigner,
+    );
 
     return liquidate;
   }
 
-  createDepositCollateral(position: Position, amount: BigInt): Deposit {
+  createDepositCollateral(
+    position: Position,
+    amount: BigInt,
+    txSigner: Bytes,
+  ): Deposit {
     const token = new TokenManager(this._market.inputToken, this._event);
 
     const amountUSD = token.getAmountUSD(amount);
@@ -240,12 +250,21 @@ export class DataManager {
       amount,
       amountUSD,
     );
-    this._updateUsageData(TransactionType.DEPOSIT_COLLATERAL, position.account);
+    this._updateUsageData(
+      TransactionType.DEPOSIT_COLLATERAL,
+      position.account,
+      txSigner,
+    );
 
     return deposit;
   }
 
-  createDeposit(position: Position, amount: BigInt, shares: BigInt): Deposit {
+  createDeposit(
+    position: Position,
+    amount: BigInt,
+    shares: BigInt,
+    txSigner: Bytes,
+  ): Deposit {
     const token = new TokenManager(this._market.inputToken, this._event);
 
     const amountUSD = token.getAmountUSD(amount);
@@ -274,12 +293,16 @@ export class DataManager {
     deposit.save();
 
     this._updateTransactionData(TransactionType.DEPOSIT, amount, amountUSD);
-    this._updateUsageData(TransactionType.DEPOSIT, position.account);
+    this._updateUsageData(TransactionType.DEPOSIT, position.account, txSigner);
 
     return deposit;
   }
 
-  createWithdrawCollateral(position: Position, amount: BigInt): Withdraw {
+  createWithdrawCollateral(
+    position: Position,
+    amount: BigInt,
+    txSigner: Bytes,
+  ): Withdraw {
     const token = new TokenManager(this._market.inputToken, this._event);
 
     const amountUSD = token.getAmountUSD(amount);
@@ -317,12 +340,18 @@ export class DataManager {
     this._updateUsageData(
       TransactionType.WITHDRAW_COLLATERAL,
       position.account,
+      txSigner,
     );
 
     return withdraw;
   }
 
-  createWithdraw(position: Position, amount: BigInt, shares: BigInt): Withdraw {
+  createWithdraw(
+    position: Position,
+    amount: BigInt,
+    shares: BigInt,
+    txSigner: Bytes,
+  ): Withdraw {
     const token = new TokenManager(this._market.borrowedToken, this._event);
 
     const amountUSD = token.getAmountUSD(amount);
@@ -353,12 +382,17 @@ export class DataManager {
     withdraw.save();
 
     this._updateTransactionData(TransactionType.WITHDRAW, amount, amountUSD);
-    this._updateUsageData(TransactionType.WITHDRAW, position.account);
+    this._updateUsageData(TransactionType.WITHDRAW, position.account, txSigner);
 
     return withdraw;
   }
 
-  createBorrow(position: Position, amount: BigInt, shares: BigInt): Borrow {
+  createBorrow(
+    position: Position,
+    amount: BigInt,
+    shares: BigInt,
+    txSigner: Bytes,
+  ): Borrow {
     const token = new TokenManager(this._market.borrowedToken, this._event);
 
     const amountUSD = token.getAmountUSD(amount);
@@ -386,7 +420,7 @@ export class DataManager {
     borrow.save();
 
     this._updateTransactionData(TransactionType.BORROW, amount, amountUSD);
-    this._updateUsageData(TransactionType.BORROW, position.account);
+    this._updateUsageData(TransactionType.BORROW, position.account, txSigner);
 
     return borrow;
   }
@@ -395,6 +429,7 @@ export class DataManager {
     position: Position,
     amount: BigInt,
     shares: BigInt,
+    txSigner: Bytes,
   ): Repay | null {
     const token = new TokenManager(this._market.borrowedToken, this._event);
 
@@ -424,12 +459,17 @@ export class DataManager {
     repay.save();
 
     this._updateTransactionData(TransactionType.REPAY, amount, amountUSD);
-    this._updateUsageData(TransactionType.REPAY, position.account);
+    this._updateUsageData(TransactionType.REPAY, position.account, txSigner);
 
     return repay;
   }
 
-  createFlashloan(asset: Address, account: Address, amount: BigInt): Flashloan {
+  createFlashloan(
+    asset: Address,
+    account: Address,
+    amount: BigInt,
+    txSigner: Bytes,
+  ): Flashloan {
     const flashloaner = new AccountManager(account).getAccount();
 
     flashloaner.flashloanCount += INT_ONE;
@@ -461,7 +501,7 @@ export class DataManager {
     flashloan.save();
 
     this._updateTransactionData(TransactionType.FLASHLOAN, amount, amountUSD);
-    this._updateUsageData(TransactionType.FLASHLOAN, account);
+    this._updateUsageData(TransactionType.FLASHLOAN, account, txSigner);
 
     return flashloan;
   }
@@ -607,7 +647,11 @@ export class DataManager {
   //
   // this only updates the usage data for the entities changed in this class
   // (ie, market and protocol)
-  private _updateUsageData(transactionType: string, account: Bytes): void {
+  private _updateUsageData(
+    transactionType: string,
+    account: Bytes,
+    txSigner: Bytes,
+  ): void {
     this._market.cumulativeUniqueUsers += activityCounter(
       account,
       transactionType,
@@ -692,11 +736,18 @@ export class DataManager {
         this._market.id,
       );
 
+    this._protocol.cumulativeUniqueTxSigners += txSignerCounter(txSigner, 0);
+    this._market.cumulativeUniqueTxSigners += txSignerCounter(
+      txSigner,
+      0,
+      this._market.id,
+    );
+
     this._protocol.save();
     this._market.save();
 
     // update the snapshots in their respective class
-    this._snapshots.updateUsageData(transactionType, account);
+    this._snapshots.updateUsageData(transactionType, account, txSigner);
   }
 
   //

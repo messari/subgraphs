@@ -1,6 +1,6 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
-import { _ActiveAccount } from "../../generated/schema";
+import { _ActiveAccount, _TxSigner } from "../../generated/schema";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -290,5 +290,23 @@ export function activityCounter(
     return INT_ONE;
   }
 
+  return INT_ZERO;
+}
+
+export function txSignerCounter(
+  signer: Bytes,
+  intervalID: i32,
+  marketID: Bytes | null = null,
+): i32 {
+  let id = signer.concat(Bytes.fromUTF8("-")).concat(Bytes.fromI32(intervalID));
+  if (marketID) id = id.concat(Bytes.fromUTF8("-")).concat(marketID);
+
+  let txSigner = _TxSigner.load(id.toHexString());
+  if (!txSigner) {
+    txSigner = new _TxSigner(id.toHexString());
+    txSigner.save();
+
+    return INT_ONE;
+  }
   return INT_ZERO;
 }

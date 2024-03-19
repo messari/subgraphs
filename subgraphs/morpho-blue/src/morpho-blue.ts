@@ -25,7 +25,12 @@ import { BadDebtRealization } from "../generated/schema";
 import { createMarket, getMarket, getZeroMarket } from "./initializers/markets";
 import { getProtocol } from "./initializers/protocol";
 import { AccountManager } from "./sdk/account";
-import { BIGDECIMAL_WAD, PositionSide } from "./sdk/constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_WAD,
+  FeeType,
+  PositionSide,
+} from "./sdk/constants";
 import { DataManager } from "./sdk/manager";
 import { PositionManager } from "./sdk/position";
 import { TokenManager } from "./sdk/token";
@@ -65,6 +70,22 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   }
 
   market.save();
+
+  const borrowedToken = new TokenManager(market.borrowedToken, event);
+  const totalRevenueDelta = borrowedToken.getAmountUSD(event.params.interest);
+  const protocolRevenueDelta = totalRevenueDelta.times(market.reserveFactor);
+  const supplyRevenueDelta = totalRevenueDelta.times(
+    BIGDECIMAL_ONE.minus(market.reserveFactor),
+  );
+
+  const manager = new DataManager(market.id, event);
+  const fee = manager.getOrUpdateFee(
+    FeeType.PROTOCOL_FEE,
+    null,
+    market.reserveFactor,
+  );
+  manager.addProtocolRevenue(protocolRevenueDelta, fee);
+  manager.addSupplyRevenue(supplyRevenueDelta, fee);
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -89,7 +110,12 @@ export function handleBorrow(event: Borrow): void {
   market.save();
 
   const manager = new DataManager(market.id, event);
-  manager.createBorrow(position, event.params.shares, event.params.assets);
+  manager.createBorrow(
+    position,
+    event.params.shares,
+    event.params.assets,
+    event.transaction.from,
+  );
 
   manager.updateMarketAndProtocolData();
 }
@@ -130,6 +156,7 @@ export function handleFlashLoan(event: FlashLoan): void {
     event.params.token,
     event.params.caller,
     event.params.assets,
+    event.transaction.from,
   );
 }
 
@@ -181,6 +208,7 @@ export function handleLiquidate(event: Liquidate): void {
     collateralPosition.getPosition()!,
     event.params.seizedAssets,
     event.params.repaidAssets,
+    event.transaction.from,
   );
 
   collateralPosition.reduceCollateralPosition(event, event.params.seizedAssets);
@@ -232,7 +260,12 @@ export function handleRepay(event: Repay): void {
   market.save();
 
   const manager = new DataManager(market.id, event);
-  manager.createRepay(position, event.params.shares, event.params.assets);
+  manager.createRepay(
+    position,
+    event.params.shares,
+    event.params.assets,
+    event.transaction.from,
+  );
 
   manager.updateMarketAndProtocolData();
 }
@@ -277,7 +310,12 @@ export function handleSupply(event: Supply): void {
   market.save();
 
   const manager = new DataManager(market.id, event);
-  manager.createDeposit(position, event.params.shares, event.params.assets);
+  manager.createDeposit(
+    position,
+    event.params.shares,
+    event.params.assets,
+    event.transaction.from,
+  );
 
   manager.updateMarketAndProtocolData();
 }
@@ -300,7 +338,11 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   );
 
   const manager = new DataManager(market.id, event);
-  manager.createDepositCollateral(position, event.params.assets);
+  manager.createDepositCollateral(
+    position,
+    event.params.assets,
+    event.transaction.from,
+  );
 
   manager.updateMarketAndProtocolData();
 }
@@ -326,7 +368,12 @@ export function handleWithdraw(event: Withdraw): void {
   market.save();
 
   const manager = new DataManager(market.id, event);
-  manager.createWithdraw(position, event.params.shares, event.params.assets);
+  manager.createWithdraw(
+    position,
+    event.params.shares,
+    event.params.assets,
+    event.transaction.from,
+  );
 
   manager.updateMarketAndProtocolData();
 }
@@ -349,7 +396,11 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   );
 
   const manager = new DataManager(market.id, event);
-  manager.createWithdrawCollateral(position, event.params.assets);
+  manager.createWithdrawCollateral(
+    position,
+    event.params.assets,
+    event.transaction.from,
+  );
 
   manager.updateMarketAndProtocolData();
 }

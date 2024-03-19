@@ -69,6 +69,10 @@ const EURe = Address.fromString(
   "0x3231cb76718cdef2155fc47b5286d82e6eda273f",
 ).toHexString();
 
+const ezETH = Address.fromString(
+  "0xbf5495efe5db9ce00f80364c8b423567e58d2110",
+).toHexString();
+
 const usdPriceFeeds = new Map<string, string>()
   .set(
     wbib01,
@@ -113,12 +117,19 @@ const usdPriceFeeds = new Map<string, string>()
     ).toHexString(),
   );
 
-const ethPriceFeeds = new Map<string, string>().set(
-  osETH,
-  Address.fromString(
-    "0x66ac817f997Efd114EDFcccdce99F3268557B32C",
-  ).toHexString(),
-);
+const ethPriceFeeds = new Map<string, string>()
+  .set(
+    osETH,
+    Address.fromString(
+      "0x66ac817f997Efd114EDFcccdce99F3268557B32C",
+    ).toHexString(),
+  )
+  .set(
+    ezETH,
+    Address.fromString(
+      "0xF4a3e183F59D2599ee3DF213ff78b1B3b1923696",
+    ).toHexString(),
+  );
 
 const eurPriceFeeds = new Map<string, string>().set(
   wbc3m,

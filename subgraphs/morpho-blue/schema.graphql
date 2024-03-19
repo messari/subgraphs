@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 3.1.0
+# Version: 3.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -345,6 +345,9 @@ interface Protocol {
   " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
+
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
 
@@ -436,6 +439,9 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   " Number of cumulative liquidatees (accounts that got liquidated) "
   cumulativeUniqueLiquidatees: Int!
+
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
@@ -591,6 +597,12 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " Number of cumulative liquidatees (accounts that got liquidated) "
   cumulativeUniqueLiquidatees: Int!
 
+  " Number of unique daily active users. e.g. accounts that signed transactions to interact with this protocol "
+  dailyActiveTxSigners: Int!
+
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
+
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
@@ -649,6 +661,9 @@ type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
 
   " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
+
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
   hourlyTransactionCount: Int!
@@ -968,6 +983,9 @@ type Market @entity @regularPolling {
   " Number of cumulative accounts that performed flashloans "
   cumulativeUniqueFlashloaners: Int!
 
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
+
   ##### Account/Position Data #####
 
   " All positions in this market "
@@ -1226,6 +1244,9 @@ type MarketDailySnapshot @entity @dailySnapshot {
 
   " Number of unique daily accounts that executed a flash loan"
   dailyActiveFlashloaners: Int!
+
+  " Number of unique daily active users. e.g. accounts that signed transaction to interact with this market "
+  dailyActiveTxSigners: Int!
 
   " Total number of deposits in a day "
   dailyDepositCount: Int!
@@ -1629,6 +1650,12 @@ type PositionSnapshot @entity(immutable: true) @hourlySnapshot {
 # Helper entity for calculating daily/hourly active users
 type _ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Optional: Transaction Type }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
+  id: ID!
+}
+
+# Helper entity for calculating daily/hourly active users
+type _TxSigner @entity(immutable: true) {
+  " { Address of the account }-{ Days since Unix epoch - 0 for all time value }-{ Optional: Market Address } "
   id: ID!
 }
 
