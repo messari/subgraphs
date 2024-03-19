@@ -27,7 +27,7 @@ export function createWithdrawTransaction(
   amount: BigInt,
   amountUSD: BigDecimal,
   transaction: ethereum.Transaction,
-  block: ethereum.Block
+  block: ethereum.Block,
 ): WithdrawTransaction {
   const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
@@ -39,7 +39,9 @@ export function createWithdrawTransaction(
     withdrawTransaction.vault = vault.id;
     withdrawTransaction.protocol = constants.PROTOCOL_ID.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
+    withdrawTransaction.to = transaction.to
+      ? transaction.to!.toHexString()
+      : constants.NULL.TYPE_STRING;
     withdrawTransaction.from = transaction.from.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
@@ -80,7 +82,7 @@ export function Withdraw(
   withdrawAmount: BigInt,
   sharesBurnt: BigInt,
   transaction: ethereum.Transaction,
-  block: ethereum.Block
+  block: ethereum.Block,
 ): void {
   const vault = getOrCreateVault(vaultAddress, block);
   const vaultContract = VaultContract.bind(vaultAddress);
@@ -89,13 +91,13 @@ export function Withdraw(
 
   const withdrawAmountUSD = withdrawAmount
     .divDecimal(
-      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal(),
     )
     .times(inputToken.lastPriceUSD!);
 
   const withdrawFeePercentage = utils.getStrategyWithdrawalFees(
     vaultAddress,
-    strategyAddress
+    strategyAddress,
   );
 
   const withdrawalFeeUSD = withdrawAmountUSD
@@ -104,17 +106,17 @@ export function Withdraw(
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
-    constants.BIGINT_ZERO
+    constants.BIGINT_ZERO,
   );
 
   vault.inputTokenBalance = utils.readValue<BigInt>(
     vaultContract.try_calcPoolValueInToken(),
-    constants.BIGINT_ZERO
+    constants.BIGINT_ZERO,
   );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .divDecimal(
-      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal(),
     )
     .times(inputToken.lastPriceUSD!);
 
@@ -127,14 +129,14 @@ export function Withdraw(
     withdrawAmount,
     withdrawAmountUSD,
     transaction,
-    block
+    block,
   );
 
   updateRevenueSnapshots(
     vault,
     constants.BIGDECIMAL_ZERO,
     withdrawalFeeUSD,
-    block
+    block,
   );
 
   utils.updateProtocolTotalValueLockedUSD();
@@ -149,6 +151,6 @@ export function Withdraw(
       withdrawalFeeUSD.toString(),
       withdrawAmountUSD.toString(),
       transaction.hash.toHexString(),
-    ]
+    ],
   );
 }

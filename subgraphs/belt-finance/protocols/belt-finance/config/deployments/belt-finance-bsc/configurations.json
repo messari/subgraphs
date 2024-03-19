@@ -1,5 +1,8 @@
 {
   "chain": "bsc",
+  "graftEnabled": false,
+  "subgraphId": "QmRkmnecqKZZsCaJiZ3yn7aEST2k2Y7qVsPEoFsU4dksJ4",
+  "graftStartBlock": 36845779,
   
   "MasterBeltAddress": "0xd4bbc80b9b102b77b21a06cb77e954049605e6c1",
   "MasterBeltStartBlock": 5246883,
