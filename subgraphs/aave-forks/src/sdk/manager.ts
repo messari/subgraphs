@@ -38,6 +38,7 @@ import {
   ProtocolType,
   Transaction,
   TransactionType,
+  txSignerCounter,
 } from "./constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
@@ -142,6 +143,7 @@ export class DataManager {
       _market.cumulativeUniqueLiquidatees = INT_ZERO;
       _market.cumulativeUniqueTransferrers = INT_ZERO;
       _market.cumulativeUniqueFlashloaners = INT_ZERO;
+      _market.cumulativeUniqueTxSigners = INT_ZERO;
 
       _market.createdTimestamp = event.block.timestamp;
       _market.createdBlockNumber = event.block.number;
@@ -197,6 +199,7 @@ export class DataManager {
       protocol.cumulativeUniqueBorrowers = INT_ZERO;
       protocol.cumulativeUniqueLiquidators = INT_ZERO;
       protocol.cumulativeUniqueLiquidatees = INT_ZERO;
+      protocol.cumulativeUniqueTxSigners = INT_ZERO;
       protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
       protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
       protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -375,6 +378,7 @@ export class DataManager {
   createDeposit(
     asset: Bytes,
     account: Bytes,
+    txSigner: Bytes,
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
@@ -428,7 +432,7 @@ export class DataManager {
     deposit.save();
 
     this.updateTransactionData(TransactionType.DEPOSIT, amount, amountUSD);
-    this.updateUsageData(TransactionType.DEPOSIT, account);
+    this.updateUsageData(TransactionType.DEPOSIT, account, txSigner);
 
     return deposit;
   }
@@ -436,6 +440,7 @@ export class DataManager {
   createWithdraw(
     asset: Bytes,
     account: Bytes,
+    txSigner: Bytes,
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
@@ -492,7 +497,7 @@ export class DataManager {
     withdraw.save();
 
     this.updateTransactionData(TransactionType.WITHDRAW, amount, amountUSD);
-    this.updateUsageData(TransactionType.WITHDRAW, account);
+    this.updateUsageData(TransactionType.WITHDRAW, account, txSigner);
 
     return withdraw;
   }
@@ -500,6 +505,7 @@ export class DataManager {
   createBorrow(
     asset: Bytes,
     account: Bytes,
+    txSigner: Bytes,
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
@@ -555,7 +561,7 @@ export class DataManager {
     borrow.save();
 
     this.updateTransactionData(TransactionType.BORROW, amount, amountUSD);
-    this.updateUsageData(TransactionType.BORROW, account);
+    this.updateUsageData(TransactionType.BORROW, account, txSigner);
 
     return borrow;
   }
@@ -563,6 +569,7 @@ export class DataManager {
   createRepay(
     asset: Bytes,
     account: Bytes,
+    txSigner: Bytes,
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
@@ -620,7 +627,7 @@ export class DataManager {
     repay.save();
 
     this.updateTransactionData(TransactionType.REPAY, amount, amountUSD);
-    this.updateUsageData(TransactionType.REPAY, account);
+    this.updateUsageData(TransactionType.REPAY, account, txSigner);
 
     return repay;
   }
@@ -644,6 +651,7 @@ export class DataManager {
     debtTokenId: Bytes,
     liquidator: Address,
     liquidatee: Address,
+    txSigner: Bytes,
     amount: BigInt,
     amountUSD: BigDecimal,
     profitUSD: BigDecimal,
@@ -751,7 +759,7 @@ export class DataManager {
 
     this.updateTransactionData(TransactionType.LIQUIDATE, amount, amountUSD);
     this.updateUsageData(TransactionType.LIQUIDATEE, liquidatee);
-    this.updateUsageData(TransactionType.LIQUIDATOR, liquidator);
+    this.updateUsageData(TransactionType.LIQUIDATOR, liquidator, txSigner);
 
     return liquidate;
   }
@@ -1114,7 +1122,11 @@ export class DataManager {
   //
   // this only updates the usage data for the entities changed in this class
   // (ie, market and protocol)
-  private updateUsageData(transactionType: string, account: Bytes): void {
+  private updateUsageData(
+    transactionType: string,
+    account: Bytes,
+    txSigner: Bytes | null = null
+  ): void {
     this.market.cumulativeUniqueUsers += activityCounter(
       account,
       transactionType,
@@ -1199,11 +1211,24 @@ export class DataManager {
         this.market.id
       );
 
+    if (txSigner) {
+      this.protocol.cumulativeUniqueTxSigners += txSignerCounter(txSigner, 0);
+      this.market.cumulativeUniqueTxSigners += txSignerCounter(
+        txSigner,
+        0,
+        this.market.id
+      );
+    }
+
     this.protocol.save();
     this.saveMarket();
 
     // update the snapshots in their respective class
-    this.snapshots.updateUsageData(transactionType, account);
+    if (txSigner) {
+      this.snapshots.updateUsageData(transactionType, account, txSigner);
+    } else {
+      this.snapshots.updateUsageData(transactionType, account);
+    }
   }
 
   //
