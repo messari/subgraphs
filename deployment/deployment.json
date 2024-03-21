@@ -580,6 +580,10 @@
           "hosted-service": {
             "slug": "aave-v3-gnosis",
             "query-id": "aave-v3-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-gnosis",
+            "query-id": "GiNMLDxT1Bdn2dQZxjQLmW24uwpc3geKUBW8RP6oEdg"
           }
         }
       },
@@ -602,6 +606,10 @@
           "hosted-service": {
             "slug": "aave-v3-bsc",
             "query-id": "aave-v3-bsc"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-bsc",
+            "query-id": "43jbGkvSw55sMvYyF6MZieksmJbajMu3hNGF8PN9ucuP"
           }
         }
       },
@@ -624,6 +632,10 @@
           "hosted-service": {
             "slug": "aave-v3-scroll",
             "query-id": "aave-v3-scroll"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-scroll",
+            "query-id": "DkvXMxq1skgSe1ehLHWpiUthHU1znnMDK2SUmj9avhEX"
           }
         }
       }
