@@ -1105,7 +1105,13 @@ export function _handleFlashLoan(
   const tokenManager = new TokenManager(asset, event);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
-  const flashloan = manager.createFlashloan(asset, account, amount, amountUSD);
+  const flashloan = manager.createFlashloan(
+    asset,
+    account,
+    event.transaction.from,
+    amount,
+    amountUSD
+  );
   flashloan.feeAmount = premiumAmount;
   flashloan.feeAmountUSD = premiumUSDTotal;
   flashloan.save();

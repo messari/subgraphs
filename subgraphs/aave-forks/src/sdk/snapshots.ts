@@ -37,7 +37,7 @@ import {
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.1
- * SDK Version:     1.0.8
+ * SDK Version:     1.0.9
  * Author(s):
  *  - @melotik
  *  - @dhruv-chauhan

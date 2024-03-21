@@ -53,7 +53,7 @@ import { PositionManager } from "./position";
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version:  3.1.1
- * SDK Version:     1.0.8
+ * SDK Version:     1.0.9
  * Author(s):
  *  - @melotik
  *  - @dhruv-chauhan
@@ -853,6 +853,7 @@ export class DataManager {
   createFlashloan(
     asset: Address,
     account: Address,
+    txSigner: Bytes,
     amount: BigInt,
     amountUSD: BigDecimal
   ): Flashloan {
@@ -884,7 +885,7 @@ export class DataManager {
     flashloan.save();
 
     this.updateTransactionData(TransactionType.FLASHLOAN, amount, amountUSD);
-    this.updateUsageData(TransactionType.FLASHLOAN, account);
+    this.updateUsageData(TransactionType.FLASHLOAN, account, txSigner);
 
     return flashloan;
   }
