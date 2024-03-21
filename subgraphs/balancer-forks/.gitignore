@@ -1,1 +1,2 @@
 subgraph.yaml
+src/common/constants.ts

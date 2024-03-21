@@ -13,7 +13,7 @@ import {
 } from "./initializers";
 import * as constants from "../common/constants";
 import { PoolFeesType, PoolTokensType } from "./types";
-import { Token, LiquidityPool } from "../../generated/schema";
+import { Token } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/Vault/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
@@ -324,18 +324,14 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
 
 export function updateProtocolTotalValueLockedUSD(): void {
   const protocol = getOrCreateDexAmmProtocol();
-
-  const poolIds = protocol._poolIds;
+  const pools = protocol.pools.load();
   let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
-  for (let poolIdx = 0; poolIdx < poolIds.length; poolIdx++) {
-    const pool = LiquidityPool.load(poolIds[poolIdx]);
-
+  for (let i = 0; i < pools.length; i++) {
+    const pool = pools[i];
     if (
       !pool ||
-      constants.BLACKLISTED_PHANTOM_POOLS.includes(
-        Address.fromString(poolIds[poolIdx])
-      )
+      constants.BLACKLISTED_PHANTOM_POOLS.includes(Address.fromString(pool.id))
     ) {
       continue;
     }
@@ -347,17 +343,9 @@ export function updateProtocolTotalValueLockedUSD(): void {
   protocol.save();
 }
 
-export function updateProtocolAfterNewLiquidityPool(
-  poolAddress: Address
-): void {
+export function updateProtocolAfterNewLiquidityPool(): void {
   const protocol = getOrCreateDexAmmProtocol();
-
-  const poolIds = protocol._poolIds;
-  poolIds.push(poolAddress.toHexString());
-  protocol._poolIds = poolIds;
-
   protocol.totalPoolCount += 1;
-
   protocol.save();
 }
 
