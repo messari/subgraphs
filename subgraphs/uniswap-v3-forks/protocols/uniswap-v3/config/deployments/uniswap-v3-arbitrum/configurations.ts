@@ -95,6 +95,7 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
     return stringToBytesList([
       "0x000000000000b91b6956fead1dda24c66aa6b972",
       "0x0000000000e586517bccb5ec52e70119299d2c9c",
+      "0x0000000000958ec6667eb97e2f64f6909073e6b7",
     ]);
   }
 }

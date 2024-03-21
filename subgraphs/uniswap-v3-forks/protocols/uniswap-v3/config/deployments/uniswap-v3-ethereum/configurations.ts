@@ -105,6 +105,6 @@ export class UniswapV3MainnetConfigurations implements Configurations {
     return BigDecimal.fromString("200000");
   }
   getBrokenERC20Tokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList(["0x0000000000958ec6667eb97e2f64f6909073e6b7"]);
   }
 }
