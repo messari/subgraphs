@@ -6,6 +6,6 @@
   "nonFungiblePositionManagerAddressStartBlock": 0,
   "deployment": "UNISWAP_V3_OPTIMISM",
   "graftEnabled": false,
-  "subgraphId": "QmbeFnzYbtGagCVpHUvKK81gKfDA9PY9sfZkeyYyjJoNZg",
-  "graftStartBlock": 115331325
+  "subgraphId": "Qmb7svNQjNGiQwEGDfgPCykc1ZA7755xuCVngPEogPndmA",
+  "graftStartBlock": 117657499
 }
