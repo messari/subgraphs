@@ -337,7 +337,7 @@ export function getInterestRateType(
       }
 
       log.info(
-        "[getInterestRateType]event at logIndex {} signature {} not match the exepected Transfer signature {}. tx {}-{} ",
+        "[getInterestRateType]event at logIndex {} signature {} not match the expected Transfer signature {}. tx {}-{} ",
         [
           thisLog.logIndex.toString(),
           logSignature.toHexString(),
