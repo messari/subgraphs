@@ -148,7 +148,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -182,7 +182,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -216,7 +216,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -250,7 +250,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -276,7 +276,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -302,7 +302,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -336,7 +336,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -362,7 +362,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -388,7 +388,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -414,7 +414,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -440,7 +440,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -466,7 +466,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -492,7 +492,7 @@
         "status": "dev",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -514,7 +514,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -540,7 +540,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -566,7 +566,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -592,7 +592,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -618,7 +618,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3796,7 +3796,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3830,7 +3830,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3856,7 +3856,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3890,7 +3890,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3924,7 +3924,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3950,7 +3950,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3984,7 +3984,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.0.0"
         },
         "files": {

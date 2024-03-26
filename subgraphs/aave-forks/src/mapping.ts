@@ -713,6 +713,7 @@ export function _handleDeposit(
   manager.createDeposit(
     asset,
     accountID,
+    event.transaction.from,
     amount,
     amountUSD,
     newCollateralBalance,
@@ -786,6 +787,7 @@ export function _handleWithdraw(
   manager.createWithdraw(
     asset,
     accountID,
+    event.transaction.from,
     amount,
     amountUSD,
     newCollateralBalance,
@@ -829,6 +831,7 @@ export function _handleBorrow(
   manager.createBorrow(
     asset,
     accountID,
+    event.transaction.from,
     amount,
     amountUSD,
     newBorrowBalances[0].plus(newBorrowBalances[1]),
@@ -885,6 +888,7 @@ export function _handleRepay(
   manager.createRepay(
     asset,
     accountID,
+    event.transaction.from,
     amount,
     amountUSD,
     newBorrowBalances[0].plus(newBorrowBalances[1]),
@@ -993,6 +997,7 @@ export function _handleLiquidate(
     debtAsset,
     liquidator,
     liquidatee,
+    event.transaction.from,
     amount,
     amountUSD,
     profitUSD,
@@ -1100,7 +1105,13 @@ export function _handleFlashLoan(
   const tokenManager = new TokenManager(asset, event);
   const amountUSD = tokenManager.getAmountUSD(amount);
   const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
-  const flashloan = manager.createFlashloan(asset, account, amount, amountUSD);
+  const flashloan = manager.createFlashloan(
+    asset,
+    account,
+    event.transaction.from,
+    amount,
+    amountUSD
+  );
   flashloan.feeAmount = premiumAmount;
   flashloan.feeAmountUSD = premiumUSDTotal;
   flashloan.save();
