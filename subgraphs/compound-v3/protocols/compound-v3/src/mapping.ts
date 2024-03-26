@@ -1313,6 +1313,7 @@ function findTransfer(event: ethereum.Event): ethereum.Log | null {
   const transferLogIndex = event.logIndex.plus(BIGINT_ONE); // expected index
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
+    if (!thisLog.topics.length) return null;
     const logSignature = thisLog.topics[0];
     if (
       transferLogIndex.equals(thisLog.logIndex) &&

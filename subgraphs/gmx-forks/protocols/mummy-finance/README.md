@@ -91,7 +91,7 @@ The usage metrics for MMY take the following user activities into accout.
 
 > TVL of the Protocol = ∑ TVL of the multi-asset pool
 
-_Note: The collateral of traders are also reserved in the MLP pool. Hence, there are two types of transactions to deposit tokens to the pool, which are the users who provide liquidity and another one for the traders who provide collaterals before trading. The subgraph only counts the tokens to be provided as liqiudity into TVL and does not add positions' collaterals to the pool's TVL, in order to be consistent with MMY official measurement._
+_Note: The collateral of traders are also reserved in the MLP pool. Hence, there are two types of transactions to deposit tokens to the pool, which are the users who provide liquidity and another one for the traders who provide collaterals before trading. The subgraph only counts the tokens to be provided as liquidity into TVL and does not add positions' collaterals to the pool's TVL, in order to be consistent with MMY official measurement._
 
 ### Volume
 

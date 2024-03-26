@@ -242,7 +242,7 @@ Useful links for troubleshooting:
 
 - More detailed graph-node [docs](https://github.com/graphprotocol/graph-node/blob/master/docs/getting-started.md)
 - [How to change postgres user password](https://chartio.com/resources/tutorials/how-to-set-the-default-user-password-in-postgresql/)
-- [Install and start](https://linuxhint.com/postgresql_installation_guide_ubuntu_20-04/) postgres in Ubunutu
+- [Install and start](https://linuxhint.com/postgresql_installation_guide_ubuntu_20-04/) postgres in Ubuntu
 - [See port number](https://stackoverflow.com/a/38011366) postgres is on
 - [WSL download](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package) instructions
 
