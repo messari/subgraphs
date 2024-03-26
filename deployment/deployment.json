@@ -2288,7 +2288,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.2.1",
+          "subgraph": "2.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2314,7 +2314,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.2.1",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2340,7 +2340,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.2.1",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2366,7 +2366,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
