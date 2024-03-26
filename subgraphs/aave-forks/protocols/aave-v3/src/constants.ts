@@ -1,4 +1,10 @@
-import { Address, dataSource, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ByteArray,
+  crypto,
+  dataSource,
+  log,
+} from "@graphprotocol/graph-ts";
 import { Network, ZERO_ADDRESS } from "../../../src/constants";
 
 //////////////////////////////
@@ -115,3 +121,8 @@ export function equalsIgnoreCase(a: string, b: string): boolean {
 // Context keys
 export const PROTOCOL_ID_KEY = "protocolId";
 export const POOL_ADDRESSES_PROVIDER_ID_KEY = "poolAddressesProviderId";
+
+export const BALANCE_TRANSFER_SIGNATURE = crypto.keccak256(
+  ByteArray.fromUTF8("BalanceTransfer(address,address,uint256,uint256)")
+);
+export const BALANCE_TRANSFER_DATA_TYPE = "(uint256,uint256)";

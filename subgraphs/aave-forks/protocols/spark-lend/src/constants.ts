@@ -1,4 +1,10 @@
-import { Address, dataSource, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ByteArray,
+  crypto,
+  dataSource,
+  log,
+} from "@graphprotocol/graph-ts";
 import { Network, ZERO_ADDRESS } from "../../../src/constants";
 
 /////////////////////////////
@@ -60,3 +66,8 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
+
+export const BALANCE_TRANSFER_SIGNATURE = crypto.keccak256(
+  ByteArray.fromUTF8("BalanceTransfer(address,address,uint256,uint256)")
+);
+export const BALANCE_TRANSFER_DATA_TYPE = "(uint256,uint256)";
