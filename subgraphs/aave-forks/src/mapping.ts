@@ -1097,7 +1097,6 @@ export function _handleFlashLoan(
   );
   const tokenManager = new TokenManager(asset, event);
   const amountUSD = tokenManager.getAmountUSD(amount);
-  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
   const flashloan = manager.createFlashloan(
     asset,
     account,
@@ -1105,55 +1104,40 @@ export function _handleFlashLoan(
     amount,
     amountUSD
   );
+  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
   flashloan.feeAmount = premiumAmount;
   flashloan.feeAmountUSD = premiumUSDTotal;
   flashloan.save();
 
-  let reserveFactor = market.reserveFactor;
-  if (!reserveFactor) {
-    reserveFactor = BIGDECIMAL_ZERO;
-  }
-  const protocolRevenueShare = reserveFactor;
-  let premiumUSDToProtocol = premiumUSDTotal.times(protocolRevenueShare);
-  let premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
-  const premiumRateTotal = flashloanPremium.premiumRateTotal;
-  let premiumRateToProtocol = premiumRateTotal.times(protocolRevenueShare);
-  let premiumRateToLP = premiumRateTotal.minus(premiumRateToProtocol);
-
+  let premiumUSDToProtocol = BIGDECIMAL_ZERO;
+  // according to https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/interfaces/IPool.sol#L634
+  // premiumRateToProtocol is the percentage of premium to protocol
   if (flashloanPremium.premiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
-    // according to https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/interfaces/IPool.sol#L634
-    // premiumRateToProtocol is the percentage of premium to protocol
-    premiumUSDToProtocol = premiumUSDTotal
-      .times(flashloanPremium.premiumRateToProtocol)
-      .plus(premiumUSDToProtocol);
-    premiumRateToProtocol = premiumRateTotal
-      .times(flashloanPremium.premiumRateToProtocol)
-      .plus(premiumRateToProtocol);
-
-    // premium to LP
-    premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
-    premiumRateToLP = premiumRateTotal.minus(premiumRateToProtocol);
-    // this part of the premium is transferred to the treasury and not
-    // accrued to liquidityIndex and thus no need to deduct
+    // premium to protocol = total premium * premiumRateToProtocol
+    premiumUSDToProtocol = premiumUSDTotal.times(
+      flashloanPremium.premiumRateToProtocol
+    );
+    const feeToProtocol = manager.getOrUpdateFee(
+      FeeType.FLASHLOAN_PROTOCOL_FEE,
+      null,
+      flashloanPremium.premiumRateToProtocol
+    );
+    manager.addProtocolRevenue(premiumUSDToProtocol, feeToProtocol);
   }
-
-  const feeToProtocol = manager.getOrUpdateFee(
-    FeeType.FLASHLOAN_PROTOCOL_FEE,
-    null,
-    premiumRateToProtocol
-  );
-
-  manager.addProtocolRevenue(premiumUSDToProtocol, feeToProtocol);
 
   // flashloan premium to LP is accrued in liquidityIndex and handled in
   // _handleReserveDataUpdated;
   // https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/FlashLoanLogic.sol#L233-L237
+  const premiumRateToLP = flashloanPremium.premiumRateTotal.minus(
+    flashloanPremium.premiumRateToProtocol
+  );
   const feeToLP = manager.getOrUpdateFee(
     FeeType.FLASHLOAN_LP_FEE,
     null,
     premiumRateToLP
   );
 
+  const premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
   manager.addSupplyRevenue(premiumUSDToLP, feeToLP);
 }
 
