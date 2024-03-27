@@ -48,6 +48,8 @@ import {
   getNetworkSpecificConstant,
   InterestRateMode,
   Protocol,
+  BALANCE_TRANSFER_DATA_TYPE,
+  BALANCE_TRANSFER_SIGNATURE,
 } from "./constants";
 import {
   _handleAssetConfigUpdated,
@@ -77,8 +79,10 @@ import {
 } from "../../../src/mapping";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_ONE_RAY,
   BIGINT_ZERO,
   INT_FOUR,
+  INT_ONE,
   INT_ZERO,
 } from "../../../src/constants";
 
@@ -392,6 +396,31 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     );
   }
 
+  let balanceTransferValue = BIGINT_ZERO;
+  let balanceTransferIndex = BIGINT_ZERO;
+  if (event.receipt) {
+    const logs = event.receipt!.logs;
+    for (let i = 0; i < logs.length; i++) {
+      const thisLog = logs[i];
+      if (!thisLog.topics.length) continue;
+
+      if (thisLog.topics[0] == BALANCE_TRANSFER_SIGNATURE) {
+        const decoded = ethereum.decode(
+          BALANCE_TRANSFER_DATA_TYPE,
+          thisLog.data
+        );
+        if (!decoded) return;
+
+        const logData = decoded.toTuple();
+        balanceTransferValue = logData[INT_ZERO].toBigInt();
+        balanceTransferIndex = logData[INT_ONE].toBigInt();
+      }
+    }
+  }
+  const balanceTransferAmount = balanceTransferValue.times(
+    balanceTransferIndex.div(BIGINT_ONE_RAY)
+  );
+
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
@@ -400,7 +429,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
-    event.params.debtToCover
+    event.params.debtToCover,
+    balanceTransferAmount
   );
 }
 

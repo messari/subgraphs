@@ -123,6 +123,7 @@ dataSources:
           receipt: true
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
           handler: handleLiquidationCall
+          receipt: true
         - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
           handler: handleRepay
           receipt: true

@@ -27,7 +27,6 @@ import {
   INT_FOUR,
   RAY_OFFSET,
   ZERO_ADDRESS,
-  BIGDECIMAL_ONE,
   BIGINT_ONE_RAY,
   BIGDECIMAL_NEG_ONE_CENT,
 } from "./constants";
@@ -906,7 +905,8 @@ export function _handleLiquidate(
   liquidator: Address,
   liquidatee: Address, // account liquidated
   debtAsset: Address, // token repaid to cover debt,
-  debtToCover: BigInt // the amount of debt repaid by liquidator
+  debtToCover: BigInt, // the amount of debt repaid by liquidator
+  liquidationProtocolFeeAmount: BigInt | null = null
 ): void {
   const market = getMarketFromToken(collateralAsset, protocolData);
   if (!market) {
@@ -935,12 +935,6 @@ export function _handleLiquidate(
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(inputTokenPriceUSD);
 
-  // according to logic in _calculateAvailableCollateralToLiquidate()
-  // liquidatedCollateralAmount = collateralAmount - liquidationProtocolFee
-  // liquidationProtocolFee = bonusCollateral * liquidationProtocolFeePercentage
-  // bonusCollateral = collateralAmount - (collateralAmount / liquidationBonus)
-  // liquidationBonus = 1 + liquidationPenalty
-  // => liquidationProtocolFee = liquidationPenalty * liquidationProtocolFeePercentage * liquidatedCollateralAmount / (1 + liquidationPenalty - liquidationPenalty*liquidationProtocolFeePercentage)
   if (!market._liquidationProtocolFee) {
     // liquidationProtocolFee is only set for v3 markets
     log.warning(
@@ -950,14 +944,13 @@ export function _handleLiquidate(
     market._liquidationProtocolFee = BIGDECIMAL_ZERO;
     market.save();
   }
-  const liquidationProtocolFeeUSD = amountUSD
-    .times(market.liquidationPenalty)
-    .times(market._liquidationProtocolFee!)
-    .div(
-      BIGDECIMAL_ONE.plus(market.liquidationPenalty).minus(
-        market.liquidationPenalty.times(market._liquidationProtocolFee!)
-      )
-    );
+  let liquidationProtocolFeeUSD = BIGDECIMAL_ZERO;
+  if (liquidationProtocolFeeAmount) {
+    liquidationProtocolFeeUSD = liquidationProtocolFeeAmount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(inputToken.decimals))
+      .times(inputTokenPriceUSD);
+  }
   const fee = manager.getOrUpdateFee(
     FeeType.LIQUIDATION_FEE,
     null,
