@@ -17,6 +17,7 @@ import {
   Token,
   Position,
   PositionSnapshot,
+  _TxSigner,
 } from "../../generated/schema";
 import {
   getOrCreateMarketHourlySnapshot,
@@ -1026,6 +1027,25 @@ export function updateUsageMetrics(
 
       usageDailySnapshot.dailyActiveUsers += 1;
     }
+  }
+
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    usageHourlySnapshot.cumulativeUniqueTxSigners += 1;
+    usageDailySnapshot.cumulativeUniqueTxSigners += 1;
+  }
+  const dailyTxSignerID = txSignerID.concat("-").concat(days);
+  let dailyActiveTxSigner = _TxSigner.load(dailyTxSignerID);
+  if (!dailyActiveTxSigner) {
+    dailyActiveTxSigner = new _TxSigner(dailyTxSignerID);
+    dailyActiveTxSigner.save();
+
+    usageDailySnapshot.dailyActiveTxSigners += 1;
   }
 
   if (deltaCollateralUSD.gt(BIGDECIMAL_ZERO)) {

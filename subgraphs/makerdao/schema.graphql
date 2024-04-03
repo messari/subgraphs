@@ -196,10 +196,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -243,6 +245,9 @@ type LendingProtocol implements Protocol @entity @regularPolling {
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
 
   " Number of cumulative depositors "
   cumulativeUniqueDepositors: Int!
@@ -310,10 +315,12 @@ type LendingProtocol implements Protocol @entity @regularPolling {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -345,6 +352,12 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+  " Number of unique daily active users. e.g. accounts that signed transactions to interact with this protocol "
+  dailyActiveTxSigners: Int!
+
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
 
   " Number of unique daily depositors "
   dailyActiveDepositors: Int!
@@ -410,6 +423,9 @@ type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+  " Number of cumulative unique users. e.g. accounts that signed transactions to interact with this market "
+  cumulativeUniqueTxSigners: Int!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
   hourlyTransactionCount: Int!
@@ -1262,6 +1278,12 @@ type Liquidate @entity(immutable: true) @transaction {
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
+  id: ID!
+}
+
+# Helper entity for calculating daily/hourly active users
+type _TxSigner @entity(immutable: true) {
+  " { Address of the account }-{ Optional: Days since Unix epoch }-{ Optional: Market Address } "
   id: ID!
 }
 

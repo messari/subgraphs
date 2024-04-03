@@ -81,6 +81,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics.protocol = protocol.id;
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.cumulativeUniqueTxSigners = protocol.cumulativeUniqueTxSigners;
     usageMetrics.hourlyTransactionCount = 0;
     usageMetrics.hourlyDepositCount = 0;
     usageMetrics.hourlyBorrowCount = 0;
@@ -108,11 +109,13 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = protocol.id;
     usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.dailyActiveTxSigners = 0;
     usageMetrics.dailyActiveDepositors = 0;
     usageMetrics.dailyActiveBorrowers = 0;
     usageMetrics.dailyActiveLiquidators = 0;
     usageMetrics.dailyActiveLiquidatees = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.cumulativeUniqueTxSigners = protocol.cumulativeUniqueTxSigners;
     usageMetrics.cumulativeUniqueDepositors =
       protocol.cumulativeUniqueDepositors;
     usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
@@ -301,6 +304,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.cumulativeUniqueUsers = 0;
+    protocol.cumulativeUniqueTxSigners = 0;
     protocol.cumulativeUniqueBorrowers = 0;
     protocol.cumulativeUniqueDepositors = 0;
     protocol.cumulativeUniqueLiquidatees = 0;
