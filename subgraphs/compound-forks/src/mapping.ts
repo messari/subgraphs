@@ -61,7 +61,7 @@ enum EventType {
   Repay,
   Liquidate,
   Liquidated,
-  Undefined
+  Undefined,
 }
 
 ////////////////////////
@@ -198,7 +198,7 @@ export function _handleMarketEntered(
   marketID: string,
   borrowerID: string,
   entered: boolean, // true = entered, false = exited
-  event: ethereum.Event
+  event: ethereum.Event,
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -1377,7 +1377,7 @@ function snapshotUsage(
   accountID: string,
   eventType: EventType,
   newTxn: bool,
-  txSigner: string | null = null
+  txSigner: string | null = null,
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -1440,14 +1440,12 @@ function snapshotUsage(
   }
 
   if (txSigner) {
-    const txSignerID = txSigner
-      .concat("-")
-      .concat(dailySnapshotID);
+    const txSignerID = txSigner.concat("-").concat(dailySnapshotID);
     let dailyActiveTxSigner = _TxSigner.load(txSignerID);
     if (!dailyActiveTxSigner) {
       dailyActiveTxSigner = new _TxSigner(txSignerID);
       dailyActiveTxSigner.save();
-  
+
       dailySnapshot.dailyActiveTxSigners += 1;
     }
   }

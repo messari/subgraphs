@@ -91,7 +91,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     event.params.vToken.toHexString(),
     event.params.account.toHexString(),
     true,
-    event
+    event,
   );
 }
 
@@ -101,7 +101,7 @@ export function handleMarketExited(event: MarketExited): void {
     event.params.vToken.toHexString(),
     event.params.account.toHexString(),
     false,
-    event
+    event,
   );
 }
 

@@ -100,7 +100,7 @@ export function handleMint(event: Mint): void {
   const contract = CTokenContract.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     comptrollerAddr,
@@ -108,7 +108,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -118,7 +118,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CTokenContract.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     comptrollerAddr,
@@ -126,7 +126,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -136,7 +136,7 @@ export function handleBorrow(event: Borrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CTokenContract.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     comptrollerAddr,
@@ -144,7 +144,7 @@ export function handleBorrow(event: Borrow): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -155,7 +155,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CTokenContract.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     comptrollerAddr,
@@ -164,7 +164,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -181,7 +181,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -197,7 +197,7 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    comptrollerAddr,
   );
 }
 
@@ -205,7 +205,7 @@ export function handleAccrueInterestNew(event: AccrueInterestNew): void {
   handleAccrueInterest(
     event,
     event.params.interestAccumulated,
-    event.params.totalBorrows
+    event.params.totalBorrows,
   );
 }
 
@@ -213,7 +213,7 @@ export function handleAccrueInterestOld(event: AccrueInterestOld): void {
   handleAccrueInterest(
     event,
     event.params.interestAccumulated,
-    event.params.totalBorrows
+    event.params.totalBorrows,
   );
 }
 
@@ -239,7 +239,7 @@ export function handleMarketListed(event: MarketListed): void {
   const cTokenContract = CTokenContract.bind(event.params.cToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
+    BIGINT_ZERO,
   );
 
   // get underlying token data
@@ -259,7 +259,7 @@ export function handleMarketListed(event: MarketListed): void {
     if (underlyingTokenAddrResult.reverted) {
       log.warning(
         "[handleMarketListed] could not fetch underlying token of cToken: {}",
-        [cTokenAddr.toHexString()]
+        [cTokenAddr.toHexString()],
       );
       return;
     }
@@ -276,18 +276,18 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         underlyingName,
         underlyingSymbol,
-        underlyingDecimals
+        underlyingDecimals,
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
 
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
 }
 
@@ -297,7 +297,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true,
-    event
+    event,
   );
 }
 
@@ -307,7 +307,7 @@ export function handleMarketExited(event: MarketExited): void {
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false,
-    event
+    event,
   );
 }
 
@@ -324,7 +324,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const protocol = getOrCreateProtocol();
   const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
@@ -350,7 +350,7 @@ function getOrCreateProtocol(): LendingProtocol {
     PROTOCOL_SLUG,
     Network.MAINNET,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    comptroller.try_oracle(),
   );
   return _getOrCreateProtocol(protocolData);
 }
@@ -360,13 +360,13 @@ function getOrCreateProtocol(): LendingProtocol {
 function handleAccrueInterest(
   event: ethereum.Event,
   interestAccumulated: BigInt,
-  totalBorrows: BigInt
+  totalBorrows: BigInt,
 ): void {
   const marketAddress = event.address;
   const cTokenContract = CTokenContract.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle2.bind(
-    Address.fromString(protocol._priceOracle)
+    Address.fromString(protocol._priceOracle),
   );
 
   // update blocksPerDay using rewards.ts
@@ -374,10 +374,10 @@ function handleAccrueInterest(
     event.block.timestamp,
     event.block.number,
     BIGDECIMAL_ZERO,
-    RewardIntervalType.BLOCK
+    RewardIntervalType.BLOCK,
   );
   const blocksPerDay = BigInt.fromString(
-    getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
+    getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString(),
   ).toI32();
 
   const updateMarketData = new UpdateMarketData(
@@ -386,7 +386,7 @@ function handleAccrueInterest(
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    blocksPerDay * DAYS_PER_YEAR
+    blocksPerDay * DAYS_PER_YEAR,
   );
 
   //
@@ -411,7 +411,7 @@ function handleAccrueInterest(
   getOrCreateMarketDailySnapshot(
     market,
     event.block.timestamp,
-    event.block.number
+    event.block.number,
   );
 
   //
@@ -420,7 +420,7 @@ function handleAccrueInterest(
   getOrCreateMarketHourlySnapshot(
     market,
     event.block.timestamp,
-    event.block.number
+    event.block.number,
   );
 
   updateMarket(
@@ -431,14 +431,14 @@ function handleAccrueInterest(
     event.block.number,
     event.block.timestamp,
     false, // do not update all prices
-    comptrollerAddr
+    comptrollerAddr,
   );
   updateProtocol(comptrollerAddr);
 
   snapshotFinancials(
     comptrollerAddr,
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
   );
 }
 
@@ -452,7 +452,7 @@ function updateMarket(
   blockNumber: BigInt,
   blockTimestamp: BigInt,
   updateMarketPrices: boolean,
-  comptrollerAddress: Address
+  comptrollerAddress: Address,
 ): void {
   const market = Market.load(marketID);
   if (!market) {
@@ -475,7 +475,7 @@ function updateMarket(
   // compound v2 specific price calculation (see ./prices.ts)
   const underlyingTokenPriceUSD = getUSDPriceOfToken(
     market,
-    blockNumber.toI32()
+    blockNumber.toI32(),
   );
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
@@ -508,7 +508,7 @@ function updateMarket(
   if (updateMarketData.exchangeRateStoredResult.reverted) {
     log.warning(
       "[updateMarket] Failed to get exchangeRateStored of Market {}",
-      [marketID]
+      [marketID],
     );
   } else {
     // Formula: check out "Interpreting Exchange Rates" in https://compound.finance/docs#protocol-math
@@ -517,12 +517,12 @@ function updateMarket(
         .toBigDecimal()
         .div(
           exponentToBigDecimal(
-            mantissaFactor + underlyingToken.decimals - outputTokenDecimals
-          )
+            mantissaFactor + underlyingToken.decimals - outputTokenDecimals,
+          ),
         );
     market.exchangeRate = oneCTokenInUnderlying;
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
-      underlyingTokenPriceUSD
+      underlyingTokenPriceUSD,
     );
 
     // calculate inputTokenBalance only if exchangeRate is updated properly
@@ -531,7 +531,7 @@ function updateMarket(
     if (underlyingToken.decimals > outputTokenDecimals) {
       // we want to multiply out the difference to expand BD
       const mantissaFactorBD = exponentToBigDecimal(
-        underlyingToken.decimals - outputTokenDecimals
+        underlyingToken.decimals - outputTokenDecimals,
       );
       const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
@@ -539,12 +539,12 @@ function updateMarket(
         .times(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
+        inputTokenBalanceBD.toString(),
       );
     } else {
       // we want to divide back the difference to decrease the BD
       const mantissaFactorBD = exponentToBigDecimal(
-        outputTokenDecimals - underlyingToken.decimals
+        outputTokenDecimals - underlyingToken.decimals,
       );
       const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
@@ -552,7 +552,7 @@ function updateMarket(
         .div(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
+        inputTokenBalanceBD.toString(),
       );
     }
   }
@@ -579,8 +579,8 @@ function updateMarket(
       marketID,
       convertRatePerUnitToAPY(
         updateMarketData.supplyRateResult.value,
-        updateMarketData.unitPerYear
-      )
+        updateMarketData.unitPerYear,
+      ),
     );
   }
 
@@ -593,8 +593,8 @@ function updateMarket(
       marketID,
       convertRatePerUnitToAPY(
         updateMarketData.borrowRateResult.value,
-        updateMarketData.unitPerYear
-      )
+        updateMarketData.unitPerYear,
+      ),
     );
   }
 
@@ -603,14 +603,14 @@ function updateMarket(
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
   const protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
-    market._reserveFactor
+    market._reserveFactor,
   );
   const supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
-    protocolSideRevenueUSDDelta
+    protocolSideRevenueUSDDelta,
   );
 
   market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
-    interestAccumulatedUSD
+    interestAccumulatedUSD,
   );
   market.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
@@ -622,10 +622,10 @@ function updateMarket(
   const dailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     blockTimestamp,
-    blockNumber
+    blockNumber,
   );
   dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
-    interestAccumulatedUSD
+    interestAccumulatedUSD,
   );
   dailySnapshot.dailyProtocolSideRevenueUSD =
     dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
@@ -637,13 +637,13 @@ function updateMarket(
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     blockTimestamp,
-    blockNumber
+    blockNumber,
   );
   hourlySnapshot.hourlyTotalRevenueUSD =
     hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);
   hourlySnapshot.hourlyProtocolSideRevenueUSD =
     hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSDDelta
+      protocolSideRevenueUSDDelta,
     );
   hourlySnapshot.hourlySupplySideRevenueUSD =
     hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
@@ -655,7 +655,7 @@ export function updateProtocol(comptrollerAddr: Address): void {
   if (!protocol) {
     log.error(
       "[updateProtocol] Protocol not found, this SHOULD NOT happen",
-      []
+      [],
     );
     return;
   }
@@ -681,26 +681,26 @@ export function updateProtocol(comptrollerAddr: Address): void {
     }
     totalValueLockedUSD = totalValueLockedUSD.plus(market.totalValueLockedUSD);
     totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
-      market.totalDepositBalanceUSD
+      market.totalDepositBalanceUSD,
     );
     totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
-      market.totalBorrowBalanceUSD
+      market.totalBorrowBalanceUSD,
     );
     cumulativeBorrowUSD = cumulativeBorrowUSD.plus(market.cumulativeBorrowUSD);
     cumulativeDepositUSD = cumulativeDepositUSD.plus(
-      market.cumulativeDepositUSD
+      market.cumulativeDepositUSD,
     );
     cumulativeLiquidateUSD = cumulativeLiquidateUSD.plus(
-      market.cumulativeLiquidateUSD
+      market.cumulativeLiquidateUSD,
     );
     cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
-      market.cumulativeTotalRevenueUSD
+      market.cumulativeTotalRevenueUSD,
     );
     cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
-      market.cumulativeProtocolSideRevenueUSD
+      market.cumulativeProtocolSideRevenueUSD,
     );
     cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
-      market.cumulativeSupplySideRevenueUSD
+      market.cumulativeSupplySideRevenueUSD,
     );
   }
 
@@ -760,7 +760,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
     const rewardDecimals = Token.load(COMP_ADDRESS)!.decimals; // COMP is already made from cCOMP market
     const troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
     const blocksPerDay = BigInt.fromString(
-      getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
+      getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString(),
     );
 
     let compPriceUSD = BIGDECIMAL_ZERO;

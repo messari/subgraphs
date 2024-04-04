@@ -94,7 +94,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true,
-    event
+    event,
   );
 }
 
@@ -104,7 +104,7 @@ export function handleMarketExited(event: MarketExited): void {
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false,
-    event
+    event,
   );
 }
 
@@ -123,14 +123,14 @@ export function handleMarketListed(event: MarketListed): void {
 
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
+    BIGINT_ZERO,
   );
   if (cTokenAddr == nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
       nativeToken,
       nativeCToken,
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     );
     _handleMarketListed(marketListedData, event);
     return;
@@ -140,7 +140,7 @@ export function handleMarketListed(event: MarketListed): void {
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
+      [cTokenAddr.toHexString()],
     );
     return;
   }
@@ -153,17 +153,17 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
 }
 
@@ -174,7 +174,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const protocol = getOrCreateProtocol();
   const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
@@ -194,7 +194,7 @@ export function handleMint(event: Mint): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     comptrollerAddr,
@@ -202,7 +202,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -212,7 +212,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     comptrollerAddr,
@@ -220,7 +220,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -230,7 +230,7 @@ export function handleBorrow(event: BorrowEvent): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     comptrollerAddr,
@@ -238,7 +238,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -249,7 +249,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     comptrollerAddr,
@@ -258,7 +258,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -275,7 +275,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -284,10 +284,10 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
+    Address.fromString(protocol._priceOracle),
   );
   const blocksPerDay = BigInt.fromString(
-    getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
+    getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString(),
   ).toI32();
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
@@ -295,7 +295,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    blocksPerDay * DAYS_PER_YEAR
+    blocksPerDay * DAYS_PER_YEAR,
   );
   const interestAccumulated = event.params.interestAccumulated;
   const totalBorrows = event.params.totalBorrows;
@@ -314,7 +314,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     interestAccumulated,
     totalBorrows,
     true,
-    event
+    event,
   );
 }
 
@@ -324,7 +324,7 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    comptrollerAddr,
   );
 }
 
@@ -336,7 +336,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "tectonic",
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    comptroller.try_oracle(),
   );
 
   return _getOrCreateProtocol(protocolData);
@@ -345,7 +345,7 @@ function getOrCreateProtocol(): LendingProtocol {
 function updateTONICRewards(
   event: AccrueInterest,
   market: Market,
-  protocol: LendingProtocol
+  protocol: LendingProtocol,
 ): void {
   let rewardTokenBorrow: RewardToken | null = null;
   let rewardTokenDeposit: RewardToken | null = null;
@@ -402,19 +402,19 @@ function updateTONICRewards(
           event.block.timestamp,
           event.block.number,
           tryTonicSpeed.value.toBigDecimal(),
-          RewardIntervalType.BLOCK
+          RewardIntervalType.BLOCK,
         )
           .truncate(0)
-          .toString()
+          .toString(),
       );
   borrowTonicPerDay = supplyTonicPerDay;
 
   if (event.block.number.gt(BigInt.fromI32(1337194))) {
     const oracleContract = PriceOracle.bind(
-      Address.fromString(protocol._priceOracle)
+      Address.fromString(protocol._priceOracle),
     );
     const price = oracleContract.try_getUnderlyingPrice(
-      Address.fromString(tTONICAddress)
+      Address.fromString(tTONICAddress),
     );
     if (price.reverted) {
       log.warning("[updateTonicrewards] getUnderlyingPrice reverted", []);

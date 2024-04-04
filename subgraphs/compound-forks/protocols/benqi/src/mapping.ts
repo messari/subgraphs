@@ -105,7 +105,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     event.params.qiToken.toHexString(),
     event.params.account.toHexString(),
     true,
-    event
+    event,
   );
 }
 
@@ -115,7 +115,7 @@ export function handleMarketExited(event: MarketExited): void {
     event.params.qiToken.toHexString(),
     event.params.account.toHexString(),
     false,
-    event
+    event,
   );
 }
 
@@ -133,14 +133,14 @@ export function handleMarketListed(event: MarketListed): void {
   const cTokenContract = CToken.bind(event.params.qiToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
+    BIGINT_ZERO,
   );
   if (cTokenAddr == nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
       nativeToken,
       nativeCToken,
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     );
     _handleMarketListed(marketListedData, event);
     initMarketRewards(cTokenAddr.toHexString());
@@ -151,7 +151,7 @@ export function handleMarketListed(event: MarketListed): void {
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
+      [cTokenAddr.toHexString()],
     );
     return;
   }
@@ -164,17 +164,17 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
   initMarketRewards(cTokenAddr.toHexString());
 }
@@ -186,7 +186,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const protocol = getOrCreateProtocol();
   const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
@@ -212,7 +212,7 @@ export function handleMint(event: Mint): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     comptrollerAddr,
@@ -220,7 +220,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -230,7 +230,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     comptrollerAddr,
@@ -238,7 +238,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -248,7 +248,7 @@ export function handleBorrow(event: BorrowEvent): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     comptrollerAddr,
@@ -256,7 +256,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -267,7 +267,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     comptrollerAddr,
@@ -276,7 +276,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -293,7 +293,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -304,7 +304,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
+    Address.fromString(protocol._priceOracle),
   );
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
@@ -312,7 +312,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    SECONDS_PER_YEAR
+    SECONDS_PER_YEAR,
   );
 
   const interestAccumulated = event.params.interestAccumulated;
@@ -323,7 +323,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     interestAccumulated,
     totalBorrows,
     false, // do not update all market prices
-    event
+    event,
   );
 }
 
@@ -333,7 +333,7 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    comptrollerAddr,
   );
 }
 
@@ -345,7 +345,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "benqi",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    comptroller.try_oracle(),
   );
 
   return _getOrCreateProtocol(protocolData);
@@ -377,11 +377,11 @@ function initMarketRewards(marketID: string): void {
   }
 
   let supplyRewardToken0 = RewardToken.load(
-    InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString())
+    InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString()),
   );
   if (!supplyRewardToken0) {
     supplyRewardToken0 = new RewardToken(
-      InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString())
+      InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString()),
     );
     supplyRewardToken0.token = QiToken.id;
     supplyRewardToken0.type = RewardTokenType.DEPOSIT;
@@ -389,11 +389,11 @@ function initMarketRewards(marketID: string): void {
   }
 
   let supplyRewardToken1 = RewardToken.load(
-    InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString())
+    InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString()),
   );
   if (!supplyRewardToken1) {
     supplyRewardToken1 = new RewardToken(
-      InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString())
+      InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString()),
     );
     supplyRewardToken1.token = AVAXToken.id;
     supplyRewardToken1.type = RewardTokenType.DEPOSIT;
@@ -401,11 +401,11 @@ function initMarketRewards(marketID: string): void {
   }
 
   let borrowRewardToken0 = RewardToken.load(
-    InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString())
+    InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString()),
   );
   if (!borrowRewardToken0) {
     borrowRewardToken0 = new RewardToken(
-      InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString())
+      InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString()),
     );
     borrowRewardToken0.token = QiToken.id;
     borrowRewardToken0.type = RewardTokenType.BORROW;
@@ -413,11 +413,11 @@ function initMarketRewards(marketID: string): void {
   }
 
   let borrowRewardToken1 = RewardToken.load(
-    InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString())
+    InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString()),
   );
   if (!borrowRewardToken1) {
     borrowRewardToken1 = new RewardToken(
-      InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString())
+      InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString()),
     );
     borrowRewardToken1.token = AVAXToken.id;
     borrowRewardToken1.type = RewardTokenType.BORROW;
@@ -480,44 +480,44 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
     supplyQiEmission = getRewardTokenEmission(
       oldComptroller.try_rewardSpeeds(0, marketAddress),
       18,
-      QiPriceUSD
+      QiPriceUSD,
     );
     supplyAVAXEmission = getRewardTokenEmission(
       oldComptroller.try_rewardSpeeds(1, marketAddress),
       18,
-      AVAXPriceUSD
+      AVAXPriceUSD,
     );
     borrowQiEmission = getRewardTokenEmission(
       oldComptroller.try_rewardSpeeds(0, marketAddress),
       18,
-      QiPriceUSD
+      QiPriceUSD,
     );
     borrowAVAXEmission = getRewardTokenEmission(
       oldComptroller.try_rewardSpeeds(1, marketAddress),
       18,
-      AVAXPriceUSD
+      AVAXPriceUSD,
     );
   } else {
     const comptroller = Comptroller.bind(comptrollerAddr);
     supplyQiEmission = getRewardTokenEmission(
       comptroller.try_supplyRewardSpeeds(0, marketAddress),
       18,
-      QiPriceUSD
+      QiPriceUSD,
     );
     supplyAVAXEmission = getRewardTokenEmission(
       comptroller.try_supplyRewardSpeeds(1, marketAddress),
       18,
-      AVAXPriceUSD
+      AVAXPriceUSD,
     );
     borrowQiEmission = getRewardTokenEmission(
       comptroller.try_borrowRewardSpeeds(0, marketAddress),
       18,
-      QiPriceUSD
+      QiPriceUSD,
     );
     borrowAVAXEmission = getRewardTokenEmission(
       comptroller.try_borrowRewardSpeeds(1, marketAddress),
       18,
-      AVAXPriceUSD
+      AVAXPriceUSD,
     );
   }
 
@@ -539,7 +539,7 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
 function getRewardTokenEmission(
   rewardSpeedsResult: ethereum.CallResult<BigInt>,
   tokenDecimals: i32,
-  tokenPriceUSD: BigDecimal
+  tokenPriceUSD: BigDecimal,
 ): RewardTokenEmission {
   if (rewardSpeedsResult.reverted) {
     log.warning("[getRewardTokenEmission] result reverted", []);
@@ -547,7 +547,7 @@ function getRewardTokenEmission(
   }
   const rewardAmountPerSecond = rewardSpeedsResult.value;
   const rewardAmount = rewardAmountPerSecond.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
+    BigInt.fromI32(SECONDS_PER_DAY),
   );
   const rewardUSD = rewardAmount
     .toBigDecimal()
