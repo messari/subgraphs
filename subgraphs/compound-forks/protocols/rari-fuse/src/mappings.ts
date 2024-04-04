@@ -198,7 +198,8 @@ export function handleMarketEntered(event: MarketEntered): void {
     Address.fromString(FACTORY_CONTRACT),
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    true
+    true,
+    event
   );
 }
 
@@ -207,7 +208,8 @@ export function handleMarketExited(event: MarketExited): void {
     Address.fromString(FACTORY_CONTRACT),
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    false
+    false,
+    event
   );
 }
 

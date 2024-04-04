@@ -26,6 +26,7 @@ import {
   Position,
   PositionSnapshot,
   _ActorAccount,
+  _TxSigner,
 } from "../generated/schema";
 import {
   ActivityType,
@@ -60,6 +61,7 @@ enum EventType {
   Repay,
   Liquidate,
   Liquidated,
+  Undefined
 }
 
 ////////////////////////
@@ -196,6 +198,7 @@ export function _handleMarketEntered(
   marketID: string,
   borrowerID: string,
   entered: boolean, // true = entered, false = exited
+  event: ethereum.Event
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -216,8 +219,20 @@ export function _handleMarketEntered(
     account = createAccount(borrowerID);
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
+
+  //
+  // track unique transaction signers
+  //
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+  }
+  protocol.save();
 
   const enabledCollaterals = account._enabledCollaterals;
   if (entered) {
@@ -403,7 +418,6 @@ export function _handleMint(
     account.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
   account.depositCount += 1;
   account.save();
@@ -418,8 +432,20 @@ export function _handleMint(
     depositorActor.save();
 
     protocol.cumulativeUniqueDepositors += 1;
-    protocol.save();
   }
+
+  //
+  // track unique transaction signers
+  //
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+  }
+  protocol.save();
 
   //
   // update position
@@ -485,6 +511,7 @@ export function _handleMint(
     minter.toHexString(),
     EventType.Deposit,
     true,
+    txSignerID,
   );
 }
 
@@ -526,10 +553,22 @@ export function _handleRedeem(
     account.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
   account.withdrawCount += 1;
   account.save();
+
+  //
+  // track unique transaction signers
+  //
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+  }
+  protocol.save();
 
   const positionID = subtractPosition(
     protocol,
@@ -592,6 +631,7 @@ export function _handleRedeem(
     redeemer.toHexString(),
     EventType.Withdraw,
     true,
+    txSignerID,
   );
 }
 
@@ -633,7 +673,6 @@ export function _handleBorrow(
     account.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
   account.borrowCount += 1;
   account.save();
@@ -648,8 +687,20 @@ export function _handleBorrow(
     borrowerActor.save();
 
     protocol.cumulativeUniqueBorrowers += 1;
-    protocol.save();
   }
+
+  //
+  // track unique transaction signers
+  //
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+  }
+  protocol.save();
 
   //
   // update position
@@ -712,6 +763,7 @@ export function _handleBorrow(
     borrower.toHexString(),
     EventType.Borrow,
     true,
+    txSignerID,
   );
 
   updateProtocol(comptrollerAddr);
@@ -762,7 +814,6 @@ export function _handleRepayBorrow(
     payerAccount.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
   payerAccount.repayCount += 1;
   payerAccount.save();
@@ -773,8 +824,20 @@ export function _handleRepayBorrow(
     borrowerAccount.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
+
+  //
+  // track unique transaction signers
+  //
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+  }
+  protocol.save();
 
   const positionID = subtractPosition(
     protocol,
@@ -837,6 +900,7 @@ export function _handleRepayBorrow(
     payer.toHexString(),
     EventType.Repay,
     true,
+    txSignerID,
   );
 
   updateProtocol(comptrollerAddr);
@@ -925,7 +989,6 @@ export function _handleLiquidateBorrow(
     liquidatorAccount.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
   const liquidatorActorID = "liquidator"
     .concat("-")
@@ -936,7 +999,6 @@ export function _handleLiquidateBorrow(
     liquidatorActor.save();
 
     protocol.cumulativeUniqueLiquidators += 1;
-    protocol.save();
   }
 
   const liquidateeAccountID = borrower.toHexString();
@@ -946,7 +1008,6 @@ export function _handleLiquidateBorrow(
     liquidateeAccount.save();
 
     protocol.cumulativeUniqueUsers++;
-    protocol.save();
   }
   const liquidateeActorID = "liquidatee"
     .concat("-")
@@ -957,8 +1018,20 @@ export function _handleLiquidateBorrow(
     liquidateeActor.save();
 
     protocol.cumulativeUniqueLiquidatees += 1;
-    protocol.save();
   }
+
+  //
+  // track unique transaction signers
+  //
+  const txSignerID = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerID);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerID);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+  }
+  protocol.save();
 
   //
   // update account
@@ -1030,6 +1103,7 @@ export function _handleLiquidateBorrow(
     liquidator.toHexString(),
     EventType.Liquidate,
     true,
+    txSignerID,
   );
 
   snapshotUsage(
@@ -1166,7 +1240,7 @@ export function _handleTransfer(
       fromAccount,
       cTokenContract.try_balanceOfUnderlying(from),
       PositionSide.LENDER,
-      -1, // TODO: not sure how to classify this event yet
+      EventType.Undefined, // TODO: not sure how to classify this event yet
       event,
     );
   }
@@ -1179,7 +1253,7 @@ export function _handleTransfer(
       toAccount,
       cTokenContract.try_balanceOfUnderlying(to),
       PositionSide.LENDER,
-      -1, // TODO: not sure how to classify this event yet
+      EventType.Undefined, // TODO: not sure how to classify this event yet
       event,
     );
   }
@@ -1303,6 +1377,7 @@ function snapshotUsage(
   accountID: string,
   eventType: EventType,
   newTxn: bool,
+  txSigner: string | null = null
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -1323,11 +1398,13 @@ function snapshotUsage(
     dailySnapshot.dailyActiveBorrowers = INT_ZERO;
     dailySnapshot.dailyActiveLiquidators = INT_ZERO;
     dailySnapshot.dailyActiveLiquidatees = INT_ZERO;
+    dailySnapshot.dailyActiveTxSigners = INT_ZERO;
     dailySnapshot.cumulativeUniqueUsers = INT_ZERO;
     dailySnapshot.cumulativeUniqueDepositors = INT_ZERO;
     dailySnapshot.cumulativeUniqueBorrowers = INT_ZERO;
     dailySnapshot.cumulativeUniqueLiquidators = INT_ZERO;
     dailySnapshot.cumulativeUniqueLiquidatees = INT_ZERO;
+    dailySnapshot.cumulativeUniqueTxSigners = INT_ZERO;
     dailySnapshot.dailyTransactionCount = INT_ZERO;
     dailySnapshot.dailyDepositCount = INT_ZERO;
     dailySnapshot.dailyWithdrawCount = INT_ZERO;
@@ -1362,6 +1439,19 @@ function snapshotUsage(
     dailyActiveActorAccount.save();
   }
 
+  if (txSigner) {
+    const txSignerID = txSigner
+      .concat("-")
+      .concat(dailySnapshotID);
+    let dailyActiveTxSigner = _TxSigner.load(txSignerID);
+    if (!dailyActiveTxSigner) {
+      dailyActiveTxSigner = new _TxSigner(txSignerID);
+      dailyActiveTxSigner.save();
+  
+      dailySnapshot.dailyActiveTxSigners += 1;
+    }
+  }
+
   switch (eventType) {
     case EventType.Deposit:
       dailySnapshot.dailyDepositCount += 1;
@@ -1394,6 +1484,7 @@ function snapshotUsage(
     default:
   }
   dailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailySnapshot.cumulativeUniqueTxSigners = protocol.cumulativeUniqueTxSigners;
   if (newTxn) {
     dailySnapshot.dailyTransactionCount += 1;
   }
@@ -1421,6 +1512,7 @@ function snapshotUsage(
     hourlySnapshot.protocol = protocol.id;
     hourlySnapshot.hourlyActiveUsers = INT_ZERO;
     hourlySnapshot.cumulativeUniqueUsers = INT_ZERO;
+    hourlySnapshot.cumulativeUniqueTxSigners = INT_ZERO;
     hourlySnapshot.hourlyTransactionCount = INT_ZERO;
     hourlySnapshot.hourlyDepositCount = INT_ZERO;
     hourlySnapshot.hourlyWithdrawCount = INT_ZERO;
@@ -1442,6 +1534,7 @@ function snapshotUsage(
     hourlySnapshot.hourlyActiveUsers += 1;
   }
   hourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  hourlySnapshot.cumulativeUniqueTxSigners = protocol.cumulativeUniqueTxSigners;
   if (newTxn) {
     hourlySnapshot.hourlyTransactionCount += 1;
   }
@@ -1843,6 +1936,7 @@ export function _getOrCreateProtocol(
     protocol.cumulativeUniqueBorrowers = 0;
     protocol.cumulativeUniqueLiquidators = 0;
     protocol.cumulativeUniqueLiquidatees = 0;
+    protocol.cumulativeUniqueTxSigners = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

@@ -96,7 +96,8 @@ export function handleMarketEntered(event: MarketEntered): void {
     protocolData.comptrollerAddress,
     event.params.mToken.toHexString(),
     event.params.account.toHexString(),
-    true
+    true,
+    event
   );
 }
 
@@ -106,7 +107,8 @@ export function handleMarketExited(event: MarketExited): void {
     protocolData.comptrollerAddress,
     event.params.mToken.toHexString(),
     event.params.account.toHexString(),
-    false
+    false,
+    event
   );
 }
 
