@@ -81,7 +81,9 @@ export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
   Address.fromString("0xc4ad29ba4b3c580e6d59105fff484999997675ff"), // crv3Crypto
 ];
-export const INCH_ORACLE_BLACKLIST: Address[] = [];
+export const INCH_ORACLE_BLACKLIST: Address[] = [
+  Address.fromString("0x365accfca291e7d3914637abf1f7635db165bb09"), // FXN
+];
 export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
