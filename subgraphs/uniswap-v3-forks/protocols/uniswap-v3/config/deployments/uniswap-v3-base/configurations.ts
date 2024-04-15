@@ -77,7 +77,13 @@ export class UniswapV3BaseConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList([
+      '0x391ef60db8e7677c32d2c547ea1a009159558419', // Penguin
+      '0x6eeb5859e32225cb61434dca63bca84bb0e735a7', // Magic Internet Memes
+      '0x0d3031225f4471eafdb1707db807cbb00eb561cc', // Floating Point
+      '0x18f377990e7ccecd8956a30603c9c17f5de9580d', // Belphin
+      '0x0e1b2c65508b1cd9939cf90337fcefa647936a98', // 1155f0
+    ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("10000");
