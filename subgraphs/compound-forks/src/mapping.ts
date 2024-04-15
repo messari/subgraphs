@@ -1642,7 +1642,7 @@ export function updateMarket(
     );
   }
 
-  const interestAccumulatedUSD = interestAccumulatedMantissa
+  const interestAccumulatedUSD = `interestAccumulatedMantissa`
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);

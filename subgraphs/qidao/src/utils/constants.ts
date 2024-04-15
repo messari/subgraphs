@@ -38,6 +38,7 @@ export namespace Network {
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const GNOSIS = "GNOSIS"; // aka Gnosis Chain
+  export const BASE = "BASE";
 }
 
 export namespace ProtocolType {
@@ -112,10 +113,10 @@ export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // cr
 export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
 
 export const STAKEDAO_STETH_VAULT = Address.fromHexString(
-  "0xcc61Ee649A95F2E2f0830838681f839BDb7CB823"
+  "0xcc61Ee649A95F2E2f0830838681f839BDb7CB823",
 );
 export const YEARN_STETH_VAULT = Address.fromHexString(
-  "0x82e90eb7034c1df646bd06afb9e67281aab5ed28"
+  "0x82e90eb7034c1df646bd06afb9e67281aab5ed28",
 );
 
 ////////////////////////
@@ -136,7 +137,7 @@ export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -162,7 +163,7 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
 );
 
 ////////////////
@@ -177,68 +178,72 @@ export const ETH_NAME = "Ether";
 /////////////////////////////
 
 export const MATIC_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000001010"
+  "0x0000000000000000000000000000000000001010",
 );
 
 export const MATIC_MAXIMUM_LTV = BIGDECIMAL_ONE.div(
-  BigDecimal.fromString("1.5")
+  BigDecimal.fromString("1.5"),
 ).times(BIGDECIMAL_HUNDRED);
 
 export const MAI_TOKEN_ADDRESS = new Map<string, string>();
 MAI_TOKEN_ADDRESS.set(
   Network.MATIC,
-  "0xa3fa99a148fa48d14ed51d610c367c61876997f1"
+  "0xa3fa99a148fa48d14ed51d610c367c61876997f1",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.FANTOM,
-  "0xfb98b335551a418cd0737375a2ea0ded62ea213b"
+  "0xfb98b335551a418cd0737375a2ea0ded62ea213b",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.AVALANCHE,
-  "0x5c49b268c9841aff1cc3b0a418ff5c3442ee3f3b"
+  "0x5c49b268c9841aff1cc3b0a418ff5c3442ee3f3b",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.MOONRIVER,
-  "0xfb2019dfd635a03cfff624d210aee6af2b00fc2c"
+  "0xfb2019dfd635a03cfff624d210aee6af2b00fc2c",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.ARBITRUM_ONE,
-  "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
+  "0x3f56e0c36d275367b8c502090edf38289b3dea0d",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.GNOSIS,
-  "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
+  "0x3f56e0c36d275367b8c502090edf38289b3dea0d",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.BSC,
-  "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
+  "0x3f56e0c36d275367b8c502090edf38289b3dea0d",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.OPTIMISM,
-  "0xdfa46478f9e5ea86d57387849598dbfb2e964b02"
+  "0xdfa46478f9e5ea86d57387849598dbfb2e964b02",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.MAINNET,
-  "0x8D6CeBD76f18E1558D4DB88138e2DeFB3909fAD6"
+  "0x8D6CeBD76f18E1558D4DB88138e2DeFB3909fAD6",
 );
 MAI_TOKEN_ADDRESS.set(
   Network.HARMONY,
-  "0x3F56e0c36d275367b8C502090EDF38289b3dEa0d"
+  "0x3F56e0c36d275367b8C502090EDF38289b3dEa0d",
+);
+MAI_TOKEN_ADDRESS.set(
+  Network.BASE,
+  "0xbf1aea8670d2528e08334083616dd9c5f3b087ae",
 );
 
 export const COLLATERAL_PRICE_DECIMALS = new Map<string, i32>();
 // MATIC
 COLLATERAL_PRICE_DECIMALS.set(
   prefixID(Network.MATIC, "0xa3fa99a148fa48d14ed51d610c367c61876997f1"),
-  8
+  8,
 );
 // camWMATIC
 COLLATERAL_PRICE_DECIMALS.set(
   prefixID(Network.MATIC, "0x88d84a85a87ed12b8f098e8953b322ff789fcd1a"),
-  8
+  8,
 );
 // camWBTC
 COLLATERAL_PRICE_DECIMALS.set(
   prefixID(Network.MATIC, "0x7dda5e1a389e0c1892caf55940f5fce6588a9ae0"),
-  8
+  8,
 );
