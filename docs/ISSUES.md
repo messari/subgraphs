@@ -2,7 +2,7 @@
 
 ## 1. Go to the Messari Github Issue Page
 
-Link - https://github.com/messari/subgraphs/issues\
+Link - https://github.com/messari/subgraphs/issues
 
 ## 2. See if there is an existing issue for the subgraph
 
