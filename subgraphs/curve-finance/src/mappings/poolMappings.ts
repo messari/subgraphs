@@ -13,7 +13,7 @@ import {
   AddLiquidity2 as AddLiquidityWithFees,
   AddLiquidity5 as AddLiquidityWithPriceScale,
   RemoveLiquidity2 as RemoveLiquidityWithFees,
-  TokenExchange1 as TokenExchangeWithPriceScale, 
+  TokenExchange1 as TokenExchangeWithPriceScale,
   RemoveLiquidityOne1 as RemoveLiquidityOneWithSupply,
   RemoveLiquidityOne2 as RemoveLiquidityOneWithPriceScale,
 } from "../../generated/templates/PoolTemplate/Pool";
@@ -47,7 +47,9 @@ export function handleTokenExchange(event: TokenExchange): void {
   updateFinancials(event.block);
 }
 
-export function handleTokenExchangeWithPriceScale(event: TokenExchangeWithPriceScale): void {
+export function handleTokenExchangeWithPriceScale(
+  event: TokenExchangeWithPriceScale
+): void {
   const buyer = event.params.buyer;
   const liquidityPoolAddress = event.address;
 
@@ -121,7 +123,9 @@ export function handleAddLiquidity(event: AddLiquidity): void {
   updateFinancials(event.block);
 }
 
-export function handleAddLiquidityWithPriceScale(event: AddLiquidityWithPriceScale): void {
+export function handleAddLiquidityWithPriceScale(
+  event: AddLiquidityWithPriceScale
+): void {
   const liquidityPoolAddress = event.address;
 
   const provider = event.params.provider;
@@ -253,7 +257,9 @@ export function handleRemoveLiquidityOneWithSupply(
   updateFinancials(event.block);
 }
 
-export function handleRemoveLiquidityOneWithPriceScale(event: RemoveLiquidityOneWithPriceScale): void {
+export function handleRemoveLiquidityOneWithPriceScale(
+  event: RemoveLiquidityOneWithPriceScale
+): void {
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
   const outputTokenBurntAmount = event.params.token_amount;
