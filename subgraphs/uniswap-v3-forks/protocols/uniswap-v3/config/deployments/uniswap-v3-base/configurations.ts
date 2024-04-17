@@ -83,6 +83,7 @@ export class UniswapV3BaseConfigurations implements Configurations {
       '0x0d3031225f4471eafdb1707db807cbb00eb561cc', // Floating Point
       '0x18f377990e7ccecd8956a30603c9c17f5de9580d', // Belphin
       '0x0e1b2c65508b1cd9939cf90337fcefa647936a98', // 1155f0
+      '0x0a7df211de68b10e9a833a42d8d30b9f0358ab6d', // Base Trade
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
