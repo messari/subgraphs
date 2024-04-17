@@ -3921,7 +3921,7 @@
     "deployments": {
       "radiant-capital-v2-arbitrum": {
         "network": "arbitrum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.1.0",
           "subgraph": "2.2.0",
@@ -3947,7 +3947,7 @@
       },
       "radiant-capital-v2-bsc": {
         "network": "bsc",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.2.0",
