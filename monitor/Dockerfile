@@ -1,7 +1,5 @@
 FROM node:20
 
-RUN apt update && apt upgrade --yes
-
 WORKDIR /
 
 COPY package.json ./
