@@ -1,7 +1,5 @@
 # pull the base image
-FROM node:lts-alpine
-
-RUN apk update && apk upgrade
+FROM node:20
 
 # set the working direction
 WORKDIR /app
