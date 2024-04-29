@@ -1,7 +1,9 @@
-specVersion: 0.0.5
+specVersion: 1.0.0
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+indexerHints:
+  prune: auto
 {{#graftEnabled}}
 description: ...
 features:

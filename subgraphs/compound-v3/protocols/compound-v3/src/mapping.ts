@@ -482,7 +482,7 @@ export function handleSupply(event: Supply): void {
   const amount = event.params.amount;
   const token = market.getInputToken();
   updateMarketData(market);
-  updateRevenue(market, event.address);
+  updateRevenue(market, event.address, event);
   updateRewards(market, event.address, event);
 
   const mintAmount = isMint(event);
@@ -496,7 +496,8 @@ export function handleSupply(event: Supply): void {
       amount,
       TransactionType.REPAY,
       PositionSide.BORROWER,
-      accountActorID
+      accountActorID,
+      event
     );
   } else if (mintAmount.ge(amount)) {
     // deposit only
@@ -508,7 +509,8 @@ export function handleSupply(event: Supply): void {
       amount,
       TransactionType.DEPOSIT,
       PositionSide.COLLATERAL,
-      accountActorID
+      accountActorID,
+      event
     );
   } else {
     // mintAmount > amount
@@ -523,7 +525,8 @@ export function handleSupply(event: Supply): void {
       repayAmount,
       TransactionType.REPAY,
       PositionSide.BORROWER,
-      accountActorID
+      accountActorID,
+      event
     );
 
     createBaseTokenTransactions(
@@ -534,7 +537,8 @@ export function handleSupply(event: Supply): void {
       depositAmount,
       TransactionType.DEPOSIT,
       PositionSide.COLLATERAL,
-      accountActorID
+      accountActorID,
+      event
     );
   }
 }
@@ -556,7 +560,7 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   const amount = event.params.amount;
   const token = market.getInputToken();
   updateMarketData(market);
-  updateRevenue(market, event.address);
+  updateRevenue(market, event.address, event);
   updateRewards(market, event.address, event);
 
   const cometContract = Comet.bind(event.address);
@@ -564,6 +568,7 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   const deposit = market.createDeposit(
     asset,
     accountID,
+    event.transaction.from,
     amount,
     bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
     supplyBalance
@@ -590,7 +595,7 @@ export function handleWithdraw(event: Withdraw): void {
   const amount = event.params.amount;
   const token = market.getInputToken();
   updateMarketData(market);
-  updateRevenue(market, event.address);
+  updateRevenue(market, event.address, event);
   updateRewards(market, event.address, event);
 
   const burnAmount = isBurn(event);
@@ -604,7 +609,8 @@ export function handleWithdraw(event: Withdraw): void {
       amount,
       TransactionType.BORROW,
       PositionSide.BORROWER,
-      accountActorID
+      accountActorID,
+      event
     );
   } else if (burnAmount.ge(amount)) {
     // withdraw only
@@ -616,7 +622,8 @@ export function handleWithdraw(event: Withdraw): void {
       amount,
       TransactionType.WITHDRAW,
       PositionSide.COLLATERAL,
-      accountActorID
+      accountActorID,
+      event
     );
   } else {
     // burnAmount < amount
@@ -631,7 +638,8 @@ export function handleWithdraw(event: Withdraw): void {
       borrowAmount,
       TransactionType.BORROW,
       PositionSide.BORROWER,
-      accountActorID
+      accountActorID,
+      event
     );
 
     createBaseTokenTransactions(
@@ -642,7 +650,8 @@ export function handleWithdraw(event: Withdraw): void {
       withdrawAmount,
       TransactionType.WITHDRAW,
       PositionSide.COLLATERAL,
-      accountActorID
+      accountActorID,
+      event
     );
   }
 }
@@ -664,7 +673,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const amount = event.params.amount;
   const token = market.getInputToken();
   updateMarketData(market);
-  updateRevenue(market, event.address);
+  updateRevenue(market, event.address, event);
   updateRewards(market, event.address, event);
 
   const cometContract = Comet.bind(event.address);
@@ -672,6 +681,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const withdraw = market.createWithdraw(
     asset,
     accountID,
+    event.transaction.from,
     amount,
     bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
     supplyBalance
@@ -714,7 +724,7 @@ export function handleTransfer(event: Transfer): void {
   let amount = event.params.amount;
   const token = market.getInputToken();
   updateMarketData(market);
-  updateRevenue(market, event.address);
+  updateRevenue(market, event.address, event);
   updateRewards(market, event.address, event);
 
   let newBalance = getUserBalance(
@@ -726,6 +736,7 @@ export function handleTransfer(event: Transfer): void {
   market.createWithdraw(
     tryBaseToken.value,
     event.params.from,
+    event.transaction.from,
     amount,
     amount
       .toBigDecimal()
@@ -749,6 +760,7 @@ export function handleTransfer(event: Transfer): void {
   market.createDeposit(
     tryBaseToken.value,
     toAddress,
+    event.transaction.from,
     amount,
     amount
       .toBigDecimal()
@@ -819,7 +831,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     marketEntity.liquidationPenalty.div(BIGDECIMAL_HUNDRED);
   const profitUSD = amountUSD.times(liquidationPenalty);
   updateMarketData(market);
-  updateRevenue(market, event.address);
+  updateRevenue(market, event.address, event);
   updateRewards(market, event.address, event);
 
   const collateralBalance = getUserBalance(
@@ -832,6 +844,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     event.params.asset,
     liquidator,
     borrower,
+    event.transaction.from,
     amount,
     amountUSD,
     profitUSD,
@@ -889,7 +902,8 @@ function createBaseTokenTransactions(
   amount: BigInt,
   transactionType: string,
   positionSide: string,
-  accountActorID: Bytes
+  accountActorID: Bytes,
+  event: ethereum.Event
 ): void {
   const principal = getPrincipal(accountID, comet);
   const newBalance = getUserBalance(comet, accountID, null, positionSide);
@@ -897,6 +911,7 @@ function createBaseTokenTransactions(
     const deposit = market.createDeposit(
       token.id,
       accountID,
+      event.transaction.from,
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
@@ -910,6 +925,7 @@ function createBaseTokenTransactions(
     const withdraw = market.createWithdraw(
       token.id,
       accountID,
+      event.transaction.from,
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
@@ -925,6 +941,7 @@ function createBaseTokenTransactions(
     const borrow = market.createBorrow(
       token.id,
       accountID,
+      event.transaction.from,
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
@@ -939,6 +956,7 @@ function createBaseTokenTransactions(
     const repay = market.createRepay(
       token.id,
       accountID,
+      event.transaction.from,
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
@@ -1095,7 +1113,11 @@ function updateRewards(
 //
 //
 // update revenue (only can update base token market revenue)
-function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
+function updateRevenue(
+  dataManager: DataManager,
+  cometAddress: Address,
+  event: ethereum.Event
+): void {
   const cometContract = Comet.bind(cometAddress);
   const inputToken = dataManager.getInputToken();
   if (cometContract.baseToken() != inputToken.id) {
@@ -1121,7 +1143,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   if (borrowRate.lt(supplyRate)) {
     log.warning(
       "[updateRevenue] Borrow rate is less than supply rate at transaction: {}",
-      [dataManager.event.transaction.hash.toHexString()]
+      [event.transaction.hash.toHexString()]
     );
     return;
   }
