@@ -44,7 +44,7 @@
     "eslint-plugin-n": "^15.2.5",
     "eslint-plugin-promise": "^6.0.1",
     "eslint-plugin-react": "^7.31.8",
-    "gh-pages": "^3.2.3",
+    "gh-pages": "^5.0.0",
     "prettier": "2.6.1",
     "typescript": "^4.8.3"
   },
