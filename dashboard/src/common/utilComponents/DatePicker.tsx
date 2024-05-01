@@ -21,7 +21,7 @@ export const DatePicker = ({ dates, setDates }: DatePickerProps) => {
             }
           }}
           value={datesValue}
-          renderDay={(day, _selectedDates, pickersDayProps) => {
+          renderDay={(day: Moment, _selectedDates: any, pickersDayProps: any) => {
             return (
               <div
                 key={day.format("l")}
@@ -38,7 +38,7 @@ export const DatePicker = ({ dates, setDates }: DatePickerProps) => {
               </div>
             );
           }}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params: any) => <TextField {...params} />}
         />
       </LocalizationProvider>
       <Box display="flex" flexWrap="wrap" gap={1} sx={{ padding: 1, backgroundColor: "Window" }}>
