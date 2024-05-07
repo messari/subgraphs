@@ -74,7 +74,6 @@ export function handleMarketEntered(event: MarketEntered): void {
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true,
-    event,
   );
 }
 
@@ -84,7 +83,6 @@ export function handleMarketExited(event: MarketExited): void {
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false,
-    event,
   );
 }
 

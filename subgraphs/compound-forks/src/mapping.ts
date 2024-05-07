@@ -198,7 +198,6 @@ export function _handleMarketEntered(
   marketID: string,
   borrowerID: string,
   entered: boolean, // true = entered, false = exited
-  event: ethereum.Event,
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
