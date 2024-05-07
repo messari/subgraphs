@@ -220,18 +220,6 @@ export function _handleMarketEntered(
 
     protocol.cumulativeUniqueUsers++;
   }
-
-  //
-  // track unique transaction signers
-  //
-  const txSignerID = event.transaction.from.toHexString();
-  let txSigner = _TxSigner.load(txSignerID);
-  if (!txSigner) {
-    txSigner = new _TxSigner(txSignerID);
-    txSigner.save();
-
-    protocol.cumulativeUniqueTxSigners += 1;
-  }
   protocol.save();
 
   const enabledCollaterals = account._enabledCollaterals;
