@@ -3,8 +3,7 @@ name: Feature request
 about: Suggest an idea for this project
 title: "#feature; concise title"
 labels: enhancement
-assignees: bye43
-
+assignees: ishraq8
 ---
 
 **What do you think is missing?**
@@ -12,6 +11,7 @@ A clear and concise description of what the problem (or solution) is. Ex. I'm al
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
+
 - new subgraph?
 - new schema support?
 - update schema?
