@@ -3,7 +3,7 @@ name: Subgraph QA
 about: QA a subgraph
 title: "#qa; protocol name"
 labels: "data quality"
-assignees: bye43
+assignees: ishraq8
 ---
 
 ## Review Info
