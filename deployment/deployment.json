@@ -641,6 +641,40 @@
       }
     }
   },
+  "seamless": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "seamless",
+    "project": "seamless",
+    "deployments": {
+      "seamless-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "seamless.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "seamless-base",
+            "query-id": "seamless-base"
+          },
+          "decentralized-network": {
+            "slug": "seamless-base",
+            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
+          }
+        }
+      }
+    }
+  },
   "alpaca-finance-lending": {
     "schema": "lending",
     "base": "alpaca-finance-lending",
