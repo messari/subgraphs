@@ -48,7 +48,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.BASE)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x90C5055530C0465AbB077FA016a3699A3F53Ef99"),
+      Address.fromString("0x90c5055530c0465abb077fa016a3699a3f53ef99"),
       Network.BASE
     );
   } else {
