@@ -2078,6 +2078,32 @@
             "query-id": "8ayELti1UNCNCWuvwSwapjh4mvvCejeXsk4PmsWBmQ82"
           }
         }
+      },
+      "moonwell-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "moonwell.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "moonwell-base",
+            "query-id": "moonwell-base"
+          },
+          "decentralized-network": {
+            "slug": "moonwell-base",
+            "query-id": "todo"
+          }
+        }
       }
     }
   },
