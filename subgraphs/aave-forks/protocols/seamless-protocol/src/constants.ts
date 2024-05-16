@@ -20,9 +20,9 @@ export const USDC_POS_TOKEN_ADDRESS =
 /////////////////////////////
 
 export namespace Protocol {
-  export const PROTOCOL = "Seamless";
-  export const NAME = "Seamless";
-  export const SLUG = "seamless";
+  export const PROTOCOL = "Seamless Protocol";
+  export const NAME = "Seamless Protocol";
+  export const SLUG = "seamless-protocol";
 }
 
 export const AAVE_DECIMALS = 8;

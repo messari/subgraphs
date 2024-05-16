@@ -641,13 +641,13 @@
       }
     }
   },
-  "seamless": {
+  "seamless-protocol": {
     "schema": "lending",
     "base": "aave-forks",
-    "protocol": "seamless",
-    "project": "seamless",
+    "protocol": "seamless-protocol",
+    "project": "seamless-protocol",
     "deployments": {
-      "seamless-base": {
+      "seamless-protocol-base": {
         "network": "base",
         "status": "prod",
         "versions": {
@@ -656,7 +656,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "seamless.template.yaml"
+          "template": "seamless-protocol.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -664,12 +664,12 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "seamless-base",
-            "query-id": "seamless-base"
+            "slug": "seamless-protocol-base",
+            "query-id": "seamless-protocol-base"
           },
           "decentralized-network": {
-            "slug": "seamless-base",
-            "query-id": "QmNykAm9QaFjjNNN8tUSjCnSz1ZTY8wKmCGJPu9wNUgvxp"
+            "slug": "seamless-protocol-base",
+            "query-id": "todo"
           }
         }
       }
