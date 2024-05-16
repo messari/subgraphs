@@ -70,6 +70,7 @@ import {
   Comptroller,
 } from "../../../generated/Comptroller/Comptroller";
 import { SolarBeamLPToken } from "../../../generated/templates/CToken/SolarBeamLPToken";
+import { AerodromeLPToken } from "../../../generated/templates/CToken/AerodromeLPToken";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
@@ -489,8 +490,11 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
     let oneAuxillaryInNative = BIGDECIMAL_ZERO;
     if (equalsIgnoreCase(dataSource.network(), Network.MOONRIVER)) {
       oneAuxillaryInNative = getOneMFAMInMOVR(protocolData.nativeLPAddress);
-    } else {
+    } else if (equalsIgnoreCase(dataSource.network(), Network.MOONBEAM)) {
       oneAuxillaryInNative = getOneWELLInGLMR(protocolData.nativeLPAddress);
+    } else {
+      // Network.BASE
+      oneAuxillaryInNative = getOneWELLInWETH(protocolData.nativeLPAddress);
     }
     token1PriceUSD = oneAuxillaryInNative.times(token0PriceUSD);
   }
@@ -577,4 +581,17 @@ function getOneWELLInGLMR(lpAddress: Address): BigDecimal {
   const GLMRReserve = getReservesResult.value.value1;
   const WELLReserve = getReservesResult.value.value0;
   return GLMRReserve.toBigDecimal().div(WELLReserve.toBigDecimal());
+}
+
+// Fetch WELL vs WETH price from Aerodrome
+function getOneWELLInWETH(lpAddress: Address): BigDecimal {
+  const lpTokenContract = AerodromeLPToken.bind(lpAddress);
+  const getReservesResult = lpTokenContract.try_getReserves();
+  if (getReservesResult.reverted) {
+    log.warning("[getOneWELLInWETH] result reverted", []);
+    return BIGDECIMAL_ZERO;
+  }
+  const WETHReserve = getReservesResult.value.value1;
+  const WELLReserve = getReservesResult.value.value0;
+  return WETHReserve.toBigDecimal().div(WELLReserve.toBigDecimal());
 }

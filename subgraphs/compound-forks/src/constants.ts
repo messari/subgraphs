@@ -13,6 +13,7 @@ export namespace Network {
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
   export const AVALANCHE = "AVALANCHE";
+  export const BASE = "BASE";
   export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
@@ -136,7 +137,7 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 export function BDChangeDecimals(
   x: BigDecimal,
   from: i32,
-  to: i32
+  to: i32,
 ): BigDecimal {
   if (to > from) {
     // increase number of decimals
