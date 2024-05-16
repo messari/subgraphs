@@ -39,15 +39,6 @@ export function getAaveProtocol(protocolAddress: Address): LendingProtocol {
       addressesProvider.getPoolConfigurator(),
     );
 
-    // TODO: Do we have any alternate function calls/events for these variables??
-    // const defaultMaxGas = morphoContract.defaultMaxGasForMatching();
-    // morpho.protocol._defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
-    // morpho.protocol._defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
-    // morpho.protocol._defaultMaxGasForMatchingWithdraw =
-    //   defaultMaxGas.getWithdraw();
-    // morpho.protocol._defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
-    // morpho.protocol._maxSortedUsers = morphoContract.maxSortedUsers();
-
     morpho.protocol._owner = morphoContract.owner();
     morpho.protocol.save();
   }
