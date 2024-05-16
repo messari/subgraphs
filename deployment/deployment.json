@@ -6151,7 +6151,7 @@
     "deployments": {
       "maker-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -6168,6 +6168,10 @@
           "hosted-service": {
             "slug": "maker-governance",
             "query-id": "maker-governance"
+          },
+          "decentralized-network": {
+            "slug": "maker-governance",
+            "query-id": "FXpCdSzUbRFzovJLW8hrwFXA2E3Bj915w99TtTSMm88p"
           }
         }
       }
@@ -6333,7 +6337,7 @@
           },
           "decentralized-network": {
             "slug": "ens-governance",
-            "query-id": "GyijYxW9yiSRcEd5u2gfquSvneQKi5QuvU3WZgFyfFSn"
+            "query-id": "F7MznC87sv5y5jNUaBSrKFgCqTqP9Vgc11xcreZQpX7e"
           }
         }
       }
@@ -6367,7 +6371,7 @@
           },
           "decentralized-network": {
             "slug": "euler-governance",
-            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
+            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
           }
         }
       }
@@ -6564,6 +6568,10 @@
           "hosted-service": {
             "slug": "rarible-governance",
             "query-id": "rarible-governance"
+          },
+          "decentralized-network": {
+            "slug": "rarible-governance",
+            "query-id": "2oGCcncW9v7AAExqpZ9T1W1GecSjGVmi7XGet3P9JiNn"
           }
         }
       }
@@ -6624,6 +6632,10 @@
           "hosted-service": {
             "slug": "ousd-governance",
             "query-id": "ousd-governance"
+          },
+          "decentralized-network": {
+            "slug": "ousd-governance",
+            "query-id": "BwcFTZJskUwk6WXKteMAEqn6CQFWsPsqq8A8YGcqnWkK"
           }
         }
       }
@@ -6654,6 +6666,10 @@
           "hosted-service": {
             "slug": "threshold-governance",
             "query-id": "threshold-governance"
+          },
+          "decentralized-network": {
+            "slug": "threshold-governance",
+            "query-id": "Bk9fLLKttYoM4fE1cXXCq61owGqFtX1RsS8kEtDnDELC"
           }
         }
       }
@@ -6684,6 +6700,10 @@
           "hosted-service": {
             "slug": "ampleforth-governance",
             "query-id": "ampleforth-governance"
+          },
+          "decentralized-network": {
+            "slug": "ampleforth-governance",
+            "query-id": "B7zUhfTTV7mi2QZgUL661D714NGqeLtk6h3q3Mf2xNNa"
           }
         }
       }
@@ -6714,6 +6734,10 @@
           "hosted-service": {
             "slug": "compound-governance",
             "query-id": "compound-governance"
+          },
+          "decentralized-network": {
+            "slug": "compound-governance",
+            "query-id": "7nuSuPhUgKSg5uKRh8g5jyjZWE8DnvQw1mQtvDWpxrnh"
           }
         }
       }
@@ -6774,6 +6798,10 @@
           "hosted-service": {
             "slug": "cryptex-governance",
             "query-id": "cryptex-governance"
+          },
+          "decentralized-network": {
+            "slug": "cryptex-governance",
+            "query-id": "AnAnCpeyy2ZbP2BLZw9u7VjGtVtRorvYuGU3vME1na7F"
           }
         }
       }
@@ -6804,6 +6832,10 @@
           "hosted-service": {
             "slug": "gitcoin-governance",
             "query-id": "gitcoin-governance"
+          },
+          "decentralized-network": {
+            "slug": "gitcoin-governance",
+            "query-id": "By35hUZiWiHNzRsdDnxFU9T47YUNZwPjfhwD1iBbNGQL"
           }
         }
       }
@@ -6834,6 +6866,10 @@
           "hosted-service": {
             "slug": "hifi-governance",
             "query-id": "hifi-governance"
+          },
+          "decentralized-network": {
+            "slug": "hifi-governance",
+            "query-id": "ANAXtqRM9cUySpQZ8xuaFTdu1oFCj4HYaRXXiChTihAM"
           }
         }
       }
@@ -7044,6 +7080,10 @@
           "hosted-service": {
             "slug": "pooltogether-governance",
             "query-id": "pooltogether-governance"
+          },
+          "decentralized-network": {
+            "slug": "pooltogether-governance",
+            "query-id": "8rW1keThqpvtoBz7V2iNbo3wqcPCJZTBGuc3frGKbyi2"
           }
         }
       }
@@ -7074,6 +7114,10 @@
           "hosted-service": {
             "slug": "radicle-governance",
             "query-id": "radicle-governance"
+          },
+          "decentralized-network": {
+            "slug": "radicle-governance",
+            "query-id": "8jQvvEWJffzA48kxnPhuG7dqv4MWwPatVKKbxzr66xiN"
           }
         }
       }
@@ -7104,6 +7148,10 @@
           "hosted-service": {
             "slug": "reflexer-governance",
             "query-id": "reflexer-governance"
+          },
+          "decentralized-network": {
+            "slug": "reflexer-governance",
+            "query-id": "wWdwntxsEd21qDdhkzDn9ycNs5kvYamkndwv3GwLfPp"
           }
         }
       }
@@ -7134,6 +7182,10 @@
           "hosted-service": {
             "slug": "uniswap-governance",
             "query-id": "uniswap-governance"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-governance",
+            "query-id": "7WXaWRE2GbBpmokFAnQfugpVsC61D9dfR6fHgjQFqpq5"
           }
         }
       }
