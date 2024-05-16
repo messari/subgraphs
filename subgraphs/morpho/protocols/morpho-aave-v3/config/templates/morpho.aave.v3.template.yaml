@@ -1,0 +1,140 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Morpho
+    network: mainnet
+    source:
+      address: "{{ factory.address }}"
+      abi: MorphoAaveV3
+      startBlock: {{ factory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MorphoAaveV3
+          file: ./abis/MorphoAaveV3.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: AToken
+          file: ./abis/aave/AToken.json
+        - name: DebtToken
+          file: ./abis/aave/DebtToken.json
+        - name: LendingPool
+          file: ./abis/aave/LendingPool.json
+        - name: LendingPoolAddressesProvider
+          file: ./abis/aave/LendingPoolAddressesProviderV3.json
+        - name: LendingPoolConfigurator
+          file: ./abis/aave/LendingPoolConfigurator.json
+        - name: PriceOracle
+          file: ./abis/aave/PriceOracle.json
+        - name: ProtocolDataProvider
+          file: ./abis/aave/ProtocolDataProviderV3.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/PriceFeed.json
+      eventHandlers:
+        - event: Borrowed(address,indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleBorrowed
+        - event: P2PTotalsUpdated(indexed address,uint256,uint256)
+          handler: handleP2PTotalsUpdated
+        - event: P2PBorrowDeltaUpdated(indexed address,uint256)
+          handler: handleP2PBorrowDeltaUpdated
+        - event: P2PSupplyDeltaUpdated(indexed address,uint256)
+          handler: handleP2PSupplyDeltaUpdated
+        - event: Supplied(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSupplied
+        - event: BorrowPositionUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleBorrowPositionUpdated
+        - event: SupplyPositionUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleSupplyPositionUpdated
+        - event: IndexesUpdated(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleIndexesUpdated
+        - event: Liquidated(indexed address,indexed address,indexed address,uint256,address,uint256)
+          handler: handleLiquidated
+        - event: Withdrawn(address,indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdrawn
+        - event: Repaid(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleRepaid
+        - event: IsBorrowPausedSet(indexed address,bool)
+          handler: handleIsBorrowPausedSet
+        - event: IsDeprecatedSet(indexed address,bool)
+          handler: handleIsDeprecatedSet
+        - event: IsLiquidateBorrowPausedSet(indexed address,bool)
+          handler: handleIsLiquidateBorrowPausedSet
+        - event: IsLiquidateCollateralPausedSet(indexed address,bool)
+          handler: handleIsLiquidateCollateralPausedSet
+        - event: IsRepayPausedSet(indexed address,bool)
+          handler: handleIsRepayPausedSet
+        - event: IsSupplyPausedSet(indexed address,bool)
+          handler: handleIsSupplyPausedSet
+        - event: IsWithdrawPausedSet(indexed address,bool)
+          handler: handleIsWithdrawPausedSet
+        - event: MarketCreated(indexed address)
+          handler: handleMarketCreated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: P2PIndexCursorSet(indexed address,uint16)
+          handler: handleP2PIndexCursorSet
+        - event: IsP2PDisabledSet(indexed address,bool)
+          handler: handleIsP2PDisabledSet
+        - event: ReserveFactorSet(indexed address,uint16)
+          handler: handleReserveFactorSet
+        - event: ReserveFeeClaimed(indexed address,uint256)
+          handler: handleReserveFeeClaimed
+      file: ./src/mapping/morpho-aave-v3/morphoAaveV3.ts
+templates:
+  - kind: ethereum
+    name: LendingPool
+    network: mainnet
+    source:
+      abi: LendingPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MorphoAaveV3
+          file: ./abis/MorphoAaveV3.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: AToken
+          file: ./abis/aave/AToken.json
+        - name: DebtToken
+          file: ./abis/aave/DebtToken.json
+        - name: LendingPool
+          file: ./abis/aave/LendingPool.json
+        - name: LendingPoolAddressesProvider
+          file: ./abis/aave/LendingPoolAddressesProviderV3.json
+        - name: LendingPoolConfigurator
+          file: ./abis/aave/LendingPoolConfigurator.json
+        - name: PriceOracle
+          file: ./abis/aave/PriceOracle.json
+        - name: ProtocolDataProvider
+          file: ./abis/aave/ProtocolDataProviderV3.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/PriceFeed.json
+      eventHandlers:
+        - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleReserveDataUpdated
+      file: ./src/mapping/morpho-aave-v3/lendingPool.ts
+  - kind: ethereum
+    name: LendingPoolConfigurator
+    network: mainnet
+    source:
+      abi: LendingPoolConfigurator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LendingPoolConfigurator
+          file: ./abis/aave/LendingPoolConfigurator.json
+      eventHandlers:
+        - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralConfigurationChanged
+      file: ./src/mapping/morpho-aave-v3/lendingPoolConfigurator.ts

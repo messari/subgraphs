@@ -3415,6 +3415,40 @@
       }
     }
   },
+  "morpho-aave-v3": {
+    "schema": "lending",
+    "base": "morpho",
+    "protocol": "morpho-aave-v3",
+    "project": "morpho",
+    "deployments": {
+      "morpho-aave-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "morpho.aave.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "morpho-aave-v3-ethereum",
+            "query-id": "morpho-aave-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "morpho-aave-v3-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
   "morpho-compound": {
     "schema": "lending",
     "base": "morpho",
