@@ -37,7 +37,7 @@ import { getAaveProtocol } from "./fetchers";
 import { BASE_UNITS } from "../../constants";
 import { getMarket } from "../../utils/initializers";
 import { AaveMath } from "../../utils/maths/aaveMath";
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { updateFinancials, updateP2PRates } from "../../helpers";
 import { UnderlyingTokenMapping } from "../../../generated/schema";
 

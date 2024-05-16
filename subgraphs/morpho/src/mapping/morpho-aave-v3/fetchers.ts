@@ -2,10 +2,8 @@ import {
   readValue,
   INT_EIGHT,
   exponentToBigInt,
-  DEFAULT_DECIMALS,
   exponentToBigDecimal,
   MORPHO_AAVE_V3_ADDRESS,
-  ETH_USD_PRICE_FEED_ADDRESS,
 } from "../../constants";
 import {
   Market,
