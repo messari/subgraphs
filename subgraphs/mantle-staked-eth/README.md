@@ -1,0 +1,1 @@
+# Mantle Staked ETH Subgraph
