@@ -1,5 +1,5 @@
 # Subgraph Schema: Generic
-# Version: 2.1.1
+# Version: 3.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -67,25 +67,6 @@ type Token @entity @regularPolling {
   lastPriceBlockNumber: BigInt
 }
 
-enum RewardTokenType {
-  " For reward tokens awarded to LPs/lenders "
-  DEPOSIT
-
-  " For reward tokens awarded to borrowers "
-  BORROW
-}
-
-type RewardToken @entity @regularPolling {
-  " { Reward token type }-{ Smart contract address of the reward token } "
-  id: Bytes!
-
-  " Reference to the actual token "
-  token: Token!
-
-  " The type of the reward token "
-  type: RewardTokenType!
-}
-
 #############################
 ##### Protocol Metadata #####
 #############################
@@ -120,9 +101,6 @@ type Protocol @entity @regularPolling {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
-  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
-  protocolControlledValueUSD: BigDecimal
-
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
 
@@ -140,12 +118,6 @@ type Protocol @entity @regularPolling {
 
   " Total number of pools "
   totalPoolCount: Int!
-
-  " Day ID of the most recent daily snapshot "
-  lastSnapshotDayID: Int!
-
-  " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: Int!
 
   " Timestamp of the last time this entity was updated "
   lastUpdateTimestamp: BigInt!
@@ -247,9 +219,6 @@ type FinancialsDailySnapshot @entity @dailySnapshot {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
-  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
-  protocolControlledValueUSD: BigDecimal
-
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
 
@@ -292,23 +261,8 @@ type Pool @entity @regularPolling {
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
 
-  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null.
-
-  " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
-
-  " Type of token used to track ownership "
-  outputTokenType: TokenType
-
-  " Specify if the output token is used to track liquidity position in the protocol "
-  isLiquidityToken: Boolean!
-
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
-
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -335,166 +289,6 @@ type Pool @entity @regularPolling {
 
   " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
   inputTokenBalancesUSD: [BigDecimal!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
-
-  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Day ID of the most recent daily snapshot "
-  lastSnapshotDayID: Int!
-
-  " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: Int!
-
-  " Timestamp of the last time this entity was updated "
-  lastUpdateTimestamp: BigInt!
-
-  ##### Snapshots #####
-
-  " Pool daily snapshots "
-  dailySnapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
-
-  " Pool hourly snapshots "
-  hourlySnapshots: [PoolHourlySnapshot!]! @derivedFrom(field: "pool")
-}
-
-type PoolDailySnapshot @entity @dailySnapshot {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-  id: Bytes!
-
-  " Number of days since Unix epoch time "
-  day: Int!
-
-  " The protocol this snapshot belongs to "
-  protocol: Protocol!
-
-  " The pool this snapshot belongs to "
-  pool: Pool!
-
-  ##### Quantitative Data #####
-
-  " Current TVL (Total Value Locked) of this pool "
-  totalValueLockedUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the supply side. "
-  cumulativeSupplySideRevenueUSD: BigDecimal!
-
-  " Daily revenue generated by the pool, accrued to the supply side. "
-  dailySupplySideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the protocol. "
-  cumulativeProtocolSideRevenueUSD: BigDecimal!
-
-  " Daily revenue generated by the pool, accrued to the protocol. "
-  dailyProtocolSideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool. "
-  cumulativeTotalRevenueUSD: BigDecimal!
-
-  " Daily revenue generated by the pool. "
-  dailyTotalRevenueUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
-  inputTokenBalancesUSD: [BigDecimal!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
-
-  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
-
-  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
-}
-
-type PoolHourlySnapshot @entity @hourlySnapshot {
-  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
-  id: Bytes!
-
-  " Number of days since Unix epoch time "
-  hours: Int!
-
-  " The protocol this snapshot belongs to "
-  protocol: Protocol!
-
-  " The pool this snapshot belongs to "
-  pool: Pool!
-
-  ##### Quantitative Data #####
-
-  " Current TVL (Total Value Locked) of this pool "
-  totalValueLockedUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the supply side. "
-  cumulativeSupplySideRevenueUSD: BigDecimal!
-
-  " Hourly revenue generated by the pool, accrued to the supply side. "
-  hourlySupplySideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the protocol. "
-  cumulativeProtocolSideRevenueUSD: BigDecimal!
-
-  " Hourly revenue generated by the pool, accrued to the protocol. "
-  hourlyProtocolSideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool. "
-  cumulativeTotalRevenueUSD: BigDecimal!
-
-  " Hourly revenue generated by the pool. "
-  hourlyTotalRevenueUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
-  inputTokenBalancesUSD: [BigDecimal!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
-
-  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
-
-  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
-
-  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
 }
 
 # An account is a unique Ethereum address
