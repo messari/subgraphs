@@ -201,7 +201,7 @@ As an example, the euler finance subgraph had a "oneshot cancelled" error for tx
 
 > Note: since this is supported in [miniscan](./TOOLING.md#miniscan) it is generally easier to use that. There still may be edge cases where the following is useful.
 
-Making historical contract calls can aide your debugging. You would want to perform this in order to see the response to a contract call at a previous block. On the chain's blockscanner you can make contract calls to the current state of the network, but previous calls will require this method:
+Making historical contract calls can aid your debugging. You would want to perform this in order to see the response to a contract call at a previous block. On the chain's blockscanner you can make contract calls to the current state of the network, but previous calls will require this method:
 
 - You will need an archival node access to the blockchain you want to query (contact @Vincent for this)
 - You can download and use this script: https://gist.github.com/0xbe1/bb1e4b4e0c3906b4fd119f62084b6749
@@ -217,7 +217,7 @@ You can debug your subgraph by running `graph-node` locally. Here are some instr
 
 https://github.com/graphprotocol/graph-node#running-a-local-graph-node
 
-Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/) or contact me for one.
+Note that you need an Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/) or contact me for one.
 
 A [video tutorial](https://youtu.be/nH_pZWgQb7g) on how to run the graph-node locally using cargo.
 
@@ -234,7 +234,7 @@ For those new to Postgres, the local node can be confusing when it comes to data
 
 3. The default port for the Postgres server is 5432. After running the start command, check if the server is up and listening by running command `sudo netstat -nlp | grep 5432`. Or you can run `sudo lsof -i -P -n | grep LISTEN` and check numerous processes/servers running on your machine.
 
-4. Unless you have set some other default, the database system initialized from initdb is owned by the username on your system (along with the databases created within this system such as "graph-node"). However, this username from the system has not yet been made as a Postgres role that has read, write etc permissions in the Postgres system. If you try to connect to a database with this role/username, authentication will fail. You must add the user as a Postgres superuser role (there are queries you can run to just give this role permissions for one database rather than as a superuser, but for simplicity sake I wont get into that here).
+4. Unless you have set some other default, the database system initialized from initdb is owned by the username on your system (along with the databases created within this system such as "graph-node"). However, this username from the system has not yet been made as a Postgres role that has read, write etc permissions in the Postgres system. If you try to connect to a database with this role/username, authentication will fail. You must add the user as a Postgres superuser role (there are queries you can run to just give this role permissions for one database rather than as a superuser, but for simplicity sake I won't get into that here).
 
 5. Start the Postgres cli with command `sudo -i -u postgres` followed by command `psql`. If inside the shell you run `\l`, you will see a list of databases, which "graph-node" will have an owner of the same name as your system user name. At this point, back out and run query `\du` to check if the owner of 'graph-node' database is in this list of roles. If not, run query `CREATE ROLE `_`myUser `_`WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD`_`'password'`_`;`. This creates a superuser role with the proper name and will allow you to connect to the database with this user/password combo. Missing this step can cause authentication issues when attempting to build the node.
 
