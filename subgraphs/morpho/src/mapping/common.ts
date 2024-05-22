@@ -92,9 +92,10 @@ export function _handleCollateralSupplied(
   );
 
   market._scaledPoolCollateral = market
-    ._scaledPoolCollateral!.minus(position.balance)
+    ._scaledPoolCollateral!.minus(position._balanceOnPool!)
     .plus(balanceInCollateral);
 
+  position._balanceOnPool = balanceInCollateral;
   position.balance = balanceInCollateral;
   position.save();
 
@@ -318,9 +319,10 @@ export function _handleCollateralWithdrawn(
   }
 
   market._scaledPoolCollateral = market
-    ._scaledPoolCollateral!.minus(position.balance!)
+    ._scaledPoolCollateral!.minus(position._balanceOnPool!)
     .plus(balanceInCollateral);
 
+  position._balanceOnPool = balanceInCollateral;
   position.balance = balanceInCollateral;
   position.save();
 
