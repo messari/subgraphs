@@ -48,6 +48,10 @@ dataSources:
           handler: handleSupplied
         - event: BorrowPositionUpdated(indexed address,indexed address,uint256,uint256)
           handler: handleBorrowPositionUpdated
+        - event: CollateralSupplied(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleCollateralSupplied
+        - event: CollateralWithdrawn(address,indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleCollateralWithdrawn
         - event: SupplyPositionUpdated(indexed address,indexed address,uint256,uint256)
           handler: handleSupplyPositionUpdated
         - event: IndexesUpdated(indexed address,uint256,uint256,uint256,uint256)

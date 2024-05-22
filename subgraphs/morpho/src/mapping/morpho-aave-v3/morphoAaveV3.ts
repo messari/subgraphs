@@ -5,6 +5,8 @@ import {
   _handleWithdrawn,
   _handleLiquidated,
   _handleP2PIndexesUpdated,
+  _handleCollateralSupplied,
+  _handleCollateralWithdrawn,
   _handleBorrowerPositionUpdated,
   _handleSupplierPositionUpdated,
 } from "../common";
@@ -24,6 +26,8 @@ import {
   IsBorrowPausedSet,
   P2PIndexCursorSet,
   ReserveFeeClaimed,
+  CollateralSupplied,
+  CollateralWithdrawn,
   IsWithdrawPausedSet,
   OwnershipTransferred,
   P2PBorrowDeltaUpdated,
@@ -105,6 +109,41 @@ export function handleP2PSupplyDeltaUpdated(
   updateP2PRates(market, new AaveMath());
   market.save();
 
+  updateFinancials(protocol, event.block);
+}
+
+export function handleCollateralSupplied(event: CollateralSupplied): void {
+  const protocol = getAaveProtocol(event.address);
+
+  const tokenMapping = UnderlyingTokenMapping.load(event.params.underlying)!;
+  const market = getMarket(Address.fromBytes(tokenMapping.aToken));
+
+  _handleCollateralSupplied(
+    event,
+    getAaveProtocol(event.address),
+    market,
+    event.params.onBehalf,
+    event.params.amount,
+    event.params.scaledBalance,
+  );
+
+  updateFinancials(protocol, event.block);
+}
+
+export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
+  const protocol = getAaveProtocol(event.address);
+
+  const tokenMapping = UnderlyingTokenMapping.load(event.params.underlying)!;
+  const market = getMarket(Address.fromBytes(tokenMapping.aToken));
+
+  _handleCollateralWithdrawn(
+    event,
+    protocol,
+    market,
+    event.params.onBehalf,
+    event.params.amount,
+    event.params.scaledBalance,
+  );
   updateFinancials(protocol, event.block);
 }
 

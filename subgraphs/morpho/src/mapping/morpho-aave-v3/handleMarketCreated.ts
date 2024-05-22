@@ -132,6 +132,7 @@ export function handleMarketCreated(event: MarketCreated): void {
 
   market._scaledSupplyOnPool = BigInt.zero();
   market._scaledSupplyInP2P = BigInt.zero();
+  market._scaledPoolCollateral = BigInt.zero();
   market._scaledBorrowOnPool = BigInt.zero();
   market._scaledBorrowInP2P = BigInt.zero();
   market._virtualScaledSupply = BigInt.zero();
