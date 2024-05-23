@@ -128,10 +128,6 @@ type Protocol @entity @regularPolling {
   dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
     @derivedFrom(field: "protocol")
 
-  " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
-    @derivedFrom(field: "protocol")
-
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -166,32 +162,6 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
 
   " Total number of pools "
   totalPoolCount: Int!
-
-  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
-
-  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
-}
-
-type UsageMetricsHourlySnapshot @entity @hourlySnapshot {
-  " { # of hours since Unix epoch time } "
-  id: Bytes!
-
-  " Protocol this snapshot is associated with "
-  protocol: Protocol!
-
-  " Number of unique hourly active users "
-  hourlyActiveUsers: Int!
-
-  " Number of cumulative unique users "
-  cumulativeUniqueUsers: Int!
-
-  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
-  hourlyTransactionCount: Int!
-
-  " Total number of transactions. Transactions include events triggered by outside users (ie, deposit, withdraw, etc.)"
-  cumulativeTransactionCount: Int!
 
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
@@ -289,16 +259,15 @@ type Account @entity @regularPolling {
   id: ID!
 }
 
-# Helper entity for calculating daily/hourly active users
+# Helper entity for calculating daily active users
 type ActiveAccount @entity {
-  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
+  " { daily }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
 
 type _ActivityHelper @entity {
-  " { daily/hourly }-{ Days/hours since Unix epoch} "
+  " { daily }-{ Days/hours since Unix epoch} "
   id: Bytes!
 
-  hourlyActiveUsers: Int!
   dailyActiveUsers: Int!
 }
