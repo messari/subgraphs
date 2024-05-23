@@ -122,9 +122,6 @@ type Protocol @entity @regularPolling {
   " Day ID of the most recent daily snapshot "
   lastSnapshotDayID: Int!
 
-  " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: Int!
-
   " Timestamp of the last time this entity was updated "
   lastUpdateTimestamp: BigInt!
 
@@ -266,9 +263,6 @@ type Pool @entity @regularPolling {
   " Day ID of the most recent daily snapshot "
   lastSnapshotDayID: Int!
 
-  " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: Int!
-
   " Timestamp of the last time this entity was updated "
   lastUpdateTimestamp: BigInt!
 }
@@ -282,12 +276,12 @@ type Account @entity @regularPolling {
 
 # Helper entity for calculating daily active users
 type ActiveAccount @entity {
-  " { daily }-{ Address of the account }-{ Days/hours since Unix epoch } "
+  " { daily }-{ Address of the account }-{ Days since Unix epoch } "
   id: ID!
 }
 
 type _ActivityHelper @entity {
-  " { daily }-{ Days/hours since Unix epoch} "
+  " { daily }-{ Days since Unix epoch} "
   id: Bytes!
 
   dailyActiveUsers: Int!
