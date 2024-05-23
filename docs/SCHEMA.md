@@ -45,7 +45,7 @@ All subgraphs follow a set of standardized schemas. This standardization brings 
 
 ## Versioning
 
-Every subgraph has a embedded versioning system in the `Protocol` entity/interface. We use 3 separate fields to version different aspects of the subgraphs for different stakeholders.
+Every subgraph has an embedded versioning system in the `Protocol` entity/interface. We use 3 separate fields to version different aspects of the subgraphs for different stakeholders.
 
 ### Schema Version
 
@@ -56,7 +56,7 @@ There are two use cases for `schemaVersion`:
 
 ### Subgraph Version
 
-The field `subgraphVersion` this is mainly used for the specific subgraph developer to keep track the implementation. For example, if there is a major refactor, we should bump this version, but this has nothing to do with the schema and will no impact on downstream consumers. There may also be repository-wide implementation upgrades. For example, we might need to reimplement everything in Rust somewhere down the road (for substream upgrades), they it'll be a major upgrade on the implementation (major version bump) but again, no impact on schema or downstream consumer.
+The field `subgraphVersion` this is mainly used for the specific subgraph developer to keep track the implementation. For example, if there is a major refactor, we should bump this version, but this has nothing to do with the schema and will have no impact on downstream consumers. There may also be repository-wide implementation upgrades. For example, we might need to reimplement everything in Rust somewhere down the road (for substream upgrades), it'll be a major upgrade on the implementation (major version bump) but again, no impact on schema or downstream consumer.
 
 > Read more about how to upgrade schema version in [`./CONTIBUTING.md`](CONTRIBUTING.md)
 
@@ -161,7 +161,7 @@ There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTo
 
 When handling reward tokens that need to be staked (e.g. in the MasterChef contract), make sure you also keep track of `stakedOutputTokenAmount`, which will be needed to calculate reward APR.
 
-For veModel protocols (e.g. Balancer V2 and Curve) that utilize gauges and "boosts" to direct and increase reward token emissions, `stakedOutputTokenAmount` should be equivalent to `GAUGE_WORKING_SUPPLY`. By doing this, using `stakedOutputTokenAmount` for reward token APR will result in the maximum boosted reward APR; therefore, users who want to show a range of min and max reward APR should divide the default reward APR by the maximum boost multiplier. For example, a reward APR of 10% is initially calculated for a Balancer V2 pool. This the maximum reward APR and the minimum reward APR would be 10% divided by 2.5 (max boost for Balancer V2 pools) or 4%. This is done so that `stakedOutputTokenAmount` accurately portrays the amount of output tokens staked in the gauge contract.
+For veModel protocols (e.g. Balancer V2 and Curve) that utilize gauges and "boosts" to direct and increase reward token emissions, `stakedOutputTokenAmount` should be equivalent to `GAUGE_WORKING_SUPPLY`. By doing this, using `stakedOutputTokenAmount` for reward token APR will result in the maximum boosted reward APR; therefore, users who want to show a range of min and max reward APR should divide the default reward APR by the maximum boost multiplier. For example, a reward APR of 10% is initially calculated for a Balancer V2 pool. This is the maximum reward APR and the minimum reward APR would be 10% divided by 2.5 (max boost for Balancer V2 pools) or 4%. This is done so that `stakedOutputTokenAmount` accurately portrays the amount of output tokens staked in the gauge contract.
 
 The fields related to rewards tokens in the LP staking programs (e.g. `rewardTokenEmissionsAmount`, `rewardTokenEmissionsUSD`, `stakedOutputTokenAmount`, `rewardToken`) should all remain null unless the LP tokens minted from this pool have been eligible for staking to earn rewards. If an LP token has at one time been eligible for use in a staking program but is no longer earning rewards, these fields should still remain as non-null values.
 
