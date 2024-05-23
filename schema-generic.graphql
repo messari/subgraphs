@@ -119,6 +119,12 @@ type Protocol @entity @regularPolling {
   " Total number of pools "
   totalPoolCount: Int!
 
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Hour ID of the most recent hourly snapshot "
+  lastSnapshotHourID: Int!
+
   " Timestamp of the last time this entity was updated "
   lastUpdateTimestamp: BigInt!
 
@@ -144,6 +150,9 @@ type Protocol @entity @regularPolling {
 type UsageMetricsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: Protocol!
@@ -173,6 +182,9 @@ type UsageMetricsDailySnapshot @entity @dailySnapshot {
 type FinancialsDailySnapshot @entity @dailySnapshot {
   " ID is # of days since Unix epoch time "
   id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: Protocol!
@@ -250,6 +262,15 @@ type Pool @entity @regularPolling {
 
   " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
   inputTokenBalancesUSD: [BigDecimal!]!
+
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Hour ID of the most recent hourly snapshot "
+  lastSnapshotHourID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
 }
 
 # An account is a unique Ethereum address
