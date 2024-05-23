@@ -57,10 +57,16 @@ dataSources:
           handler: handleSetBaseTrackingBorrowSpeed
           calls:
             Comet.baseToken: Comet[event.params.cometProxy].baseToken()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: SetBaseTrackingSupplySpeed(indexed address,uint64,uint64)
           handler: handleSetBaseTrackingSupplySpeed
           calls:
             Comet.baseToken: Comet[event.params.cometProxy].baseToken()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: UpdateAsset(indexed address,(address,address,uint8,uint64,uint64,uint64,uint128),(address,address,uint8,uint64,uint64,uint64,uint128))
           handler: handleUpdateAsset
         - event: UpdateAssetBorrowCollateralFactor(indexed address,indexed address,uint64,uint64)
@@ -106,12 +112,18 @@ templates:
             Comet.baseToken: Comet[event.address].baseToken()
             Comet.totalsBasic: Comet[event.address].totalsBasic()
             Comet.getUtilization: Comet[event.address].getUtilization()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: SupplyCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleSupplyCollateral
           receipt: true
           calls:
             Comet.totalsBasic: Comet[event.address].totalsBasic()
             Comet.getUtilization: Comet[event.address].getUtilization()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: Withdraw(indexed address,indexed address,uint256)
           handler: handleWithdraw
           receipt: true
@@ -119,21 +131,34 @@ templates:
             Comet.baseToken: Comet[event.address].baseToken()
             Comet.totalsBasic: Comet[event.address].totalsBasic()
             Comet.getUtilization: Comet[event.address].getUtilization()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: WithdrawCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
           receipt: true
           calls:
             Comet.totalsBasic: Comet[event.address].totalsBasic()
             Comet.getUtilization: Comet[event.address].getUtilization()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: TransferCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleTransferCollateral
           receipt: true
+          calls:
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleAbsorbCollateral
           receipt: true
           calls:
             Comet.totalsBasic: Comet[event.address].totalsBasic()
             Comet.getUtilization: Comet[event.address].getUtilization()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
           receipt: true
@@ -141,3 +166,6 @@ templates:
             Comet.baseToken: Comet[event.address].baseToken()
             Comet.totalsBasic: Comet[event.address].totalsBasic()
             Comet.getUtilization: Comet[event.address].getUtilization()
+            Comet.trackingIndexScale: Comet[event.address].trackingIndexScale()
+            Comet.baseTrackingBorrowSpeed: Comet[event.address].baseTrackingBorrowSpeed()
+            Comet.baseTrackingSupplySpeed: Comet[event.address].baseTrackingSupplySpeed()
