@@ -281,7 +281,7 @@ export function snapshotUsage(
   }
 
   if (txSignerID) {
-    let txSignerId = txSignerID
+    const txSignerId = txSignerID
       .concat("-")
       .concat(dailySnapshotID.toHexString());
     let txSigner = _TxSigner.load(txSignerId);

@@ -83,7 +83,7 @@ export function _handleSupplied(
   account.depositCount += 1;
   account.save();
 
-  let txSignerId = event.transaction.from.toHexString();
+  const txSignerId = event.transaction.from.toHexString();
   let txSigner = _TxSigner.load(txSignerId);
   if (!txSigner) {
     txSigner = new _TxSigner(txSignerId);
@@ -215,7 +215,7 @@ export function _handleWithdrawn(
   account.withdrawCount += 1;
   account.save();
 
-  let txSignerId = event.transaction.from.toHexString();
+  const txSignerId = event.transaction.from.toHexString();
   let txSigner = _TxSigner.load(txSignerId);
   if (!txSigner) {
     txSigner = new _TxSigner(txSignerId);
@@ -383,7 +383,7 @@ export function _handleLiquidated(
     protocol.save();
   }
 
-  let txSignerId = event.transaction.from.toHexString();
+  const txSignerId = event.transaction.from.toHexString();
   let txSigner = _TxSigner.load(txSignerId);
   if (!txSigner) {
     txSigner = new _TxSigner(txSignerId);
@@ -489,7 +489,7 @@ export function _handleBorrowed(
   account.borrowCount += 1;
   account.save();
 
-  let txSignerId = event.transaction.from.toHexString();
+  const txSignerId = event.transaction.from.toHexString();
   let txSigner = _TxSigner.load(txSignerId);
   if (!txSigner) {
     txSigner = new _TxSigner(txSignerId);
@@ -763,7 +763,7 @@ export function _handleRepaid(
   account.repayCount += 1;
   account.save();
 
-  let txSignerId = event.transaction.from.toHexString();
+  const txSignerId = event.transaction.from.toHexString();
   let txSigner = _TxSigner.load(txSignerId);
   if (!txSigner) {
     txSigner = new _TxSigner(txSignerId);
