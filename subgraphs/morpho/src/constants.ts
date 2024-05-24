@@ -106,36 +106,36 @@ export namespace RewardTokenType {
 export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // used for Mainnet pricing
 
 export const MORPHO_AAVE_V2_ADDRESS = Address.fromBytes(
-  Bytes.fromHexString("0x777777c9898d384f785ee44acfe945efdff5f3e0"),
+  Bytes.fromHexString("0x777777c9898d384f785ee44acfe945efdff5f3e0")
 );
 
 export const MORPHO_AAVE_V3_ADDRESS = Address.fromBytes(
-  Bytes.fromHexString("0x33333aea097c193e66081e930c33020272b33333"),
+  Bytes.fromHexString("0x33333aea097c193e66081e930c33020272b33333")
 );
 
 export const MORPHO_COMPOUND_ADDRESS = Address.fromBytes(
-  Bytes.fromHexString("0x8888882f8f843896699869179fb6e4f7e3b58888"),
+  Bytes.fromHexString("0x8888882f8f843896699869179fb6e4f7e3b58888")
 );
 
 export const C_ETH = Address.fromBytes(
-  Bytes.fromHexString("0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5"),
+  Bytes.fromHexString("0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5")
 );
 export const WRAPPED_ETH = Address.fromBytes(
-  Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
+  Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
 );
 
 export const ETH_USD_PRICE_FEED_ADDRESS = Address.fromBytes(
-  Bytes.fromHexString("0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419"),
+  Bytes.fromHexString("0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419")
 );
 
 export const CCOMP_ADDRESS = Address.fromString(
-  "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4",
+  "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4"
 );
 export const COMP_ADDRESS = Address.fromString(
-  "0xc00e94cb662c3520282e6f5717214004a7f26888",
+  "0xc00e94cb662c3520282e6f5717214004a7f26888"
 );
 export const COMPTROLLER_ADDRESS = Address.fromString(
-  "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b",
+  "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
 );
 
 ///////////////////
@@ -193,7 +193,7 @@ export const HALF_WAD_RAY_RATIO = WAD_RAY_RATIO.div(BIGINT_TWO);
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
-  defaultValue: T,
+  defaultValue: T
 ): T {
   return callResult.reverted ? defaultValue : callResult.value;
 }
@@ -246,7 +246,7 @@ export class ReserveUpdateParams {
     public readonly reserveSupplyIndex: BigInt,
     public readonly reserveBorrowIndex: BigInt,
     public readonly poolSupplyRate: BigInt,
-    public readonly poolBorrowRate: BigInt,
+    public readonly poolBorrowRate: BigInt
   ) {}
 }
 
@@ -262,7 +262,7 @@ export class ProtocolData {
     public readonly borrowerPermissionType: string | null,
     public readonly poolCreatorPermissionType: string | null,
     public readonly collateralizationType: string | null,
-    public readonly riskType: string | null,
+    public readonly riskType: string | null
   ) {}
 }
 
@@ -279,7 +279,7 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONED,
       CollateralizationType.UNDER_COLLATERALIZED,
-      RiskType.ISOLATED,
+      RiskType.ISOLATED
     );
   }
   if (protocolAddress == MORPHO_AAVE_V3_ADDRESS) {
@@ -294,7 +294,7 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONED,
       CollateralizationType.UNDER_COLLATERALIZED,
-      RiskType.ISOLATED,
+      RiskType.ISOLATED
     );
   }
   if (protocolAddress == MORPHO_COMPOUND_ADDRESS) {
@@ -309,7 +309,7 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONED,
       CollateralizationType.UNDER_COLLATERALIZED,
-      RiskType.ISOLATED,
+      RiskType.ISOLATED
     );
   }
 
@@ -327,6 +327,6 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
     null,
     null,
     null,
-    null,
+    null
   );
 }

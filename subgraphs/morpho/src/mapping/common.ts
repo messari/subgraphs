@@ -52,7 +52,7 @@ export class MorphoPositions {
     public readonly morphoSupplyOnPool_BI: BigInt,
     public readonly morphoBorrowOnPool_BI: BigInt,
     public readonly morphoSupplyP2P_BI: BigInt,
-    public readonly morphoBorrowP2P_BI: BigInt,
+    public readonly morphoBorrowP2P_BI: BigInt
   ) {}
 }
 
@@ -62,111 +62,12 @@ export function _handleCollateralSupplied(
   market: Market,
   accountID: Address,
   amount: BigInt,
-  balanceInCollateral: BigInt,
+  balanceInCollateral: BigInt
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
   const deposit = new Deposit(
-    getEventId(event.transaction.hash, event.logIndex),
-  );
-
-  // create account
-  let account = Account.load(accountID);
-  if (!account) {
-    account = createAccount(accountID);
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  account.depositCount += 1;
-  account.save();
-
-  // update position
-  const position = addPosition(
-    protocol,
-    market,
-    account,
-    PositionSide.COLLATERAL,
-    EventType.DEPOSIT,
-    event,
-  );
-
-  market._scaledPoolCollateral = market
-    ._scaledPoolCollateral!.minus(position._balanceOnPool!)
-    .plus(balanceInCollateral);
-
-  position._balanceOnPool = balanceInCollateral;
-  position.balance = balanceInCollateral;
-  position.save();
-
-  deposit.position = position.id;
-  deposit.nonce = event.transaction.nonce;
-  deposit.account = account.id;
-  deposit.blockNumber = event.block.number;
-  deposit.timestamp = event.block.timestamp;
-  deposit.market = market.id;
-  deposit.hash = event.transaction.hash;
-  deposit.logIndex = event.logIndex.toI32();
-  deposit.asset = inputToken.id;
-  deposit.amount = amount;
-  deposit.amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken.decimals))
-    .times(market.inputTokenPriceUSD);
-  deposit.gasPrice = event.transaction.gasPrice;
-  deposit.gasLimit = event.transaction.gasLimit;
-  deposit.save();
-
-  // update metrics
-  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
-    deposit.amountUSD,
-  );
-  protocol.depositCount += 1;
-  protocol.save();
-  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(
-    deposit.amountUSD,
-  );
-  market.depositCount += 1;
-  market.save();
-
-  // update usage metrics
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    accountID.toHexString(),
-    EventType.DEPOSIT,
-    true,
-  );
-
-  updateProtocolPosition(protocol, market);
-
-  // update market daily / hourly snapshots / financialSnapshots
-  updateSnapshots(
-    protocol,
-    market,
-    deposit.amountUSD,
-    deposit.amount,
-    EventType.DEPOSIT,
-    event.block,
-  );
-  updateProtocolValues(protocol.id);
-}
-
-export function _handleSupplied(
-  event: ethereum.Event,
-  protocol: LendingProtocol,
-  market: Market,
-  accountID: Address,
-  amount: BigInt,
-  balanceOnPool: BigInt,
-  balanceInP2P: BigInt,
-): void {
-  const inputToken = getOrInitToken(market.inputToken);
-
-  const deposit = new Deposit(
-    getEventId(event.transaction.hash, event.logIndex),
+    getEventId(event.transaction.hash, event.logIndex)
   );
 
   // create account
@@ -198,7 +99,117 @@ export function _handleSupplied(
     account,
     PositionSide.COLLATERAL,
     EventType.DEPOSIT,
-    event,
+    event
+  );
+
+  market._scaledPoolCollateral = market
+    ._scaledPoolCollateral!.minus(position._balanceOnPool!)
+    .plus(balanceInCollateral);
+
+  position._balanceOnPool = balanceInCollateral;
+  position.balance = balanceInCollateral;
+  position.save();
+
+  deposit.position = position.id;
+  deposit.nonce = event.transaction.nonce;
+  deposit.account = account.id;
+  deposit.blockNumber = event.block.number;
+  deposit.timestamp = event.block.timestamp;
+  deposit.market = market.id;
+  deposit.hash = event.transaction.hash;
+  deposit.logIndex = event.logIndex.toI32();
+  deposit.asset = inputToken.id;
+  deposit.amount = amount;
+  deposit.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(market.inputTokenPriceUSD);
+  deposit.gasPrice = event.transaction.gasPrice;
+  deposit.gasLimit = event.transaction.gasLimit;
+  deposit.save();
+
+  // update metrics
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
+    deposit.amountUSD
+  );
+  protocol.depositCount += 1;
+  protocol.save();
+  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(
+    deposit.amountUSD
+  );
+  market.depositCount += 1;
+  market.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    accountID.toHexString(),
+    EventType.DEPOSIT,
+    true,
+    txSignerId
+  );
+
+  updateProtocolPosition(protocol, market);
+
+  // update market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    market,
+    deposit.amountUSD,
+    deposit.amount,
+    EventType.DEPOSIT,
+    event.block
+  );
+  updateProtocolValues(protocol.id);
+}
+
+export function _handleSupplied(
+  event: ethereum.Event,
+  protocol: LendingProtocol,
+  market: Market,
+  accountID: Address,
+  amount: BigInt,
+  balanceOnPool: BigInt,
+  balanceInP2P: BigInt
+): void {
+  const inputToken = getOrInitToken(market.inputToken);
+
+  const deposit = new Deposit(
+    getEventId(event.transaction.hash, event.logIndex)
+  );
+
+  // create account
+  let account = Account.load(accountID);
+  if (!account) {
+    account = createAccount(accountID);
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.depositCount += 1;
+  account.save();
+
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
+  // update position
+  const position = addPosition(
+    protocol,
+    market,
+    account,
+    PositionSide.COLLATERAL,
+    EventType.DEPOSIT,
+    event
   );
 
   const virtualP2P = balanceInP2P
@@ -250,12 +261,12 @@ export function _handleSupplied(
 
   // update metrics
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
-    deposit.amountUSD,
+    deposit.amountUSD
   );
   protocol.depositCount += 1;
   protocol.save();
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(
-    deposit.amountUSD,
+    deposit.amountUSD
   );
   market.depositCount += 1;
   market.save();
@@ -280,7 +291,7 @@ export function _handleSupplied(
     deposit.amountUSD,
     deposit.amount,
     EventType.DEPOSIT,
-    event.block,
+    event.block
   );
   updateProtocolValues(protocol.id);
 }
@@ -291,13 +302,13 @@ export function _handleCollateralWithdrawn(
   market: Market,
   accountID: Address,
   amount: BigInt,
-  balanceInCollateral: BigInt,
+  balanceInCollateral: BigInt
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
   // create withdraw entity
   const withdraw = new Withdraw(
-    getEventId(event.transaction.hash, event.logIndex),
+    getEventId(event.transaction.hash, event.logIndex)
   );
 
   // get account
@@ -312,6 +323,16 @@ export function _handleCollateralWithdrawn(
   account.withdrawCount += 1;
   account.save();
 
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
   const position = subtractPosition(
     protocol,
     market,
@@ -319,13 +340,13 @@ export function _handleCollateralWithdrawn(
     balanceInCollateral,
     PositionSide.COLLATERAL,
     EventType.WITHDRAW,
-    event,
+    event
   );
 
   if (position === null) {
     log.critical(
       "[handleWithdraw] Position not found for account: {} in transaction: {}",
-      [accountID.toHexString(), event.transaction.hash.toHexString()],
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
     );
     return;
   }
@@ -369,6 +390,7 @@ export function _handleCollateralWithdrawn(
     withdraw.account.toHexString(),
     EventType.WITHDRAW,
     true,
+    txSignerId
   );
 
   updateProtocolPosition(protocol, market);
@@ -380,7 +402,7 @@ export function _handleCollateralWithdrawn(
     withdraw.amountUSD,
     withdraw.amount,
     EventType.WITHDRAW,
-    event.block,
+    event.block
   );
   updateProtocolValues(protocol.id);
 }
@@ -392,13 +414,13 @@ export function _handleWithdrawn(
   accountID: Address,
   amount: BigInt,
   balanceOnPool: BigInt,
-  balanceInP2P: BigInt,
+  balanceInP2P: BigInt
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
   // create withdraw entity
   const withdraw = new Withdraw(
-    getEventId(event.transaction.hash, event.logIndex),
+    getEventId(event.transaction.hash, event.logIndex)
   );
 
   // get account
@@ -438,13 +460,13 @@ export function _handleWithdrawn(
     balance,
     PositionSide.COLLATERAL,
     EventType.WITHDRAW,
-    event,
+    event
   );
 
   if (position === null) {
     log.critical(
       "[handleWithdraw] Position not found for account: {} in transaction: {}",
-      [accountID.toHexString(), event.transaction.hash.toHexString()],
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
     );
     return;
   }
@@ -511,7 +533,7 @@ export function _handleWithdrawn(
     withdraw.amountUSD,
     withdraw.amount,
     EventType.WITHDRAW,
-    event.block,
+    event.block
   );
   updateProtocolValues(protocol.id);
 }
@@ -524,7 +546,7 @@ export function _handleLiquidated(
   liquidator: Address,
   liquidated: Address,
   amountSeized: BigInt,
-  amountRepaid: BigInt,
+  amountRepaid: BigInt
 ): void {
   // collateral market
   const market = getMarket(collateralAddress);
@@ -532,7 +554,7 @@ export function _handleLiquidated(
 
   // create liquidate entity
   const liquidate = new Liquidate(
-    getEventId(event.transaction.hash, event.logIndex),
+    getEventId(event.transaction.hash, event.logIndex)
   );
 
   // update liquidators account
@@ -614,17 +636,17 @@ export function _handleLiquidated(
     amountRepaid
       .toBigDecimal()
       .div(exponentToBigDecimal(debtAsset.decimals))
-      .times(repayTokenMarket.inputTokenPriceUSD),
+      .times(repayTokenMarket.inputTokenPriceUSD)
   );
   liquidate.save();
 
   protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD,
+    liquidate.amountUSD
   );
   protocol.liquidationCount += 1;
   protocol.save();
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD,
+    liquidate.amountUSD
   );
   market.liquidationCount += 1;
   market.save();
@@ -636,7 +658,7 @@ export function _handleLiquidated(
     event.block.timestamp,
     liquidate.liquidatee.toHexString(),
     EventType.LIQUIDATEE,
-    true, // only count this liquidate as new tx
+    true // only count this liquidate as new tx
   );
   snapshotUsage(
     protocol,
@@ -655,7 +677,7 @@ export function _handleLiquidated(
     liquidate.amountUSD,
     liquidate.amount,
     EventType.LIQUIDATOR,
-    event.block,
+    event.block
   );
 }
 
@@ -666,7 +688,7 @@ export function _handleBorrowed(
   accountID: Address,
   amount: BigInt,
   onPool: BigInt,
-  inP2P: BigInt,
+  inP2P: BigInt
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
@@ -704,7 +726,7 @@ export function _handleBorrowed(
     account,
     PositionSide.BORROWER,
     EventType.BORROW,
-    event,
+    event
   );
 
   const virtualP2P = inP2P
@@ -756,12 +778,12 @@ export function _handleBorrowed(
 
   // update metrics
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
-    borrow.amountUSD,
+    borrow.amountUSD
   );
   protocol.borrowCount += 1;
   protocol.save();
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(
-    borrow.amountUSD,
+    borrow.amountUSD
   );
   market.borrowCount += 1;
   market.save();
@@ -785,7 +807,7 @@ export function _handleBorrowed(
     borrow.amountUSD,
     borrow.amount,
     EventType.BORROW,
-    event.block,
+    event.block
   );
   updateProtocolValues(protocol.id);
 }
@@ -797,7 +819,7 @@ export function _handleP2PIndexesUpdated(
   poolSupplyIndex: BigInt,
   p2pSupplyIndex: BigInt,
   poolBorrowIndex: BigInt,
-  p2pBorrowIndex: BigInt,
+  p2pBorrowIndex: BigInt
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
@@ -858,65 +880,65 @@ export function _handleP2PIndexesUpdated(
   const totalRevenueDelta = poolSupplyInterest.plus(p2pSupplyInterest);
 
   const totalRevenueDeltaUSD = totalRevenueDelta.times(
-    market.inputTokenPriceUSD,
+    market.inputTokenPriceUSD
   );
 
   if (!market.reserveFactor) market.reserveFactor = BigDecimal.zero();
   const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
-    market.reserveFactor!,
+    market.reserveFactor!
   );
 
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
-    protocolSideRevenueDeltaUSD,
+    protocolSideRevenueDeltaUSD
   );
 
   // Morpho specific: update the interests generated on Morpho by both suppliers and borrowers, matched or not
   market._poolSupplyInterests =
     market._poolSupplyInterests!.plus(poolSupplyInterest);
   market._poolSupplyInterestsUSD! = market._poolSupplyInterestsUSD!.plus(
-    poolSupplyInterest.times(market.inputTokenPriceUSD),
+    poolSupplyInterest.times(market.inputTokenPriceUSD)
   );
 
   market._p2pSupplyInterests =
     market._p2pSupplyInterests!.plus(p2pSupplyInterest);
   market._p2pSupplyInterestsUSD = market._p2pSupplyInterestsUSD!.plus(
-    p2pSupplyInterest.times(market.inputTokenPriceUSD),
+    p2pSupplyInterest.times(market.inputTokenPriceUSD)
   );
 
   market._poolBorrowInterests =
     market._poolBorrowInterests!.plus(poolBorrowInterest);
   market._poolBorrowInterestsUSD = market._poolBorrowInterestsUSD!.plus(
-    poolBorrowInterest.times(market.inputTokenPriceUSD),
+    poolBorrowInterest.times(market.inputTokenPriceUSD)
   );
 
   market._p2pBorrowInterests =
     market._p2pBorrowInterests!.plus(p2pBorrowInterest);
   market._p2pBorrowInterestsUSD = market._p2pBorrowInterestsUSD!.plus(
-    p2pBorrowInterest.times(market.inputTokenPriceUSD),
+    p2pBorrowInterest.times(market.inputTokenPriceUSD)
   );
 
   market._p2pSupplyInterestsImprovement =
     market._p2pSupplyInterestsImprovement!.plus(
-      p2pSupplyInterest.minus(virtualSupplyInterest),
+      p2pSupplyInterest.minus(virtualSupplyInterest)
     );
 
   market._p2pSupplyInterestsImprovementUSD =
     market._p2pSupplyInterestsImprovementUSD!.plus(
       p2pSupplyInterest
         .minus(virtualSupplyInterest)
-        .times(market.inputTokenPriceUSD),
+        .times(market.inputTokenPriceUSD)
     );
 
   market._p2pBorrowInterestsImprovement =
     market._p2pBorrowInterestsImprovement!.plus(
-      virtualBorrowInterest.minus(p2pBorrowInterest),
+      virtualBorrowInterest.minus(p2pBorrowInterest)
     );
 
   market._p2pBorrowInterestsImprovementUSD =
     market._p2pBorrowInterestsImprovementUSD!.plus(
       virtualBorrowInterest
         .minus(p2pBorrowInterest)
-        .times(market.inputTokenPriceUSD),
+        .times(market.inputTokenPriceUSD)
     );
 
   market.save();
@@ -928,7 +950,7 @@ export function _handleP2PIndexesUpdated(
     protocol,
     supplySideRevenueDeltaUSD,
     protocolSideRevenueDeltaUSD,
-    event.block,
+    event.block
   );
 
   updateProtocolPosition(protocol, market);
@@ -942,7 +964,7 @@ export function _handleRepaid(
   accountID: Address,
   amount: BigInt,
   balanceOnPool: BigInt,
-  balanceInP2P: BigInt,
+  balanceInP2P: BigInt
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
@@ -986,12 +1008,12 @@ export function _handleRepaid(
     balance, // try getting balance of account in debt market
     PositionSide.BORROWER,
     EventType.REPAY,
-    event,
+    event
   );
   if (position === null) {
     log.warning(
       "[handleRepay] Position not found for account: {} in transaction; {}",
-      [accountID.toHexString(), event.transaction.hash.toHexString()],
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
     );
     return;
   }
@@ -1058,7 +1080,7 @@ export function _handleRepaid(
     repay.amountUSD,
     repay.amount,
     EventType.REPAY,
-    event.block,
+    event.block
   );
 
   updateProtocolValues(protocol.id);
@@ -1067,7 +1089,7 @@ export function _handleRepaid(
 export function _handleReserveUpdate(
   params: ReserveUpdateParams,
   market: Market,
-  __MATHS__: IMaths,
+  __MATHS__: IMaths
 ): void {
   // Update the total supply and borrow frequently by using pool updates
   const totalDepositBalanceUSD = market
@@ -1099,13 +1121,13 @@ export function _handleReserveUpdate(
     market.id,
     InterestRateSide.LENDER,
     InterestRateType.VARIABLE,
-    supplyRate.times(BIGDECIMAL_HUNDRED),
+    supplyRate.times(BIGDECIMAL_HUNDRED)
   );
   const poolBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.VARIABLE,
-    borrowRate.times(BIGDECIMAL_HUNDRED),
+    borrowRate.times(BIGDECIMAL_HUNDRED)
   );
 
   market.rates = [
@@ -1129,7 +1151,7 @@ export function _handleSupplierPositionUpdated(
   marketAddress: Address,
   accountID: Address,
   onPool: BigInt,
-  inP2P: BigInt,
+  inP2P: BigInt
 ): void {
   const market = getMarket(marketAddress);
   const account = Account.load(accountID);
@@ -1145,7 +1167,7 @@ export function _handleSupplierPositionUpdated(
     account,
     PositionSide.COLLATERAL,
     EventType.SUPPLIER_POSITION_UPDATE,
-    event,
+    event
   );
   const virtualP2P = inP2P
     .times(market._p2pSupplyIndex!)
@@ -1176,7 +1198,7 @@ export function _handleBorrowerPositionUpdated(
   marketAddress: Address,
   accountID: Address,
   onPool: BigInt,
-  inP2P: BigInt,
+  inP2P: BigInt
 ): void {
   const market = getMarket(marketAddress);
   const account = Account.load(accountID);
@@ -1192,7 +1214,7 @@ export function _handleBorrowerPositionUpdated(
     account,
     PositionSide.BORROWER,
     EventType.BORROWER_POSITION_UPDATE,
-    event,
+    event
   );
   const virtualP2P = inP2P
     .times(market._p2pBorrowIndex!)

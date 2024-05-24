@@ -72,7 +72,7 @@ export function createInterestRate(
   marketAddress: Bytes,
   rateSide: string,
   rateType: string,
-  rate: BigDecimal,
+  rate: BigDecimal
 ): InterestRate {
   const id: string = `${rateSide}-${rateType}-${marketAddress.toHexString()}`;
   const interestRate = new InterestRate(id);
@@ -91,7 +91,7 @@ export function updateRevenueSnapshots(
   protocol: LendingProtocol,
   supplySideRevenue: BigDecimal,
   protocolSideRevenue: BigDecimal,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): void {
   const financialSnapshot = getOrCreateFinancialDailySnapshots(protocol, block);
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(market, block);
@@ -155,7 +155,7 @@ export function updateRevenueSnapshots(
 
   marketDailySnapshot.rates = getSnapshotRates(
     market.rates,
-    (block.timestamp.toI32() / SECONDS_PER_DAY).toString(),
+    (block.timestamp.toI32() / SECONDS_PER_DAY).toString()
   );
 
   marketHourlySnapshot.save();
@@ -167,7 +167,7 @@ export function updateRevenueSnapshots(
 
 export function getOrCreateFinancialDailySnapshots(
   protocol: LendingProtocol,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): FinancialsDailySnapshot {
   const snapshotId = getDayId(block.timestamp);
   let financialMetrics = FinancialsDailySnapshot.load(snapshotId);
@@ -219,7 +219,7 @@ export function getOrCreateFinancialDailySnapshots(
 
 export function updateFinancials(
   protocol: LendingProtocol,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(protocol, block);
 
@@ -457,12 +457,12 @@ export function updateSnapshots(
   amountUSD: BigDecimal,
   amountNative: BigInt,
   eventType: i32,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): void {
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(market, block);
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(market, block);
   const financialSnapshot = FinancialsDailySnapshot.load(
-    getDayId(block.timestamp),
+    getDayId(block.timestamp)
   );
   if (!financialSnapshot) {
     // should NOT happen
@@ -553,7 +553,7 @@ export function addPosition(
   account: Account,
   side: string,
   eventType: i32,
-  event: ethereum.Event,
+  event: ethereum.Event
 ): Position {
   const counterID = account.id
     .toHexString()
@@ -675,7 +675,7 @@ export function subtractPosition(
   balance: BigInt,
   side: string,
   eventType: i32,
-  event: ethereum.Event,
+  event: ethereum.Event
 ): Position | null {
   const counterID = account.id
     .toHexString()
@@ -782,7 +782,7 @@ export function createAccount(accountID: Bytes): Account {
 
 function getOrCreateMarketDailySnapshot(
   market: Market,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): MarketDailySnapshot {
   const snapshotID = market.id.concat(getDayId(block.timestamp));
   let snapshot = MarketDailySnapshot.load(snapshotID);
@@ -844,7 +844,7 @@ function getOrCreateMarketDailySnapshot(
 
   snapshot.rates = getSnapshotRates(
     market.rates,
-    (block.timestamp.toI32() / SECONDS_PER_DAY).toString(),
+    (block.timestamp.toI32() / SECONDS_PER_DAY).toString()
   );
   snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   snapshot.cumulativeSupplySideRevenueUSD =
@@ -875,7 +875,7 @@ function getOrCreateMarketDailySnapshot(
 
 export function getOrCreateMarketHourlySnapshot(
   market: Market,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): MarketHourlySnapshot {
   const snapshotID = market.id.concat(getHourId(block.timestamp));
   let snapshot = MarketHourlySnapshot.load(snapshotID);
@@ -903,7 +903,7 @@ export function getOrCreateMarketHourlySnapshot(
   snapshot.timestamp = block.timestamp;
   snapshot.rates = getSnapshotRates(
     market.rates,
-    (block.timestamp.toI32() / SECONDS_PER_HOUR).toString(),
+    (block.timestamp.toI32() / SECONDS_PER_HOUR).toString()
   );
   snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   snapshot.cumulativeSupplySideRevenueUSD =
@@ -930,7 +930,7 @@ export function getOrCreateMarketHourlySnapshot(
 
 function getSnapshotRates(
   rates: string[] | null,
-  timeSuffix: string,
+  timeSuffix: string
 ): string[] {
   if (!rates) return [];
   const snapshotRates: string[] = [];
@@ -961,7 +961,7 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
       .concat("-")
       .concat(event.transaction.hash.toHexString())
       .concat("-")
-      .concat(event.logIndex.toString()),
+      .concat(event.logIndex.toString())
   );
   const market = getMarket(position.market);
   const inputToken = getOrInitToken(market.inputToken);
@@ -1015,7 +1015,7 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
  */
 export function updateProtocolPosition(
   protocol: LendingProtocol,
-  market: Market,
+  market: Market
 ): void {
   const inputToken = getOrInitToken(market.inputToken);
 
@@ -1069,7 +1069,7 @@ export function updateProtocolPosition(
     .times(market.inputTokenPriceUSD);
 
   market.variableBorrowedTokenBalance = newMarketBorrowInP2P_BI.plus(
-    newMarketBorrowOnPool_BI,
+    newMarketBorrowOnPool_BI
   );
 
   market.inputTokenBalance = newMarketSupplyOnPool_BI
@@ -1115,7 +1115,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market._lastPoolBorrowIndex!,
     market._p2pIndexCursor_BI!,
     market._reserveFactor_BI!,
-    __MATHS__,
+    __MATHS__
   );
   market._p2pSupplyIndexFromRates = computeP2PIndex(
     market._lastPoolSupplyIndex!,
@@ -1125,7 +1125,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market._p2pSupplyDelta!,
     market._p2pSupplyAmount!,
     proportionIdle,
-    __MATHS__,
+    __MATHS__
   );
   market._p2pBorrowIndexFromRates = computeP2PIndex(
     market._lastPoolBorrowIndex!,
@@ -1135,7 +1135,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market._p2pBorrowDelta!,
     market._p2pBorrowAmount!,
     proportionIdle,
-    __MATHS__,
+    __MATHS__
   );
   market._p2pBorrowRate = computeP2PBorrowRate(
     market._poolBorrowRate!,
@@ -1147,7 +1147,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market._p2pBorrowAmount!,
     market._reserveFactor_BI!,
     proportionIdle,
-    __MATHS__,
+    __MATHS__
   );
   market._p2pSupplyRate = computeP2PSupplyRate(
     market._poolBorrowRate!,
@@ -1159,7 +1159,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market._p2pSupplyAmount!,
     market._reserveFactor_BI!,
     proportionIdle,
-    __MATHS__,
+    __MATHS__
   );
 
   const p2pSupplyRate = createInterestRate(
@@ -1169,7 +1169,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market
       ._p2pSupplyRate!.toBigDecimal()
       .div(exponentToBigDecimal(market._indexesOffset))
-      .times(BIGDECIMAL_HUNDRED),
+      .times(BIGDECIMAL_HUNDRED)
   );
   const p2pBorrowRate = createInterestRate(
     market.id,
@@ -1178,7 +1178,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
     market
       ._p2pBorrowRate!.toBigDecimal()
       .div(exponentToBigDecimal(market._indexesOffset))
-      .times(BIGDECIMAL_HUNDRED),
+      .times(BIGDECIMAL_HUNDRED)
   );
   market.save();
 
@@ -1202,7 +1202,7 @@ export const getEventId = (hash: Bytes, logIndex: BigInt): Bytes =>
 
 export function updateProtocolValues(protocolAddress: Bytes): void {
   const protocol = getOrInitLendingProtocol(
-    Address.fromBytes(protocolAddress),
+    Address.fromBytes(protocolAddress)
   ).protocol;
 
   const marketIds = protocol._marketIds;
@@ -1216,10 +1216,10 @@ export function updateProtocolValues(protocolAddress: Bytes): void {
 
     totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
     totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
-      pool.totalDepositBalanceUSD,
+      pool.totalDepositBalanceUSD
     );
     totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
-      pool.totalBorrowBalanceUSD,
+      pool.totalBorrowBalanceUSD
     );
   }
 
@@ -1231,10 +1231,10 @@ export function updateProtocolValues(protocolAddress: Bytes): void {
 
 export function updateProtocolAfterNewMarket(
   poolAddress: Bytes,
-  protocolAddress: Bytes,
+  protocolAddress: Bytes
 ): void {
   const protocol = getOrInitLendingProtocol(
-    Address.fromBytes(protocolAddress),
+    Address.fromBytes(protocolAddress)
   ).protocol;
 
   const marketIds = protocol._marketIds;

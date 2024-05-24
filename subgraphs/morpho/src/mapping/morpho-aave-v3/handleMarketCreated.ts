@@ -28,17 +28,17 @@ export function handleMarketCreated(event: MarketCreated): void {
 
   const lendingPool = LendingPool.bind(morpho.pool());
   const addressProvider = LendingPoolAddressesProvider.bind(
-    morpho.addressesProvider(),
+    morpho.addressesProvider()
   );
 
   const oracle = PriceOracle.bind(addressProvider.getPriceOracle());
   const USDC = Address.fromString("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
   const ethPrice = oracle.getAssetPrice(USDC);
   const dataProvider = ProtocolDataProvider.bind(
-    addressProvider.getPoolDataProvider(),
+    addressProvider.getPoolDataProvider()
   );
   const reserveConfiguration = dataProvider.getReserveConfigurationData(
-    underlying._address,
+    underlying._address
   );
   market.protocol = event.address;
   market.name = `Morpho ${aToken.name()}`;
@@ -93,6 +93,7 @@ export function handleMarketCreated(event: MarketCreated): void {
   market.transferCount = 0 as i32;
   market.flashloanCount = 0 as i32;
   market.cumulativeUniqueUsers = 0 as i32;
+  market.cumulativeUniqueTxSigners = 0 as i32;
   market.cumulativeUniqueDepositors = 0 as i32;
   market.cumulativeUniqueBorrowers = 0 as i32;
   market.cumulativeUniqueLiquidators = 0 as i32;
@@ -164,7 +165,7 @@ export function handleMarketCreated(event: MarketCreated): void {
   const tokenMapping = new UnderlyingTokenMapping(underlying._address);
   tokenMapping.aToken = marketInfo.aToken;
   const tokenAddresses = dataProvider.getReserveTokensAddresses(
-    underlying._address,
+    underlying._address
   );
   tokenMapping.debtToken = tokenAddresses.getVariableDebtTokenAddress();
   tokenMapping.save();

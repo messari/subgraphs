@@ -35,7 +35,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.liquidityIndex,
     event.params.variableBorrowIndex,
     event.params.liquidityRate,
-    event.params.variableBorrowRate,
+    event.params.variableBorrowRate
   );
 
   _handleReserveUpdate(params, market, new AaveMath());

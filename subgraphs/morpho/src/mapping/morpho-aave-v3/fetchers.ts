@@ -33,10 +33,10 @@ export function getAaveProtocol(protocolAddress: Address): LendingProtocol {
     const lendingPool = LendingPool.bind(morphoContract.pool());
     LendingPoolTemplate.create(lendingPool._address);
     const addressesProvider = LendingPoolAddressesProvider.bind(
-      morphoContract.addressesProvider(),
+      morphoContract.addressesProvider()
     );
     LendingPoolConfiguratorTemplate.create(
-      addressesProvider.getPoolConfigurator(),
+      addressesProvider.getPoolConfigurator()
     );
 
     morpho.protocol._owner = morphoContract.owner();
@@ -62,7 +62,7 @@ export const fetchMorphoPositionsAaveV3 = (market: Market): MorphoPositions => {
       BigInt.zero(),
       BigInt.zero(),
       BigInt.zero(),
-      BigInt.zero(),
+      BigInt.zero()
     );
   }
 
@@ -106,7 +106,7 @@ export const fetchMorphoPositionsAaveV3 = (market: Market): MorphoPositions => {
     morphoSupplyOnPool_BI,
     morphoBorrowOnPool_BI,
     morphoSupplyP2P_BI,
-    morphoBorrowP2P_BI,
+    morphoBorrowP2P_BI
   );
 };
 
@@ -117,14 +117,14 @@ export function fetchAssetPrice(market: Market): BigDecimal {
   if (!morphoProtocol) return BigDecimal.zero(); // Morpho not initialized yet
   const morpho = MorphoAaveV3.bind(MORPHO_AAVE_V3_ADDRESS);
   const addressesProvider = LendingPoolAddressesProvider.bind(
-    morpho.addressesProvider(),
+    morpho.addressesProvider()
   );
 
   const oracle = PriceOracle.bind(addressesProvider.getPriceOracle());
 
   let oracleResult = readValue<BigInt>(
     oracle.try_getAssetPrice(inputTokenAddress),
-    BigInt.zero(),
+    BigInt.zero()
   );
 
   // if the result is zero or less, try the fallback oracle
@@ -134,7 +134,7 @@ export function fetchAssetPrice(market: Market): BigDecimal {
       const fallbackOracle = PriceOracle.bind(tryFallback.value);
       oracleResult = readValue<BigInt>(
         fallbackOracle.try_getAssetPrice(inputTokenAddress),
-        BigInt.zero(),
+        BigInt.zero()
       );
     }
   }

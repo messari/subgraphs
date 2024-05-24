@@ -60,7 +60,7 @@ export function handleBorrowed(event: Borrowed): void {
     event.params.onBehalf,
     event.params.amount,
     event.params.scaledOnPool,
-    event.params.scaledInP2P,
+    event.params.scaledInP2P
   );
 
   updateFinancials(protocol, event.block);
@@ -82,7 +82,7 @@ export function handleP2PTotalsUpdated(event: P2PTotalsUpdated): void {
 }
 
 export function handleP2PBorrowDeltaUpdated(
-  event: P2PBorrowDeltaUpdated,
+  event: P2PBorrowDeltaUpdated
 ): void {
   const protocol = getAaveProtocol(event.address);
 
@@ -98,7 +98,7 @@ export function handleP2PBorrowDeltaUpdated(
 }
 
 export function handleP2PSupplyDeltaUpdated(
-  event: P2PSupplyDeltaUpdated,
+  event: P2PSupplyDeltaUpdated
 ): void {
   const protocol = getAaveProtocol(event.address);
 
@@ -124,7 +124,7 @@ export function handleCollateralSupplied(event: CollateralSupplied): void {
     market,
     event.params.onBehalf,
     event.params.amount,
-    event.params.scaledBalance,
+    event.params.scaledBalance
   );
 
   updateFinancials(protocol, event.block);
@@ -142,7 +142,7 @@ export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
     market,
     event.params.onBehalf,
     event.params.amount,
-    event.params.scaledBalance,
+    event.params.scaledBalance
   );
   updateFinancials(protocol, event.block);
 }
@@ -160,14 +160,14 @@ export function handleSupplied(event: Supplied): void {
     event.params.onBehalf,
     event.params.amount,
     event.params.scaledOnPool,
-    event.params.scaledInP2P,
+    event.params.scaledInP2P
   );
 
   updateFinancials(protocol, event.block);
 }
 
 export function handleBorrowPositionUpdated(
-  event: BorrowPositionUpdated,
+  event: BorrowPositionUpdated
 ): void {
   const protocol = getAaveProtocol(event.address);
   const tokenMapping = UnderlyingTokenMapping.load(event.params.underlying)!;
@@ -178,14 +178,14 @@ export function handleBorrowPositionUpdated(
     Address.fromBytes(tokenMapping.aToken),
     event.params.user,
     event.params.scaledOnPool,
-    event.params.scaledInP2P,
+    event.params.scaledInP2P
   );
 
   updateFinancials(protocol, event.block);
 }
 
 export function handleSupplyPositionUpdated(
-  event: SupplyPositionUpdated,
+  event: SupplyPositionUpdated
 ): void {
   const protocol = getAaveProtocol(event.address);
   const tokenMapping = UnderlyingTokenMapping.load(event.params.underlying)!;
@@ -196,7 +196,7 @@ export function handleSupplyPositionUpdated(
     Address.fromBytes(tokenMapping.aToken),
     event.params.user,
     event.params.scaledOnPool,
-    event.params.scaledInP2P,
+    event.params.scaledInP2P
   );
 
   updateFinancials(protocol, event.block);
@@ -215,7 +215,7 @@ export function handleIndexesUpdated(event: IndexesUpdated): void {
     event.params.poolSupplyIndex,
     event.params.p2pSupplyIndex,
     event.params.poolBorrowIndex,
-    event.params.p2pBorrowIndex,
+    event.params.p2pBorrowIndex
   );
 
   updateFinancials(protocol, event.block);
@@ -225,10 +225,10 @@ export function handleLiquidated(event: Liquidated): void {
   const protocol = getAaveProtocol(event.address);
 
   const borrowerTokenMapping = UnderlyingTokenMapping.load(
-    event.params.underlyingBorrowed,
+    event.params.underlyingBorrowed
   )!;
   const collateralTokenMapping = UnderlyingTokenMapping.load(
-    event.params.underlyingCollateral,
+    event.params.underlyingCollateral
   )!;
 
   _handleLiquidated(
@@ -239,7 +239,7 @@ export function handleLiquidated(event: Liquidated): void {
     event.params.liquidator,
     event.params.borrower,
     event.params.amountSeized,
-    event.params.amountLiquidated,
+    event.params.amountLiquidated
   );
 
   updateFinancials(protocol, event.block);
@@ -258,7 +258,7 @@ export function handleWithdrawn(event: Withdrawn): void {
     event.params.onBehalf,
     event.params.amount,
     event.params.scaledOnPool,
-    event.params.scaledInP2P,
+    event.params.scaledInP2P
   );
   updateFinancials(protocol, event.block);
 }
@@ -276,7 +276,7 @@ export function handleRepaid(event: Repaid): void {
     event.params.onBehalf,
     event.params.amount,
     event.params.scaledOnPool,
-    event.params.scaledInP2P,
+    event.params.scaledInP2P
   );
   updateFinancials(protocol, event.block);
 }
@@ -306,7 +306,7 @@ export function handleIsDeprecatedSet(event: IsDeprecatedSet): void {
 }
 
 export function handleIsLiquidateBorrowPausedSet(
-  event: IsLiquidateBorrowPausedSet,
+  event: IsLiquidateBorrowPausedSet
 ): void {
   const protocol = getAaveProtocol(event.address);
 
@@ -320,7 +320,7 @@ export function handleIsLiquidateBorrowPausedSet(
 }
 
 export function handleIsLiquidateCollateralPausedSet(
-  event: IsLiquidateCollateralPausedSet,
+  event: IsLiquidateCollateralPausedSet
 ): void {
   const protocol = getAaveProtocol(event.address);
 

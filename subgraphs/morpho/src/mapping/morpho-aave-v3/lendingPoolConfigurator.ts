@@ -5,7 +5,7 @@ import { UnderlyingTokenMapping } from "../../../generated/schema";
 import { CollateralConfigurationChanged } from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 
 export function handleCollateralConfigurationChanged(
-  event: CollateralConfigurationChanged,
+  event: CollateralConfigurationChanged
 ): void {
   const tokenMapping = UnderlyingTokenMapping.load(event.params.asset);
   if (!tokenMapping) return;
