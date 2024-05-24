@@ -24,6 +24,8 @@ Protocol applies a 10% fee on a user’s staking rewards. This fee is split betw
 Staking rewards on the total staked ETH make up the total revenue.
 Of this 10% is kept by the protocol as fees (protocol side revenue), rest 90% is passed on to the stakers (supply side revenue).
 
+_Note_: ConsensusLayer and ExecutionLayer rewards are collected every ~8 days, hence there are peaks and troughs in revenue charts. [docs](https://docs.mantle.xyz/meth/concepts/accounting/calculating-fees).
+
 ## Useful Links
 
 - Landing Page: https://mantle.xyz/meth
