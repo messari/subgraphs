@@ -537,3 +537,12 @@ type _CircularBuffer @entity {
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
 }
+
+type _UnstakeRequest @entity {
+  " { Address of the account }-{ nonce } "
+  id: Bytes!
+  account: Bytes!
+  nonce: BigInt!
+  amount: BigInt!
+  claimed: Boolean!
+}

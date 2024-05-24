@@ -32,8 +32,17 @@ dataSources:
       abis:
         - name: Staking
           file: ./abis/mantle-staked-eth/Staking.json
+        - name: METH
+          file: ./abis/mantle-staked-eth/METH.json
         - name: ReturnsAggregator
           file: ./abis/mantle-staked-eth/ReturnsAggregator.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -43,30 +52,30 @@ dataSources:
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurvePool
-          file: ./abis/prices/Curve/Pool.json
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
-          file: ./abis/prices/Curve/Registry.json
+          file: ./abis/Prices/Curve/Registry.json
         - name: CalculationsCurve
-          file: ./abis/prices/Calculations/Curve.json
+          file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
-          file: ./abis/prices/YearnLens.json
+          file: ./abis/Prices/YearnLens.json
         # Aave Oracle Contract
         - name: AaveOracleContract
-          file: ./abis/prices/AaveOracle.json
+          file: ./abis/Prices/AaveOracle.json
         # SushiSwap Contracts
         - name: CalculationsSushiSwap
-          file: ./abis/prices/Calculations/SushiSwap.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
-          file: ./abis/prices/ChainLink.json
+          file: ./abis/Prices/ChainLink.json
         # Uniswap Contracts
         - name: UniswapRouter
-          file: ./abis/prices/Uniswap/Router.json
+          file: ./abis/Prices/Uniswap/Router.json
         - name: UniswapFactory
-          file: ./abis/prices/Uniswap/Factory.json
+          file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
-          file: ./abis/prices/Uniswap/Pair.json
+          file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
         - event: Staked(indexed address,uint256,uint256)
           handler: handleStaked
@@ -98,8 +107,17 @@ dataSources:
       abis:
         - name: Staking
           file: ./abis/mantle-staked-eth/Staking.json
+        - name: METH
+          file: ./abis/mantle-staked-eth/METH.json
         - name: ReturnsAggregator
           file: ./abis/mantle-staked-eth/ReturnsAggregator.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -109,33 +127,31 @@ dataSources:
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurvePool
-          file: ./abis/prices/Curve/Pool.json
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
-          file: ./abis/prices/Curve/Registry.json
+          file: ./abis/Prices/Curve/Registry.json
         - name: CalculationsCurve
-          file: ./abis/prices/Calculations/Curve.json
+          file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
-          file: ./abis/prices/YearnLens.json
+          file: ./abis/Prices/YearnLens.json
         # Aave Oracle Contract
         - name: AaveOracleContract
-          file: ./abis/prices/AaveOracle.json
+          file: ./abis/Prices/AaveOracle.json
         # SushiSwap Contracts
         - name: CalculationsSushiSwap
-          file: ./abis/prices/Calculations/SushiSwap.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
-          file: ./abis/prices/ChainLink.json
+          file: ./abis/Prices/ChainLink.json
         # Uniswap Contracts
         - name: UniswapRouter
-          file: ./abis/prices/Uniswap/Router.json
+          file: ./abis/Prices/Uniswap/Router.json
         - name: UniswapFactory
-          file: ./abis/prices/Uniswap/Factory.json
+          file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
-          file: ./abis/prices/Uniswap/Pair.json
+          file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: ProtocolConfigChanged(indexed bytes4,string,bytes)
-          handler: handleProtocolConfigChanged
         - event: FeesCollected(uint256)
           handler: handleFeesCollected
       file: {{{ file }}}

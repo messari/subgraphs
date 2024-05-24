@@ -1,6 +1,6 @@
 {
   "deployment": "MANTLE_STAKED_ETH_ETHEREUM",
-  "network": "ethereum",
+  "network": "mainnet",
   "file": "./src/mappings/handlers.ts",
   "staking": {
     "address": "0xe3cbd06d7dadb3f4e6557bab7edd924cd1489e8f",
