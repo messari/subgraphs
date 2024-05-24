@@ -56,6 +56,115 @@ export class MorphoPositions {
   ) {}
 }
 
+export function _handleCollateralSupplied(
+  event: ethereum.Event,
+  protocol: LendingProtocol,
+  market: Market,
+  accountID: Address,
+  amount: BigInt,
+  balanceInCollateral: BigInt
+): void {
+  const inputToken = getOrInitToken(market.inputToken);
+
+  const deposit = new Deposit(
+    getEventId(event.transaction.hash, event.logIndex)
+  );
+
+  // create account
+  let account = Account.load(accountID);
+  if (!account) {
+    account = createAccount(accountID);
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.depositCount += 1;
+  account.save();
+
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
+  // update position
+  const position = addPosition(
+    protocol,
+    market,
+    account,
+    PositionSide.COLLATERAL,
+    EventType.DEPOSIT,
+    event
+  );
+
+  market._scaledPoolCollateral = market
+    ._scaledPoolCollateral!.minus(position._balanceOnPool!)
+    .plus(balanceInCollateral);
+
+  position._balanceOnPool = balanceInCollateral;
+  position.balance = balanceInCollateral;
+  position.save();
+
+  deposit.position = position.id;
+  deposit.nonce = event.transaction.nonce;
+  deposit.account = account.id;
+  deposit.blockNumber = event.block.number;
+  deposit.timestamp = event.block.timestamp;
+  deposit.market = market.id;
+  deposit.hash = event.transaction.hash;
+  deposit.logIndex = event.logIndex.toI32();
+  deposit.asset = inputToken.id;
+  deposit.amount = amount;
+  deposit.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(market.inputTokenPriceUSD);
+  deposit.gasPrice = event.transaction.gasPrice;
+  deposit.gasLimit = event.transaction.gasLimit;
+  deposit.save();
+
+  // update metrics
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
+    deposit.amountUSD
+  );
+  protocol.depositCount += 1;
+  protocol.save();
+  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(
+    deposit.amountUSD
+  );
+  market.depositCount += 1;
+  market.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    accountID.toHexString(),
+    EventType.DEPOSIT,
+    true,
+    txSignerId
+  );
+
+  updateProtocolPosition(protocol, market);
+
+  // update market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    market,
+    deposit.amountUSD,
+    deposit.amount,
+    EventType.DEPOSIT,
+    event.block
+  );
+  updateProtocolValues(protocol.id);
+}
+
 export function _handleSupplied(
   event: ethereum.Event,
   protocol: LendingProtocol,
@@ -182,6 +291,117 @@ export function _handleSupplied(
     deposit.amountUSD,
     deposit.amount,
     EventType.DEPOSIT,
+    event.block
+  );
+  updateProtocolValues(protocol.id);
+}
+
+export function _handleCollateralWithdrawn(
+  event: ethereum.Event,
+  protocol: LendingProtocol,
+  market: Market,
+  accountID: Address,
+  amount: BigInt,
+  balanceInCollateral: BigInt
+): void {
+  const inputToken = getOrInitToken(market.inputToken);
+
+  // create withdraw entity
+  const withdraw = new Withdraw(
+    getEventId(event.transaction.hash, event.logIndex)
+  );
+
+  // get account
+  let account = Account.load(accountID);
+  if (!account) {
+    account = createAccount(accountID);
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.withdrawCount += 1;
+  account.save();
+
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
+  const position = subtractPosition(
+    protocol,
+    market,
+    account,
+    balanceInCollateral,
+    PositionSide.COLLATERAL,
+    EventType.WITHDRAW,
+    event
+  );
+
+  if (position === null) {
+    log.critical(
+      "[handleWithdraw] Position not found for account: {} in transaction: {}",
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
+    );
+    return;
+  }
+
+  market._scaledPoolCollateral = market
+    ._scaledPoolCollateral!.minus(position._balanceOnPool!)
+    .plus(balanceInCollateral);
+
+  position._balanceOnPool = balanceInCollateral;
+  position.balance = balanceInCollateral;
+  position.save();
+
+  withdraw.position = position.id;
+  withdraw.blockNumber = event.block.number;
+  withdraw.timestamp = event.block.timestamp;
+  withdraw.account = account.id;
+  withdraw.market = market.id;
+  withdraw.hash = event.transaction.hash;
+  withdraw.nonce = event.transaction.nonce;
+  withdraw.logIndex = event.logIndex.toI32();
+  withdraw.asset = inputToken.id;
+  withdraw.amount = amount;
+  withdraw.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(market.inputTokenPriceUSD);
+  withdraw.gasPrice = event.transaction.gasPrice;
+  withdraw.gasLimit = event.transaction.gasLimit;
+  withdraw.save();
+
+  protocol.withdrawCount += 1;
+  protocol.save();
+  market.withdrawCount += 1;
+  market.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    withdraw.account.toHexString(),
+    EventType.WITHDRAW,
+    true,
+    txSignerId
+  );
+
+  updateProtocolPosition(protocol, market);
+
+  // update market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    market,
+    withdraw.amountUSD,
+    withdraw.amount,
+    EventType.WITHDRAW,
     event.block
   );
   updateProtocolValues(protocol.id);

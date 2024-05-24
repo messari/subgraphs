@@ -1036,9 +1036,7 @@ export function updateProtocolPosition(
     .div(exponentToBigDecimal(inputToken.decimals));
 
   const newMarketSupplyCollateral_BI = market._scaledPoolCollateral
-    ? market
-        ._scaledPoolCollateral!.times(market._reserveSupplyIndex!)
-        .div(exponentToBigInt(market._indexesOffset))
+    ? market._scaledPoolCollateral!
     : BigInt.zero();
 
   const newMarketSupplyCollateral = newMarketSupplyCollateral_BI
