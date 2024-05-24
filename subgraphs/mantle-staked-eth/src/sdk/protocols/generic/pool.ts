@@ -99,8 +99,8 @@ export class Pool {
     this.pool.createdTimestamp = event.block.timestamp;
     this.pool.createdBlockNumber = event.block.number;
 
-    let inputTokenBalances: BigInt[] = [];
-    let inputTokenBalancesUSD: BigDecimal[] = [];
+    const inputTokenBalances: BigInt[] = [];
+    const inputTokenBalancesUSD: BigDecimal[] = [];
     for (let i = 0; i < inputTokens.length; i++) {
       inputTokenBalances.push(BIGINT_ZERO);
       inputTokenBalancesUSD.push(BIGDECIMAL_ZERO);
