@@ -15,6 +15,7 @@ import {
   Liquidate,
   _ActiveAccount,
   LendingProtocol,
+  _TxSigner,
 } from "../../generated/schema";
 import {
   EventType,
@@ -180,6 +181,16 @@ export function _handleSupplied(
   account.depositCount += 1;
   account.save();
 
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
   // update position
   const position = addPosition(
     protocol,
@@ -257,6 +268,7 @@ export function _handleSupplied(
     accountID.toHexString(),
     EventType.DEPOSIT,
     true,
+    txSignerId
   );
 
   updateProtocolPosition(protocol, market);
@@ -401,6 +413,16 @@ export function _handleWithdrawn(
   account.withdrawCount += 1;
   account.save();
 
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
   const totalSupplyOnPool = balanceOnPool
     .times(market._lastPoolSupplyIndex!)
     .div(exponentToBigInt(market._indexesOffset));
@@ -477,6 +499,7 @@ export function _handleWithdrawn(
     withdraw.account.toHexString(),
     EventType.WITHDRAW,
     true,
+    txSignerId
   );
 
   updateProtocolPosition(protocol, market);
@@ -558,6 +581,16 @@ export function _handleLiquidated(
     protocol.save();
   }
 
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
   const repayTokenMarket = getMarket(debtAddress);
   const debtAsset = getOrInitToken(repayTokenMarket.inputToken);
   // repaid position was updated in the repay event earlier
@@ -612,6 +645,7 @@ export function _handleLiquidated(
     liquidate.liquidator.toHexString(),
     EventType.LIQUIDATOR, // updates dailyActiveLiquidators
     false,
+    txSignerId
   );
 
   // update market daily / hourly snapshots / financialSnapshots
@@ -652,6 +686,16 @@ export function _handleBorrowed(
   }
   account.borrowCount += 1;
   account.save();
+
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
 
   // update position
   const position = addPosition(
@@ -730,6 +774,7 @@ export function _handleBorrowed(
     borrow.account.toHexString(),
     EventType.BORROW,
     true,
+    txSignerId
   );
 
   updateProtocolPosition(protocol, market);
@@ -916,6 +961,16 @@ export function _handleRepaid(
   account.repayCount += 1;
   account.save();
 
+  const txSignerId = event.transaction.from.toHexString();
+  let txSigner = _TxSigner.load(txSignerId);
+  if (!txSigner) {
+    txSigner = new _TxSigner(txSignerId);
+    txSigner.save();
+
+    protocol.cumulativeUniqueTxSigners += 1;
+    protocol.save();
+  }
+
   const borrowOnPool = balanceOnPool
     .times(market._lastPoolBorrowIndex!)
     .div(exponentToBigInt(market._indexesOffset));
@@ -992,6 +1047,7 @@ export function _handleRepaid(
     repay.account.toHexString(),
     EventType.REPAY,
     true,
+    txSignerId
   );
 
   updateProtocolPosition(protocol, market);
