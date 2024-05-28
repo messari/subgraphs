@@ -1,0 +1,16 @@
+{
+  "network": "mainnet",
+
+  "LiquidityPool": {
+    "address": "0x308861a430be4cce5502d0a12724771fc6daf216",
+    "startBlock": "17664317"
+  },
+  "NodesManager": {
+    "address": "0x8b71140ad2e5d1e7018d2a7f8a288bd3cd38916f",
+    "startBlock": "17174453"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
