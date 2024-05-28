@@ -29,7 +29,7 @@ export class SDK {
     config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
-    event: CustomEventType,
+    event: CustomEventType
   ) {
     this.Protocol = ProtocolManager.load(config, pricer, event);
     this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
@@ -44,13 +44,13 @@ export class SDK {
     config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
-    event: ethereum.Event,
+    event: ethereum.Event
   ): SDK {
     const customEvent = CustomEventType.initialize(
       event.block,
       event.transaction,
       event.logIndex,
-      event,
+      event
     );
     return new SDK(config, pricer, tokenInitializer, customEvent);
   }
@@ -59,12 +59,12 @@ export class SDK {
     config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
-    event: ethereum.Call,
+    event: ethereum.Call
   ): SDK {
     const customEvent = CustomEventType.initialize(
       event.block,
       event.transaction,
-      BIGINT_ZERO,
+      BIGINT_ZERO
     );
     return new SDK(config, pricer, tokenInitializer, customEvent);
   }

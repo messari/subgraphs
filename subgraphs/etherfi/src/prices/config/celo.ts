@@ -53,13 +53,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x122013fd7df1c6f636a5bb8f03108e876548b455",
+  "0x122013fd7df1c6f636a5bb8f03108e876548b455"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x471ece3750da237f93b8e339c536989b8978a438", // Celo native asset (CELO)
+  "0x471ece3750da237f93b8e339c536989b8978a438" // Celo native asset (CELO)
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x37f750b7cc259a2f741af45294f6a16572cf5cad",
+  "0x37f750b7cc259a2f741af45294f6a16572cf5cad"
 );
 
 export class config implements Configurations {
@@ -125,7 +125,7 @@ export class config implements Configurations {
 
   getOracleOverride(
     tokenAddr: Address | null,
-    block: ethereum.Block | null,
+    block: ethereum.Block | null
   ): OracleConfig | null {
     return null;
   }

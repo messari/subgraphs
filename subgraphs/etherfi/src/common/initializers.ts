@@ -13,7 +13,7 @@ export function initializeSDK(event: ethereum.Event): SDK {
     constants.Protocol.ID,
     constants.Protocol.NAME,
     constants.Protocol.SLUG,
-    Versions,
+    Versions
   );
   const tokenPricer = new Pricer();
   const tokenInitializer = new TokenInit();
@@ -22,7 +22,7 @@ export function initializeSDK(event: ethereum.Event): SDK {
     protocolConfig,
     tokenPricer,
     tokenInitializer,
-    event,
+    event
   );
 
   return sdk;
@@ -32,10 +32,10 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 
   const inputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.ETH_ADDRESS),
+    Address.fromString(constants.ETH_ADDRESS)
   );
   const outputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.EETH_ADDRESS),
+    Address.fromString(constants.EETH_ADDRESS)
   );
 
   if (!pool.isInitialized) {
@@ -44,7 +44,7 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
       outputToken.symbol,
       [inputToken.id],
       outputToken,
-      true,
+      true
     );
   }
 
@@ -56,7 +56,7 @@ export function updatePoolTVL(pool: Pool): void {
 
   const poolTVL = readValue<BigInt>(
     poolContract.try_getTotalPooledEther(),
-    constants.BIGINT_ZERO,
+    constants.BIGINT_ZERO
   );
 
   pool.setInputTokenBalances([poolTVL], true);
@@ -67,7 +67,7 @@ export function updatePoolOutputTokenSupply(pool: Pool): void {
 
   const outputTokenSupply = readValue<BigInt>(
     contract.try_totalSupply(),
-    constants.BIGINT_ZERO,
+    constants.BIGINT_ZERO
   );
 
   pool.setOutputTokenSupply(outputTokenSupply);

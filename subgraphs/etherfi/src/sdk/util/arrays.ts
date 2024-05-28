@@ -9,7 +9,7 @@ import { Bytes } from "@graphprotocol/graph-ts";
 export function sortArrayByReference<T, K>(
   reference: T[],
   array: T[],
-  toSort: K[],
+  toSort: K[]
 ): K[] {
   const sorted: K[] = new Array<K>();
   for (let i = 0; i < reference.length; i++) {

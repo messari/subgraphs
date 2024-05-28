@@ -6,7 +6,7 @@ import { ChainLinkContract } from "../../../generated/LiquidityPool/ChainLinkCon
 
 export function getChainLinkContract(
   contract: OracleContract,
-  block: ethereum.Block | null = null,
+  block: ethereum.Block | null = null
 ): ChainLinkContract | null {
   if (
     (block && contract.startBlock.gt(block.number)) ||
@@ -19,7 +19,7 @@ export function getChainLinkContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block: ethereum.Block | null = null,
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
   if (!config) return new CustomPriceType();
@@ -29,13 +29,13 @@ export function getTokenPriceUSDC(
 
   const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
-    constants.CHAIN_LINK_USD_ADDRESS,
+    constants.CHAIN_LINK_USD_ADDRESS
   );
 
   if (!result.reverted) {
     const decimals = chainLinkContract.try_decimals(
       tokenAddr,
-      constants.CHAIN_LINK_USD_ADDRESS,
+      constants.CHAIN_LINK_USD_ADDRESS
     );
 
     if (decimals.reverted) {
@@ -45,7 +45,7 @@ export function getTokenPriceUSDC(
     return CustomPriceType.initialize(
       result.value.value1.toBigDecimal(),
       decimals.value,
-      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CHAINLINK_FEED
     );
   }
 

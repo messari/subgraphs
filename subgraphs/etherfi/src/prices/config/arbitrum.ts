@@ -11,15 +11,15 @@ export const NETWORK_STRING = "arbitrum-one";
 
 export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
   "0x043518ab266485dc085a1db095b8d9c2fc78e9b9",
-  2396321,
+  2396321
 );
 export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
   "0xb56c2f0b653b2e0b10c9b928c8580ac5df02c7c7",
-  7740843,
+  7740843
 );
 export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
   "0x5ea7e501c9a23f4a76dc7d33a11d995b13a1dd25",
-  2396120,
+  2396120
 );
 export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
 
@@ -29,7 +29,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
   "0x3268c3bda100ef0ff3c2d044f23eab62c80d78d2",
-  11707234,
+  11707234
 );
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
@@ -67,13 +67,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+  "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
 );
 
 export class config implements Configurations {
@@ -139,7 +139,7 @@ export class config implements Configurations {
 
   getOracleOverride(
     tokenAddr: Address | null,
-    block: ethereum.Block | null,
+    block: ethereum.Block | null
   ): OracleConfig | null {
     return null;
   }

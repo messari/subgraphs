@@ -10,11 +10,11 @@ export function handleFullWithdrawal(event: FullWithdrawal): void {
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(
     Address.fromString(constants.EETH_LIQUIDITY_POOL_ADDRESS),
-    sdk,
+    sdk
   );
 
   const inputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.ETH_ADDRESS),
+    Address.fromString(constants.ETH_ADDRESS)
   );
 
   const supplySideRevenue = event.params.toOperator
@@ -29,11 +29,11 @@ export function handlePartialWithdrawal(event: PartialWithdrawal): void {
   const sdk = initializeSDK(event);
   const pool = getOrCreatePool(
     Address.fromString(constants.EETH_LIQUIDITY_POOL_ADDRESS),
-    sdk,
+    sdk
   );
 
   const inputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.ETH_ADDRESS),
+    Address.fromString(constants.ETH_ADDRESS)
   );
 
   const supplySideRevenue = event.params.toOperator

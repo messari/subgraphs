@@ -38,7 +38,7 @@ export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -66,7 +66,7 @@ export const SECONDS_PER_HOUR_BI = BigInt.fromI32(SECONDS_PER_HOUR);
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 
 ////////////////
