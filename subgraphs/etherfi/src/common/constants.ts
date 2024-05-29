@@ -17,6 +17,11 @@ export namespace Protocol {
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const EETH_ADDRESS = "0x35fa164735182de50811e8e2e824cfb9b6118ac2";
+export const RETH_ADDRESS = "0xae78736cd615f374d3085123a210448e74fc6393"; // rETH
+export const WSTETH_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"; // wstETH
+export const SFRXETH_ADDRESS = "0xac3e018457b222d93114458476f3e3416abbe38f"; // sfrxETH
+export const CBETH_ADDRESS = "0xbe9895146f7af43049ca1c1ae358b0541ea49704"; // cbETH
+
 export const EETH_LIQUIDITY_POOL_ADDRESS =
   "0x308861a430be4cce5502d0a12724771fc6daf216";
 

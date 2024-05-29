@@ -1,45 +1,26 @@
 import {
-  FullWithdrawal,
-  PartialWithdrawal,
+  RegisterValidatorCall,
+  RegisterEtherFiNodeCall,
+  RegisterEtherFiNode1Call as RegisterEtherFiNodeWithOutputCall,
 } from "../../generated/NodesManager/NodesManager";
-import * as constants from "../common/constants";
-import { Address } from "@graphprotocol/graph-ts";
-import { getOrCreatePool, initializeSDK } from "../common/initializers";
+import { EtherFiNode as EtherFiNodeTemplate } from "../../generated/templates";
 
-export function handleFullWithdrawal(event: FullWithdrawal): void {
-  const sdk = initializeSDK(event);
-  const pool = getOrCreatePool(
-    Address.fromString(constants.EETH_LIQUIDITY_POOL_ADDRESS),
-    sdk
-  );
+export function handleRegisterValidator(call: RegisterValidatorCall): void {
+  const etherFiNodeAddress = call.inputs._withdrawalSafeAddress;
 
-  const inputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.ETH_ADDRESS)
-  );
-
-  const supplySideRevenue = event.params.toOperator
-    .plus(event.params.toBnft)
-    .plus(event.params.toTnft);
-  const protocolSideRevenue = event.params.toTreasury;
-
-  pool.addRevenueNative(inputToken, supplySideRevenue, protocolSideRevenue);
+  EtherFiNodeTemplate.create(etherFiNodeAddress);
 }
 
-export function handlePartialWithdrawal(event: PartialWithdrawal): void {
-  const sdk = initializeSDK(event);
-  const pool = getOrCreatePool(
-    Address.fromString(constants.EETH_LIQUIDITY_POOL_ADDRESS),
-    sdk
-  );
+export function handleRegisterEtherFiNode(call: RegisterEtherFiNodeCall): void {
+  const etherFiNodeAddress = call.inputs._address;
 
-  const inputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.ETH_ADDRESS)
-  );
+  EtherFiNodeTemplate.create(etherFiNodeAddress);
+}
 
-  const supplySideRevenue = event.params.toOperator
-    .plus(event.params.toBnft)
-    .plus(event.params.toTnft);
-  const protocolSideRevenue = event.params.toTreasury;
+export function handleRegisterEtherFiNodeWithOutput(
+  call: RegisterEtherFiNodeWithOutputCall
+): void {
+  const etherFiNodeAddress = call.outputs.value0;
 
-  pool.addRevenueNative(inputToken, supplySideRevenue, protocolSideRevenue);
+  EtherFiNodeTemplate.create(etherFiNodeAddress);
 }

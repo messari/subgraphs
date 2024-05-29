@@ -1,6 +1,10 @@
 {
   "network": "mainnet",
 
+  "EarlyAdopterPool": {
+    "address": "0x7623e9dc0da6ff821ddb9ebaba794054e078f8c4",
+    "startBlock": "16722425"
+  },
   "LiquidityPool": {
     "address": "0x308861a430be4cce5502d0a12724771fc6daf216",
     "startBlock": "17664317"

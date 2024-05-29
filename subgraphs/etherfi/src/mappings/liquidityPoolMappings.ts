@@ -1,7 +1,7 @@
 import {
-  initializeSDK,
   updatePoolTVL,
   getOrCreatePool,
+  initializeSDKFromEvent,
   updatePoolOutputTokenSupply,
 } from "../common/initializers";
 import {
@@ -14,7 +14,7 @@ import {
 export function handleDeposit(event: Deposit): void {
   const sender = event.params.sender;
 
-  const sdk = initializeSDK(event);
+  const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
 
   updatePoolOutputTokenSupply(pool);
@@ -27,7 +27,7 @@ export function handleDeposit(event: Deposit): void {
 export function handleDepositWithSource(event: DepositWithSource): void {
   const sender = event.params.sender;
 
-  const sdk = initializeSDK(event);
+  const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
 
   updatePoolOutputTokenSupply(pool);
@@ -40,7 +40,7 @@ export function handleDepositWithSource(event: DepositWithSource): void {
 export function handleWithdraw(event: Withdraw): void {
   const sender = event.params.sender;
 
-  const sdk = initializeSDK(event);
+  const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
 
   updatePoolOutputTokenSupply(pool);
@@ -53,7 +53,7 @@ export function handleWithdraw(event: Withdraw): void {
 export function handleWithdrawWithSource(event: WithdrawWithSource): void {
   const sender = event.params.sender;
 
-  const sdk = initializeSDK(event);
+  const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
 
   updatePoolOutputTokenSupply(pool);

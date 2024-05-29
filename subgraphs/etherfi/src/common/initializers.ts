@@ -8,7 +8,7 @@ import { Pricer, TokenInit, readValue } from "../common/utils";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool } from "../../generated/LiquidityPool/LiquidityPool";
 
-export function initializeSDK(event: ethereum.Event): SDK {
+export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(
     constants.Protocol.ID,
     constants.Protocol.NAME,
@@ -28,22 +28,83 @@ export function initializeSDK(event: ethereum.Event): SDK {
   return sdk;
 }
 
+export function initializeSDKFromCall(call: ethereum.Call): SDK {
+  const protocolConfig = new ProtocolConfig(
+    constants.Protocol.ID,
+    constants.Protocol.NAME,
+    constants.Protocol.SLUG,
+    Versions
+  );
+  const tokenPricer = new Pricer();
+  const tokenInitializer = new TokenInit();
+
+  const sdk = SDK.initializeFromCall(
+    protocolConfig,
+    tokenPricer,
+    tokenInitializer,
+    call
+  );
+
+  return sdk;
+}
+
 export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 
-  const inputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.ETH_ADDRESS)
-  );
-  const outputToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(constants.EETH_ADDRESS)
-  );
-
   if (!pool.isInitialized) {
+    const inputToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.ETH_ADDRESS)
+    );
+    const outputToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.EETH_ADDRESS)
+    );
+
     pool.initialize(
       outputToken.name,
       outputToken.symbol,
       [inputToken.id],
       outputToken,
+      true
+    );
+  }
+
+  return pool;
+}
+
+export function getOrCreateEarlyAdopterPool(
+  poolAddress: Address,
+  sdk: SDK
+): Pool {
+  const pool = sdk.Pools.loadPool(poolAddress);
+
+  if (!pool.isInitialized) {
+    const rEthToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.RETH_ADDRESS)
+    );
+    const wstEthToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.WSTETH_ADDRESS)
+    );
+    const sfrxEthToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.SFRXETH_ADDRESS)
+    );
+    const cbEthToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.CBETH_ADDRESS)
+    );
+    const ethToken = sdk.Tokens.getOrCreateToken(
+      Address.fromString(constants.ETH_ADDRESS)
+    );
+
+    pool.initialize(
+      "EarlyAdopterPool",
+      "adopter-pool",
+      [
+        rEthToken.id,
+        wstEthToken.id,
+        sfrxEthToken.id,
+        cbEthToken.id,
+        ethToken.id,
+      ],
+      null,
       true
     );
   }

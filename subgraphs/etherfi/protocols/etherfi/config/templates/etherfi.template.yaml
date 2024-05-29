@@ -11,6 +11,67 @@ graft:
 dataSources:
   - kind: ethereum
     network: {{ network }}
+    name: EarlyAdopterPool
+    source:
+      address: "{{ EarlyAdopterPool.address }}"
+      abi: EarlyAdopterPool
+      startBlock: {{ EarlyAdopterPool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+      abis:
+        - name: EarlyAdopterPool
+          file: ./abis/EarlyAdopterPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: DepositEth(indexed address,uint256)
+          handler: handleDepositEth
+        - event: DepositERC20(indexed address,uint256)
+          handler: handleDepositERC20
+        - event: Withdrawn(indexed address)
+          handler: handleWithdrawn
+        - event: ERC20TVLUpdated(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleERC20TVLUpdated
+      file: ./src/mappings/earlyAdopterPoolMappings.ts
+  - kind: ethereum
+    network: {{ network }}
     name: LiquidityPool
     source:
       address: "{{ LiquidityPool.address }}"
@@ -71,7 +132,7 @@ dataSources:
           handler: handleWithdrawWithSource
       file: ./src/mappings/liquidityPoolMappings.ts
   - kind: ethereum
-    network: mainnet
+    network: {{ network }}
     name: NodesManager
     source:
       address: "{{ NodesManager.address }}"
@@ -123,9 +184,70 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-      eventHandlers:
-        - event: PartialWithdrawal(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
-          handler: handlePartialWithdrawal
-        - event: FullWithdrawal(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
-          handler: handleFullWithdrawal
+      callHandlers:
+        - function: registerValidator(uint256,bool,address)
+          handler: handleRegisterValidator
+        - function: registerEtherFiNode(uint256,address)
+          handler: handleRegisterEtherFiNode
+        - function: registerEtherFiNode(uint256,bool)
+          handler: handleRegisterEtherFiNodeWithOutput
       file: ./src/mappings/nodesManagerMappings.ts
+
+templates: 
+  - kind: ethereum
+    network: {{ network }}
+    name: EtherFiNode
+    source:
+      abi: EtherFiNode
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+      abis:
+        - name: EtherFiNode
+          file: ./abis/EtherFiNode.json
+        - name: NodesManager
+          file: ./abis/EtherFiNodesManager.json
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      callHandlers:
+        - function: withdrawFunds(address,uint256,address,uint256,address,uint256,address,uint256)
+          handler: handleWithdrawFunds
+      file: ./src/mappings/etherFiNodeMappings.ts
