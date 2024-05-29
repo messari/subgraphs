@@ -1,7 +1,5 @@
 import {
-  updatePoolTVL,
   initializeSDKFromEvent,
-  updatePoolOutputTokenSupply,
   getOrCreateEarlyAdopterPool,
 } from "../common/initializers";
 import {
