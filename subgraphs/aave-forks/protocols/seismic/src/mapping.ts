@@ -41,7 +41,7 @@ import {
   UserEModeSet,
   MintedToTreasury,
 } from "../../../generated/LendingPool/LendingPool";
-import { Market, _DefaultOracle } from "../../../generated/schema";
+import { Market } from "../../../generated/schema";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
