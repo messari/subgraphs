@@ -25,9 +25,6 @@ export function handleERC20TVLUpdated(event: ERC20TVLUpdated): void {
     ],
     true
   );
-
-  updatePoolOutputTokenSupply(pool);
-  updatePoolTVL(pool);
 }
 
 export function handleDepositEth(event: DepositEth): void {
