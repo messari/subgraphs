@@ -2,7 +2,7 @@ import {
   Pool as PoolSchema,
   PoolDailySnapshot,
 } from "../../../../generated/schema";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
+import { SECONDS_PER_DAY } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
@@ -46,7 +46,7 @@ export class PoolSnapshot {
   private takeDailySnapshot(day: i32): void {
     const snapshot = new PoolDailySnapshot(this.pool.id.concatI32(day));
     const previousSnapshot = PoolDailySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotDayID),
+      this.pool.id.concatI32(this.pool.lastSnapshotDayID)
     );
 
     snapshot.day = day;
@@ -74,14 +74,14 @@ export class PoolSnapshot {
 
     if (previousSnapshot) {
       supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
-        previousSnapshot.cumulativeSupplySideRevenueUSD,
+        previousSnapshot.cumulativeSupplySideRevenueUSD
       );
       protocolSideRevenueDelta =
         snapshot.cumulativeProtocolSideRevenueUSD.minus(
-          previousSnapshot.cumulativeProtocolSideRevenueUSD,
+          previousSnapshot.cumulativeProtocolSideRevenueUSD
         );
       totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD.minus(
-        previousSnapshot.cumulativeTotalRevenueUSD,
+        previousSnapshot.cumulativeTotalRevenueUSD
       );
     }
     snapshot.dailySupplySideRevenueUSD = supplySideRevenueDelta;

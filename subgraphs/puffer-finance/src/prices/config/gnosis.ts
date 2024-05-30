@@ -55,13 +55,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1",
+  "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+  "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
+  "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83"
 );
 
 export class config implements Configurations {
@@ -127,7 +127,7 @@ export class config implements Configurations {
 
   getOracleOverride(
     tokenAddr: Address | null,
-    block: ethereum.Block | null,
+    block: ethereum.Block | null
   ): OracleConfig | null {
     return null;
   }

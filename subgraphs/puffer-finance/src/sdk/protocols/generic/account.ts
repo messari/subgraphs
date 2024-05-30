@@ -58,7 +58,7 @@ export class Account {
   constructor(
     protocol: ProtocolManager,
     account: AccountSchema,
-    tokens: TokenManager,
+    tokens: TokenManager
   ) {
     this.account = account;
     this.protocol = protocol;
