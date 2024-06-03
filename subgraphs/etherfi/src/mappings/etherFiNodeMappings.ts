@@ -1,5 +1,5 @@
 import * as constants from "../common/constants";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { getOrCreatePool, initializeSDKFromCall } from "../common/initializers";
 import { WithdrawFundsCall } from "../../generated/templates/EtherFiNode/EtherFiNode";
 
