@@ -36,7 +36,7 @@ import {
   SWETH,
 } from "../../generated/SWETH/SWETH";
 import { _ERC20 } from "../../generated/SWETH/_ERC20";
-import { Token, _UnstakeRequest, _FeePercentage } from "../../generated/schema";
+import { Token, _UnstakeRequest } from "../../generated/schema";
 
 const conf = new ProtocolConfig(
   NetworkConfigs.getLSTAddress().toHexString(),
