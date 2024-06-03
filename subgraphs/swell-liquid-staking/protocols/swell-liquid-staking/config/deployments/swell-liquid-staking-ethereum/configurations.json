@@ -1,0 +1,20 @@
+{
+  "deployment": "SWELL_LIQUID_STAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "sweth": {
+    "address": "0xf951e335afb289353dc249e82926178eac7ded78",
+    "startBlock": "17030767"
+  },
+  "depositManager": {
+    "address": "0xb3d9cf8e163bbc840195a97e81f8a34e295b8f39",
+    "startBlock": "17030752"
+  },
+  "swEXIT": {
+    "address": "0x48c11b86807627af70a34662d4865cf854251663",
+    "startBlock": "19324498"
+  },
+  "graftEnabled": true,
+  "subgraphId": "QmeGqwA3ZMijDj1cC1dur5cLJ5mzrNeNh7vMkncWC9tcxP",
+  "graftStartBlock": 17688208
+}
