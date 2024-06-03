@@ -38,41 +38,43 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 export function handleProposalCreatedS(event: ProposalCreatedS): void {
   const quorumVotes = getQuorumFromContract(
     event.address,
-    event.block.number.minus(BIGINT_ONE)
+    event.block.number.minus(BIGINT_ONE),
   );
   _handleProposalCreated(
     event.params.proposalId.toString(),
     event.params.proposer.toHexString(),
     [event.params.votingModule],
     [BigInt.fromI32(0)],
-    [''],
+    [""],
     [event.params.proposalData],
     event.params.startBlock,
     event.params.endBlock,
     event.params.description,
     quorumVotes,
-    event
+    event,
   );
 }
 
 // ProposalCreated(indexed uint256,indexed address,indexed address,bytes,uint256,uint256,string)
-export function handleProposalCreatedSwithT(event: ProposalCreatedSwithT): void {
+export function handleProposalCreatedSwithT(
+  event: ProposalCreatedSwithT,
+): void {
   const quorumVotes = getQuorumFromContract(
     event.address,
-    event.block.number.minus(BIGINT_ONE)
+    event.block.number.minus(BIGINT_ONE),
   );
   _handleProposalCreated(
     event.params.proposalId.toString(),
     event.params.proposer.toHexString(),
     [event.params.votingModule],
     [BigInt.fromI32(0)],
-    [''],
+    [""],
     [event.params.proposalData],
     event.params.startBlock,
     event.params.endBlock,
     event.params.description,
     quorumVotes,
-    event
+    event,
   );
 }
 
@@ -80,7 +82,7 @@ export function handleProposalCreatedSwithT(event: ProposalCreatedSwithT): void 
 export function handleProposalCreatedM(event: ProposalCreatedM): void {
   const quorumVotes = getQuorumFromContract(
     event.address,
-    event.block.number.minus(BIGINT_ONE)
+    event.block.number.minus(BIGINT_ONE),
   );
   _handleProposalCreated(
     event.params.proposalId.toString(),
@@ -93,15 +95,17 @@ export function handleProposalCreatedM(event: ProposalCreatedM): void {
     event.params.endBlock,
     event.params.description,
     quorumVotes,
-    event
+    event,
   );
 }
 
 // ProposalCreated(indexed uint256,indexed address,address[],uint256[],string[],bytes[],uint256,uint256,string,uint8)
-export function handleProposalCreatedMwithT(event: ProposalCreatedMwithT): void {
+export function handleProposalCreatedMwithT(
+  event: ProposalCreatedMwithT,
+): void {
   const quorumVotes = getQuorumFromContract(
     event.address,
-    event.block.number.minus(BIGINT_ONE)
+    event.block.number.minus(BIGINT_ONE),
   );
   _handleProposalCreated(
     event.params.proposalId.toString(),
@@ -114,7 +118,7 @@ export function handleProposalCreatedMwithT(event: ProposalCreatedMwithT): void 
     event.params.endBlock,
     event.params.description,
     quorumVotes,
-    event
+    event,
   );
 }
 
@@ -126,7 +130,7 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 // ProposalThresholdSet(oldProposalThreshold,newProposalThreshold)
 export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
   const governanceFramework = getGovernanceFramework(
-    event.address.toHexString()
+    event.address.toHexString(),
   );
   governanceFramework.proposalThreshold = event.params.newProposalThreshold;
   governanceFramework.save();
@@ -134,10 +138,10 @@ export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
 
 // QuorumNumeratorUpdated(oldQuorumNumerator, newQuorumNumerator)
 export function handleQuorumNumeratorUpdated(
-  event: QuorumNumeratorUpdated
+  event: QuorumNumeratorUpdated,
 ): void {
   const governanceFramework = getGovernanceFramework(
-    event.address.toHexString()
+    event.address.toHexString(),
   );
   governanceFramework.quorumNumerator = event.params.newQuorumNumerator;
   governanceFramework.save();
@@ -145,7 +149,7 @@ export function handleQuorumNumeratorUpdated(
 
 function getLatestProposalValues(
   proposalId: string,
-  contractAddress: Address
+  contractAddress: Address,
 ): Proposal {
   const proposal = getProposal(proposalId);
 
@@ -154,7 +158,7 @@ function getLatestProposalValues(
     proposal.state = ProposalState.ACTIVE;
     proposal.quorumVotes = getQuorumFromContract(
       contractAddress,
-      proposal.startBlock
+      proposal.startBlock,
     );
 
     const governance = getGovernance();
@@ -168,7 +172,7 @@ function getLatestProposalValues(
 export function handleVoteCast(event: VoteCast): void {
   const proposal = getLatestProposalValues(
     event.params.proposalId.toString(),
-    event.address
+    event.address,
   );
 
   // Proposal will be updated as part of handler
@@ -178,7 +182,7 @@ export function handleVoteCast(event: VoteCast): void {
     event.params.weight,
     event.params.reason,
     event.params.support,
-    event
+    event,
   );
 }
 
@@ -186,7 +190,7 @@ export function handleVoteCast(event: VoteCast): void {
 export function handleVoteCastWithParams(event: VoteCastWithParams): void {
   const proposal = getLatestProposalValues(
     event.params.proposalId.toString(),
-    event.address
+    event.address,
   );
 
   _handleVoteCast(
@@ -195,14 +199,14 @@ export function handleVoteCastWithParams(event: VoteCastWithParams): void {
     event.params.weight,
     event.params.reason,
     event.params.support,
-    event
+    event,
   );
 }
 
 // VotingDelaySet(oldVotingDelay,newVotingDelay)
 export function handleVotingDelaySet(event: VotingDelaySet): void {
   const governanceFramework = getGovernanceFramework(
-    event.address.toHexString()
+    event.address.toHexString(),
   );
   governanceFramework.votingDelay = event.params.newVotingDelay;
   governanceFramework.save();
@@ -211,7 +215,7 @@ export function handleVotingDelaySet(event: VotingDelaySet): void {
 // VotingDelaySet(oldVotingPeriod,newVotingPeriod)
 export function handleVotingPeriodSet(event: VotingPeriodSet): void {
   const governanceFramework = getGovernanceFramework(
-    event.address.toHexString()
+    event.address.toHexString(),
   );
   governanceFramework.votingPeriod = event.params.newVotingPeriod;
   governanceFramework.save();
@@ -224,7 +228,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
     const contract = OptimismGovernorV6.bind(
-      Address.fromString(contractAddress)
+      Address.fromString(contractAddress),
     );
 
     governanceFramework.name = "optimism-governance";
@@ -247,13 +251,13 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
 function getQuorumFromContract(
   contractAddress: Address,
-  blockNumber: BigInt
+  blockNumber: BigInt,
 ): BigInt {
   const contract = OptimismGovernorV6.bind(contractAddress);
   const quorumVotes = contract.quorum(blockNumber);
 
   const governanceFramework = getGovernanceFramework(
-    contractAddress.toHexString()
+    contractAddress.toHexString(),
   );
   governanceFramework.quorumVotes = quorumVotes;
   governanceFramework.save();

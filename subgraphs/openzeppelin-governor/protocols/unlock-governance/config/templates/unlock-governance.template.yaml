@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: UnlockProtocolGovernor
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: UnlockProtocolGovernor
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -45,11 +45,11 @@ dataSources:
       file: ./protocols/unlock-governance/src/unlock-protocol-governor.ts
   - kind: ethereum/contract
     name: UnlockDiscountTokenV3
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: UnlockDiscountTokenV3
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

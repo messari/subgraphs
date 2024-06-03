@@ -13,7 +13,7 @@ export function handleDelegateChanged(event: DelegateChanged): void {
     event.params.delegator.toHexString(),
     event.params.fromDelegate.toHexString(),
     event.params.toDelegate.toHexString(),
-    event
+    event,
   );
 }
 
@@ -24,7 +24,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
     event.params.delegate.toHexString(),
     event.params.previousBalance,
     event.params.newBalance,
-    event
+    event,
   );
 }
 
