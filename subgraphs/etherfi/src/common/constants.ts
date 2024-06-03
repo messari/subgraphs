@@ -60,6 +60,15 @@ export const BIGDECIMAL_MINUS_ONE = new BigDecimal(BIGINT_MINUS_ONE);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
+export const BNFT_STAKING_AMOUNT = BigInt.fromI32(2).times(
+  BIGINT_TEN_TO_EIGHTEENTH
+);
+export const TNFT_STAKING_AMOUNT = BigInt.fromI32(30).times(
+  BIGINT_TEN_TO_EIGHTEENTH
+);
+export const MINIMUM_FULL_WITHDRAW_AMOUNT = BigInt.fromI32(31).times(
+  BIGINT_TEN_TO_EIGHTEENTH
+);
 /////////////////////
 ///// Date/Time /////
 /////////////////////
