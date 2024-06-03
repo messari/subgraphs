@@ -7,5 +7,8 @@
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.46.1",
     "@graphprotocol/graph-ts": "^0.29.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
   }
 }

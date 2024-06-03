@@ -71,6 +71,7 @@ export const getOrInitLendingProtocol = (
     protocol.riskType = data.riskType;
 
     protocol.cumulativeUniqueUsers = 0 as i32;
+    protocol.cumulativeUniqueTxSigners = 0 as i32;
     protocol.cumulativeUniqueDepositors = 0 as i32;
     protocol.cumulativeUniqueBorrowers = 0 as i32;
     protocol.cumulativeUniqueLiquidators = 0 as i32;

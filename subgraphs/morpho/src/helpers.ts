@@ -20,6 +20,7 @@ import {
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
+  _TxSigner,
 } from "../generated/schema";
 import {
   RAY_BI,
@@ -234,7 +235,8 @@ export function snapshotUsage(
   blockTimestamp: BigInt,
   accountID: string,
   eventType: i32,
-  isNewTx: boolean // used for liquidations to track daily liquidat-ors/-ees
+  isNewTx: boolean, // used for liquidations to track daily liquidat-ors/-ees
+  txSignerID: string | null = null
 ): void {
   //
   // daily snapshot
@@ -246,6 +248,7 @@ export function snapshotUsage(
     dailySnapshot.protocol = protocol.id;
     dailySnapshot.days = getDay(blockTimestamp).toI32();
     dailySnapshot.dailyActiveUsers = INT_ZERO;
+    dailySnapshot.dailyActiveTxSigners = INT_ZERO;
     dailySnapshot.dailyTransactionCount = INT_ZERO;
     dailySnapshot.dailyDepositCount = INT_ZERO;
     dailySnapshot.dailyWithdrawCount = INT_ZERO;
@@ -275,6 +278,19 @@ export function snapshotUsage(
     dailyActiveAccount.save();
 
     dailySnapshot.dailyActiveUsers += 1;
+  }
+
+  if (txSignerID) {
+    const txSignerId = txSignerID
+      .concat("-")
+      .concat(dailySnapshotID.toHexString());
+    let txSigner = _TxSigner.load(txSignerId);
+    if (!txSigner) {
+      txSigner = new _TxSigner(txSignerId);
+      txSigner.save();
+
+      dailySnapshot.dailyActiveTxSigners += 1;
+    }
   }
 
   // update daily active positions
@@ -320,6 +336,7 @@ export function snapshotUsage(
   }
 
   dailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailySnapshot.cumulativeUniqueTxSigners = protocol.cumulativeUniqueTxSigners;
   dailySnapshot.totalPoolCount = protocol.totalPoolCount;
   dailySnapshot.openPositionCount = protocol.openPositionCount;
   dailySnapshot.cumulativeUniqueDepositors =
@@ -383,6 +400,7 @@ export function snapshotUsage(
     hourlySnapshot.hours = getHour(blockTimestamp).toI32();
     hourlySnapshot.hourlyActiveUsers = INT_ZERO;
     hourlySnapshot.cumulativeUniqueUsers = INT_ZERO;
+    hourlySnapshot.cumulativeUniqueTxSigners = INT_ZERO;
     hourlySnapshot.hourlyTransactionCount = INT_ZERO;
     hourlySnapshot.hourlyDepositCount = INT_ZERO;
     hourlySnapshot.hourlyWithdrawCount = INT_ZERO;
@@ -404,6 +422,7 @@ export function snapshotUsage(
     hourlySnapshot.hourlyActiveUsers += 1;
   }
   hourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  hourlySnapshot.cumulativeUniqueTxSigners = protocol.cumulativeUniqueTxSigners;
   if (isNewTx) {
     hourlySnapshot.hourlyTransactionCount += 1;
   }
@@ -776,6 +795,7 @@ function getOrCreateMarketDailySnapshot(
     snapshot.dailyActiveFlashloaners = INT_ZERO;
     snapshot.dailyActiveTransferrers = INT_ZERO;
     snapshot.dailyActiveUsers = INT_ZERO;
+    snapshot.dailyActiveTxSigners = INT_ZERO;
     snapshot.dailyActiveLiquidators = INT_ZERO;
     snapshot.dailyActiveBorrowers = INT_ZERO;
     snapshot.dailyActiveDepositors = INT_ZERO;
@@ -1016,9 +1036,7 @@ export function updateProtocolPosition(
     .div(exponentToBigDecimal(inputToken.decimals));
 
   const newMarketSupplyCollateral_BI = market._scaledPoolCollateral
-    ? market
-        ._scaledPoolCollateral!.times(market._reserveSupplyIndex!)
-        .div(exponentToBigInt(market._indexesOffset))
+    ? market._scaledPoolCollateral!
     : BigInt.zero();
 
   const newMarketSupplyCollateral = newMarketSupplyCollateral_BI
@@ -1182,9 +1200,7 @@ export function updateP2PRates(market: Market, __MATHS__: IMaths): void {
 export const getEventId = (hash: Bytes, logIndex: BigInt): Bytes =>
   hash.concat(Bytes.fromI32(logIndex.toI32()));
 
-export function updateProtocolValues(
-  protocolAddress: Bytes
-): void {
+export function updateProtocolValues(protocolAddress: Bytes): void {
   const protocol = getOrInitLendingProtocol(
     Address.fromBytes(protocolAddress)
   ).protocol;
