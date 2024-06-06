@@ -1,7 +1,7 @@
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../../util/constants";
 import { TokenManager } from "./tokens";
 import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../../util/constants";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
@@ -263,8 +263,8 @@ export class Pool {
    */
   addRevenueNative(
     inputToken: Token,
-    protocolSide: BigInt,
-    supplySide: BigInt
+    supplySide: BigInt,
+    protocolSide: BigInt
   ): void {
     const pricer = this.protocol.pricer;
 
