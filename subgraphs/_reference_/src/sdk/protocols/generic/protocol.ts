@@ -18,8 +18,8 @@ import { Versions } from "../../../../../../deployment/context/interface";
  * This file contains the ProtocolManager class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  2.1.1
- * SDK Version:     1.0.1
+ * Schema Version:  3.0.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @steegecs
  *  - @shashwatS22
@@ -79,7 +79,6 @@ export class ProtocolManager {
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = constants.ProtocolType.GENERIC;
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    protocol.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -89,7 +88,6 @@ export class ProtocolManager {
     protocol.totalPoolCount = 0;
 
     protocol.lastSnapshotDayID = 0;
-    protocol.lastSnapshotHourID = 0;
     protocol.lastUpdateTimestamp = BIGINT_ZERO;
 
     protocol.schemaVersion = conf.getVersions().getSchemaVersion();
