@@ -288,12 +288,18 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     `,
     { client },
   );
+
+  let placeholderQuery = `query MyQuery {
+    _meta {
+      deployment
+    }
+  }`;
   const [
     getHourlyUsageData,
     { data: hourlyUsageData, loading: hourlyUsageLoading, error: hourlyUsageError, refetch: hourlyUsageRefetch },
   ] = useLazyQuery(
     gql`
-      ${hourlyUsageQuery}
+      ${hourlyUsageQuery ? hourlyUsageQuery : placeholderQuery}
     `,
     { client },
   );
@@ -324,7 +330,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   );
   const [getOverlayHourlyUsageData, { data: overlayHourlyUsageData }] = useLazyQuery(
     gql`
-      ${overlayHourlyUsageQuery}
+      ${overlayHourlyUsageQuery ? overlayHourlyUsageQuery : placeholderQuery}
     `,
     { client: overlayDeploymentClient },
   );
