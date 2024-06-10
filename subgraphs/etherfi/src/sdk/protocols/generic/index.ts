@@ -10,9 +10,8 @@ import { ProtocolConfigurer, TokenPricer } from "../config";
 /**
  * This file contains the SDK class, which initializes
  * all managers from event or call.
- * 
- * Schema Version:  3.0.0
- * SDK Version:     1.1.0
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @steegecs
  *  - @shashwatS22
