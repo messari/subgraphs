@@ -11,11 +11,6 @@
     "startBlock": "17490416"
   },
 
-  "VaultFactory": {
-    "address": "0x03abeec03bf39ac5a5c8886cf3496326d8164e1e",
-    "startBlock": "17416138"
-  },
-
   "SocializingPools": [
     {
       "name": "PermissionedSocializingPool",
