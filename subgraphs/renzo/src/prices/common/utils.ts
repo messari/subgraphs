@@ -16,7 +16,7 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 import { Configurations, CustomPriceType } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-import { _ERC20 } from "../../../generated/LiquidityPool/_ERC20";
+import { _ERC20 } from "../../../generated/RestakeManager/_ERC20";
 import {
   Address,
   BigInt,

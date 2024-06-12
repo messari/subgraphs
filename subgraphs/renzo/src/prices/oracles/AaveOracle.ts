@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { AaveOracleContract } from "../../../generated/LiquidityPool/AaveOracleContract";
+import { AaveOracleContract } from "../../../generated/RestakeManager/AaveOracleContract";
 
 export function getAaveOracleContract(
   contract: OracleContract,
