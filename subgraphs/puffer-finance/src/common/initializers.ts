@@ -28,6 +28,26 @@ export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   return sdk;
 }
 
+export function initializeSDKFromCall(call: ethereum.Call): SDK {
+  const protocolConfig = new ProtocolConfig(
+    constants.Protocol.ID,
+    constants.Protocol.NAME,
+    constants.Protocol.SLUG,
+    Versions
+  );
+  const tokenPricer = new Pricer();
+  const tokenInitializer = new TokenInit();
+
+  const sdk = SDK.initializeFromCall(
+    protocolConfig,
+    tokenPricer,
+    tokenInitializer,
+    call
+  );
+
+  return sdk;
+}
+
 export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 

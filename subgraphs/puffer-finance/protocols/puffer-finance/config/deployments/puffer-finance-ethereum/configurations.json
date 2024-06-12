@@ -6,6 +6,12 @@
     "startBlock": "19128047"
   },
 
+  "PufferDepositor": {
+    "address": "0x4aa799c5dfc01ee7d790e3bf1a7c2257ce1dceff",
+    "startBlock": "19128046"
+  },
+
+
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": 0
