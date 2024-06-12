@@ -5,7 +5,7 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 //////////////////////////////
 
 export namespace Protocol {
-  export const ID = "0xbf5495Efe5DB9ce00f80364C8B423567e58d2110";
+  export const ID = "0xbf5495efe5db9ce00f80364c8b423567e58d2110";
   export const NAME = "Renzo";
   export const SLUG = "renzo";
 }
