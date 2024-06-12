@@ -11150,5 +11150,39 @@
         }
       }
     }
+  },
+  "renzo": {
+    "schema": "generic",
+    "base": "renzo",
+    "protocol": "renzo",
+    "project": "renzo",
+    "deployments": {
+      "renzo-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "renzo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "renzo-ethereum",
+            "query-id": "renzo-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "renzo-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
