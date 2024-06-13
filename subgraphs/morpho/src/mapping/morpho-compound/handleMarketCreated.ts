@@ -87,6 +87,7 @@ export function handleMarketCreated(event: MarketCreated): void {
   market.transferCount = 0 as i32;
   market.flashloanCount = 0 as i32;
   market.cumulativeUniqueUsers = 0 as i32;
+  market.cumulativeUniqueTxSigners = 0 as i32;
   market.cumulativeUniqueDepositors = 0 as i32;
   market.cumulativeUniqueBorrowers = 0 as i32;
   market.cumulativeUniqueLiquidators = 0 as i32;

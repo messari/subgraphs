@@ -12,7 +12,7 @@ There are couple things you can do to significantly improve your indexing speed:
 
 ### Using Transaction .receipt
 
-In many cases, an event is a part of a transaction emitting many events and it is helpful to get the information from an event upstream or downstream of current event in the same transaction. One example is in the balancer V2 subgraph, needed OutputTokenAmount info was included in the Transfer event preceding the PoolBalanceChanged event; another example is in the Euler subgraph, we need to know whether a Liquidation event is emitted after a AssetStatus event. Transaction receipt allow us the traverse the information of all events in the same transaction and can help improve performance of subgraphs.
+In many cases, an event is a part of a transaction emitting many events and it is helpful to get the information from an event upstream or downstream of current event in the same transaction. One example is in the balancer V2 subgraph, needed OutputTokenAmount info was included in the Transfer event preceding the PoolBalanceChanged event; another example is in the Euler subgraph, we need to know whether a Liquidation event is emitted after an AssetStatus event. Transaction receipt allow us the traverse the information of all events in the same transaction and can help improve performance of subgraphs.
 
 Steps to use transaction receipt:
 
@@ -180,7 +180,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 ## Hourly Metrics Test 1.0
 
 - The purpose of this test is to check how much adding entities that track hourly metrics affects the indexing speed of the uniswap v2 subgraph.
-- In this test, I adding hourly metrics for financials, usage, and pools in addition to the daily metrics. The tests were were started at the same block number and near the same time.
+- In this test, I added hourly metrics for financials, usage, and pools in addition to the daily metrics. The tests were started at the same block number and near the same time.
 
 ### Checkpoints
 
@@ -208,7 +208,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 
 ### Results
 
-- The results after a a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph.
+- The results after a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph.
 - An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
 
 ### Bytes and Immutables Test (Deprecated)
@@ -274,6 +274,6 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 
 ### Results
 
-- The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed.
+- The results of this test indicate that having neither bytes as IDs or immutable entities is the fastest case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed.
 - The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%).
 - These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investigation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and achieve the desired performance improvements.

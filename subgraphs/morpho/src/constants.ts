@@ -109,6 +109,10 @@ export const MORPHO_AAVE_V2_ADDRESS = Address.fromBytes(
   Bytes.fromHexString("0x777777c9898d384f785ee44acfe945efdff5f3e0")
 );
 
+export const MORPHO_AAVE_V3_ADDRESS = Address.fromBytes(
+  Bytes.fromHexString("0x33333aea097c193e66081e930c33020272b33333")
+);
+
 export const MORPHO_COMPOUND_ADDRESS = Address.fromBytes(
   Bytes.fromHexString("0x8888882f8f843896699869179fb6e4f7e3b58888")
 );
@@ -269,6 +273,21 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
       "Morpho",
       "Morpho Aave V2",
       "morpho-aave-v2",
+      Network.MAINNET,
+      LendingType.POOLED,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONED,
+      CollateralizationType.UNDER_COLLATERALIZED,
+      RiskType.ISOLATED
+    );
+  }
+  if (protocolAddress == MORPHO_AAVE_V3_ADDRESS) {
+    return new ProtocolData(
+      Bytes.fromHexString(MORPHO_AAVE_V3_ADDRESS.toHexString()),
+      "Morpho",
+      "Morpho Aave V3",
+      "morpho-aave-v3",
       Network.MAINNET,
       LendingType.POOLED,
       PermissionType.PERMISSIONLESS,
