@@ -39,6 +39,8 @@ dataSources:
           file: ./abis/NodeOperatorsRegistry.json
         - name: LidoOracle
           file: ./abis/LidoOracle.json
+        - name: WithdrawalQueue
+          file: ./abis/WithdrawalQueue.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -113,6 +115,8 @@ dataSources:
           file: ./abis/NodeOperatorsRegistry.json
         - name: LidoOracle
           file: ./abis/LidoOracle.json
+        - name: WithdrawalQueue
+          file: ./abis/WithdrawalQueue.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -152,3 +156,76 @@ dataSources:
         - event: PostTotalShares(uint256,uint256,uint256,uint256)
           handler: handlePostTotalShares
       file: ./src/mappings/Oracle.ts
+  - kind: ethereum
+    name: WithdrawalQueue
+    network: mainnet
+    source:
+      address: "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1"
+      abi: WithdrawalQueue
+      startBlock: 17172547
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        ###########################################
+        ########### Lido Generic ABIs #############
+        ###########################################
+        - name: Lido
+          file: ./abis/Lido.json
+        - name: NodeOperatorsRegistry
+          file: ./abis/NodeOperatorsRegistry.json
+        - name: LidoOracle
+          file: ./abis/LidoOracle.json
+        - name: WithdrawalQueue
+          file: ./abis/WithdrawalQueue.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: WithdrawalRequested(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdrawalRequested
+        - event: WithdrawalClaimed(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleWithdrawalClaimed
+      file: ./src/mappings/Lido.ts
