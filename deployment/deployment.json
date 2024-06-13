@@ -10688,5 +10688,39 @@
         }
       }
     }
+  },
+  "mantle-staked-eth": {
+    "schema": "generic",
+    "base": "mantle-staked-eth",
+    "protocol": "mantle-staked-eth",
+    "project": "mantle-staked-eth",
+    "deployments": {
+      "mantle-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mantle-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mantle-staked-eth-ethereum",
+            "query-id": "mantle-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mantle-staked-eth-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
