@@ -1,11 +1,13 @@
-import {
-  Address,
-  ByteArray,
-  crypto,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
 import { Network, ZERO_ADDRESS } from "../../../src/constants";
+
+//////////////////////////////
+///// Ethereum Addresses /////
+//////////////////////////////
+
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // ETH
+export const USDC_POS_TOKEN_ADDRESS =
+  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // Polygon
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -16,21 +18,11 @@ export namespace Protocol {
   export const NAME = "Seismic Protocol";
   export const SLUG = "seismic";
 }
-
-export namespace IavsTokenType {
-  export const ATOKEN = "ATOKEN";
-  export const INPUTTOKEN = "INPUTTOKEN";
-  export const VTOKEN = "VTOKEN";
-  export const STOKEN = "STOKEN";
-}
-
 export const AAVE_DECIMALS = 8;
 
-export namespace InterestRateMode {
-  export const NONE = 0 as i32;
-  export const STABLE = 1 as i32;
-  export const VARIABLE = 2 as i32;
-}
+// This is hardcoded and can not be changed, so it is set as a constant here
+// https://etherscan.io/address/0x05bfa9157e92690b179033ca2f6dd1e86b25ea4d#code#F96#L89
+export const FLASHLOAN_PREMIUM_TOTAL = BigDecimal.fromString("0.0009"); // = 9/10000
 
 ////////////////////////////
 ///// Network Specific /////
@@ -38,7 +30,7 @@ export namespace InterestRateMode {
 
 export class NetworkSpecificConstant {
   constructor(
-    public readonly protocolAddress: Address, // aka, PoolAddressesProviderRegistry
+    public readonly protocolAddress: Address, // aka, LendingPoolAddressesProvider
     public readonly network: string
   ) {}
 }
@@ -61,8 +53,3 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
-
-export const BALANCE_TRANSFER_SIGNATURE = crypto.keccak256(
-  ByteArray.fromUTF8("BalanceTransfer(address,address,uint256,uint256)")
-);
-export const BALANCE_TRANSFER_DATA_TYPE = "(uint256,uint256)";

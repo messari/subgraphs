@@ -7,4 +7,4 @@ Contracts for:
 - [StableDebtToken](https://blastscan.io/address/0x226033e18e87852C5C8721C6a62D7cEdD55D810d#code)
 - [VariableDebtToken](https://blastscan.io/address/0xe7A8225eB6F923482972fFC53851D3aC053c7e98#code)
 
-are not verified on blastscan, hence using Aave-V3's abis for them instead.
+are not verified on blastscan, hence using Aave-V2's abis for them instead.

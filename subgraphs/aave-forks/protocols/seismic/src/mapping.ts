@@ -2,54 +2,43 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  ByteArray,
-  Bytes,
-  crypto,
+  dataSource,
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
-import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
-import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
-import { AaveOracle } from "../../../generated/LendingPool/AaveOracle";
 import {
+  AAVE_DECIMALS,
+  FLASHLOAN_PREMIUM_TOTAL,
+  getNetworkSpecificConstant,
+  Protocol,
+  USDC_POS_TOKEN_ADDRESS,
+  USDC_TOKEN_ADDRESS,
+} from "./constants";
+import {
+  BorrowingDisabledOnReserve,
+  BorrowingEnabledOnReserve,
   CollateralConfigurationChanged,
+  ReserveActivated,
+  ReserveDeactivated,
   ReserveFactorChanged,
-  ReserveActive,
-  ReserveBorrowing,
-  ReserveFrozen,
   ReserveInitialized,
-  ReservePaused,
-  LiquidationProtocolFeeChanged,
-  FlashloanPremiumTotalUpdated,
-  FlashloanPremiumToProtocolUpdated,
-  SiloedBorrowingChanged,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
+  Deposit,
   FlashLoan,
-  LendingPool as LendingPoolContract,
   LiquidationCall,
+  Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
-  Supply,
-  SwapBorrowRateMode,
+  Unpaused,
   Withdraw,
-  UserEModeSet,
-  MintedToTreasury,
+  Swap,
 } from "../../../generated/LendingPool/LendingPool";
-import { Market } from "../../../generated/schema";
-import {
-  AAVE_DECIMALS,
-  getNetworkSpecificConstant,
-  InterestRateMode,
-  Protocol,
-  BALANCE_TRANSFER_DATA_TYPE,
-  BALANCE_TRANSFER_SIGNATURE,
-} from "./constants";
+import { AToken } from "../../../generated/LendingPool/AToken";
 import {
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
@@ -57,11 +46,8 @@ import {
   _handleCollateralConfigurationChanged,
   _handleDeposit,
   _handleFlashLoan,
-  _handleFlashloanPremiumToProtocolUpdated,
-  _handleFlashloanPremiumTotalUpdated,
   _handleLiquidate,
-  _handleLiquidationProtocolFeeChanged,
-  _handleMintedToTreasury,
+  _handlePaused,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -73,37 +59,46 @@ import {
   _handleReserveUsedAsCollateralEnabled,
   _handleSwapBorrowRateMode,
   _handleTransfer,
+  _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
   BIGDECIMAL_ZERO,
-  BIGINT_ONE_RAY,
   BIGINT_ZERO,
-  INT_FOUR,
-  INT_ONE,
-  INT_ZERO,
+  InterestRateMode,
+  Network,
+  SECONDS_PER_DAY,
 } from "../../../src/constants";
-
-import { DataManager, ProtocolData } from "../../../src/sdk/manager";
+import { Token, _DefaultOracle } from "../../../generated/schema";
+import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
+import { StakedAave } from "../../../generated/LendingPool/StakedAave";
+import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
+import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import {
-  readValue,
-  getMarketFromToken,
+  DataManager,
+  ProtocolData,
+  RewardData,
+} from "../../../src/sdk/manager";
+import {
+  equalsIgnoreCase,
   exponentToBigDecimal,
-  getOrCreateFlashloanPremium,
   getBorrowBalances,
+  getMarketFromToken,
+  getOrCreateFlashloanPremium,
+  readValue,
 } from "../../../src/helpers";
 import {
-  LendingType,
   CollateralizationType,
-  PermissionType,
-  RiskType,
   InterestRateType,
+  LendingType,
+  PermissionType,
   PositionSide,
-  INT_TEN,
-  INT_152,
-  INT_THIRTY_TWO,
+  RewardTokenType,
+  RiskType,
 } from "../../../src/sdk/constants";
-import { AccountManager } from "../../../src/sdk/account";
+import { TokenManager } from "../../../src/sdk/token";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -124,17 +119,17 @@ function getProtocolData(): ProtocolData {
 
 const protocolData = getProtocolData();
 
-////////////////////////////////////////
-///// PoolAddressProvider Handlers /////
-////////////////////////////////////////
+///////////////////////////////////////////////
+///// LendingPoolAddressProvider Handlers /////
+///////////////////////////////////////////////
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
-/////////////////////////////////////
-///// PoolConfigurator Handlers /////
-/////////////////////////////////////
+//////////////////////////////////////
+///// Lending Pool Configuration /////
+//////////////////////////////////////
 
 export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
@@ -162,61 +157,32 @@ export function handleCollateralConfigurationChanged(
   );
 }
 
-export function handleReserveActive(event: ReserveActive): void {
+export function handleBorrowingEnabledOnReserve(
+  event: BorrowingEnabledOnReserve
+): void {
+  _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
+}
+
+export function handleBorrowingDisabledOnReserve(
+  event: BorrowingDisabledOnReserve
+): void {
+  _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
+}
+
+export function handleReserveActivated(event: ReserveActivated): void {
   _handleReserveActivated(event.params.asset, protocolData);
 }
 
-export function handleReserveBorrowing(event: ReserveBorrowing): void {
-  if (event.params.enabled) {
-    _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
-  } else {
-    _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
-  }
-}
-
-export function handleReserveFrozen(event: ReserveFrozen): void {
-  _handleReserveDeactivated(event.params.asset, protocolData);
-}
-
-export function handleReservePaused(event: ReservePaused): void {
+export function handleReserveDeactivated(event: ReserveDeactivated): void {
   _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   _handleReserveFactorChanged(
     event.params.asset,
-    event.params.newReserveFactor,
+    event.params.factor,
     protocolData
   );
-}
-
-export function handleLiquidationProtocolFeeChanged(
-  event: LiquidationProtocolFeeChanged
-): void {
-  _handleLiquidationProtocolFeeChanged(
-    event.params.asset,
-    event.params.newFee,
-    protocolData
-  );
-}
-
-export function handleFlashloanPremiumTotalUpdated(
-  event: FlashloanPremiumTotalUpdated
-): void {
-  const rate = event.params.newFlashloanPremiumTotal
-    .toBigDecimal()
-    .div(exponentToBigDecimal(INT_FOUR));
-
-  _handleFlashloanPremiumTotalUpdated(rate, protocolData);
-}
-
-export function handleFlashloanPremiumToProtocolUpdated(
-  event: FlashloanPremiumToProtocolUpdated
-): void {
-  const rate = event.params.newFlashloanPremiumToProtocol
-    .toBigDecimal()
-    .div(exponentToBigDecimal(INT_FOUR));
-  _handleFlashloanPremiumToProtocolUpdated(rate, protocolData);
 }
 
 /////////////////////////////////
@@ -238,9 +204,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     protocolData
   );
 
+  updateRewards(manager, event);
+
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromBytes(market.inputToken),
-    manager.getOracleAddress()
+    manager.getOracleAddress(),
+    event.block.number
   );
 
   _handleReserveDataUpdated(
@@ -278,7 +247,17 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
-export function handleDeposit(event: Supply): void {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function handlePaused(event: Paused): void {
+  _handlePaused(protocolData);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function handleUnpaused(event: Unpaused): void {
+  _handleUnpaused(protocolData);
+}
+
+export function handleDeposit(event: Deposit): void {
   _handleDeposit(
     event,
     event.params.amount,
@@ -299,36 +278,12 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  // determine whether the borrow position is in isolated mode
-  // borrow in isolated mode will have an IsolationModeTotalDebtUpdated event emitted
-  // before the Borrow event
-  // https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/protocol/libraries/logic/BorrowLogic.sol#L139
-  let isIsolated = false;
-  const receipt = event.receipt;
-  if (!receipt) {
-    log.warning(
-      "[handleBorrow]No receipt for tx {}; cannot set isIsolated flag",
-      [event.transaction.hash.toHexString()]
-    );
-  } else {
-    isIsolated = getIsIsolatedFlag(event);
-  }
-
-  let interestRateType: InterestRateType | null = null;
-  if (event.params.interestRateMode === InterestRateMode.STABLE) {
-    interestRateType = InterestRateType.STABLE;
-  } else if (event.params.interestRateMode === InterestRateMode.VARIABLE) {
-    interestRateType = InterestRateType.VARIABLE;
-  }
-
   _handleBorrow(
     event,
     event.params.amount,
     event.params.reserve,
     protocolData,
-    event.params.onBehalfOf,
-    interestRateType,
-    isIsolated
+    event.params.onBehalfOf
   );
 }
 
@@ -343,50 +298,6 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
-  const collateralMarket = getMarketFromToken(
-    event.params.collateralAsset,
-    protocolData
-  );
-  if (!collateralMarket) {
-    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
-      event.params.collateralAsset.toHexString(),
-    ]);
-    return;
-  }
-
-  if (!collateralMarket._liquidationProtocolFee) {
-    storeLiquidationProtocolFee(
-      collateralMarket,
-      event.address,
-      event.params.collateralAsset
-    );
-  }
-
-  let balanceTransferValue = BIGINT_ZERO;
-  let balanceTransferIndex = BIGINT_ZERO;
-  if (event.receipt) {
-    const logs = event.receipt!.logs;
-    for (let i = 0; i < logs.length; i++) {
-      const thisLog = logs[i];
-      if (!thisLog.topics.length) continue;
-
-      if (thisLog.topics[0] == BALANCE_TRANSFER_SIGNATURE) {
-        const decoded = ethereum.decode(
-          BALANCE_TRANSFER_DATA_TYPE,
-          thisLog.data
-        );
-        if (!decoded) return;
-
-        const logData = decoded.toTuple();
-        balanceTransferValue = logData[INT_ZERO].toBigInt();
-        balanceTransferIndex = logData[INT_ONE].toBigInt();
-      }
-    }
-  }
-  const balanceTransferAmount = balanceTransferValue.times(
-    balanceTransferIndex.div(BIGINT_ONE_RAY)
-  );
-
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
@@ -395,13 +306,14 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
-    event.params.debtToCover,
-    balanceTransferAmount
+    event.params.debtToCover
   );
 }
 
 export function handleFlashloan(event: FlashLoan): void {
   const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+  flashloanPremium.premiumRateTotal = FLASHLOAN_PREMIUM_TOTAL;
+  flashloanPremium.save();
 
   _handleFlashLoan(
     event.params.asset,
@@ -414,12 +326,44 @@ export function handleFlashloan(event: FlashLoan): void {
   );
 }
 
-export function handleMintedToTreasury(event: MintedToTreasury): void {
-  _handleMintedToTreasury(
+export function handleSwapBorrowRateMode(event: Swap): void {
+  const interestRateMode = event.params.rateMode.toI32();
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      interestRateMode
+    )
+  ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
+    return;
+  }
+
+  const interestRateType =
+    interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
     event,
-    protocolData,
-    event.params.reserve,
-    event.params.amountMinted
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 
@@ -428,29 +372,13 @@ export function handleMintedToTreasury(event: MintedToTreasury): void {
 /////////////////////////
 
 export function handleCollateralTransfer(event: CollateralTransfer): void {
-  // determine the transfer amount because different versions of the AToken contract
-  // pass discounted and undiscounted amount to Transfer() and BalanceTransfer() event
-  // here we get the higher of the two amount and use it as the transfer amount
-  // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
-  // logIndex 18 and 21
-  let amount = event.params.value;
-  const receipt = event.receipt;
-  if (!receipt) {
-    log.warning("[handleBorrow]No receipt for tx {}", [
-      event.transaction.hash.toHexString(),
-    ]);
-  } else {
-    const btAmount = getBalanceTransferAmount(event);
-    amount = btAmount.gt(amount) ? btAmount : amount;
-  }
-
   _handleTransfer(
     event,
     protocolData,
     PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
-    amount
+    event.params.value
   );
 }
 
@@ -476,214 +404,210 @@ export function handleStableTransfer(event: StableTransfer): void {
   );
 }
 
-export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
-  const interestRateMode = event.params.interestRateMode;
-  if (
-    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
-      event.params.interestRateMode
-    )
-  ) {
-    log.error(
-      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
-      [
-        interestRateMode.toString(),
-        InterestRateMode.STABLE.toString(),
-        InterestRateMode.VARIABLE.toString(),
-      ]
-    );
-    return;
-    return;
-  }
-  const interestRateType =
-    event.params.interestRateMode === InterestRateMode.STABLE
-      ? InterestRateType.STABLE
-      : InterestRateType.VARIABLE;
-  const market = getMarketFromToken(event.params.reserve, protocolData);
-  if (!market) {
-    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
-  const newBorrowBalances = getBorrowBalances(market, event.params.user);
-  _handleSwapBorrowRateMode(
-    event,
-    market,
-    event.params.user,
-    newBorrowBalances,
-    interestRateType,
-    protocolData
-  );
-}
-
-export function handleSiloedBorrowingChanged(
-  event: SiloedBorrowingChanged
-): void {
-  const market = getMarketFromToken(event.params.asset, protocolData);
-  if (!market) {
-    log.error("[handleSiloedBorrowingChanged]market not found for token {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
-  market._siloedBorrowing = event.params.newState;
-  market.save();
-}
-
-export function handleUserEModeSet(event: UserEModeSet): void {
-  const account = new AccountManager(event.params.user).getAccount();
-  account._eMode = true;
-  account.save();
-}
-
 ///////////////////
 ///// Helpers /////
 ///////////////////
 
 function getAssetPriceInUSDC(
   tokenAddress: Address,
-  priceOracle: Address
+  priceOracle: Address,
+  blockNumber: BigInt
 ): BigDecimal {
-  const oracle = AaveOracle.bind(priceOracle);
-  const baseUnit = readValue<BigInt>(
-    oracle.try_BASE_CURRENCY_UNIT(),
-    BigInt.fromI32(INT_TEN).pow(AAVE_DECIMALS as u8)
-  ).toBigDecimal();
-
-  const oracleResult = readValue<BigInt>(
+  const oracle = IPriceOracleGetter.bind(priceOracle);
+  let oracleResult = readValue<BigInt>(
     oracle.try_getAssetPrice(tokenAddress),
     BIGINT_ZERO
   );
 
-  if (oracleResult.gt(BIGINT_ZERO)) {
-    return oracleResult.toBigDecimal().div(baseUnit);
+  // if the result is zero or less, try the fallback oracle
+  if (!oracleResult.gt(BIGINT_ZERO)) {
+    const tryFallback = oracle.try_getFallbackOracle();
+    if (tryFallback) {
+      const fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
+      oracleResult = readValue<BigInt>(
+        fallbackOracle.try_getAssetPrice(tokenAddress),
+        BIGINT_ZERO
+      );
+    }
   }
 
-  // fall price oracle unimplemented
+  // Mainnet Oracles return the price in eth, must convert to USD through the following method
+  if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
+    const priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
+      BIGINT_ZERO
+    );
 
-  return BIGDECIMAL_ZERO;
-}
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
+  }
 
-function storeLiquidationProtocolFee(
-  market: Market,
-  poolAddress: Address,
-  reserve: Address
-): void {
-  // Store LiquidationProtocolFee if not set, as setLiquidationProtocolFee() may be never called
-  // and no LiquidationProtocolFeeChanged event is emitted
-  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
-  // for how to decode configuration data to get _liquidationProtocolFee
-  const liquidationProtocolFeeMask =
-    "0xFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-  const liquidationProtocolFeeStartBitPosition = INT_152 as u8;
-  const pool = LendingPoolContract.bind(poolAddress);
-  const poolConfigData = pool.getConfiguration(reserve).data;
-  const liquidationProtocolFee = decodeConfig(
-    poolConfigData,
-    liquidationProtocolFeeMask,
-    liquidationProtocolFeeStartBitPosition
-  )
+  // Polygon Oracle returns price in ETH, must convert to USD with following method
+  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+    // there was misprice at block 15783457 that affects 2 transactions
+    // we will override the price at this block to $1.55615781978
+    // this price is derived using the following method on that block using historical contract calls
+    // The contract calls return 634291527055835 / 407601027988722 = our new price
+    const MISPRICE_BLOCK_NUMBER = 15783457;
+    if (blockNumber.equals(BigInt.fromI32(MISPRICE_BLOCK_NUMBER))) {
+      return BigDecimal.fromString("1.55615781978");
+    }
+
+    const priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
+      BIGINT_ZERO
+    );
+
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      // USD price = token oracle result / USDC POS oracle result
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
+  }
+
+  // Avalanche Oracle return the price offset by 8 decimals
+  if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
+    return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
+  }
+
+  // last resort, should not be touched
+  const inputToken = Token.load(tokenAddress);
+  if (!inputToken) {
+    log.warning(
+      "[getAssetPriceInUSDC]token {} not found in Token entity; return BIGDECIMAL_ZERO",
+      [tokenAddress.toHexString()]
+    );
+    return BIGDECIMAL_ZERO;
+  }
+  return oracleResult
     .toBigDecimal()
-    .div(exponentToBigDecimal(INT_FOUR));
-
-  log.info("[storeLiquidationProtocolFee]market {} liquidationProtocolFee={}", [
-    market.id.toHexString(),
-    liquidationProtocolFee.toString(),
-  ]);
-  market._liquidationProtocolFee = liquidationProtocolFee;
-  market.save();
+    .div(exponentToBigDecimal(inputToken.decimals));
 }
 
-function decodeConfig(
-  storedData: BigInt,
-  maskStr: string,
-  startBitPosition: u8
-): BigInt {
-  // aave-v3 stores configuration in packed bits (ReserveConfiguration.sol)
-  // decoding them by applying a bit_not mask and right shift by startBitPosition
-  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
-  // for how to decode configuration data to get _liquidationProtocolFee
-
-  const maskArray = new Uint8Array(INT_THIRTY_TWO);
-  maskArray.set(Bytes.fromHexString(maskStr));
-  // BITWISE NOT
-  for (let i = 0; i < maskArray.length; i++) {
-    maskArray[i] = ~maskArray[i];
+function updateRewards(manager: DataManager, event: ethereum.Event): void {
+  // Reward rate (rewards/second) in a market comes from try_assets(to)
+  // Supply side the to address is the aToken
+  // Borrow side the to address is the variableDebtToken
+  const market = manager.getMarket();
+  const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
+  const tryIncentiveController = aTokenContract.try_getIncentivesController();
+  if (tryIncentiveController.reverted) {
+    log.warning(
+      "[updateRewards]getIncentivesController() call for aToken {} is reverted",
+      [market.outputToken!.toHexString()]
+    );
+    return;
   }
-  // reverse for little endian
-  const configMaskBigInt = BigInt.fromUnsignedBytes(
-    Bytes.fromUint8Array(maskArray.reverse())
+  const incentiveControllerContract = AaveIncentivesController.bind(
+    tryIncentiveController.value
+  );
+  const tryBorrowRewards = incentiveControllerContract.try_assets(
+    Address.fromBytes(market._vToken!)
+  );
+  const trySupplyRewards = incentiveControllerContract.try_assets(
+    Address.fromBytes(market.outputToken!)
+  );
+  const tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
+
+  if (tryRewardAsset.reverted) {
+    log.warning(
+      "[updateRewards]REWARD_TOKEN() call for AaveIncentivesController contract {} is reverted",
+      [tryIncentiveController.value.toHexString()]
+    );
+    return;
+  }
+  // create reward tokens
+  const tokenManager = new TokenManager(tryRewardAsset.value, event);
+  const rewardToken = tokenManager.getToken();
+  const vBorrowRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.VARIABLE_BORROW
+  );
+  const sBorrowRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.STABLE_BORROW
+  );
+  const depositRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.DEPOSIT
   );
 
-  const config = storedData
-    .bitAnd(configMaskBigInt)
-    .rightShift(startBitPosition);
-
-  return config;
-}
-
-function getIsIsolatedFlag(event: ethereum.Event): boolean {
-  let isIsolated = false;
-  const ISOLATE_MODE = "IsolationModeTotalDebtUpdated(address,uint256)";
-  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(ISOLATE_MODE));
-  const logs = event.receipt!.logs;
-  //IsolationModeTotalDebtUpdated emitted before Borrow's event.logIndex
-  // e.g. https://etherscan.io/tx/0x4b038b26555d4b6c057cd612057b39e6482a7c60eb44058ee61d299332efdf29#eventlog
-  const eventLogIndex = event.logIndex;
-  for (let i = 0; i < logs.length; i++) {
-    const thisLog = logs[i];
-    if (thisLog.topics.length > INT_ZERO) {
-      if (thisLog.logIndex.gt(eventLogIndex)) {
-        // no IsolationModeTotalDebtUpdated log before Borrow
-        break;
-      }
-      // topics[0] - signature
-      const logSignature = thisLog.topics[0];
-      if (thisLog.address == event.address && logSignature == eventSignature) {
-        log.info(
-          "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
-          [event.transaction.hash.toHexString()]
-        );
-        isIsolated = true;
-        break;
-      }
+  const rewardDecimals = rewardToken.decimals;
+  const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  // get reward token price
+  // get price of reward token (if stkAAVE it is tied to the price of AAVE)
+  let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+  if (
+    equalsIgnoreCase(dataSource.network(), Network.MAINNET) &&
+    defaultOracle &&
+    defaultOracle.oracle
+  ) {
+    // get staked token if possible to grab price of staked token
+    const stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
+    const tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
+    if (!tryStakedToken.reverted) {
+      rewardTokenPriceUSD = getAssetPriceInUSDC(
+        tryStakedToken.value,
+        Address.fromBytes(defaultOracle.oracle),
+        event.block.number
+      );
     }
   }
-  return isIsolated;
-}
 
-function getBalanceTransferAmount(event: ethereum.Event): BigInt {
-  let btAmount = BIGINT_ZERO;
-  const BALANCE_TRANSFER =
-    "BalanceTransfer(address, address, uint256, uint256)";
-  const eventSignature = crypto.keccak256(ByteArray.fromUTF8(BALANCE_TRANSFER));
-  const logs = event.receipt!.logs;
-  // BalanceTransfer emitted after Transfer's event.logIndex
-  // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
-  const eventLogIndex = event.logIndex;
-  for (let i = 0; i < logs.length; i++) {
-    const thisLog = logs[i];
-    if (thisLog.topics.length > INT_ZERO) {
-      if (thisLog.logIndex.le(eventLogIndex)) {
-        // skip event with logIndex < event.logIndex
-        continue;
-      }
-      // topics[0] - signature
-      const logSignature = thisLog.topics[0];
-      if (thisLog.address == event.address && logSignature == eventSignature) {
-        const UINT256_UINT256 = "(uint256,uint256)";
-        const decoded = ethereum.decode(UINT256_UINT256, thisLog.data);
-        if (!decoded) continue;
-
-        const logData = decoded.toTuple();
-        btAmount = logData[0].toBigInt();
-        log.info(
-          "[handleCollateralTransfer] BalanceTransfer amount= {} tx {}",
-          [btAmount.toString(), event.transaction.hash.toHexString()]
-        );
-        break;
-      }
-    }
+  // if reward token price was not found then use old method
+  if (
+    rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO) &&
+    defaultOracle &&
+    defaultOracle.oracle
+  ) {
+    rewardTokenPriceUSD = getAssetPriceInUSDC(
+      tryRewardAsset.value,
+      Address.fromBytes(defaultOracle.oracle),
+      event.block.number
+    );
   }
-  return btAmount;
+
+  // we check borrow first since it will show up first in graphql ordering
+  // see explanation in docs/Mapping.md#Array Sorting When Querying
+  if (!tryBorrowRewards.reverted) {
+    // update borrow rewards
+    const borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    const borrowRewardsPerDayUSD = borrowRewardsPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(rewardTokenPriceUSD);
+
+    const vBorrowRewardData = new RewardData(
+      vBorrowRewardToken,
+      borrowRewardsPerDay,
+      borrowRewardsPerDayUSD
+    );
+    const sBorrowRewardData = new RewardData(
+      sBorrowRewardToken,
+      borrowRewardsPerDay,
+      borrowRewardsPerDayUSD
+    );
+    manager.updateRewards(vBorrowRewardData);
+    manager.updateRewards(sBorrowRewardData);
+  }
+
+  if (!trySupplyRewards.reverted) {
+    // update deposit rewards
+    const supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    const supplyRewardsPerDayUSD = supplyRewardsPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(rewardTokenPriceUSD);
+    const depositRewardData = new RewardData(
+      depositRewardToken,
+      supplyRewardsPerDay,
+      supplyRewardsPerDayUSD
+    );
+    manager.updateRewards(depositRewardData);
+  }
 }
