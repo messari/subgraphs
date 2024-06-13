@@ -21,8 +21,10 @@ export namespace Versions {
   export const Schema110 = "1.1.0";
   export const Schema120 = "1.2.0";
   export const Schema130 = "1.3.0";
+  export const Schema140 = "1.4.0";
   export const Schema200 = "2.0.0";
   export const Schema201 = "2.0.1";
+  export const Schema210 = "2.1.0";
   export const Schema300 = "3.0.0";
   export const Schema301 = "3.0.1";
   export const Schema302 = "3.0.2";
@@ -45,7 +47,7 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
       return true;
     }
   } else if (schema === "generic") {
-    if (["2.1.1"].includes(versionStr)) {
+    if (["3.0.0"].includes(versionStr)) {
       return true;
     }
   } else if (schema === "bridge") {
@@ -146,7 +148,7 @@ export interface Schema {
   protocolFields: { [x: string]: string };
   query: string;
   financialsQuery: string;
-  hourlyUsageQuery: string;
+  hourlyUsageQuery?: string;
   dailyUsageQuery: string;
   protocolTableQuery: string;
   poolsQuery: string;
