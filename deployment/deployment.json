@@ -10722,5 +10722,39 @@
         }
       }
     }
+  },
+  "swell-liquid-staking": {
+    "schema": "generic",
+    "base": "swell-liquid-staking",
+    "protocol": "swell-liquid-staking",
+    "project": "swell-liquid-staking",
+    "deployments": {
+      "swell-liquid-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "swell.liquid.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "swell-liquid-staking-ethereum",
+            "query-id": "swell-liquid-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "swell-liquid-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
