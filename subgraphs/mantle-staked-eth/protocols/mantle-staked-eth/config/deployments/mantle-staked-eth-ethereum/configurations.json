@@ -1,0 +1,16 @@
+{
+  "deployment": "MANTLE_STAKED_ETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "staking": {
+    "address": "0xe3cbd06d7dadb3f4e6557bab7edd924cd1489e8f",
+    "startBlock": "18290598"
+  },
+  "returnsAggregator": {
+    "address": "0x1766be66fbb0a1883d41b4cfb0a533c5249d3b82",
+    "startBlock": "18290595"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

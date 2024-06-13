@@ -10498,5 +10498,263 @@
         }
       }
     }
+  },
+  "frax-ether-staking": {
+    "schema": "generic",
+    "base": "frax-ether-staking",
+    "protocol": "frax-ether-staking",
+    "project": "frax-ether-staking",
+    "deployments": {
+      "frax-ether-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-ethereum",
+            "query-id": "frax-ether-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "frax-ether-staking-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-arbitrum",
+            "query-id": "frax-ether-staking-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-arbitrum",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "frax-ether-staking-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-bsc",
+            "query-id": "frax-ether-staking-bsc"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-bsc",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "frax-ether-staking-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-fantom",
+            "query-id": "frax-ether-staking-fantom"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-fantom",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "frax-ether-staking-moonbeam": {
+        "network": "moonbeam",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-moonbeam",
+            "query-id": "frax-ether-staking-moonbeam"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-moonbeam",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "frax-ether-staking-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-optimism",
+            "query-id": "frax-ether-staking-optimism"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-optimism",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "frax-ether-staking-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "frax.ether.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "frax-ether-staking-polygon",
+            "query-id": "frax-ether-staking-polygon"
+          },
+          "decentralized-network": {
+            "slug": "frax-ether-staking-polygon",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "mantle-staked-eth": {
+    "schema": "generic",
+    "base": "mantle-staked-eth",
+    "protocol": "mantle-staked-eth",
+    "project": "mantle-staked-eth",
+    "deployments": {
+      "mantle-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mantle-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mantle-staked-eth-ethereum",
+            "query-id": "mantle-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mantle-staked-eth-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "swell-liquid-staking": {
+    "schema": "generic",
+    "base": "swell-liquid-staking",
+    "protocol": "swell-liquid-staking",
+    "project": "swell-liquid-staking",
+    "deployments": {
+      "swell-liquid-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "swell.liquid.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "swell-liquid-staking-ethereum",
+            "query-id": "swell-liquid-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "swell-liquid-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
