@@ -1,0 +1,12 @@
+{
+  "deployment": "FRAX_ETHER_STAKING_OPTIMISM",
+  "network": "optimism",
+  "file": "./src/mappings/handlers.ts",
+  "sfrxeth": {
+    "address": "0x484c2D6e3cDd945a8B2DF735e079178C1036578c",
+    "startBlock": "62701957"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

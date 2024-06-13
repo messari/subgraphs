@@ -1,13 +1,12 @@
 import {
-  Protocol as ProtocolSchema,
+  _ActivityHelper,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
-  UsageMetricsHourlySnapshot,
-  _ActivityHelper,
+  Protocol as ProtocolSchema,
 } from "../../../../generated/schema";
 import { AccountWasActive } from "./account";
 import { Bytes } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
+import { SECONDS_PER_DAY } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
@@ -17,8 +16,8 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  2.1.1
- * SDK Version:     1.0.1
+ * Schema Version:  3.0.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @steegecs
  *  - @shashwatS22
@@ -50,26 +49,17 @@ export class ProtocolSnapshot {
 
   addActiveUser(activity: AccountWasActive): void {
     this.activityHelper.dailyActiveUsers += activity.daily ? 1 : 0;
-    this.activityHelper.hourlyActiveUsers += activity.hourly ? 1 : 0;
     this.activityHelper.save();
   }
 
   private takeSnapshots(): void {
     const snapshotDayID =
       this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
-    const snapshotHourID =
-      this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
       this.takeUsageDailySnapshot(snapshotDayID);
       this.protocol.lastSnapshotDayID = snapshotDayID;
-      this.protocol.save();
-    }
-
-    if (snapshotHourID != this.hourID) {
-      this.takeUsageHourlySnapshot(snapshotHourID);
-      this.protocol.lastSnapshotHourID = snapshotHourID;
       this.protocol.save();
     }
   }
@@ -87,8 +77,6 @@ export class ProtocolSnapshot {
 
     // tvl
     snapshot.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
-    snapshot.protocolControlledValueUSD =
-      this.protocol.protocolControlledValueUSD;
 
     // revenues
     snapshot.cumulativeSupplySideRevenueUSD =
@@ -162,43 +150,6 @@ export class ProtocolSnapshot {
     activity.dailyActiveUsers = 0;
     activity.save();
   }
-
-  private takeUsageHourlySnapshot(hour: i32): void {
-    const activity = this.activityHelper;
-
-    const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
-    const previousSnapshot = UsageMetricsHourlySnapshot.load(
-      Bytes.fromI32(this.protocol.lastSnapshotHourID)
-    );
-
-    snapshot.protocol = this.protocol.id;
-    snapshot.hour = hour;
-    snapshot.blockNumber = this.event.block.number;
-    snapshot.timestamp = this.event.block.timestamp;
-
-    // unique users
-    snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
-
-    // hourly activity
-    snapshot.hourlyActiveUsers = activity.hourlyActiveUsers;
-
-    // transaction counts
-    snapshot.cumulativeTransactionCount =
-      this.protocol.cumulativeTransactionCount;
-
-    // deltas
-    let transactionDelta = snapshot.cumulativeTransactionCount;
-    if (previousSnapshot) {
-      transactionDelta =
-        snapshot.cumulativeTransactionCount -
-        previousSnapshot.cumulativeTransactionCount;
-    }
-    snapshot.hourlyTransactionCount = transactionDelta;
-    snapshot.save();
-
-    activity.hourlyActiveUsers = 0;
-    activity.save();
-  }
 }
 
 function initActivityHelper(): _ActivityHelper {
@@ -207,7 +158,6 @@ function initActivityHelper(): _ActivityHelper {
     return helper;
   }
   helper = new _ActivityHelper(ActivityHelperID);
-  helper.hourlyActiveUsers = 0;
   helper.dailyActiveUsers = 0;
 
   helper.save();

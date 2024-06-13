@@ -1,0 +1,12 @@
+{
+  "deployment": "FRAX_ETHER_STAKING_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "sfrxeth": {
+    "address": "0x95ab45875cffdba1e5f451b950bc2e42c0053f39",
+    "startBlock": "51698320"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
