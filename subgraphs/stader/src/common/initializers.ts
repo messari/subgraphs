@@ -48,16 +48,3 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
 
   return pool;
 }
-
-export function updatePoolTVL(pool: Pool): void {
-  const stakingContract = StakingPoolManager.bind(
-    Address.fromBytes(pool.getBytesID())
-  );
-
-  const protocolTVL = readValue<BigInt>(
-    stakingContract.try_totalAssets(),
-    constants.BIGINT_ZERO
-  );
-
-  pool.setInputTokenBalances([protocolTVL], true);
-}
