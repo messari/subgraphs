@@ -2,10 +2,9 @@ import { Versions } from "../versions";
 import { SDK } from "../sdk/protocols/generic";
 import * as constants from "../common/constants";
 import { Pool } from "../sdk/protocols/generic/pool";
-import { Pricer, TokenInit, readValue } from "./utils";
+import { Pricer, TokenInit } from "./utils";
 import { ProtocolConfig } from "../sdk/protocols/config";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { StakingPoolManager } from "../../generated/StakingPoolManager/StakingPoolManager";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(

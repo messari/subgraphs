@@ -1,7 +1,4 @@
-import {
-  getOrCreatePool,
-  initializeSDKFromEvent,
-} from "../common/initializers";
+import { initializeSDKFromEvent } from "../common/initializers";
 import { Deposited } from "../../generated/StakingPoolManager/StakingPoolManager";
 
 export function handleDeposited(event: Deposited): void {
