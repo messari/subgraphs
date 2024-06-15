@@ -1,0 +1,30 @@
+{
+  "network": "mainnet",
+
+  "StakingPoolManager": {
+    "address": "0xcf5ea1b38380f6af39068375516daf40ed70d299",
+    "startBlock": "17433382"
+  },
+
+  "StaderOracle": {
+    "address": "0xf64bae65f6f2a5277571143a24faafdfc0c2a737",
+    "startBlock": "17490416"
+  },
+
+  "SocializingPools": [
+    {
+      "name": "PermissionedSocializingPool",
+      "address": "0x9d4c3166c59412cedbe7d901f5fde41903a1d6fc",
+      "startBlock": "17416150"
+    },
+    {
+      "name": "PermissionlessSocializingPool",
+      "address": "0x1de458031bfbe5689ded5a8b9ed57e1e79eab2a4",
+      "startBlock": "17416150"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
