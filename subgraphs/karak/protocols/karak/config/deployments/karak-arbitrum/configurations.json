@@ -1,0 +1,16 @@
+{
+  "deployment": "KARAK_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "vaultSupervisor": {
+    "address": "0x399f22ae52a18382a67542b3de9bed52b7b9a4ad",
+    "startBlock": "197660972"
+  },
+  "delegationSupervisor": {
+    "address": "0x48769803c0449532bd23db3a413152632753c8f0",
+    "startBlock": "197660998"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

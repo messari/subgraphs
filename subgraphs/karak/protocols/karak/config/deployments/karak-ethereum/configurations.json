@@ -1,0 +1,16 @@
+{
+  "deployment": "KARAK_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "vaultSupervisor": {
+    "address": "0x54e44dbb92dba848ace27f44c0cb4268981ef1cc",
+    "startBlock": "19588141"
+  },
+  "delegationSupervisor": {
+    "address": "0xafa904152e04abff56701223118be2832a4449e0",
+    "startBlock": "19588142"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
