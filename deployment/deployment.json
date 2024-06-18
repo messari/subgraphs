@@ -11235,8 +11235,8 @@
           }
         }
       },
-      "renzo-blast": {
-        "network": "blast",
+      "renzo-blast-mainnet": {
+        "network": "blast-mainnet",
         "status": "prod",
         "versions": {
           "schema": "3.0.0",
@@ -11252,11 +11252,11 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "renzo-blast",
-            "query-id": "renzo-blast"
+            "slug": "renzo-blast-mainnet",
+            "query-id": "renzo-blast-mainnet"
           },
           "decentralized-network": {
-            "slug": "renzo-blast",
+            "slug": "renzo-blast-mainnet",
             "query-id": "TODO"
           }
         }

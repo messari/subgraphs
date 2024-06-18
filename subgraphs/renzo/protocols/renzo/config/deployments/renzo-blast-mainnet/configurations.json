@@ -1,5 +1,5 @@
 {
-  "network": "blast",
+  "network": "blast-mainnet",
 
   "RestakeManager": {
     "address": "0xe65843850106421eab49dd43d19fa2d75fc19a75",
