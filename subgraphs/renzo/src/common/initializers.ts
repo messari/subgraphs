@@ -6,7 +6,7 @@ import { ProtocolConfig } from "../sdk/protocols/config";
 import { ERC20 } from "../../generated/RestakeManager/ERC20";
 import { Pricer, TokenInit, readValue } from "../common/utils";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { DepositQueue } from "../../generated/DepositQueue/DepositQueue";
+import { DepositQueue } from "../../generated/RestakeManager/DepositQueue";
 import { RestakeManager } from "../../generated/RestakeManager/RestakeManager";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
@@ -82,4 +82,26 @@ export function getRestakeManagerAddress(depositQueue: Address): Address {
   );
 
   return outputTokenSupply;
+}
+
+export function updatePoolTvlAndSupplyL2(pool: Pool): void {
+  // Update pool TVL for layer2 forks
+  const poolContract = RestakeManager.bind(
+    Address.fromBytes(pool.getBytesID())
+  );
+
+  const xezEthAddress = readValue<Address>(
+    poolContract.try_xezETH(),
+    Address.fromString(constants.ZERO_ADDRESS)
+  );
+
+  const xezEthContract = ERC20.bind(xezEthAddress);
+
+  const tvl = readValue<BigInt>(
+    xezEthContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+
+  pool.setInputTokenBalances([tvl], true);
+  pool.setOutputTokenSupply(tvl);
 }

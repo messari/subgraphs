@@ -9,6 +9,7 @@ graft:
   block: {{ graftStartBlock }} # Block number
 {{/graftEnabled}}
 dataSources:
+  {{ #RestakeManager }}
   - kind: ethereum
     network: {{ network }}
     name: RestakeManager
@@ -25,6 +26,8 @@ dataSources:
       abis:
         - name: RestakeManager
           file: ./abis/RestakeManager.json
+        - name: DepositQueue
+          file: ./abis/DepositQueue.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -61,12 +64,16 @@ dataSources:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositL2
         - event: Deposit(address,address,uint256,uint256,uint256)
           handler: handleDeposit
         - event: UserWithdrawCompleted(bytes32,address,address,uint256,uint256)
           handler: handleUserWithdrawCompleted
       file: ./src/mappings/restakeManagerMappings.ts
+  {{ /RestakeManager }}
 
+  {{ #DepositQueue }}
   - kind: ethereum
     network: {{ network }}
     name: DepositQueue
@@ -124,3 +131,4 @@ dataSources:
         - event: ProtocolFeesPaid(address,uint256,address)
           handler: handleProtocolFeesPaid
       file: ./src/mappings/depositQueueMappings.ts
+  {{ /DepositQueue }}

@@ -11182,6 +11182,110 @@
             "query-id": "TODO"
           }
         }
+      },
+      "renzo-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "renzo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "renzo-arbitrum",
+            "query-id": "renzo-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "renzo-arbitrum",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "renzo-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "renzo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "renzo-base",
+            "query-id": "renzo-base"
+          },
+          "decentralized-network": {
+            "slug": "renzo-base",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "renzo-blast": {
+        "network": "blast",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "renzo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "renzo-blast",
+            "query-id": "renzo-blast"
+          },
+          "decentralized-network": {
+            "slug": "renzo-blast",
+            "query-id": "TODO"
+          }
+        }
+      },
+      "renzo-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "renzo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "renzo-bsc",
+            "query-id": "renzo-bsc"
+          },
+          "decentralized-network": {
+            "slug": "renzo-bsc",
+            "query-id": "TODO"
+          }
+        }
       }
     }
   }
