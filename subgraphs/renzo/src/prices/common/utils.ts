@@ -2,6 +2,7 @@ import * as BSC from "../config/bsc";
 import * as CELO from "../config/celo";
 import * as FUSE from "../config/fuse";
 import * as XDAI from "../config/gnosis";
+import * as BLAST from "../config/blast";
 import * as CRONOS from "../config/cronos";
 import * as AURORA from "../config/aurora";
 import * as FANTOM from "../config/fantom";
@@ -105,6 +106,8 @@ export function getConfig(): Configurations {
     return new CELO.config();
   } else if (network == FUSE.NETWORK_STRING) {
     return new FUSE.config();
+  } else if (network == BLAST.NETWORK_STRING) {
+    return new BLAST.config();
   }
 
   return new TEMPLATE.config();
