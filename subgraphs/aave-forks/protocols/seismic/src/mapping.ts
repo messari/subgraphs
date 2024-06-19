@@ -470,7 +470,10 @@ function getAssetPriceInUSDC(
   }
 
   // Avalanche Oracle return the price offset by 8 decimals
-  if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
+  if (
+    equalsIgnoreCase(dataSource.network(), Network.AVALANCHE) ||
+    equalsIgnoreCase(dataSource.network(), Network.BLAST_MAINNET)
+  ) {
     return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
   }
 
