@@ -18,6 +18,7 @@ import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
 import { Address, ethereum, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
 import { PoolTemplate } from "../../generated/templates";
+import { Versions } from "../versions";
 
 export function getOrCreateLiquidityPool(
   address: Address,
@@ -96,9 +97,9 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(constants.REGISTRY_ADDRESS.toHexString());
     protocol.name = constants.PROTOCOL_NAME;
     protocol.slug = constants.PROTOCOL_SLUG;
-    protocol.schemaVersion = constants.PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.PROTOCOL_METHODOLOGY_VERSION;
+    protocol.schemaVersion = Versions.getSchemaVersion();
+    protocol.subgraphVersion = Versions.getSubgraphVersion();
+    protocol.methodologyVersion = Versions.getMethodologyVersion();
     protocol.network = constants.Network.BSC;
     protocol.type = constants.ProtocolType.EXCHANGE;
 
