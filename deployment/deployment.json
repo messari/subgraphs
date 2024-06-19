@@ -675,6 +675,246 @@
       }
     }
   },
+  "kinza-finance": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "kinza-finance",
+    "project": "kinza-finance",
+    "deployments": {
+      "kinza-finance-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kinza.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kinza-finance-bsc",
+            "query-id": "kinza-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "kinza-finance-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "seismic": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "seismic",
+    "project": "seismic",
+    "deployments": {
+      "seismic-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "seismic.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "seismic-blast",
+            "query-id": "seismic-blast"
+          },
+          "decentralized-network": {
+            "slug": "seismic-blast",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "pac-finance": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "pac-finance",
+    "project": "pac-finance",
+    "deployments": {
+      "pac-finance-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pac.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pac-finance-blast",
+            "query-id": "pac-finance-blast"
+          },
+          "decentralized-network": {
+            "slug": "pac-finance-blast",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "zerolend": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "zerolend",
+    "project": "zerolend",
+    "deployments": {
+      "zerolend-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-ethereum",
+            "query-id": "zerolend-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-blast",
+            "query-id": "zerolend-blast"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-blast",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-zksync-era": {
+        "network": "zksync-era",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-zksync-era",
+            "query-id": "zerolend-zksync-era"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-zksync-era",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-linea": {
+        "network": "linea",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-linea",
+            "query-id": "zerolend-linea"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-linea",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-xlayer": {
+        "network": "xlayer-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-xlayer",
+            "query-id": "zerolend-xlayer"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-xlayer",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "alpaca-finance-lending": {
     "schema": "lending",
     "base": "alpaca-finance-lending",

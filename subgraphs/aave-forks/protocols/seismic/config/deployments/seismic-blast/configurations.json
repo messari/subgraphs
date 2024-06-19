@@ -1,0 +1,18 @@
+{
+  "network": "blast-mainnet",
+  "factory": {
+    "startBlock": "2586743",
+    "address": "0x98eCDB245dC5cc0D8F4A6E8a42C953e0DE5cb133"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "2586786",
+    "address": "0x2270735CB61D1dF462dbd4c49EC5BD5482e82312"
+  },
+  "lendingPool": {
+    "startBlock": "2586778",
+    "address": "0x83d55e27b8033b6D5874CBb3c9252c4Bfdb2bC75"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}
