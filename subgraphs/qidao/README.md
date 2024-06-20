@@ -57,7 +57,6 @@ Polygon Treasury [0xc63c477465a792537d291adb32ed15c0095e106b](https://debank.com
 
 The total revenue can be calculated by summing the
 
-
 1. Yield from LP Pools
 2. Interaction fees (repay, swap, lp deposit, liquidations)
 
@@ -67,10 +66,9 @@ or `Total Revenue (USD) =  Supply Side Revenue (USD) + Protocol Revenue (USD)`
 
 **Supply Side Revenue USD**
 
-Supply side revenue can be determined by omitting the interaction fees that go to the protocol. 
+Supply side revenue can be determined by omitting the interaction fees that go to the protocol.
 
 `Supply Side Revenue (USD) = supply side Interaction fees + supply side Pool Yield`
-
 
 **Protocol Revenue USD**
 
@@ -96,7 +94,7 @@ Substituting in fee breakdown, we can rearrange to
 
 where percentage multipliers, and staking reward LP pool share are subject to change with DAO policy.
 
-Rewards are currently calculated offchain. 
+Rewards are currently calculated offchain.
 
 ## Pool-Level Metrics
 
