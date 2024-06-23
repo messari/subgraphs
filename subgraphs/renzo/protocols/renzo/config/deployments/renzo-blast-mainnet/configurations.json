@@ -1,6 +1,10 @@
 {
   "network": "blast-mainnet",
 
+  "DepositQueue": {
+    "address": "0xe65843850106421eab49dd43d19fa2d75fc19a75",
+    "startBlock": "1031132"
+  },
   "ezETH": {
     "address": "0x2416092f143378750bb29b79ed961ab195cceea5",
     "startBlock": "722967"

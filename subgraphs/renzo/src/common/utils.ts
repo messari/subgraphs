@@ -2,8 +2,8 @@ import { Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { TokenPricer } from "../sdk/protocols/config";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
+import { ERC20 } from "../../generated/DepositQueue/ERC20";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
-import { ERC20 } from "../../generated/RestakeManager/ERC20";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { TokenParams, TokenInitializer } from "../sdk/protocols/generic/tokens";
 

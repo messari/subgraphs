@@ -3,11 +3,11 @@ import { SDK } from "../sdk/protocols/generic";
 import * as constants from "../common/constants";
 import { Pool } from "../sdk/protocols/generic/pool";
 import { ProtocolConfig } from "../sdk/protocols/config";
-import { ERC20 } from "../../generated/RestakeManager/ERC20";
+import { ERC20 } from "../../generated/DepositQueue/ERC20";
 import { Pricer, TokenInit, readValue } from "../common/utils";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { DepositQueue } from "../../generated/RestakeManager/DepositQueue";
-import { RestakeManager } from "../../generated/RestakeManager/RestakeManager";
+import { DepositQueue } from "../../generated/DepositQueue/DepositQueue";
+import { RestakeManager } from "../../generated/DepositQueue/RestakeManager";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(

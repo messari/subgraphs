@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/RestakeManager/YearnLensContract";
+import { YearnLensContract } from "../../../generated/DepositQueue/YearnLensContract";
 
 export function getYearnLensContract(
   contract: OracleContract,

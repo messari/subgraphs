@@ -1,7 +1,11 @@
 {
   "network": "base",
 
-  "RestakeManager": {
+  "DepositQueue": {
+    "address": "0x4d7572040b84b41a6aa2efe4a93efff182388f88",
+    "startBlock": "5005667"
+  },
+  "ezETH": {
     "address": "0x2416092f143378750bb29b79ed961ab195cceea5",
     "startBlock": "4749150"
   },
