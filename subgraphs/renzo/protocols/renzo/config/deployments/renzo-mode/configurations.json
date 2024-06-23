@@ -1,9 +1,9 @@
 {
-  "network": "arbitrum-one",
+  "network": "base",
 
-  "ezETH": {
+  "RestakeManager": {
     "address": "0x2416092f143378750bb29b79ed961ab195cceea5",
-    "startBlock": "185410162"
+    "startBlock": "4749150"
   },
 
   "graftEnabled": false,

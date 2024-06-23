@@ -29,6 +29,17 @@ export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   return sdk;
 }
 
+export function getEzEthAddress(depositAddress: Address): Address {
+  const contract = RestakeManager.bind(depositAddress);
+
+  const xezEthAddress = readValue<Address>(
+    contract.try_xezETH(),
+    Address.fromString(constants.EZETH_ADDRESS)
+  );
+
+  return xezEthAddress;
+}
+
 export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 
@@ -37,7 +48,7 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
       Address.fromString(constants.ETH_ADDRESS)
     );
     const outputToken = sdk.Tokens.getOrCreateToken(
-      Address.fromString(constants.EZETH_ADDRESS)
+      getEzEthAddress(Address.fromBytes(pool.getBytesID()))
     );
 
     pool.initialize(
@@ -82,26 +93,4 @@ export function getRestakeManagerAddress(depositQueue: Address): Address {
   );
 
   return outputTokenSupply;
-}
-
-export function updatePoolTvlAndSupplyL2(pool: Pool): void {
-  // Update pool TVL for layer2 forks
-  const poolContract = RestakeManager.bind(
-    Address.fromBytes(pool.getBytesID())
-  );
-
-  const xezEthAddress = readValue<Address>(
-    poolContract.try_xezETH(),
-    Address.fromString(constants.ZERO_ADDRESS)
-  );
-
-  const xezEthContract = ERC20.bind(xezEthAddress);
-
-  const tvl = readValue<BigInt>(
-    xezEthContract.try_totalSupply(),
-    constants.BIGINT_ZERO
-  );
-
-  pool.setInputTokenBalances([tvl], true);
-  pool.setOutputTokenSupply(tvl);
 }
