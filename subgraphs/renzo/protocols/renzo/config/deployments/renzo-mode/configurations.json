@@ -1,5 +1,5 @@
 {
-  "network": "base",
+  "network": "mode-mainnet",
 
   "DepositQueue": {
     "address": "0x4d7572040b84b41a6aa2efe4a93efff182388f88",
