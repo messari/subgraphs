@@ -540,7 +540,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.4.0",
+          "subgraph": "1.4.1",
           "methodology": "1.1.0"
         },
         "files": {
@@ -669,6 +669,246 @@
           },
           "decentralized-network": {
             "slug": "seamless-protocol-base",
+            "query-id": "2u4mWUV4xS19ef1MbnxZHWLLMwdPxtVifH46JbonXwXP"
+          }
+        }
+      }
+    }
+  },
+  "kinza-finance": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "kinza-finance",
+    "project": "kinza-finance",
+    "deployments": {
+      "kinza-finance-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kinza.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kinza-finance-bsc",
+            "query-id": "kinza-finance-bsc"
+          },
+          "decentralized-network": {
+            "slug": "kinza-finance-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "seismic": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "seismic",
+    "project": "seismic",
+    "deployments": {
+      "seismic-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "seismic.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "seismic-blast",
+            "query-id": "seismic-blast"
+          },
+          "decentralized-network": {
+            "slug": "seismic-blast",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "pac-finance": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "pac-finance",
+    "project": "pac-finance",
+    "deployments": {
+      "pac-finance-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pac.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pac-finance-blast",
+            "query-id": "pac-finance-blast"
+          },
+          "decentralized-network": {
+            "slug": "pac-finance-blast",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "zerolend": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "zerolend",
+    "project": "zerolend",
+    "deployments": {
+      "zerolend-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-ethereum",
+            "query-id": "zerolend-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-blast",
+            "query-id": "zerolend-blast"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-blast",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-zksync-era": {
+        "network": "zksync-era",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-zksync-era",
+            "query-id": "zerolend-zksync-era"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-zksync-era",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-linea": {
+        "network": "linea",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-linea",
+            "query-id": "zerolend-linea"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-linea",
+            "query-id": "todo"
+          }
+        }
+      },
+      "zerolend-xlayer": {
+        "network": "xlayer-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zerolend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zerolend-xlayer",
+            "query-id": "zerolend-xlayer"
+          },
+          "decentralized-network": {
+            "slug": "zerolend-xlayer",
             "query-id": "todo"
           }
         }
@@ -2135,7 +2375,7 @@
           },
           "decentralized-network": {
             "slug": "moonwell-base",
-            "query-id": "todo"
+            "query-id": "33ex1ExmYQtwGVwri1AP3oMFPGSce6YbocBP7fWbsBrg"
           }
         }
       }
@@ -2426,7 +2666,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.1.0",
+          "subgraph": "2.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2712,7 +2952,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3503,7 +3743,7 @@
           },
           "decentralized-network": {
             "slug": "morpho-aave-v3-ethereum",
-            "query-id": "TODO"
+            "query-id": "FKe6ANnWmGPE6hajGLoTgPrVF2jYPHiRu2Jwcg9ZmG9A"
           }
         }
       }
@@ -7798,7 +8038,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.4.0",
-          "subgraph": "1.0.3",
+          "subgraph": "1.0.4",
           "methodology": "1.0.0"
         },
         "services": {
@@ -10465,6 +10705,40 @@
       }
     }
   },
+  "stader": {
+    "schema": "generic",
+    "base": "stader",
+    "protocol": "stader",
+    "project": "stader",
+    "deployments": {
+      "stader-ethereum": {
+        "network": "mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stader.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stader-ethereum",
+            "query-id": "stader-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stader-ethereum",
+            "query-id": "2RLAUqUMvGGFygtuJfmTyeo62zFSJswDZSRMTcu28fSa"
+          }
+        }
+      }
+    }
+  },
   "etherfi": {
     "schema": "generic",
     "base": "etherfi",
@@ -10493,7 +10767,7 @@
           },
           "decentralized-network": {
             "slug": "etherfi-ethereum",
-            "query-id": "TODO"
+            "query-id": "GPwCNqJ5aroTtkk48Y57pBjFHVkeYmMzmBpE1a7WF7Hc"
           }
         }
       }
@@ -10527,7 +10801,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-ethereum",
-            "query-id": "TODO"
+            "query-id": "FeKHrGeNxVctN6EeAhba2Kv78xNxuEhbRKNECLfVH8z2"
           }
         }
       },
@@ -10553,7 +10827,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-arbitrum",
-            "query-id": "TODO"
+            "query-id": "FSafXUhkuwqARZNNe82isspkjQJcPK2PrSjQLvNXuakU"
           }
         }
       },
@@ -10579,7 +10853,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-bsc",
-            "query-id": "TODO"
+            "query-id": "A113zHKpiXzugLyKDVknAxjQ6qFSPQwfiGK7rjiuqbcq"
           }
         }
       },
@@ -10605,7 +10879,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-fantom",
-            "query-id": "TODO"
+            "query-id": "Ba52AgUJfCmWQpBJEwRvygC45iGr9uqnrehpymN2Xmx4"
           }
         }
       },
@@ -10631,7 +10905,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-moonbeam",
-            "query-id": "TODO"
+            "query-id": "FhaAErF9146bnqJsQD34zPHNC11quKTuk9HBA7RdGrjz"
           }
         }
       },
@@ -10657,7 +10931,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-optimism",
-            "query-id": "TODO"
+            "query-id": "G9nDvQw6S7LkzNxj7oGFZUsahe3ebpAtEww716kWkfZd"
           }
         }
       },
@@ -10683,7 +10957,7 @@
           },
           "decentralized-network": {
             "slug": "frax-ether-staking-polygon",
-            "query-id": "TODO"
+            "query-id": "FMkrjPgSyGm2UBFrMqpJVwWgGHLek8U39W1M4R9TfP1T"
           }
         }
       }
@@ -10717,7 +10991,7 @@
           },
           "decentralized-network": {
             "slug": "mantle-staked-eth-ethereum",
-            "query-id": "todo"
+            "query-id": "VVKZagj4XUyamqXysVBniarN8HMz87DnwkTChuXH18Z"
           }
         }
       }
@@ -10751,7 +11025,7 @@
           },
           "decentralized-network": {
             "slug": "swell-liquid-staking-ethereum",
-            "query-id": "todo"
+            "query-id": "F8nUFWAC9vE1gHcUj5ZHXSt53eXo9vRqf2SuCcYVs93S"
           }
         }
       }
@@ -10785,7 +11059,7 @@
           },
           "decentralized-network": {
             "slug": "puffer-finance-ethereum",
-            "query-id": "TODO"
+            "query-id": "F8nUFWAC9vE1gHcUj5ZHXSt53eXo9vRqf2SuCcYVs93S"
           }
         }
       }

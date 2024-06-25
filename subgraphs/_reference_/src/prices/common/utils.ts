@@ -1,10 +1,14 @@
 import * as BSC from "../config/bsc";
+import * as BASE from "../config/base";
+import * as MODE from "../config/mode";
 import * as CELO from "../config/celo";
 import * as FUSE from "../config/fuse";
 import * as XDAI from "../config/gnosis";
+import * as BLAST from "../config/blast";
 import * as CRONOS from "../config/cronos";
 import * as AURORA from "../config/aurora";
 import * as FANTOM from "../config/fantom";
+import * as SCROLL from "../config/scroll";
 import * as POLYGON from "../config/polygon";
 import * as MAINNET from "../config/mainnet";
 import * as HARMONY from "../config/harmony";
@@ -12,6 +16,8 @@ import * as MOONBEAM from "../config/moonbeam";
 import * as OPTIMISM from "../config/optimism";
 import * as AVALANCHE from "../config/avalanche";
 import * as ARBITRUM_ONE from "../config/arbitrum";
+import * as ZKSYNC_ERA from "../config/zksync_era";
+import * as POLYGON_ZKEVM from "../config/polygon_zkevm";
 
 import { Configurations, CustomPriceType } from "./types";
 import * as constants from "./constants";
@@ -105,6 +111,18 @@ export function getConfig(): Configurations {
     return new CELO.config();
   } else if (network == FUSE.NETWORK_STRING) {
     return new FUSE.config();
+  } else if (network == BLAST.NETWORK_STRING) {
+    return new BLAST.config();
+  } else if (network == BASE.NETWORK_STRING) {
+    return new BASE.config();
+  } else if (network == MODE.NETWORK_STRING) {
+    return new MODE.config();
+  } else if (network == POLYGON_ZKEVM.NETWORK_STRING) {
+    return new POLYGON_ZKEVM.config();
+  } else if (network == SCROLL.NETWORK_STRING) {
+    return new SCROLL.config();
+  } else if (network == ZKSYNC_ERA.NETWORK_STRING) {
+    return new ZKSYNC_ERA.config();
   }
 
   return new TEMPLATE.config();

@@ -9,27 +9,30 @@ export namespace Network {
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
   export const AVALANCHE = "AVALANCHE";
+  export const BASE = "BASE";
+  export const BLAST_MAINNET = "BLAST_MAINNET";
   export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const COSMOS = "COSMOS";
   export const CRONOS = "CRONOS";
-  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const GNOSIS = "GNOSIS"; // aka xDAI
   export const HARMONY = "HARMONY";
   export const JUNO = "JUNO";
+  export const LINEA = "LINEA";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const MATIC = "MATIC"; // aka Polygon
+  export const METIS = "ANDROMEDA";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const OSMOSIS = "OSMOSIS";
-  export const MATIC = "MATIC"; // aka Polygon
-  export const GNOSIS = "GNOSIS"; // aka xDAI
-
-  export const METIS = "ANDROMEDA";
-  export const BASE = "BASE";
   export const SCROLL = "SCROLL";
+  export const XLAYER_MAINNET = "XLAYER_MAINNET";
+  export const ZKSYNC_ERA = "ZKSYNC_ERA";
 }
 
 export namespace ProtocolType {

@@ -1,0 +1,22 @@
+{
+  "network": "zksync-era",
+  "factory": {
+    "startBlock": "8776200",
+    "address": "0x4f285ea117ef0067b59853d6d16a5de8088ba259"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "8776623",
+    "address": "0x9c3058f7bfca6139ac3013999f57d7aa6a3ab1ed"
+  },
+  "lendingPool": {
+    "startBlock": "8776619",
+    "address": "0x4d9429246ea989c9cee203b43f6d1c7d83e3b8f8"
+  },
+  "RewardsController": {
+    "startBlock": "8776729",
+    "address": "0x54ab34ab3c723bd2674c7082aa6ffcdfd3a5bedc"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

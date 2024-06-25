@@ -1,0 +1,22 @@
+{
+  "network": "bsc",
+  "factory": {
+    "startBlock": 29232007,
+    "address": "0xca20a50ea454bd9f37a895182ff3309f251fd7ce"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": 29232426,
+    "address": "0xa5776459837651ed4de8ed922e123d5898efe5a2"
+  },
+  "LendingPool": {
+    "startBlock": 29232426,
+    "address": "0xcb0620b181140e57d1c0d8b724cde623ca963c8c"
+  },
+  "RewardsController": {
+    "startBlock": 29232522,
+    "address": "0x30b1a8c1a4a9dd9146d1166f992f4e1962683a67"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
