@@ -34,10 +34,7 @@ const conf = new ProtocolConfig(
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
-    const pricedToken = getUpdatedPricedToken(
-      dataSource.network(),
-      Address.fromBytes(token.id)
-    );
+    const pricedToken = getUpdatedPricedToken(Address.fromBytes(token.id));
     const pricedTokenAddr = pricedToken.addr;
     const pricedTokenMultiplier = pricedToken.multiplier;
     const pricedTokenChanged = pricedToken.changed;
@@ -63,10 +60,7 @@ class Pricer implements TokenPricer {
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
     const _amount = bigIntToBigDecimal(amount, token.decimals);
 
-    const pricedToken = getUpdatedPricedToken(
-      dataSource.network(),
-      Address.fromBytes(token.id)
-    );
+    const pricedToken = getUpdatedPricedToken(Address.fromBytes(token.id));
     const pricedTokenAddr = pricedToken.addr;
     const pricedTokenMultiplier = pricedToken.multiplier;
     const pricedTokenChanged = pricedToken.changed;

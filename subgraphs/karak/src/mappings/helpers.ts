@@ -1,4 +1,4 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 
 import { bigIntToBigDecimal } from "../prices/common/utils";
 import { WETH_ADDRESS as WETH_ADDRESS_MAINNET } from "../prices/config/mainnet";
@@ -33,14 +33,12 @@ export class PricedTokenParams {
   }
 }
 
-export function getUpdatedPricedToken(
-  network: String,
-  tokenAddr: Address
-): PricedTokenParams {
+export function getUpdatedPricedToken(tokenAddr: Address): PricedTokenParams {
   let pricedToken = tokenAddr;
   let multiplier = BIGDECIMAL_ONE;
   let changed = false;
 
+  const network = dataSource.network().toUpperCase().replace("-", "_");
   if (network == Network.MAINNET) {
     // Case: inputToken is mwBETH or mswETH
     if (
