@@ -3,29 +3,34 @@
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
+  ANDROMEDA # metis node
   ARBITRUM_ONE
   ARWEAVE_MAINNET
   AURORA
   AVALANCHE
+  BASE
+  BLAST_MAINNET
   BOBA
   BSC # aka BNB Chain
   CELO
   COSMOS
   CRONOS
-  MAINNET # Ethereum Mainnet
   FANTOM
   FUSE
+  GNOSIS
   HARMONY
   JUNO
+  LINEA
+  MAINNET # Ethereum Mainnet
+  MATIC # aka Polygon
   MOONBEAM
   MOONRIVER
   NEAR_MAINNET
   OPTIMISM
   OSMOSIS
-  MATIC # aka Polygon
-  GNOSIS
-  ANDROMEDA # metis node
-  BASE
+  SCROLL
+  XLAYER_MAINNET
+  ZKSYNC_ERA
 }
 
 enum ProtocolType {
