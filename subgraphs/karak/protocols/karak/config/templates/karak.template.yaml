@@ -76,6 +76,17 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Pendle Contracts
+        - name: PendlePT
+          file: ./abis/Prices/PendlePT.json
+        - name: PendleSY
+          file: ./abis/Prices/PendleSY.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
       eventHandlers:
         - event: NewVault(indexed address)
           handler: handleNewVault
@@ -147,6 +158,17 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Pendle Contracts
+        - name: PendlePT
+          file: ./abis/Prices/PendlePT.json
+        - name: PendleSY
+          file: ./abis/Prices/PendleSY.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
       eventHandlers:
         - event: StartedWithdrawal(indexed address,indexed address,indexed address,address,uint256)
           handler: handleStartedWithdrawal
@@ -217,6 +239,17 @@ templates:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Pendle Contracts
+        - name: PendlePT
+          file: ./abis/Prices/PendlePT.json
+        - name: PendleSY
+          file: ./abis/Prices/PendleSY.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
       eventHandlers:
         - event: Deposit(indexed address,indexed address,uint256,uint256)
           handler: handleDeposit

@@ -59,6 +59,9 @@ export const WETH_ADDRESS = Address.fromString(
 export const USDC_ADDRESS = Address.fromString(
   "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
 );
+export const BTC_ADDRESS = Address.fromString(
+  "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"
+);
 
 export class config implements Configurations {
   network(): string {

@@ -1,8 +1,15 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+  log,
+} from "@graphprotocol/graph-ts";
 
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { getUpdatedPricedToken } from "./helpers";
 
 import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
@@ -27,16 +34,60 @@ const conf = new ProtocolConfig(
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
-    const pricedToken = Address.fromBytes(token.id);
+    const pricedToken = getUpdatedPricedToken(
+      dataSource.network(),
+      Address.fromBytes(token.id)
+    );
+    const pricedTokenAddr = pricedToken.addr;
+    const pricedTokenMultiplier = pricedToken.multiplier;
+    const pricedTokenChanged = pricedToken.changed;
 
-    return getUsdPricePerToken(pricedToken).usdPrice;
+    const returnedPrice = getUsdPricePerToken(pricedTokenAddr).usdPrice.times(
+      pricedTokenMultiplier
+    );
+    if (pricedTokenChanged) {
+      log.debug(
+        "[getTokenPrice] inputToken: {} pricedToken: {} multiplier: {} returnedPrice: {}",
+        [
+          token.id.toHexString(),
+          pricedTokenAddr.toHexString(),
+          pricedTokenMultiplier.toString(),
+          returnedPrice.toString(),
+        ]
+      );
+    }
+
+    return returnedPrice;
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
-    const pricedToken = Address.fromBytes(token.id);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
 
-    return getUsdPrice(pricedToken, _amount);
+    const pricedToken = getUpdatedPricedToken(
+      dataSource.network(),
+      Address.fromBytes(token.id)
+    );
+    const pricedTokenAddr = pricedToken.addr;
+    const pricedTokenMultiplier = pricedToken.multiplier;
+    const pricedTokenChanged = pricedToken.changed;
+
+    const returnedPrice = getUsdPrice(pricedTokenAddr, _amount).times(
+      pricedTokenMultiplier
+    );
+    if (pricedTokenChanged) {
+      log.debug(
+        "[getAmountValueUSD] inputToken: {} pricedToken: {} multiplier: {} amount: {} returnedPrice: {}",
+        [
+          token.id.toHexString(),
+          pricedTokenAddr.toHexString(),
+          pricedTokenMultiplier.toString(),
+          _amount.toString(),
+          returnedPrice.toString(),
+        ]
+      );
+    }
+
+    return returnedPrice;
   }
 }
 
@@ -104,7 +155,7 @@ export function handleDeposit(event: Deposit): void {
   const token = sdk.Tokens.getOrCreateToken(asset);
   const outputToken = sdk.Tokens.getOrCreateToken(event.address);
 
-  const pool = sdk.Pools.loadPool(token.id);
+  const pool = sdk.Pools.loadPool(outputToken.id);
   if (!pool.isInitialized) {
     pool.initialize(
       outputToken.name,
@@ -150,7 +201,7 @@ export function handleWithdraw(event: Withdraw): void {
   const token = sdk.Tokens.getOrCreateToken(asset);
   const outputToken = sdk.Tokens.getOrCreateToken(event.address);
 
-  const pool = sdk.Pools.loadPool(token.id);
+  const pool = sdk.Pools.loadPool(outputToken.id);
   if (!pool.isInitialized) {
     pool.initialize(
       outputToken.name,
