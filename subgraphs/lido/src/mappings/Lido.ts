@@ -26,9 +26,14 @@ import {
   INT_TWO,
   INT_ZERO,
   INT_THREE,
+  BIGINT_MINUS_ONE,
 } from "../utils/constants";
 import { getOrCreatePool } from "../entities/pool";
 import { Lido } from "../../generated/Lido/Lido";
+import {
+  WithdrawalRequested,
+  WithdrawalClaimed,
+} from "../../generated/WithdrawalQueue/WithdrawalQueue";
 
 export function handleSubmit(event: Submitted): void {
   // update Token lastPrice and lastBlock
@@ -146,4 +151,37 @@ export function handleETHDistributed(event: ETHDistributed): void {
   updateTotalRevenueMetrics(event.block, totalRewards, supply);
   updateSupplySideRevenueMetrics(event.block);
   updateProtocolAndPoolTvl(event.block, BIGINT_ZERO);
+}
+
+export function handleWithdrawalRequested(event: WithdrawalRequested): void {
+  // update Token lastPrice and lastBlock
+  getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
+  getOrCreateToken(Address.fromString(PROTOCOL_ID), event.block.number);
+
+  const lido = Lido.bind(Address.fromString(PROTOCOL_ID));
+  const supply = lido.totalSupply();
+  const pool = getOrCreatePool(event.block.number, event.block.timestamp);
+  pool.outputTokenSupply = supply;
+  pool.save();
+
+  // update metrics
+  updateUsageMetrics(event.block, event.params.requestor);
+}
+
+export function handleWithdrawalClaimed(event: WithdrawalClaimed): void {
+  // update Token lastPrice and lastBlock
+  getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
+  getOrCreateToken(Address.fromString(PROTOCOL_ID), event.block.number);
+
+  const lido = Lido.bind(Address.fromString(PROTOCOL_ID));
+  const supply = lido.totalSupply();
+  const pool = getOrCreatePool(event.block.number, event.block.timestamp);
+  pool.outputTokenSupply = supply;
+  pool.save();
+
+  // update metrics
+  updateProtocolAndPoolTvl(
+    event.block,
+    event.params.amountOfETH.times(BIGINT_MINUS_ONE)
+  );
 }
