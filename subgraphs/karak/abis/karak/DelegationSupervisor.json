@@ -1,0 +1,639 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  { "inputs": [], "name": "AlreadyInitialized", "type": "error" },
+  { "inputs": [], "name": "ArrayLengthsNotEqual", "type": "error" },
+  { "inputs": [], "name": "EnforcedPause", "type": "error" },
+  { "inputs": [], "name": "ExpectedPause", "type": "error" },
+  { "inputs": [], "name": "InvalidInitialization", "type": "error" },
+  { "inputs": [], "name": "InvalidInput", "type": "error" },
+  { "inputs": [], "name": "InvalidWithdrawalDelay", "type": "error" },
+  { "inputs": [], "name": "MinWithdrawDelayNotPassed", "type": "error" },
+  { "inputs": [], "name": "NewOwnerIsZeroAddress", "type": "error" },
+  { "inputs": [], "name": "NoElementsInArray", "type": "error" },
+  { "inputs": [], "name": "NoHandoverRequest", "type": "error" },
+  { "inputs": [], "name": "NotInitializing", "type": "error" },
+  { "inputs": [], "name": "NotStaker", "type": "error" },
+  { "inputs": [], "name": "Reentrancy", "type": "error" },
+  { "inputs": [], "name": "Unauthorized", "type": "error" },
+  { "inputs": [], "name": "UnauthorizedCallContext", "type": "error" },
+  { "inputs": [], "name": "UpgradeFailed", "type": "error" },
+  { "inputs": [], "name": "WithdrawAlreadyCompleted", "type": "error" },
+  { "inputs": [], "name": "WithdrawerNotCaller", "type": "error" },
+  { "inputs": [], "name": "ZeroShares", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "EIP712DomainChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "withdrawer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "shares",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "withdrawRoot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FinishedWithdrawal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "pendingOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipHandoverCanceled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "pendingOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipHandoverRequested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roles",
+        "type": "uint256"
+      }
+    ],
+    "name": "RolesUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "withdrawer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "shares",
+        "type": "uint256"
+      }
+    ],
+    "name": "StartedWithdrawal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "cancelOwnershipHandover",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "pendingOwner", "type": "address" }
+    ],
+    "name": "completeOwnershipHandover",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "eip712Domain",
+    "outputs": [
+      { "internalType": "bytes1", "name": "fields", "type": "bytes1" },
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "string", "name": "version", "type": "string" },
+      { "internalType": "uint256", "name": "chainId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "verifyingContract",
+        "type": "address"
+      },
+      { "internalType": "bytes32", "name": "salt", "type": "bytes32" },
+      { "internalType": "uint256[]", "name": "extensions", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "staker", "type": "address" }
+    ],
+    "name": "fetchQueuedWithdrawals",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "staker", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "delegatedTo",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+          { "internalType": "uint256", "name": "start", "type": "uint256" },
+          {
+            "components": [
+              {
+                "internalType": "contract IVault[]",
+                "name": "vaults",
+                "type": "address[]"
+              },
+              {
+                "internalType": "uint256[]",
+                "name": "shares",
+                "type": "uint256[]"
+              },
+              {
+                "internalType": "address",
+                "name": "withdrawer",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct Withdraw.WithdrawRequest",
+            "name": "request",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Withdraw.QueuedWithdrawal[]",
+        "name": "queuedWithdrawals",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "staker", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "delegatedTo",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+          { "internalType": "uint256", "name": "start", "type": "uint256" },
+          {
+            "components": [
+              {
+                "internalType": "contract IVault[]",
+                "name": "vaults",
+                "type": "address[]"
+              },
+              {
+                "internalType": "uint256[]",
+                "name": "shares",
+                "type": "uint256[]"
+              },
+              {
+                "internalType": "address",
+                "name": "withdrawer",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct Withdraw.WithdrawRequest",
+            "name": "request",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Withdraw.QueuedWithdrawal[]",
+        "name": "startedWithdrawals",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "finishWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "roles", "type": "uint256" }
+    ],
+    "name": "grantRoles",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "roles", "type": "uint256" }
+    ],
+    "name": "hasAllRoles",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "roles", "type": "uint256" }
+    ],
+    "name": "hasAnyRole",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "vaultSupervisor",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minWithdrawDelay",
+        "type": "uint256"
+      },
+      { "internalType": "address", "name": "manager", "type": "address" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "staker", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "delegatedTo",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+          { "internalType": "uint256", "name": "start", "type": "uint256" },
+          {
+            "components": [
+              {
+                "internalType": "contract IVault[]",
+                "name": "vaults",
+                "type": "address[]"
+              },
+              {
+                "internalType": "uint256[]",
+                "name": "shares",
+                "type": "uint256[]"
+              },
+              {
+                "internalType": "address",
+                "name": "withdrawer",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct Withdraw.WithdrawRequest",
+            "name": "request",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Withdraw.QueuedWithdrawal",
+        "name": "withdrawal",
+        "type": "tuple"
+      }
+    ],
+    "name": "isWithdrawPending",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      { "internalType": "address", "name": "result", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "pendingOwner", "type": "address" }
+    ],
+    "name": "ownershipHandoverExpiresAt",
+    "outputs": [
+      { "internalType": "uint256", "name": "result", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bool", "name": "toPause", "type": "bool" }],
+    "name": "pause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "roles", "type": "uint256" }
+    ],
+    "name": "renounceRoles",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "requestOwnershipHandover",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "roles", "type": "uint256" }
+    ],
+    "name": "revokeRoles",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" }
+    ],
+    "name": "rolesOf",
+    "outputs": [
+      { "internalType": "uint256", "name": "roles", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IVault[]",
+            "name": "vaults",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "shares",
+            "type": "uint256[]"
+          },
+          { "internalType": "address", "name": "withdrawer", "type": "address" }
+        ],
+        "internalType": "struct Withdraw.WithdrawRequest[]",
+        "name": "withdrawalRequests",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "startWithdraw",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "withdrawalRoots",
+        "type": "bytes32[]"
+      },
+      {
+        "components": [
+          { "internalType": "address", "name": "staker", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "delegatedTo",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+          { "internalType": "uint256", "name": "start", "type": "uint256" },
+          {
+            "components": [
+              {
+                "internalType": "contract IVault[]",
+                "name": "vaults",
+                "type": "address[]"
+              },
+              {
+                "internalType": "uint256[]",
+                "name": "shares",
+                "type": "uint256[]"
+              },
+              {
+                "internalType": "address",
+                "name": "withdrawer",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct Withdraw.WithdrawRequest",
+            "name": "request",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Withdraw.QueuedWithdrawal[]",
+        "name": "withdrawConfigs",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "delay", "type": "uint256" }
+    ],
+    "name": "updateMinWithdrawDelay",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      { "internalType": "bytes", "name": "data", "type": "bytes" }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawalDelay",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

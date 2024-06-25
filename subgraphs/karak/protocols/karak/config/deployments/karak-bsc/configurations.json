@@ -1,0 +1,16 @@
+{
+  "deployment": "KARAK_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "vaultSupervisor": {
+    "address": "0x4a2b015ccb8658998692db9ed4522b8e846962ed",
+    "startBlock": "39498130"
+  },
+  "delegationSupervisor": {
+    "address": "0x025ea109029ce1da34f41d4c480c0bcf72248a16",
+    "startBlock": "39498131"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
