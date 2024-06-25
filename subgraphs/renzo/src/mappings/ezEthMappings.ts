@@ -1,32 +1,11 @@
-import { Versions } from "../versions";
+import { readValue } from "../common/utils";
 import { SDK } from "../sdk/protocols/generic";
 import * as constants from "../common/constants";
 import { ERC20 } from "../../generated/ezETH/ERC20";
 import { Pool } from "../sdk/protocols/generic/pool";
-import { ProtocolConfig } from "../sdk/protocols/config";
-import { Pricer, TokenInit, readValue } from "../common/utils";
-import { MintCall, BurnCall } from "../../generated/ezETH/ezETH";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-
-export function initializeSDKFromCall(call: ethereum.Call): SDK {
-  const protocolConfig = new ProtocolConfig(
-    constants.Protocol.ID,
-    constants.Protocol.NAME,
-    constants.Protocol.SLUG,
-    Versions
-  );
-  const tokenPricer = new Pricer();
-  const tokenInitializer = new TokenInit();
-
-  const sdk = SDK.initializeFromCall(
-    protocolConfig,
-    tokenPricer,
-    tokenInitializer,
-    call
-  );
-
-  return sdk;
-}
+import { Transfer } from "../../generated/ezETH/ezETH";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { initializeSDKFromEvent } from "../common/initializers";
 
 export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
@@ -61,26 +40,17 @@ export function updatePoolTvlAndSupply(pool: Pool): void {
   pool.setOutputTokenSupply(tvl);
 }
 
-export function handleMint(call: MintCall): void {
-  const sender = call.inputs._user;
+export function handleTransfer(event: Transfer): void {
+  const from = event.params.from;
+  const to = event.params.to;
 
-  const sdk = initializeSDKFromCall(call);
-  const pool = getOrCreatePool(call.to, sdk);
-
-  updatePoolTvlAndSupply(pool);
-
-  const account = sdk.Accounts.loadAccount(sender);
-  account.trackActivity();
-}
-
-export function handleBurn(call: BurnCall): void {
-  const sender = call.inputs._user;
-
-  const sdk = initializeSDKFromCall(call);
-  const pool = getOrCreatePool(call.to, sdk);
+  const sdk = initializeSDKFromEvent(event);
+  const pool = getOrCreatePool(event.address, sdk);
 
   updatePoolTvlAndSupply(pool);
 
-  const account = sdk.Accounts.loadAccount(sender);
-  account.trackActivity();
+  const fromAccount = sdk.Accounts.loadAccount(from);
+  const toAccount = sdk.Accounts.loadAccount(to);
+  fromAccount.trackActivity();
+  toAccount.trackActivity();
 }

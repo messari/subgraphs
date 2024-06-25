@@ -7,8 +7,10 @@ enum Network {
   ARWEAVE_MAINNET
   AURORA
   AVALANCHE
+  BASE
   BOBA
   BSC # aka BNB Chain
+  BLAST_MAINNET
   CELO
   COSMOS
   CRONOS

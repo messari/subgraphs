@@ -185,10 +185,8 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-      callHandlers:
-        - function: mint(address,uint256)
-          handler: handleMint
-        - function: burn(address,uint256)
-          handler: handleBurn
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
       file: ./src/mappings/ezEthMappings.ts
   {{ /ezETH }}
