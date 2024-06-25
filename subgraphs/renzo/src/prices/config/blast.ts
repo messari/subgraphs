@@ -53,7 +53,9 @@ export const HARDCODED_STABLES: Address[] = [];
 
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(18);
 
-export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const ETH_ADDRESS = Address.fromString(
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+);
 export const WETH_ADDRESS = Address.fromString(
   "0x4300000000000000000000000000000000000004"
 );

@@ -25,6 +25,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
+  MODE_MAINNET
   GNOSIS
 }
 
