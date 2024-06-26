@@ -27,8 +27,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x8cfe327cec66d1c090dd72bd0ff11d690c33a2eb", 2910568),
-  new OracleContract("0x6bded42c6da8fbf0d2ba55b2fa120c5e0c8d7891", 2631217),
+  new OracleContract("0x4752ba5dbc23f44d87826276bf6fd6b1c372ad24", 2631217),
 ];
 
 ///////////////////////////////////////////////////////////////////////////

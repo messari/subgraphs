@@ -98,11 +98,6 @@ export class OracleType {
   constructor() {
     this.oracleCount = constants.INT_ONE;
     this.oracleOrder = [
-      constants.OracleType.YEARN_LENS_ORACLE,
-      constants.OracleType.CHAINLINK_FEED,
-      constants.OracleType.CURVE_CALCULATIONS,
-      constants.OracleType.SUSHI_CALCULATIONS,
-      constants.OracleType.CURVE_ROUTER,
       constants.OracleType.UNISWAP_FORKS_ROUTER,
     ];
   }

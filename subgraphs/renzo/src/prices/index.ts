@@ -74,6 +74,12 @@ export function getUsdPricePerToken(
     }
 
     if (!oraclePrice.reverted) {
+      log.warning("[Oracle] tokenAddr: {}, price: {}, oracleOrder: {}", [
+        tokenAddr.toHexString(),
+        oraclePrice.usdPrice.toString(),
+        oracleOrder[i],
+      ]);
+
       prices.push(oraclePrice);
     }
   }
