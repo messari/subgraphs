@@ -120,4 +120,8 @@ templates:
           handler: handleMint
         - event: Burn(indexed address,uint256,indexed address)
           handler: handleBurn
+        - event: Wrap(indexed address,uint256,indexed address)
+          handler: handleWrap
+        - event: Unwrap(indexed address,uint256,indexed address)
+          handler: handleUnwrap
       file: ./src/mappings/fewWrappedTokenMappings.ts

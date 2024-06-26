@@ -7,6 +7,8 @@ import {
 import {
   Mint,
   Burn,
+  Wrap,
+  Unwrap,
 } from "../../generated/templates/FewWrappedToken/FewWrappedToken";
 
 export function handleMint(event: Mint): void {
@@ -31,6 +33,22 @@ export function handleBurn(event: Burn): void {
   updatePoolOutputTokenSupply(pool);
   updatePoolTVL(pool);
 
+  const account = sdk.Accounts.loadAccount(sender);
+  account.trackActivity();
+}
+
+export function handleWrap(event: Wrap): void {
+  const sender = event.params.sender;
+
+  const sdk = initializeSDKFromEvent(event);
+  const account = sdk.Accounts.loadAccount(sender);
+  account.trackActivity();
+}
+
+export function handleUnwrap(event: Unwrap): void {
+  const sender = event.params.sender;
+
+  const sdk = initializeSDKFromEvent(event);
   const account = sdk.Accounts.loadAccount(sender);
   account.trackActivity();
 }
