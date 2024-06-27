@@ -12,7 +12,7 @@ import {
 } from "../../generated/templates/FewWrappedToken/FewWrappedToken";
 
 export function handleMint(event: Mint): void {
-  const sender = event.params.minter;
+  const sender = event.transaction.from;
 
   const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
@@ -25,7 +25,7 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleBurn(event: Burn): void {
-  const sender = event.params.burner;
+  const sender = event.transaction.from;
 
   const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
@@ -38,7 +38,7 @@ export function handleBurn(event: Burn): void {
 }
 
 export function handleWrap(event: Wrap): void {
-  const sender = event.params.sender;
+  const sender = event.transaction.from;
 
   const sdk = initializeSDKFromEvent(event);
   const account = sdk.Accounts.loadAccount(sender);
@@ -46,7 +46,7 @@ export function handleWrap(event: Wrap): void {
 }
 
 export function handleUnwrap(event: Unwrap): void {
-  const sender = event.params.sender;
+  const sender = event.transaction.from;
 
   const sdk = initializeSDKFromEvent(event);
   const account = sdk.Accounts.loadAccount(sender);

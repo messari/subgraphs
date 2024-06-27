@@ -27,6 +27,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
+  new OracleContract("0x7001f706acb6440d17cbfad63fa50a22d51696ff", 163568), // Ring Swap v2
   new OracleContract("0x98994a9a7a2570367554589189dc9772241650f6", 157110), // Thruster v2 Router1
   new OracleContract("0x44889b52b71e60de6ed7de82e2939fcc52fb2b4e", 157501), // Thruster v2 Router2
   new OracleContract("0x54cf3d259a06601b5bc45f61a16443ed5404dd64", 285726), // Sushiswap v2 Router02
