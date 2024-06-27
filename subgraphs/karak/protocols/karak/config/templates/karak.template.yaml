@@ -1,21 +1,21 @@
-specVersion: 0.0.4
+specVersion: 0.0.8
 schema:
   file: ./schema.graphql
 {{#graftEnabled}}
 features:
   - grafting
 graft:
-  base: {{subgraphId}} # Subgraph ID of base subgraph
-  block: {{graftStartBlock}} # Block number
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
 {{/graftEnabled}}
 dataSources:
   - kind: ethereum
-    name: Lido
-    network: mainnet
+    name: VaultSupervisor
+    network: {{ network }}
     source:
-      address: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-      abi: Lido
-      startBlock: 11473216
+      address: "{{ vaultSupervisor.address }}"
+      abi: VaultSupervisor
+      startBlock: {{ vaultSupervisor.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -30,19 +30,19 @@ dataSources:
         - UsageMetricsDailySnapshot
         - UsageMetricsHourlySnapshot
       abis:
-        ###########################################
-        ########### Lido Generic ABIs #############
-        ###########################################
-        - name: Lido
-          file: ./abis/Lido.json
-        - name: NodeOperatorsRegistry
-          file: ./abis/NodeOperatorsRegistry.json
-        - name: LidoOracle
-          file: ./abis/LidoOracle.json
-        - name: WithdrawalQueue
-          file: ./abis/WithdrawalQueue.json
+        - name: VaultSupervisor
+          file: ./abis/karak/VaultSupervisor.json
+        - name: DelegationSupervisor
+          file: ./abis/karak/DelegationSupervisor.json
+        - name: Vault
+          file: ./abis/karak/Vault.json
+
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -76,22 +76,28 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Pendle Contracts
+        - name: PendlePT
+          file: ./abis/Prices/PendlePT.json
+        - name: PendleSY
+          file: ./abis/Prices/PendleSY.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
       eventHandlers:
-        - event: Submitted(indexed address,uint256,address)
-          handler: handleSubmit
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-          receipt: true
-        - event: ETHDistributed(indexed uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleETHDistributed
-      file: ./src/mappings/Lido.ts
+        - event: NewVault(indexed address)
+          handler: handleNewVault
+      file: {{{ file }}}
   - kind: ethereum
-    name: LidoOracle
-    network: mainnet
+    name: DelegationSupervisor
+    network: {{ network }}
     source:
-      address: "0x442af784a788a5bd6f42a01ebe9f287a871243fb"
-      abi: LidoOracle
-      startBlock: 11473216
+      address: "{{ delegationSupervisor.address }}"
+      abi: DelegationSupervisor
+      startBlock: {{ delegationSupervisor.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -106,19 +112,19 @@ dataSources:
         - UsageMetricsDailySnapshot
         - UsageMetricsHourlySnapshot
       abis:
-        ###########################################
-        ########### Lido Generic ABIs #############
-        ###########################################
-        - name: Lido
-          file: ./abis/Lido.json
-        - name: NodeOperatorsRegistry
-          file: ./abis/NodeOperatorsRegistry.json
-        - name: LidoOracle
-          file: ./abis/LidoOracle.json
-        - name: WithdrawalQueue
-          file: ./abis/WithdrawalQueue.json
+        - name: VaultSupervisor
+          file: ./abis/karak/VaultSupervisor.json
+        - name: DelegationSupervisor
+          file: ./abis/karak/DelegationSupervisor.json
+        - name: Vault
+          file: ./abis/karak/Vault.json
+
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -152,17 +158,27 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Pendle Contracts
+        - name: PendlePT
+          file: ./abis/Prices/PendlePT.json
+        - name: PendleSY
+          file: ./abis/Prices/PendleSY.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
       eventHandlers:
-        - event: PostTotalShares(uint256,uint256,uint256,uint256)
-          handler: handlePostTotalShares
-      file: ./src/mappings/Oracle.ts
+        - event: StartedWithdrawal(indexed address,indexed address,indexed address,address,uint256)
+          handler: handleStartedWithdrawal
+      file: {{{ file }}}
+templates:
   - kind: ethereum
-    name: WithdrawalQueue
-    network: mainnet
+    name: Vault
+    network: {{ network }}
     source:
-      address: "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1"
-      abi: WithdrawalQueue
-      startBlock: 17172547
+      abi: Vault
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -177,19 +193,19 @@ dataSources:
         - UsageMetricsDailySnapshot
         - UsageMetricsHourlySnapshot
       abis:
-        ###########################################
-        ########### Lido Generic ABIs #############
-        ###########################################
-        - name: Lido
-          file: ./abis/Lido.json
-        - name: NodeOperatorsRegistry
-          file: ./abis/NodeOperatorsRegistry.json
-        - name: LidoOracle
-          file: ./abis/LidoOracle.json
-        - name: WithdrawalQueue
-          file: ./abis/WithdrawalQueue.json
+        - name: VaultSupervisor
+          file: ./abis/karak/VaultSupervisor.json
+        - name: DelegationSupervisor
+          file: ./abis/karak/DelegationSupervisor.json
+        - name: Vault
+          file: ./abis/karak/Vault.json
+
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -223,9 +239,20 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Pendle Contracts
+        - name: PendlePT
+          file: ./abis/Prices/PendlePT.json
+        - name: PendleSY
+          file: ./abis/Prices/PendleSY.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
       eventHandlers:
-        - event: WithdrawalRequested(indexed uint256,indexed address,indexed address,uint256,uint256)
-          handler: handleWithdrawalRequested
-        - event: WithdrawalClaimed(indexed uint256,indexed address,indexed address,uint256)
-          handler: handleWithdrawalClaimed
-      file: ./src/mappings/Lido.ts
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+      file: {{{ file }}}

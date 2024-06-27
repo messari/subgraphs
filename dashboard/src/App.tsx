@@ -98,38 +98,42 @@ function App() {
           subgraphEndpoints[schemaType][protocolName] = {};
         }
       }
-      Object.values(protocol.deployments).forEach((depoData: any) => {
-        if (!depoData?.services) {
-          return;
-        }
-        if (
-          schemaType &&
-          (!!depoData["services"]["hosted-service"] || !!depoData["services"]["decentralized-network"])
-        ) {
-          if (!!subgraphEndpoints[schemaType][protocolName][depoData.network]) {
-            const protocolKeyArr = depoData["services"]["hosted-service"]["slug"].split("-");
-            const networkKey = protocolKeyArr.pop();
-            subgraphEndpoints[schemaType][protocolKeyArr.join("-")] = {};
-            subgraphEndpoints[schemaType][protocolKeyArr.join("-")][networkKey] =
-              process.env.REACT_APP_GRAPH_BASE_URL! +
-              "/subgraphs/name/messari/" +
-              depoData["services"]["hosted-service"]["slug"];
-          } else {
-            subgraphEndpoints[schemaType][protocolName][depoData.network] =
-              process.env.REACT_APP_GRAPH_BASE_URL! +
-              "/subgraphs/name/messari/" +
-              depoData["services"]["hosted-service"]["slug"];
+      if (protocol.deployments && typeof protocol.deployments === 'object') {
+        Object.values(protocol.deployments).forEach((depoData: any) => {
+          if (!depoData?.services) {
+            return;
           }
-        }
-        if (!depoCount[schemaType]) {
-          depoCount[schemaType] = { totalCount: 0, prodCount: 0, devCount: 0 };
-        }
-        depoCount.all.totalCount += 1;
-        depoCount[schemaType].totalCount += 1;
-        if (depoData?.status === "dev") {
-          isDev = true;
-        }
-      });
+          if (
+            schemaType &&
+            (!!depoData["services"]["hosted-service"] || !!depoData["services"]["decentralized-network"])
+          ) {
+            if (!!subgraphEndpoints[schemaType][protocolName][depoData.network]) {
+              const protocolKeyArr = depoData["services"]["hosted-service"]["slug"].split("-");
+              const networkKey = protocolKeyArr.pop();
+              subgraphEndpoints[schemaType][protocolKeyArr.join("-")] = {};
+              subgraphEndpoints[schemaType][protocolKeyArr.join("-")][networkKey] =
+                process.env.REACT_APP_GRAPH_BASE_URL! +
+                "/subgraphs/name/messari/" +
+                depoData["services"]["hosted-service"]["slug"];
+            } else {
+              subgraphEndpoints[schemaType][protocolName][depoData.network] =
+                process.env.REACT_APP_GRAPH_BASE_URL! +
+                "/subgraphs/name/messari/" +
+                depoData["services"]["hosted-service"]["slug"];
+            }
+          }
+          if (!depoCount[schemaType]) {
+            depoCount[schemaType] = { totalCount: 0, prodCount: 0, devCount: 0 };
+          }
+          depoCount.all.totalCount += 1;
+          depoCount[schemaType].totalCount += 1;
+          if (depoData?.status === "dev") {
+            isDev = true;
+          }
+        });
+      } else {
+        console.warn(`Deployments for protocol ${protocolName} is not a valid object`);
+      }
       if (isDev) {
         depoCount.all.devCount += 1;
         depoCount[schemaType].devCount += 1;
