@@ -1,0 +1,16 @@
+{
+  "network": "mainnet",
+
+  "RestakeManager": {
+    "address": "0x74a09653a083691711cf8215a6ab074bb4e99ef5",
+    "startBlock": "18722789"
+  },
+  "DepositQueue": {
+    "address": "0xf2f305d14dcd8aaef887e0428b3c9534795d0d60",
+    "startBlock": "18722786"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
