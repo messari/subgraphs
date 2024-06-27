@@ -11064,5 +11064,299 @@
         }
       }
     }
+  },
+  "tarot": {
+    "schema": "generic",
+    "base": "tarot",
+    "protocol": "tarot",
+    "project": "tarot",
+    "deployments": {
+      "tarot-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-ethereum",
+            "query-id": "tarot-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "tarot-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-arbitrum",
+            "query-id": "tarot-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "tarot-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-avalanche",
+            "query-id": "tarot-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "tarot-avalanche",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-base",
+            "query-id": "tarot-base"
+          },
+          "decentralized-network": {
+            "slug": "tarot-base",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-bsc",
+            "query-id": "tarot-bsc"
+          },
+          "decentralized-network": {
+            "slug": "tarot-bsc",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-fantom",
+            "query-id": "tarot-fantom"
+          },
+          "decentralized-network": {
+            "slug": "tarot-fantom",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-linea": {
+        "network": "linea",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-linea",
+            "query-id": "tarot-linea"
+          },
+          "decentralized-network": {
+            "slug": "tarot-linea",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-optimism",
+            "query-id": "tarot-optimism"
+          },
+          "decentralized-network": {
+            "slug": "tarot-optimism",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-polygon",
+            "query-id": "tarot-polygon"
+          },
+          "decentralized-network": {
+            "slug": "tarot-polygon",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-scroll": {
+        "network": "scroll",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-scroll",
+            "query-id": "tarot-scroll"
+          },
+          "decentralized-network": {
+            "slug": "tarot-scroll",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tarot-zksync": {
+        "network": "zksync-era",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tarot.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tarot-zksync",
+            "query-id": "tarot-zksync"
+          },
+          "decentralized-network": {
+            "slug": "tarot-zksync",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,16 @@
+{
+  "deployment": "TAROT_LINEA",
+  "network": "linea",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0xb6193df61351736e5190bf1deb2e4f0769bd1bf2",
+      "startBlock": "5245850"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

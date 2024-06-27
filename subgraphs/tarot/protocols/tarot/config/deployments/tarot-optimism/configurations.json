@@ -1,0 +1,34 @@
+{
+  "deployment": "TAROT_OPTIMISM",
+  "network": "optimism",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x1d90fdac4dd30c3ba38d53f52a884f6e75d0989e",
+      "startBlock": "7225578"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0xd7cabef2c1fd77a31c5ba97c724b82d3e25fc83c",
+      "startBlock": "10334303"
+    },
+    {
+      "name": "Factory3",
+      "abi": "Factory",
+      "address": "0x49df1fe24caf1a7dcbb2e2b1793b93b04edb62bf",
+      "startBlock": "45053372"
+    },
+    {
+      "name": "Factory4",
+      "abi": "Factory",
+      "address": "0xba47316035e6c95b31cb55bfb93458ad41e4da04",
+      "startBlock": "106096953"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
