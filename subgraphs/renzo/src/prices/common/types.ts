@@ -97,9 +97,7 @@ export class OracleType {
 
   constructor() {
     this.oracleCount = constants.INT_ONE;
-    this.oracleOrder = [
-      constants.OracleType.UNISWAP_FORKS_ROUTER,
-    ];
+    this.oracleOrder = [constants.OracleType.UNISWAP_FORKS_ROUTER];
   }
 
   setOracleConfig(override: OracleConfig): void {
