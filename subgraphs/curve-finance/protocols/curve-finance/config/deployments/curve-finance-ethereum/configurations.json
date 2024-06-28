@@ -318,7 +318,6 @@
     {
       "name": "oldcontract",
       "address": "0x2e60cf74d81ac34eb21eeff58db4d385920ef419",
-      "lpToken": "0x2e60cf74d81ac34eb21eeff58db4d385920ef419",
       "startBlock": "9325883"
     }
   ],
