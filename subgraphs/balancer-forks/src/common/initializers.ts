@@ -394,7 +394,7 @@ export function getOrCreateLiquidityPool(
     );
     pool._poolId = poolId.toHexString();
 
-    const inputTokensInfo = utils.getPoolTokensInfo(poolId);
+    const inputTokensInfo = utils.getPoolTokensInfo(poolAddress, poolId);
     pool.inputTokens = inputTokensInfo.getInputTokens;
     pool.inputTokenBalances = inputTokensInfo.getBalances;
     pool.inputTokenWeights = utils.getPoolTokenWeights(
