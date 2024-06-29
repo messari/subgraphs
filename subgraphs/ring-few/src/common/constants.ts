@@ -20,6 +20,7 @@ export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 
 export const BLACKLISTED_POOLS_LIST: Address[] = [
   Address.fromString("0x35b1cd11b684c7a9e1aa8d34e6b2a500310ec35c"),
+  Address.fromString("0x9b96f74a2798c31b7c87a82e4d224951cf514d24"),
 ];
 
 ////////////////////////
