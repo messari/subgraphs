@@ -1,0 +1,16 @@
+{
+  "deployment": "TAROT_SCROLL",
+  "network": "scroll",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x2217aec3440e8fd6d49a118b1502e539f88dba55",
+      "startBlock": "6361404"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

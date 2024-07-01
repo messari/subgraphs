@@ -1,0 +1,22 @@
+{
+  "deployment": "TAROT_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x2217aec3440e8fd6d49a118b1502e539f88dba55",
+      "startBlock": "24673615"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0xc20099a3f0728634c1136489074508be7b406d3a",
+      "startBlock": "24674043"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

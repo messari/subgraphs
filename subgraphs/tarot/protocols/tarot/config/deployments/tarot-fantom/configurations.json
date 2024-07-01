@@ -1,0 +1,40 @@
+{
+  "deployment": "TAROT_FANTOM",
+  "network": "fantom",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x35c052bbf8338b06351782a565aa9aad173432ea",
+      "startBlock": "9926326"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0xf6d943c8904195d0f69ba03d97c0baf5bbdcd01b",
+      "startBlock": "32494961"
+    },
+    {
+      "name": "Factory3",
+      "abi": "Factory",
+      "address": "0xbf76f858b42bb9b196a87e43235c2f0058cf7322",
+      "startBlock": "32950135"
+    },
+    {
+      "name": "Factory4",
+      "abi": "Factory",
+      "address": "0xa90092a6bfc100e32777b257af46b3ec2675d876",
+      "startBlock": "59008663"
+    },
+    {
+      "name": "Factory5",
+      "abi": "Factory",
+      "address": "0xe034c865299da16a429dad26bff5468c2689f7d8",
+      "startBlock": "59010680"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,0 +1,16 @@
+{
+  "deployment": "TAROT_BASE",
+  "network": "base",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0xeb5809eb0f79aab6e53e6374258b29a244dfc12d",
+      "startBlock": "2237091"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
