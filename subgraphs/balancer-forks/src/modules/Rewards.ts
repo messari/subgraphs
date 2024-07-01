@@ -9,7 +9,7 @@ import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
-import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
+import { Gauge as LiquidityGaugeContract } from "../../generated/templates/Gauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
 
 export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
