@@ -1,0 +1,12 @@
+{
+  "network": "blast-mainnet",
+
+  "FewFactory": {
+    "address": "0x455b20131d59f01d082df1225154fda813e8cee9",
+    "startBlock": "160873"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
