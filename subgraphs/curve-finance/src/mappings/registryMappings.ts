@@ -1,17 +1,19 @@
 import {
-  getOrCreateLpToken,
-  getOrCreateLiquidityPool,
   getOrCreateLiquidityGauge,
+  getOrCreateLiquidityPool,
+  getOrCreateLpToken,
+  getOrCreateToken,
 } from "../common/initializers";
 import {
-  PoolAdded,
-  PoolAdded1,
   BasePoolAdded,
+  CryptoPoolDeployed,
+  LiquidityGaugeDeployed as LiquidityGaugeDeployedWithToken,
+  LiquidityGaugeDeployed1 as LiquidityGaugeDeployed,
   MetaPoolDeployed,
   PlainPoolDeployed,
-  CryptoPoolDeployed,
-  LiquidityGaugeDeployed1 as LiquidityGaugeDeployed,
-  LiquidityGaugeDeployed as LiquidityGaugeDeployedWithToken,
+  PoolAdded,
+  PoolAdded1,
+  TricryptoPoolDeployed,
 } from "../../generated/templates/PoolTemplate/Registry";
 import * as utils from "../common/utils";
 import { Address, log } from "@graphprotocol/graph-ts";
@@ -201,6 +203,37 @@ export function handleLiquidityGaugeDeployed(
     [
       gaugeAddress.toHexString(),
       poolAddress.toHexString(),
+      registryAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleTricryptoPoolDeployed(
+  event: TricryptoPoolDeployed
+): void {
+  const poolAddress = event.params.pool;
+  const name = event.params.name;
+  const symbol = event.params.symbol;
+  const poolCoins = event.params.coins;
+  const registryAddress = event.address;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+
+  pool._registryAddress = registryAddress.toHexString();
+  pool.name = name;
+  pool.symbol = symbol;
+  const inputTokens: string[] = [];
+  for (let i = 0; i < poolCoins.length; i++) {
+    inputTokens.push(getOrCreateToken(poolCoins[i], event.block).id);
+  }
+  pool._inputTokensOrdered = inputTokens;
+  pool.save();
+
+  log.warning(
+    "[TricryptoPoolDeployed] PoolAddress: {}, registryAddress: {}, TxnHash: {}",
+    [
+      pool.id,
       registryAddress.toHexString(),
       event.transaction.hash.toHexString(),
     ]
