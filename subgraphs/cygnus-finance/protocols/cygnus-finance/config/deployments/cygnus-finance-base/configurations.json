@@ -1,0 +1,12 @@
+{
+  "network": "base",
+
+  "CGUSD": {
+    "address": "0xca72827a3d211cfd8f6b00ac98824872b72cab49",
+    "startBlock": "10814542"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
