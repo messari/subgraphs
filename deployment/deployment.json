@@ -11314,5 +11314,169 @@
         }
       }
     }
+  },
+  "impermax-finance": {
+    "schema": "generic",
+    "base": "impermax-finance",
+    "protocol": "impermax-finance",
+    "project": "impermax-finance",
+    "deployments": {
+      "impermax-finance-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "impermax.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "impermax-finance-ethereum",
+            "query-id": "impermax-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "impermax-finance-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "impermax-finance-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "impermax.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "impermax-finance-arbitrum",
+            "query-id": "impermax-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "impermax-finance-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "impermax-finance-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "impermax.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "impermax-finance-avalanche",
+            "query-id": "impermax-finance-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "impermax-finance-avalanche",
+            "query-id": "todo"
+          }
+        }
+      },
+      "impermax-finance-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "impermax.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "impermax-finance-fantom",
+            "query-id": "impermax-finance-fantom"
+          },
+          "decentralized-network": {
+            "slug": "impermax-finance-fantom",
+            "query-id": "todo"
+          }
+        }
+      },
+      "impermax-finance-polygon": {
+        "network": "matic",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "impermax.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "impermax-finance-polygon",
+            "query-id": "impermax-finance-polygon"
+          },
+          "decentralized-network": {
+            "slug": "impermax-finance-polygon",
+            "query-id": "todo"
+          }
+        }
+      },
+      "impermax-finance-zksync": {
+        "network": "zksync-era",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "impermax.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "impermax-finance-zksync",
+            "query-id": "impermax-finance-zksync"
+          },
+          "decentralized-network": {
+            "slug": "impermax-finance-zksync",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,16 @@
+{
+  "deployment": "IMPERMAX_ZKSYNC",
+  "network": "zksync-era",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x6ce1a2c079871e4d4b91ff29e7d2acbd42b46e36",
+      "startBlock": "877771"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

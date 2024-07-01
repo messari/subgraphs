@@ -1,0 +1,16 @@
+{
+  "deployment": "IMPERMAX_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x8c3736e2fe63cc2cd89ee228d9dbcab6ce5b767b",
+      "startBlock": "11940265"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
