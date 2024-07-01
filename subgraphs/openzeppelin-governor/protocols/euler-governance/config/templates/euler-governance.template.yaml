@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Governance
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: Governance
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -49,11 +49,11 @@ dataSources:
       file: ./protocols/euler-governance/src/governance.ts
   - kind: ethereum/contract
     name: Eul
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: Eul
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

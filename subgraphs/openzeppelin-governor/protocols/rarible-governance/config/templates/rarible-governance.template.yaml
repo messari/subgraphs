@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: RariGovernor
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: RariGovernor
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -43,11 +43,11 @@ dataSources:
       file: ./protocols/rarible-governance/src/RariGovernor.ts
   - kind: ethereum/contract
     name: Staking
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: Staking
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -66,7 +66,7 @@ dataSources:
           handler: handleDelegateChanged
         - event: DelegateVotesChanged(indexed address,uint256,uint256)
           handler: handleDelegateVotesChanged
-        # Staking token is Non-ERC20 
+        # Staking token is Non-ERC20
         # - event: Transfer(indexed address,indexed address,uint256)
-        #   handler: handleTransfer 
+        #   handler: handleTransfer
       file: ./protocols/rarible-governance/src/Staking.ts

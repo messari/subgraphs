@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: HOPGovernor
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: HOPGovernor
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -41,11 +41,11 @@ dataSources:
       file: ./protocols/hop-governance/src/hop-governor.ts
   - kind: ethereum/contract
     name: HOPToken
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: HOPToken
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: SiloGovernor
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: SiloGovernor
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -47,11 +47,11 @@ dataSources:
       file: ./protocols/silo-governance/src/silo-governor.ts
   - kind: ethereum/contract
     name: SiloGovernanceToken
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: SiloGovernanceToken
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

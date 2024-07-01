@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: FeiDAO
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: FeiDAO
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -47,11 +47,11 @@ dataSources:
       file: ./protocols/fei-governance/src/fei-dao.ts
   - kind: ethereum/contract
     name: Tribe
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: Tribe
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

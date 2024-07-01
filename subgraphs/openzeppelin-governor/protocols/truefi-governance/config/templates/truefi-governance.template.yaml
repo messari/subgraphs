@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: DaoGovernor
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ governorContractAddress }}"
       abi: DaoGovernor
-      startBlock: {{ governorContractStartBlock }}
+      startBlock: { { governorContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -49,11 +49,11 @@ dataSources:
       file: ./protocols/truefi-governance/src/dao-governor.ts
   - kind: ethereum/contract
     name: StkTruToken
-    network:  {{ network }}
+    network: { { network } }
     source:
       address: "{{ tokenContractAddress }}"
       abi: StkTruToken
-      startBlock: {{ tokenContractStartBlock }}
+      startBlock: { { tokenContractStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

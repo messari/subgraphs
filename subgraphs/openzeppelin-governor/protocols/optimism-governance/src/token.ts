@@ -26,7 +26,7 @@ export function handleDelegateChanged(event: DelegateChanged): void {
     event.params.delegator.toHexString(),
     event.params.fromDelegate.toHexString(),
     event.params.toDelegate.toHexString(),
-    event
+    event,
   );
 }
 
@@ -40,7 +40,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
     event.params.delegate.toHexString(),
     event.params.previousBalance,
     event.params.newBalance,
-    event
+    event,
   );
 }
 
@@ -49,7 +49,7 @@ function _handleDelegateChanged(
   delegator: string,
   fromDelegate: string,
   toDelegate: string,
-  event: ethereum.Event
+  event: ethereum.Event,
 ): void {
   const tokenHolder = getOrCreateTokenHolder(delegator);
   const previousDelegate = getOrCreateDelegate(fromDelegate);
@@ -70,7 +70,7 @@ function _handleDelegateChanged(
     event,
     toDelegate,
     fromDelegate,
-    delegator
+    delegator,
   );
 
   delegateChanged.save();
@@ -80,7 +80,7 @@ function _handleDelegateVotesChanged(
   delegateAddress: string,
   previousBalance: BigInt,
   newBalance: BigInt,
-  event: ethereum.Event
+  event: ethereum.Event,
 ): void {
   const votesDifference = newBalance.minus(previousBalance);
 
@@ -94,7 +94,7 @@ function _handleDelegateVotesChanged(
     event,
     previousBalance,
     newBalance,
-    delegateAddress
+    delegateAddress,
   );
   delegateVPChange.save();
 
@@ -117,7 +117,7 @@ function createDelegateChange(
   event: ethereum.Event,
   toDelegate: string,
   fromDelegate: string,
-  delegator: string
+  delegator: string,
 ): DelegateChange {
   // THIS SINGLE LINE IS THE ONLY DIFFERENCE FROM THE ORIGINAL FUNCTION
   // We are adding the block number to the id to avoid duplicate ids when there are multiple blocks
@@ -144,7 +144,7 @@ function createDelegateVotingPowerChange(
   event: ethereum.Event,
   previousBalance: BigInt,
   newBalance: BigInt,
-  delegate: string
+  delegate: string,
 ): DelegateVotingPowerChange {
   // THIS SINGLE LINE IS THE ONLY DIFFERENCE FROM THE ORIGINAL FUNCTION
   // We are adding the block number to the id to avoid duplicate ids when there are multiple blocks
@@ -154,7 +154,7 @@ function createDelegateVotingPowerChange(
   }-${event.logIndex}`;
 
   const delegateVPChange = new DelegateVotingPowerChange(
-    delegateVotingPwerChangeId
+    delegateVotingPwerChangeId,
   );
 
   delegateVPChange.previousBalance = previousBalance;
@@ -175,6 +175,6 @@ export function handleTransfer(event: Transfer): void {
     event.params.from.toHexString(),
     event.params.to.toHexString(),
     event.params.value,
-    event
+    event,
   );
 }
