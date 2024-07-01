@@ -2,7 +2,6 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   DataSourceContext,
   dataSource,
   log,
@@ -16,6 +15,7 @@ import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
+import { updateArrayAtIndex } from "../sdk/util/arrays";
 import {
   ETH_ADDRESS,
   INT_ZERO,
@@ -23,7 +23,6 @@ import {
   ZERO_ADDRESS,
   DEFAULT_DECIMALS,
   BIGDECIMAL_ZERO,
-  BIGINT_TEN_TO_EIGHTEENTH,
   BIGDECIMAL_ONE,
 } from "../sdk/util/constants";
 
@@ -43,16 +42,12 @@ import {
 } from "../../generated/templates/VaultToken/VaultToken";
 import {
   Borrow as BorrowBorrowable,
+  Mint as MintBorrowable,
   Redeem as RedeemBorrowable,
   Sync as SyncBorrowable,
   Borrowable,
 } from "../../generated/templates/Borrowable/Borrowable";
-import {
-  Mint as MintCollateral,
-  Redeem as RedeemCollateral,
-} from "../../generated/templates/Collateral/Collateral";
 import { Sync as SyncPair, Pair } from "../../generated/templates/Pair/Pair";
-import { updateArrayAtIndex } from "../sdk/util/arrays";
 
 const conf = new ProtocolConfig(
   NetworkConfigs.getProtocolId(),
@@ -136,20 +131,6 @@ class TokenInit implements TokenInitializer {
 export function handleLendingPoolInitialized(
   event: LendingPoolInitialized
 ): void {
-  log.debug(
-    "[LendingPoolInitialized] id: {} pair: {} token0: {} token1: {} collateral: {} borrowable0: {} borrowable1: {} tx: {}",
-    [
-      event.params.lendingPoolId.toString(),
-      event.params.uniswapV2Pair.toHexString(),
-      event.params.token0.toHexString(),
-      event.params.token1.toHexString(),
-      event.params.collateral.toHexString(),
-      event.params.borrowable0.toHexString(),
-      event.params.borrowable1.toHexString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
-
   const context = new DataSourceContext();
   context.setString("vault", event.params.uniswapV2Pair.toHexString());
   context.setString("token0", event.params.token0.toHexString());
@@ -173,7 +154,7 @@ export function handleLendingPoolInitialized(
 }
 
 export function handleMintVaultToken(event: MintVaultToken): void {
-  const user = event.params.minter;
+  const user = event.transaction.from;
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -186,7 +167,7 @@ export function handleMintVaultToken(event: MintVaultToken): void {
 }
 
 export function handleRedeemVaultToken(event: RedeemVaultToken): void {
-  const user = event.params.redeemer;
+  const user = event.transaction.from;
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -202,9 +183,6 @@ export function handleSyncVaultToken(event: SyncVaultToken): void {
   const context = dataSource.context();
   const token0Addr = context.getString("token0");
   const token1Addr = context.getString("token1");
-  const collateral = context.getString("collateral");
-  const borrowable0 = context.getString("borrowable0");
-  const borrowable1 = context.getString("borrowable1");
   const underlying = context.getString("underlying");
 
   const vaultTokenContract = VaultToken.bind(event.address);
@@ -213,21 +191,6 @@ export function handleSyncVaultToken(event: SyncVaultToken): void {
   if (!totalSupplyCall.reverted) {
     totalSupply = totalSupplyCall.value;
   }
-
-  log.debug(
-    "[SyncVaultToken] token0: {} token1: {} collateral: {} borrowable0: {} borrowable1: {} underlying: {} totalBalance: {} totalSupply: {} tx: {}",
-    [
-      token0Addr,
-      token1Addr,
-      collateral,
-      borrowable0,
-      borrowable1,
-      underlying,
-      event.params.totalBalance.toString(),
-      totalSupply.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -270,12 +233,10 @@ export function handleBorrowBorrowable(event: BorrowBorrowable): void {
   const vault = context.getString("vault");
   const token0Addr = context.getString("token0");
   const token1Addr = context.getString("token1");
-  const collateral = context.getString("collateral");
-  const borrowable0 = context.getString("borrowable0");
   const borrowable1 = context.getString("borrowable1");
   const underlying = context.getString("underlying");
 
-  const user = event.params.borrower;
+  const user = event.transaction.from;
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -318,10 +279,8 @@ export function handleBorrowBorrowable(event: BorrowBorrowable): void {
     );
   }
 
-  let borrowable = borrowable0;
   let borrowableUnderlying = token0;
   if (event.address == Address.fromString(borrowable1)) {
-    borrowable = borrowable1;
     borrowableUnderlying = token1;
   }
 
@@ -336,8 +295,21 @@ export function handleBorrowBorrowable(event: BorrowBorrowable): void {
   );
 }
 
+export function handleMintBorrowable(event: MintBorrowable): void {
+  const user = event.transaction.from;
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
+}
+
 export function handleRedeemBorrowable(event: RedeemBorrowable): void {
-  const user = event.params.redeemer;
+  const user = event.transaction.from;
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -354,8 +326,6 @@ export function handleSyncBorrowable(event: SyncBorrowable): void {
   const vault = context.getString("vault");
   const token0Addr = context.getString("token0");
   const token1Addr = context.getString("token1");
-  const collateral = context.getString("collateral");
-  const borrowable0 = context.getString("borrowable0");
   const borrowable1 = context.getString("borrowable1");
   const underlying = context.getString("underlying");
 
@@ -386,10 +356,8 @@ export function handleSyncBorrowable(event: SyncBorrowable): void {
 
   let amountsToAdd = [BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO];
 
-  let borrowable = borrowable0;
   let borrowableUnderlying = token0;
   if (event.address == Address.fromString(borrowable1)) {
-    borrowable = borrowable1;
     borrowableUnderlying = token1;
   }
   const borrowableTokenIdx = inputTokens.indexOf(borrowableUnderlying.id);
@@ -402,58 +370,13 @@ export function handleSyncBorrowable(event: SyncBorrowable): void {
     borrowableTokenIdx
   );
 
-  log.debug(
-    "[SyncBorrowable] vault: {} token0: {} token1: {} collateral: {} borrowable0: {} borrowable1: {} borrowable: {} borrowableUnderlying: {} totalBalance: {} tx: {}",
-    [
-      vault,
-      token0Addr,
-      token1Addr,
-      collateral,
-      borrowable0,
-      borrowable1,
-      borrowable,
-      borrowableUnderlying.id.toHexString(),
-      event.params.totalBalance.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
   pool.addInputTokenBalances(amountsToAdd, true);
-}
-
-export function handleMintCollateral(event: MintCollateral): void {
-  const user = event.params.minter;
-  const sdk = SDK.initializeFromEvent(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event
-  );
-
-  const account = sdk.Accounts.loadAccount(user);
-  account.trackActivity();
-}
-
-export function handleRedeemCollateral(event: RedeemCollateral): void {
-  const user = event.params.redeemer;
-  const sdk = SDK.initializeFromEvent(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event
-  );
-
-  const account = sdk.Accounts.loadAccount(user);
-  account.trackActivity();
 }
 
 export function handleSyncPair(event: SyncPair): void {
   const context = dataSource.context();
-  const vault = context.getString("vault");
   const token0Addr = context.getString("token0");
   const token1Addr = context.getString("token1");
-  const collateral = context.getString("collateral");
-  const borrowable0 = context.getString("borrowable0");
-  const borrowable1 = context.getString("borrowable1");
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -500,21 +423,4 @@ export function handleSyncPair(event: SyncPair): void {
   const lpToken = sdk.Tokens.getOrCreateToken(event.address);
   lpToken.lastPriceUSD = lpTokenUsd;
   lpToken.save();
-
-  log.debug(
-    "[SyncPair] t0: {} r0: {} v0: {} t1: {} r1: {} v1: {} pair: {} decimals: {} supply: {} vLP: {} tx: {}",
-    [
-      token0Addr,
-      reserve0.toString(),
-      token0Usd.toString(),
-      token1Addr,
-      reserve1.toString(),
-      token1Usd.toString(),
-      event.address.toHexString(),
-      decimals.toString(),
-      totalSupply.toString(),
-      lpTokenUsd.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
 }
