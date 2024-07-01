@@ -143,12 +143,6 @@ export function getUsdPrice(
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
-    if (
-      tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
-      tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
-    ) {
-      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
-    }
     return tokenPrice.usdPrice.times(amount);
   }
 
