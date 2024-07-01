@@ -1,4 +1,3 @@
-import * as constants from "../common/constants";
 import { FewWrappedToken } from "../../generated/templates";
 import { WrappedTokenCreated } from "../../generated/FewFactory/FewFactory";
 
