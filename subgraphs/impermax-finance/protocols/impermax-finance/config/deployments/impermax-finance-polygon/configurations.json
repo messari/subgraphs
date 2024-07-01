@@ -1,0 +1,28 @@
+{
+  "deployment": "IMPERMAX_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0xbb92270716c8c424849f17ccc12f4f24ad4064d6",
+      "startBlock": "14868433"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0x7f7ad5b16c97aa9c2b0447c2676ce7d5cefebcd3",
+      "startBlock": "27965432"
+    },
+    {
+      "name": "Factory3",
+      "abi": "Factory",
+      "address": "0x7ed6ef7419cd9c00693d7a4f81c2a151f49c7ac2",
+      "startBlock": "40124899"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

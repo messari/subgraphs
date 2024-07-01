@@ -1,0 +1,22 @@
+{
+  "deployment": "IMPERMAX_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x8c3736e2fe63cc2cd89ee228d9dbcab6ce5b767b",
+      "startBlock": "763103"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0x97bc7fefb84a4654d4d3938751b5fe401e8771c2",
+      "startBlock": "61550862"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

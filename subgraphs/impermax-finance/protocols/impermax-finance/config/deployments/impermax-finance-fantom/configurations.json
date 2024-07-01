@@ -1,0 +1,22 @@
+{
+  "deployment": "IMPERMAX_FANTOM",
+  "network": "fantom",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x60ae5f446ae1575534a5f234d6ec743215624556",
+      "startBlock": "31942371"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0x9b4ae930255cb8695a9f525da414f80c4c7a945b",
+      "startBlock": "34301660"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
