@@ -11314,5 +11314,39 @@
         }
       }
     }
+  },
+  "symbiotic": {
+    "schema": "generic",
+    "base": "symbiotic",
+    "protocol": "symbiotic",
+    "project": "symbiotic",
+    "deployments": {
+      "symbiotic-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "symbiotic.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "symbiotic-ethereum",
+            "query-id": "symbiotic-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "symbiotic-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
