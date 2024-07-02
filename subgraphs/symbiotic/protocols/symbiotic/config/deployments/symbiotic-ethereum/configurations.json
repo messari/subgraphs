@@ -1,0 +1,16 @@
+{
+  "deployment": "SYMBIOTIC_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory",
+      "abi": "Factory",
+      "address": "0x1bc8fcfbe6aa17e4a7610f51b888f34583d202ec",
+      "startBlock": "20011312"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
