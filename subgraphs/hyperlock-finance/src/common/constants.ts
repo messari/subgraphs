@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 //////////////////////////////
 /////// Protocol Config //////
@@ -14,9 +14,12 @@ export namespace Protocol {
 ///// Ethereum Addresses /////
 //////////////////////////////
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
+export namespace NULL {
+  export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
+  export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
+}
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////

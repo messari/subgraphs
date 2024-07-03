@@ -3,11 +3,10 @@ import { SDK } from "../sdk/protocols/generic";
 import * as constants from "../common/constants";
 import { Pool } from "../sdk/protocols/generic/pool";
 import { ProtocolConfig } from "../sdk/protocols/config";
-import { ERC20 } from "../../generated/DepositQueue/ERC20";
-import { Pricer, TokenInit, readValue } from "../common/utils";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { DepositQueue } from "../../generated/DepositQueue/DepositQueue";
-import { RestakeManager } from "../../generated/DepositQueue/RestakeManager";
+import { Pricer, TokenInit, readValue } from "../common/utils";
+import { ThrusterV2 } from "../../generated/ERC20PointsDeposit/ThrusterV2";
+import { ERC20PointsDeposit } from "../../generated/ERC20PointsDeposit/ERC20PointsDeposit";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(
@@ -29,68 +28,58 @@ export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   return sdk;
 }
 
-export function getEzEthAddress(depositAddress: Address): Address {
-  const contract = RestakeManager.bind(depositAddress);
-
-  const xezEthAddress = readValue<Address>(
-    contract.try_xezETH(),
-    Address.fromString(constants.EZETH_ADDRESS)
-  );
-
-  return xezEthAddress;
-}
-
-export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
+export function getOrCreateV2Pool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 
   if (!pool.isInitialized) {
-    const inputToken = sdk.Tokens.getOrCreateToken(
-      Address.fromString(constants.ETH_ADDRESS)
+    const inputToken = sdk.Tokens.getOrCreateToken(poolAddress);
+
+    const poolContract = ThrusterV2.bind(poolAddress);
+
+    const token0 = sdk.Tokens.getOrCreateToken(
+      readValue<Address>(poolContract.try_token0(), constants.NULL.TYPE_ADDRESS)
     );
-    const outputToken = sdk.Tokens.getOrCreateToken(
-      getEzEthAddress(Address.fromBytes(pool.getBytesID()))
+    const token1 = sdk.Tokens.getOrCreateToken(
+      readValue<Address>(poolContract.try_token1(), constants.NULL.TYPE_ADDRESS)
     );
 
-    pool.initialize(
-      outputToken.name,
-      outputToken.symbol,
-      [inputToken.id],
-      outputToken
-    );
+    const poolName = token0.name.concat(" / ").concat(token1.name);
+    const poolsymbol = token0.symbol.concat(" / ").concat(token1.symbol);
+
+    pool.initialize(poolName, poolsymbol, [inputToken.id], null);
   }
 
   return pool;
 }
 
-export function updatePoolTVL(pool: Pool): void {
-  const poolContract = RestakeManager.bind(
+export function getOrCreateV3Pool(poolAddress: Address, sdk: SDK): Pool {
+  const pool = sdk.Pools.loadPool(poolAddress);
+
+  if (!pool.isInitialized) {
+    const inputToken = sdk.Tokens.getOrCreateToken(poolAddress);
+
+    const poolContract = ThrusterV2.bind(poolAddress);
+
+    const token0 = sdk.Tokens.getOrCreateToken(
+      readValue<Address>(poolContract.try_token0(), constants.NULL.TYPE_ADDRESS)
+    );
+    const token1 = sdk.Tokens.getOrCreateToken(
+      readValue<Address>(poolContract.try_token1(), constants.NULL.TYPE_ADDRESS)
+    );
+
+    const poolName = token0.name.concat(" / ").concat(token1.name);
+    const poolsymbol = token0.symbol.concat(" / ").concat(token1.symbol);
+
+    pool.initialize(poolName, poolsymbol, [inputToken.id], null);
+  }
+
+  return pool;
+}
+
+export function updatePoolTVL(pool: Pool, amount: BigInt): void {
+  const v2DepositsContract = ERC20PointsDeposit.bind(
     Address.fromBytes(pool.getBytesID())
   );
 
-  const tvlCall = poolContract.try_calculateTVLs();
-  if (tvlCall.reverted) return;
-
   pool.setInputTokenBalances([tvlCall.value.value2], true);
-}
-
-export function updatePoolOutputTokenSupply(pool: Pool): void {
-  const contract = ERC20.bind(Address.fromString(constants.EZETH_ADDRESS));
-
-  const outputTokenSupply = readValue<BigInt>(
-    contract.try_totalSupply(),
-    constants.BIGINT_ZERO
-  );
-
-  pool.setOutputTokenSupply(outputTokenSupply);
-}
-
-export function getRestakeManagerAddress(depositQueue: Address): Address {
-  const contract = DepositQueue.bind(depositQueue);
-
-  const outputTokenSupply = readValue<Address>(
-    contract.try_restakeManager(),
-    Address.fromString(constants.ZERO_ADDRESS)
-  );
-
-  return outputTokenSupply;
 }
