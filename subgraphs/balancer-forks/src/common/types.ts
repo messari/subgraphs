@@ -66,10 +66,16 @@ export class PoolFeesType {
 }
 
 export class PoolTokensType {
+  private _poolAddress: Address;
   private _tokens: Address[];
   private _balances: BigInt[];
 
-  constructor(tokens: Address[] = [], balances: BigInt[] = []) {
+  constructor(
+    poolAddress: Address = constants.NULL.TYPE_ADDRESS,
+    tokens: Address[] = [],
+    balances: BigInt[] = []
+  ) {
+    this._poolAddress = poolAddress;
     this._tokens = tokens;
     this._balances = balances;
   }
@@ -78,6 +84,10 @@ export class PoolTokensType {
     const inputTokens: string[] = [];
 
     for (let idx = 0; idx < this._tokens.length; idx++) {
+      if (this._tokens.at(idx) == this._poolAddress) {
+        continue;
+      }
+
       inputTokens.push(this._tokens.at(idx).toHexString());
     }
 
