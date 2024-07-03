@@ -150,7 +150,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
     PROTOCOL_SLUG,
     PROTOCOL_NETWORK,
     troller.try_liquidationIncentiveMantissa(),
-    troller.try_oracle()
+    troller.try_oracle(),
   );
 
   // only needed to create the new pool (ie, pool's Comptroller implementation)
@@ -175,7 +175,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
   if (tryLiquidationIncentive.reverted) {
     log.warning(
       "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
-      []
+      [],
     );
   } else {
     pool.liquidationIncentive = tryLiquidationIncentive.value
@@ -198,7 +198,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     Address.fromString(FACTORY_CONTRACT),
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    true
+    true,
   );
 }
 
@@ -207,7 +207,7 @@ export function handleMarketExited(event: MarketExited): void {
     Address.fromString(FACTORY_CONTRACT),
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    false
+    false,
   );
 }
 
@@ -236,13 +236,13 @@ export function handleMarketListed(event: MarketListed): void {
     event.params.cToken,
     getOrElse(cTokenContract.try_name(), "UNKNOWN"),
     getOrElse(cTokenContract.try_symbol(), "UNKNOWN"),
-    getOrElse(cTokenContract.try_decimals(), -1)
+    getOrElse(cTokenContract.try_decimals(), -1),
   );
 
   // get/create underlying token
   const underlyingAddress = getOrElse(
     cTokenContract.try_underlying(),
-    Address.fromString(ZERO_ADDRESS)
+    Address.fromString(ZERO_ADDRESS),
   );
 
   let underlyingToken: TokenData;
@@ -252,7 +252,7 @@ export function handleMarketListed(event: MarketListed): void {
       Address.fromString(ETH_ADDRESS),
       ETH_NAME,
       ETH_SYMBOL,
-      mantissaFactor
+      mantissaFactor,
     );
   } else {
     const underlyingContract = ERC20.bind(underlyingAddress);
@@ -260,7 +260,7 @@ export function handleMarketListed(event: MarketListed): void {
       underlyingAddress,
       getOrElse(underlyingContract.try_name(), "UNKNOWN"),
       getOrElse(underlyingContract.try_symbol(), "UNKOWN"),
-      getOrElse(underlyingContract.try_decimals(), -1)
+      getOrElse(underlyingContract.try_decimals(), -1),
     );
   }
 
@@ -269,7 +269,7 @@ export function handleMarketListed(event: MarketListed): void {
     protocol,
     underlyingToken,
     cToken,
-    getOrElse(cTokenContract.try_reserveFactorMantissa(), BIGINT_ZERO)
+    getOrElse(cTokenContract.try_reserveFactorMantissa(), BIGINT_ZERO),
   );
 
   _handleMarketListed(marketData, event);
@@ -281,7 +281,7 @@ export function handleMarketListed(event: MarketListed): void {
   updateOrCreateRariFee(
     tryFuseFeeMantissa.reverted ? BIGINT_ZERO : tryFuseFeeMantissa.value,
     RariFee.FUSE_FEE,
-    event.params.cToken.toHexString()
+    event.params.cToken.toHexString(),
   );
 
   // get admin fee - pool owners (admin) collect this (ie, protocol revenue)
@@ -289,7 +289,7 @@ export function handleMarketListed(event: MarketListed): void {
   updateOrCreateRariFee(
     tryAdminFeeMantissa.reverted ? BIGINT_ZERO : tryAdminFeeMantissa.value,
     RariFee.ADMIN_FEE,
-    event.params.cToken.toHexString()
+    event.params.cToken.toHexString(),
   );
 
   // add market ID to the fuse pool
@@ -320,7 +320,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const liquidationIncentive = event.params.newLiquidationIncentiveMantissa
     .toBigDecimal()
@@ -383,7 +383,7 @@ export function handleMint(event: Mint): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     factoryContract,
@@ -391,7 +391,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -402,7 +402,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     factoryContract,
@@ -410,7 +410,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -421,7 +421,7 @@ export function handleBorrow(event: Borrow): void {
   const factoryContract = Address.fromString(FACTORY_CONTRACT);
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     factoryContract,
@@ -429,7 +429,7 @@ export function handleBorrow(event: Borrow): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -441,7 +441,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const factoryContract = Address.fromString(FACTORY_CONTRACT);
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     factoryContract,
@@ -450,7 +450,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -468,7 +468,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -504,11 +504,11 @@ export function handleAccrueInterest(event: AccrueInterest): void {
       event.block.timestamp,
       event.block.number,
       BIGDECIMAL_ZERO,
-      RewardIntervalType.BLOCK
+      RewardIntervalType.BLOCK,
     );
     blocksPerDay = getOrCreateCircularBuffer().blocksPerDay;
     const blocksPerDayBI = BigInt.fromString(
-      blocksPerDay.truncate(0).toString()
+      blocksPerDay.truncate(0).toString(),
     );
 
     blocksPerYear = blocksPerDayBI.toI32() * DAYS_PER_YEAR;
@@ -518,7 +518,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     // see discussion: https://github.com/messari/subgraphs/issues/939
     blocksPerYear = ETHEREUM_BLOCKS_PER_YEAR;
     blocksPerDay = BigDecimal.fromString(
-      (ETHEREUM_BLOCKS_PER_YEAR / 365).toString()
+      (ETHEREUM_BLOCKS_PER_YEAR / 365).toString(),
     );
   }
 
@@ -540,7 +540,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     if (underlying.toHexString().toLowerCase() == GOHM_ADDRESS.toLowerCase()) {
       log.warning(
         "[handleAccrueInterest] sOHM migrated to gOHM in market: {} at block: {}",
-        [marketID, event.block.number.toString()]
+        [marketID, event.block.number.toString()],
       );
 
       const newInputToken = new Token(GOHM_ADDRESS);
@@ -561,7 +561,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    blocksPerYear
+    blocksPerYear,
   );
 
   // creates and initializes market snapshots
@@ -572,7 +572,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   getOrCreateMarketDailySnapshot(
     market,
     event.block.timestamp,
-    event.block.number
+    event.block.number,
   );
 
   //
@@ -581,7 +581,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   getOrCreateMarketHourlySnapshot(
     market,
     event.block.timestamp,
-    event.block.number
+    event.block.number,
   );
 
   // handles fuse and admin fees (ie, protocol-side)
@@ -594,14 +594,14 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.timestamp,
     trollerAddr,
     blocksPerDay,
-    true // update all prices on each transaction for arbitrum / ethereum
+    true, // update all prices on each transaction for arbitrum / ethereum
   );
   updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
   snapshotFinancials(
     Address.fromString(FACTORY_CONTRACT),
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
   );
 }
 
@@ -609,7 +609,7 @@ export function handleNewFuseFee(event: NewFuseFee): void {
   updateOrCreateRariFee(
     event.params.newFuseFeeMantissa,
     RariFee.FUSE_FEE,
-    event.address.toHexString()
+    event.address.toHexString(),
   );
 }
 
@@ -617,7 +617,7 @@ export function handleNewAdminFee(event: NewAdminFee): void {
   updateOrCreateRariFee(
     event.params.newAdminFeeMantissa,
     RariFee.ADMIN_FEE,
-    event.address.toHexString()
+    event.address.toHexString(),
   );
 }
 
@@ -634,7 +634,7 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    factoryContract
+    factoryContract,
   );
 }
 
@@ -650,7 +650,7 @@ function getComptrollerAddress(event: ethereum.Event): Address {
     // comptroller does not exist
     log.warning(
       "[handleTransaction] Comptroller not found for transaction: {}",
-      [event.transaction.hash.toHexString()]
+      [event.transaction.hash.toHexString()],
     );
     return Address.fromString(ZERO_ADDRESS);
   }
@@ -662,7 +662,7 @@ function getComptrollerAddress(event: ethereum.Event): Address {
 function updateOrCreateRariFee(
   rateMantissa: BigInt,
   rariFeeType: string,
-  marketID: string
+  marketID: string,
 ): void {
   const rariFeeId =
     InterestRateSide.BORROWER + "-" + rariFeeType + "-" + marketID;
@@ -707,7 +707,7 @@ function updateMarket(
   blockTimestamp: BigInt,
   comptroller: Address,
   blocksPerDay: BigDecimal,
-  updateMarketPrices: boolean
+  updateMarketPrices: boolean,
 ): void {
   const market = Market.load(marketID);
   if (!market) {
@@ -731,7 +731,7 @@ function updateMarket(
   // grab price of ETH then multiply by underlying price
   const customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
   const ethPriceUSD = customETHPrice.usdPrice.div(
-    customETHPrice.decimalsBaseTen
+    customETHPrice.decimalsBaseTen,
   );
 
   let underlyingTokenPriceUSD: BigDecimal;
@@ -740,10 +740,10 @@ function updateMarket(
       marketID,
     ]);
     const backupPrice = getUsdPricePerToken(
-      Address.fromString(market.inputToken)
+      Address.fromString(market.inputToken),
     );
     underlyingTokenPriceUSD = backupPrice.usdPrice.div(
-      backupPrice.decimalsBaseTen
+      backupPrice.decimalsBaseTen,
     );
   } else {
     const mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
@@ -772,10 +772,10 @@ function updateMarket(
       underlyingTokenPriceUSD.ge(BigDecimal.fromString("2")))
   ) {
     const customPrice = getUsdPricePerToken(
-      Address.fromString(market.inputToken)
+      Address.fromString(market.inputToken),
     );
     underlyingTokenPriceUSD = customPrice.usdPrice.div(
-      customPrice.decimalsBaseTen
+      customPrice.decimalsBaseTen,
     );
   }
 
@@ -786,7 +786,7 @@ function updateMarket(
   ) {
     const customPrice = getUsdPricePerToken(Address.fromString(FLOAT_ADDRESS));
     underlyingTokenPriceUSD = customPrice.usdPrice.div(
-      customPrice.decimalsBaseTen
+      customPrice.decimalsBaseTen,
     );
   }
 
@@ -820,7 +820,7 @@ function updateMarket(
   if (updateMarketData.exchangeRateStoredResult.reverted) {
     log.warning(
       "[updateMarket] Failed to get exchangeRateStored of Market {}",
-      [marketID]
+      [marketID],
     );
   } else {
     // Formula: check out "Interpreting Exchange Rates" in https://compound.finance/docs#protocol-math
@@ -829,12 +829,12 @@ function updateMarket(
         .toBigDecimal()
         .div(
           exponentToBigDecimal(
-            mantissaFactor + underlyingToken.decimals - outputTokenDecimals
-          )
+            mantissaFactor + underlyingToken.decimals - outputTokenDecimals,
+          ),
         );
     market.exchangeRate = oneCTokenInUnderlying;
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
-      underlyingTokenPriceUSD
+      underlyingTokenPriceUSD,
     );
 
     // calculate inputTokenBalance only if exchangeRate is updated properly
@@ -843,7 +843,7 @@ function updateMarket(
     if (underlyingToken.decimals > outputTokenDecimals) {
       // we want to multiply out the difference to expand BD
       const mantissaFactorBD = exponentToBigDecimal(
-        underlyingToken.decimals - outputTokenDecimals
+        underlyingToken.decimals - outputTokenDecimals,
       );
       const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
@@ -851,12 +851,12 @@ function updateMarket(
         .times(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
+        inputTokenBalanceBD.toString(),
       );
     } else {
       // we want to divide back the difference to decrease the BD
       const mantissaFactorBD = exponentToBigDecimal(
-        outputTokenDecimals - underlyingToken.decimals
+        outputTokenDecimals - underlyingToken.decimals,
       );
       const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
@@ -864,7 +864,7 @@ function updateMarket(
         .div(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
+        inputTokenBalanceBD.toString(),
       );
     }
   }
@@ -891,8 +891,8 @@ function updateMarket(
       marketID,
       convertRatePerUnitToAPY(
         updateMarketData.supplyRateResult.value,
-        updateMarketData.unitPerYear
-      )
+        updateMarketData.unitPerYear,
+      ),
     );
   }
 
@@ -905,8 +905,8 @@ function updateMarket(
       marketID,
       convertRatePerUnitToAPY(
         updateMarketData.borrowRateResult.value,
-        updateMarketData.unitPerYear
-      )
+        updateMarketData.unitPerYear,
+      ),
     );
   }
 
@@ -923,13 +923,13 @@ function updateMarket(
   const fuseFeeId =
     InterestRateSide.BORROWER + "-" + RariFee.FUSE_FEE + "-" + marketID;
   const fuseFee = InterestRate.load(fuseFeeId)!.rate.div(
-    exponentToBigDecimal(INT_TWO)
+    exponentToBigDecimal(INT_TWO),
   );
 
   const adminFeeId =
     InterestRateSide.BORROWER + "-" + RariFee.ADMIN_FEE + "-" + marketID;
   const adminFee = InterestRate.load(adminFeeId)!.rate.div(
-    exponentToBigDecimal(INT_TWO)
+    exponentToBigDecimal(INT_TWO),
   );
 
   const interestAccumulatedUSD = interestAccumulatedMantissa
@@ -938,14 +938,14 @@ function updateMarket(
     .times(underlyingTokenPriceUSD);
 
   const protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
-    market._reserveFactor.plus(fuseFee).plus(adminFee)
+    market._reserveFactor.plus(fuseFee).plus(adminFee),
   );
   const supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
-    protocolSideRevenueUSDDelta
+    protocolSideRevenueUSDDelta,
   );
 
   market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
-    interestAccumulatedUSD
+    interestAccumulatedUSD,
   );
   market.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
@@ -957,10 +957,10 @@ function updateMarket(
   const dailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     blockTimestamp,
-    blockNumber
+    blockNumber,
   );
   dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
-    interestAccumulatedUSD
+    interestAccumulatedUSD,
   );
   dailySnapshot.dailyProtocolSideRevenueUSD =
     dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
@@ -972,13 +972,13 @@ function updateMarket(
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     blockTimestamp,
-    blockNumber
+    blockNumber,
   );
   hourlySnapshot.hourlyTotalRevenueUSD =
     hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);
   hourlySnapshot.hourlyProtocolSideRevenueUSD =
     hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSDDelta
+      protocolSideRevenueUSDDelta,
     );
   hourlySnapshot.hourlySupplySideRevenueUSD =
     hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
@@ -989,7 +989,7 @@ function updateRewards(
   rewardDistributor: Address[],
   marketID: string,
   blocksPerDay: BigDecimal,
-  blockNumber: BigInt
+  blockNumber: BigInt,
 ): void {
   const market = Market.load(marketID);
   if (!market) {
@@ -1015,10 +1015,10 @@ function updateRewards(
     // get distributor contract and grab borrow/supply distribution
     const distributor = RewardsDistributorDelegator.bind(rewardDistributor[i]);
     const tryBorrowSpeeds = distributor.try_compBorrowSpeeds(
-      Address.fromString(marketID)
+      Address.fromString(marketID),
     );
     const trySupplySpeeds = distributor.try_compSupplySpeeds(
-      Address.fromString(marketID)
+      Address.fromString(marketID),
     );
     const tryRewardToken = distributor.try_rewardToken();
 
@@ -1037,7 +1037,7 @@ function updateRewards(
       // get reward token price
       const customPrice = getUsdPricePerToken(Address.fromString(token.id));
       const rewardTokenPriceUSD = customPrice.usdPrice.div(
-        customPrice.decimalsBaseTen
+        customPrice.decimalsBaseTen,
       );
       token.lastPriceUSD = rewardTokenPriceUSD;
       token.lastPriceBlockNumber = blockNumber;
@@ -1050,7 +1050,7 @@ function updateRewards(
           .div(exponentToBigDecimal(token.decimals));
         const rewardsPerDay = borrowRewardsBD.times(blocksPerDay);
         distributorRewards[0] = BigInt.fromString(
-          rewardsPerDay.truncate(0).toString()
+          rewardsPerDay.truncate(0).toString(),
         );
         distributorRewardsUSD[0] = rewardsPerDay.times(rewardTokenPriceUSD);
 
@@ -1073,7 +1073,7 @@ function updateRewards(
           .div(exponentToBigDecimal(token.decimals));
         const rewardsPerDay = supplyRewardsBD.times(blocksPerDay);
         distributorRewards[1] = BigInt.fromString(
-          rewardsPerDay.truncate(0).toString()
+          rewardsPerDay.truncate(0).toString(),
         );
         distributorRewardsUSD[1] = rewardsPerDay.times(rewardTokenPriceUSD);
 
@@ -1105,7 +1105,7 @@ function updateRewards(
 
 function updateAllMarketPrices(
   comptrollerAddr: Address,
-  blockNumber: BigInt
+  blockNumber: BigInt,
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -1115,7 +1115,7 @@ function updateAllMarketPrices(
     return;
   }
   const priceOracle = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
+    Address.fromString(protocol._priceOracle),
   );
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
@@ -1131,10 +1131,10 @@ function updateAllMarketPrices(
     // update market price
     const customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
     const ethPriceUSD = customETHPrice.usdPrice.div(
-      customETHPrice.decimalsBaseTen
+      customETHPrice.decimalsBaseTen,
     );
     const tryUnderlyingPrice = priceOracle.try_getUnderlyingPrice(
-      Address.fromString(market.id)
+      Address.fromString(market.id),
     );
 
     let underlyingTokenPriceUSD: BigDecimal;

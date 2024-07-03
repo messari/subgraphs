@@ -1,0 +1,12 @@
+{
+  "deployment": "FRAX_ETHER_STAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "sfrxeth": {
+    "address": "0xac3e018457b222d93114458476f3e3416abbe38f",
+    "startBlock": "15686046"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

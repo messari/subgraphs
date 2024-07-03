@@ -113,14 +113,14 @@ export function handleMarketListed(event: MarketListed): void {
   const cTokenContract = CToken.bind(event.params.cToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
+    BIGINT_ZERO,
   );
   if (cTokenAddr == nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
       nativeToken,
       nativeCToken,
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     );
     _handleMarketListed(marketListedData, event);
     return;
@@ -130,7 +130,7 @@ export function handleMarketListed(event: MarketListed): void {
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
+      [cTokenAddr.toHexString()],
     );
     return;
   }
@@ -143,18 +143,18 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
 
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
 }
 
@@ -163,7 +163,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    true
+    true,
   );
 }
 
@@ -172,7 +172,7 @@ export function handleMarketExited(event: MarketExited): void {
     comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    false
+    false,
   );
 }
 
@@ -183,7 +183,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const protocol = getOrCreateProtocol();
   const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
@@ -209,7 +209,7 @@ export function handleMint(event: Mint): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     comptrollerAddr,
@@ -217,7 +217,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -227,7 +227,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     comptrollerAddr,
@@ -235,7 +235,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -245,7 +245,7 @@ export function handleBorrow(event: BorrowEvent): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     comptrollerAddr,
@@ -253,7 +253,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -264,7 +264,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     comptrollerAddr,
@@ -273,7 +273,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -290,7 +290,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -304,7 +304,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
     getPrice(marketAddress, protocol._priceOracle),
-    SECONDS_PER_YEAR
+    SECONDS_PER_YEAR,
   );
 
   const interestAccumulated = event.params.interestAccumulated;
@@ -315,7 +315,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     interestAccumulated,
     totalBorrows,
     false, // do not update market prices since not all markets have proper price oracle
-    event
+    event,
   );
 
   // Rewards not started until block 64549279
@@ -330,7 +330,7 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    comptrollerAddr,
   );
 }
 
@@ -342,7 +342,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "aurigami",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    comptroller.try_oracle(),
   );
   return _getOrCreateProtocol(protocolData);
 }
@@ -354,7 +354,7 @@ function getOrCreateProtocol(): LendingProtocol {
 class RewardTokenEmission {
   constructor(
     public readonly amount: BigInt,
-    public readonly amountUSD: BigDecimal
+    public readonly amountUSD: BigDecimal,
   ) {}
 }
 
@@ -369,7 +369,7 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
   const auriLensContract = AuriLens.bind(AURI_LENS_CONTRACT_ADDRESS);
   const tryRewardSpeeds = auriLensContract.try_getRewardSpeeds(
     comptrollerAddr,
-    event.address
+    event.address,
   );
 
   market.rewardTokens = [
@@ -394,7 +394,7 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
   rewards = getRewardsPerDay(
     tryRewardSpeeds.value.plyRewardBorrowSpeed,
     RewardToken.load(market.rewardTokens![0]),
-    getPrice(PLY_MARKET, protocol._priceOracle)
+    getPrice(PLY_MARKET, protocol._priceOracle),
   );
   rewardsAmount.push(rewards.amount);
   rewardsAmountUSD.push(rewards.amountUSD);
@@ -403,7 +403,7 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
   rewards = getRewardsPerDay(
     tryRewardSpeeds.value.auroraRewardBorrowSpeed,
     RewardToken.load(market.rewardTokens![1]),
-    getPrice(AURORA_MARKET, protocol._priceOracle)
+    getPrice(AURORA_MARKET, protocol._priceOracle),
   );
   rewardsAmount.push(rewards.amount);
   rewardsAmountUSD.push(rewards.amountUSD);
@@ -412,7 +412,7 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
   rewards = getRewardsPerDay(
     tryRewardSpeeds.value.plyRewardSupplySpeed,
     RewardToken.load(market.rewardTokens![2]),
-    getPrice(PLY_MARKET, protocol._priceOracle)
+    getPrice(PLY_MARKET, protocol._priceOracle),
   );
   rewardsAmount.push(rewards.amount);
   rewardsAmountUSD.push(rewards.amountUSD);
@@ -421,7 +421,7 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
   rewards = getRewardsPerDay(
     tryRewardSpeeds.value.auroraRewardSupplySpeed,
     RewardToken.load(market.rewardTokens![3]),
-    getPrice(AURORA_MARKET, protocol._priceOracle)
+    getPrice(AURORA_MARKET, protocol._priceOracle),
   );
   rewardsAmount.push(rewards.amount);
   rewardsAmountUSD.push(rewards.amountUSD);
@@ -434,7 +434,7 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
 function getRewardsPerDay(
   rewardSpeed: BigInt,
   rewardToken: RewardToken | null,
-  price: ethereum.CallResult<BigInt>
+  price: ethereum.CallResult<BigInt>,
 ): RewardTokenEmission {
   // Reward speed of <= 1 is 0
   if (rewardSpeed.gt(BIGINT_ONE) && rewardToken) {
@@ -454,7 +454,7 @@ function getRewardsPerDay(
 
 function getOrCreateRewardToken(
   tokenAddress: Address,
-  type: string
+  type: string,
 ): RewardToken {
   const rewardTokenId = type.concat("-").concat(tokenAddress.toHexString());
   let rewardToken = RewardToken.load(rewardTokenId);
@@ -482,7 +482,7 @@ function getOrCreateToken(tokenAddress: Address): Token {
 
 function getPrice(
   marketAddress: Address,
-  priceOracle: string
+  priceOracle: string,
 ): ethereum.CallResult<BigInt> {
   //
   //
@@ -492,22 +492,22 @@ function getPrice(
 
   if (marketAddress == PLY_MARKET) {
     return ethereum.CallResult.fromValue(
-      getPriceFromLp(priceOracle, WNEAR_MARKET, PLY_MARKET, WNEAR_PLY_LP)
+      getPriceFromLp(priceOracle, WNEAR_MARKET, PLY_MARKET, WNEAR_PLY_LP),
     );
   }
   if (marketAddress == AURORA_MARKET) {
     return ethereum.CallResult.fromValue(
-      getPriceFromLp(priceOracle, ETH_MARKET, AURORA_MARKET, AURORA_ETH_LP)
+      getPriceFromLp(priceOracle, ETH_MARKET, AURORA_MARKET, AURORA_ETH_LP),
     );
   }
   if (marketAddress == TRI_MARKET) {
     return ethereum.CallResult.fromValue(
-      getPriceFromLp(priceOracle, USDT_MARKET, TRI_MARKET, TRI_USDT_LP)
+      getPriceFromLp(priceOracle, USDT_MARKET, TRI_MARKET, TRI_USDT_LP),
     );
   }
   if (marketAddress == USN_MARKET) {
     return ethereum.CallResult.fromValue(
-      getPriceFromLp(priceOracle, WNEAR_MARKET, USN_MARKET, WNEAR_USN_LP)
+      getPriceFromLp(priceOracle, WNEAR_MARKET, USN_MARKET, WNEAR_USN_LP),
     );
   }
 
@@ -520,7 +520,7 @@ function getPriceFromLp(
   priceOracle: string, // aurigami price oracle
   knownMarketID: Address, // address of the market we know the price of
   wantAddress: Address, // market address of token we want to price
-  lpAddress: Address // address of LP token
+  lpAddress: Address, // address of LP token
 ): BigInt {
   const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
   const knownMarket = Market.load(knownMarketID.toHexString());
@@ -531,7 +531,7 @@ function getPriceFromLp(
   const knownMarketDecimals = Token.load(knownMarket.inputToken)!.decimals;
   const knownPriceUSD = getTokenPriceUSD(
     oracleContract.try_getUnderlyingPrice(knownMarketID),
-    knownMarketDecimals
+    knownMarketDecimals,
   );
 
   const lpPair = Pair.bind(lpAddress);
@@ -602,6 +602,6 @@ function getPriceFromLp(
     priceBD
       .times(exponentToBigDecimal(reverseMantissaFactor))
       .truncate(0)
-      .toString()
+      .toString(),
   );
 }

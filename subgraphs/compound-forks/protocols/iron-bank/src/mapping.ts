@@ -107,7 +107,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    true
+    true,
   );
 }
 
@@ -116,7 +116,7 @@ export function handleMarketExited(event: MarketExited): void {
     comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    false
+    false,
   );
 }
 
@@ -148,14 +148,14 @@ export function handleMarketListed(event: MarketListed): void {
   const cTokenContract = CToken.bind(event.params.cToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
+    BIGINT_ZERO,
   );
 
   const underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
+      [cTokenAddr.toHexString()],
     );
     return;
   }
@@ -168,18 +168,18 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
 
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
 }
 
@@ -190,7 +190,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const protocol = getOrCreateProtocol();
   const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
@@ -216,7 +216,7 @@ export function handleMint(event: Mint): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     comptrollerAddr,
@@ -224,7 +224,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -234,7 +234,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     comptrollerAddr,
@@ -242,7 +242,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -252,7 +252,7 @@ export function handleBorrow(event: BorrowEvent): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     comptrollerAddr,
@@ -260,7 +260,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -271,7 +271,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     comptrollerAddr,
@@ -280,7 +280,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -297,7 +297,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -306,7 +306,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
+    Address.fromString(protocol._priceOracle),
   );
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
@@ -314,7 +314,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    unitPerYear
+    unitPerYear,
   );
   const interestAccumulated = event.params.interestAccumulated;
   const totalBorrows = event.params.totalBorrows;
@@ -324,7 +324,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     interestAccumulated,
     totalBorrows,
     false, // do not update all prices
-    event
+    event,
   );
 }
 
@@ -334,12 +334,12 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    comptrollerAddr,
   );
 }
 
 export function handleStakingRewardsCreated(
-  event: StakingRewardsCreated
+  event: StakingRewardsCreated,
 ): void {
   log.info(
     "[handleStakingRewardsCreated]StakingReward contract {} created for token {} at tx {}",
@@ -347,7 +347,7 @@ export function handleStakingRewardsCreated(
       event.params.stakingRewards.toHexString(),
       event.params.stakingToken.toHexString(),
       event.transaction.hash.toHexString(),
-    ]
+    ],
   );
 
   StakingRewardsTemplate.create(event.params.stakingRewards);
@@ -357,14 +357,14 @@ export function handleStaked(event: Staked): void {
   const rewardContract = StakingRewardsContract.bind(event.address);
   const marketID = getOrElse<Address>(
     rewardContract.try_getStakingToken(),
-    Address.zero()
+    Address.zero(),
   ).toHexString();
 
   const market = Market.load(marketID);
   if (!market) {
     log.error(
       "[handleStaked]market does not exist for staking token {} at tx {}",
-      [marketID, event.transaction.hash.toHexString()]
+      [marketID, event.transaction.hash.toHexString()],
     );
     return;
   }
@@ -376,14 +376,14 @@ export function handleWithdrawn(event: Withdrawn): void {
   const rewardContract = StakingRewardsContract.bind(event.address);
   const marketID = getOrElse<Address>(
     rewardContract.try_getStakingToken(),
-    Address.zero()
+    Address.zero(),
   ).toHexString();
 
   const market = Market.load(marketID);
   if (!market) {
     log.error(
       "[handleStaked]market does not exist for staking token {} at tx {}",
-      [marketID, event.transaction.hash.toHexString()]
+      [marketID, event.transaction.hash.toHexString()],
     );
     return;
   }
@@ -395,14 +395,14 @@ export function handleRewardPaid(event: RewardPaid): void {
   const rewardContract = StakingRewardsContract.bind(event.address);
   const marketID = getOrElse<Address>(
     rewardContract.try_getStakingToken(),
-    Address.zero()
+    Address.zero(),
   ).toHexString();
 
   const market = Market.load(marketID);
   if (!market) {
     log.error(
       "[handleRewardPaid]market does not exist for staking token {} at tx {}",
-      [marketID, event.transaction.hash.toHexString()]
+      [marketID, event.transaction.hash.toHexString()],
     );
     return;
   }
@@ -439,7 +439,7 @@ export function handleRewardPaid(event: RewardPaid): void {
   const _cumulativeRewardAmount = market._cumulativeRewardAmount;
   if (_cumulativeRewardAmount) {
     market._cumulativeRewardAmount = market._cumulativeRewardAmount!.plus(
-      event.params.reward
+      event.params.reward,
     );
   } else {
     market._cumulativeRewardAmount = event.params.reward;
@@ -450,7 +450,7 @@ export function handleRewardPaid(event: RewardPaid): void {
   if (!market._rewardLastUpdatedTimestamp) {
     log.info(
       "[handleRewardPaid]_rewardLastUpdatedTimestamp for market {} not set, skip updating reward emission, current timestamp={}",
-      [market.id, currTimestamp.toString()]
+      [market.id, currTimestamp.toString()],
     );
     market._rewardLastUpdatedTimestamp = currTimestamp;
     market.save();
@@ -460,12 +460,15 @@ export function handleRewardPaid(event: RewardPaid): void {
   // update reward emission every day or longer
   if (
     currTimestamp.lt(
-      market._rewardLastUpdatedTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
+      market._rewardLastUpdatedTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY)),
     )
   ) {
     log.info(
       "[handleRewardPaid]Reward emission updated less than 1 day ago (_rewardLastUpdatedTimestamp={}, current timestamp={}), skip updating reward emission",
-      [market._rewardLastUpdatedTimestamp!.toString(), currTimestamp.toString()]
+      [
+        market._rewardLastUpdatedTimestamp!.toString(),
+        currTimestamp.toString(),
+      ],
     );
     return;
   }
@@ -475,7 +478,7 @@ export function handleRewardPaid(event: RewardPaid): void {
     .toBigDecimal();
   const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
   const rewardTokenEmissionsAmount = bigDecimalToBigInt(
-    market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
+    market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler),
   );
   const IBTokenPriceUSD = getIBTokenPrice(event);
   let rewardTokenEmissionsUSD = BIGDECIMAL_ZERO;
@@ -506,7 +509,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "iron-bank",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    comptroller.try_oracle(),
   );
   return _getOrCreateProtocol(protocolData);
 }
@@ -518,13 +521,13 @@ function getIBTokenPrice(event: ethereum.Event): BigDecimal | null {
   const IBPriceInrETH = getToken0PriceInToken1(
     rETH_IB_POOL_ADDRESS,
     IB_TOKEN_ADDRESS,
-    rETH_ADDRESS
+    rETH_ADDRESS,
   );
 
   const rETHPriceInUSD = getToken0PriceInToken1(
     rETH_OP_USD_POOL_ADDRESS,
     rETH_ADDRESS,
-    BB_aUSD_ADDRESS
+    BB_aUSD_ADDRESS,
   );
 
   if (!IBPriceInrETH || !rETHPriceInUSD) {
@@ -542,10 +545,10 @@ function getIBTokenPrice(event: ethereum.Event): BigDecimal | null {
 function getToken0PriceInToken1(
   poolAddress: string,
   token0: string,
-  token1: string
+  token1: string,
 ): BigDecimal | null {
   const poolContract = BeethovenXPoolContract.bind(
-    Address.fromString(poolAddress)
+    Address.fromString(poolAddress),
   );
   const vaultAddressResult = poolContract.try_getVault();
   if (vaultAddressResult.reverted) {
@@ -574,7 +577,7 @@ function getToken0PriceInToken1(
     .divDecimal(
       poolTokenBalances[token0Idx]
         .times(weightsResult.value[token1Idx])
-        .toBigDecimal()
+        .toBigDecimal(),
     );
   return token0PriceInToken1;
 }

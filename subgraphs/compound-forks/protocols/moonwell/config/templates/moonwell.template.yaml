@@ -1,6 +1,8 @@
-specVersion: 0.0.4
+specVersion: 1.0.0
 schema:
   file: ./schema.graphql
+indexerHints:
+  prune: auto
 {{#graftEnabled}}
 description: ...
 features:
@@ -75,6 +77,8 @@ templates:
           file: ./abis/PriceOracle.json
         - name: SolarBeamLPToken
           file: ./abis/moonwell/SolarBeamLPToken.json
+        - name: AerodromeLPToken
+          file: ./abis/moonwell/AerodromeLPToken.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

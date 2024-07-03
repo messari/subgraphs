@@ -3,7 +3,7 @@ name: Bug report
 about: Report a bug in our subgraphs or data
 title: "#bug; concise title"
 labels: bug
-assignees: bye43
+assignees: ishraq8
 ---
 
 **Describe the bug**

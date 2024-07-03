@@ -1,0 +1,12 @@
+{
+  "deployment": "FRAX_ETHER_STAKING_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "sfrxeth": {
+    "address": "0x3cd55356433c89e50dc51ab07ee0fa0a95623d53",
+    "startBlock": "24619258"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

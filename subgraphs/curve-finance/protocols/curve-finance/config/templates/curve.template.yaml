@@ -1,4 +1,4 @@
-specVersion: 0.0.5
+specVersion: 1.0.0
 repository: https://github.com/messari/subgraphs
 {{#graftEnabled}}
 features:
@@ -180,6 +180,8 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchange
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchangeWithPriceScale
         
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
@@ -187,6 +189,8 @@ dataSources:
         
         - event: AddLiquidity(indexed address,uint256[3],uint256,uint256)
           handler: handleAddLiquidity
+        - event: AddLiquidity(indexed address,uint256[3],uint256,uint256,uint256)
+          handler: handleAddLiquidityWithPriceScale
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidityWithFees
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
@@ -215,6 +219,9 @@ dataSources:
           receipt: true
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneWithSupply
+          receipt: true
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOneWithPriceScale
           receipt: true
         
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
@@ -377,6 +384,8 @@ templates:
           handler: handleTokenExchange
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchange
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchangeWithPriceScale
         
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
@@ -384,6 +393,8 @@ templates:
         
         - event: AddLiquidity(indexed address,uint256[3],uint256,uint256)
           handler: handleAddLiquidity
+        - event: AddLiquidity(indexed address,uint256[3],uint256,uint256,uint256)
+          handler: handleAddLiquidityWithPriceScale
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidityWithFees
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
@@ -412,6 +423,9 @@ templates:
           receipt: true
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneWithSupply
+          receipt: true
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOneWithPriceScale
           receipt: true
         
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)

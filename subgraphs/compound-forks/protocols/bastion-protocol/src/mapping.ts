@@ -108,7 +108,7 @@ export function handleNewRewardDistributor(event: NewRewardDistributor): void {
       event.params.newRewardDistributor.toHexString(),
       event.address.toHexString(),
       event.transaction.hash.toHexString(),
-    ]
+    ],
   );
   RewardDistributorTemplate.create(event.params.newRewardDistributor);
 }
@@ -127,7 +127,7 @@ export function handleMarketEntered(event: MarketEntered): void {
     comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    true
+    true,
   );
 }
 
@@ -136,7 +136,7 @@ export function handleMarketExited(event: MarketExited): void {
     comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
-    false
+    false,
   );
 }
 
@@ -159,7 +159,7 @@ export function handleMarketListed(event: MarketListed): void {
   const cTokenContract = CToken.bind(event.params.cToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
+    BIGINT_ZERO,
   );
 
   let marketNamePrefix = "";
@@ -176,7 +176,7 @@ export function handleMarketListed(event: MarketListed): void {
       protocol,
       nativeToken,
       nativeCToken,
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     );
     _handleMarketListed(marketListedData, event);
     const market = Market.load(cTokenAddr.toHexString());
@@ -187,7 +187,7 @@ export function handleMarketListed(event: MarketListed): void {
           cTokenAddr.toHexString(),
           event.transaction.hash.toHexString(),
           event.transactionLogIndex.toString(),
-        ]
+        ],
       );
       return;
     }
@@ -201,7 +201,7 @@ export function handleMarketListed(event: MarketListed): void {
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
+      [cTokenAddr.toHexString()],
     );
     return;
   }
@@ -214,17 +214,17 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
 
   const market = Market.load(cTokenAddr.toHexString());
@@ -235,7 +235,7 @@ export function handleMarketListed(event: MarketListed): void {
         cTokenAddr.toHexString(),
         event.transaction.hash.toHexString(),
         event.transactionLogIndex.toString(),
-      ]
+      ],
     );
     return;
   }
@@ -251,7 +251,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
+  event: NewLiquidationIncentive,
 ): void {
   const protocol = getOrCreateProtocol();
   const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
@@ -280,7 +280,7 @@ export function handleMint(event: Mint): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
+    event.params.minter,
   );
   _handleMint(
     comptrollerAddr,
@@ -288,7 +288,7 @@ export function handleMint(event: Mint): void {
     mintAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -298,7 +298,7 @@ export function handleRedeem(event: Redeem): void {
   const contract = CToken.bind(event.address);
   const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
+    event.params.redeemer,
   );
   _handleRedeem(
     comptrollerAddr,
@@ -306,7 +306,7 @@ export function handleRedeem(event: Redeem): void {
     redeemAmount,
     outputTokenSupplyResult,
     balanceOfUnderlyingResult,
-    event
+    event,
   );
 }
 
@@ -316,7 +316,7 @@ export function handleBorrow(event: BorrowEvent): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleBorrow(
     comptrollerAddr,
@@ -324,7 +324,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrowAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -335,7 +335,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
+    event.params.borrower,
   );
   _handleRepayBorrow(
     comptrollerAddr,
@@ -344,7 +344,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     repayAmount,
     borrowBalanceStoredResult,
     totalBorrows,
-    event
+    event,
   );
 }
 
@@ -361,7 +361,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower,
     seizeTokens,
     repayAmount,
-    event
+    event,
   );
 }
 
@@ -376,7 +376,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
         market && !market._realm ? "=null" : "",
         event.transaction.hash.toHexString(),
         event.transactionLogIndex.toHexString(),
-      ]
+      ],
     );
     return;
   }
@@ -414,7 +414,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddressForOracle),
-    SECONDS_PER_YEAR
+    SECONDS_PER_YEAR,
   );
   const interestAccumulated = event.params.interestAccumulated;
   const totalBorrows = event.params.totalBorrows;
@@ -424,7 +424,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     interestAccumulated,
     totalBorrows,
     false, // do not update all market prices
-    event
+    event,
   );
 }
 
@@ -434,7 +434,7 @@ export function handleTransfer(event: Transfer): void {
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    comptrollerAddr,
   );
 }
 
@@ -446,7 +446,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "bastion-protocol",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    comptroller.try_oracle(),
   );
   return _getOrCreateProtocol(protocolData);
 }
@@ -474,26 +474,26 @@ export function handleRewardAddressChanged(event: RewardAddressChanged): void {
 }
 
 export function handleRewardBorrowSpeedUpdated(
-  event: RewardBorrowSpeedUpdated
+  event: RewardBorrowSpeedUpdated,
 ): void {
   updateRewardSpeed(
     event.params.rewardType.toString(),
     event.params.cToken,
     event.params.newSpeed,
     RewardTokenType.BORROW,
-    event
+    event,
   );
 }
 
 export function handleRewardSupplySpeedUpdated(
-  event: RewardSupplySpeedUpdated
+  event: RewardSupplySpeedUpdated,
 ): void {
   updateRewardSpeed(
     event.params.rewardType.toString(),
     event.params.cToken,
     event.params.newSpeed,
     RewardTokenType.DEPOSIT,
-    event
+    event,
   );
 }
 
@@ -502,13 +502,13 @@ function updateRewardSpeed(
   cToken: Address,
   newSpeed: BigInt,
   rewardTokenType: RewardTokenType,
-  event: ethereum.Event
+  event: ethereum.Event,
 ): void {
   const rewardType = _RewardType.load(rewardTypeId);
   if (!rewardType) {
     log.error(
       "[updateRewardSpeed]RewardType {} doesn't exist in _RewardType tx {}",
-      [rewardTypeId, event.transaction.hash.toHexString()]
+      [rewardTypeId, event.transaction.hash.toHexString()],
     );
     return;
   }
@@ -552,12 +552,12 @@ function updateRewardSpeed(
       rewardEmissions = sortArrayByReference<string, BigInt>(
         rewardTokens,
         rewardTokensUnsorted,
-        rewardEmissions
+        rewardEmissions,
       );
       rewardEmissionsUSD = sortArrayByReference<string, BigDecimal>(
         rewardTokens,
         rewardTokensUnsorted,
-        rewardEmissionsUSD
+        rewardEmissionsUSD,
       );
     }
   } else {
@@ -580,18 +580,18 @@ function updateRewardSpeed(
       market.rewardTokenEmissionsUSD!.toString(),
       event.transaction.hash.toHexString(),
       event.transactionLogIndex.toString(),
-    ]
+    ],
   );
 
   getOrCreateMarketDailySnapshot(
     market,
     event.block.timestamp,
-    event.block.number
+    event.block.number,
   );
   getOrCreateMarketHourlySnapshot(
     market,
     event.block.timestamp,
-    event.block.number
+    event.block.number,
   );
 }
 
@@ -622,7 +622,7 @@ function updateRewardTokenPrices(market: Market): void {
       rewardEmissions[i]
         .toBigDecimal()
         .div(exponentToBigDecimal(token.decimals))
-        .times(priceUSD)
+        .times(priceUSD),
     );
   }
   market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
@@ -661,7 +661,7 @@ function getRewardTokenPrice(token: Token): BigDecimal {
     const oracleContract = PriceOracle.bind(bstnOracle);
     const price = getOrElse(
       oracleContract.try_getUnderlyingPrice(cBSTNContract),
-      BIGINT_ZERO
+      BIGINT_ZERO,
     );
     const priceUSD = price
       .toBigDecimal()
@@ -678,7 +678,7 @@ function getRewardTokenPrice(token: Token): BigDecimal {
     const oracleContract = PriceOracle.bind(nearOracle);
     const price = getOrElse(
       oracleContract.try_getUnderlyingPrice(cNearContract),
-      BIGINT_ZERO
+      BIGINT_ZERO,
     );
     const priceUSD = price
       .toBigDecimal()
@@ -710,7 +710,7 @@ function getRewardTokenPrice(token: Token): BigDecimal {
 export function sortArrayByReference<T, K>(
   reference: T[],
   array: T[],
-  toSort: K[]
+  toSort: K[],
 ): K[] {
   const sorted: K[] = new Array<K>();
   for (let i = 0; i < reference.length; i++) {
