@@ -88,8 +88,8 @@ export class Pool {
     this.pool.createdTimestamp = event.block.timestamp;
     this.pool.createdBlockNumber = event.block.number;
 
-    this.pool.inputTokenBalances = [];
-    this.pool.inputTokenBalancesUSD = [];
+    this.pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    this.pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     this.pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
