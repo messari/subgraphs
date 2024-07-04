@@ -94,9 +94,7 @@ export function getOrCreatePositionsNft(
   tokenId: BigInt,
   block: ethereum.Block
 ): _ThrusterPositionsNftHelper {
-  const id = Bytes.fromHexString(
-    poolAddress.toHexString().concat("-").concat(tokenId.toHexString())
-  );
+  const id = poolAddress.concatI32(tokenId.toI32());
   let positionsNft = _ThrusterPositionsNftHelper.load(id);
 
   if (!positionsNft) {
