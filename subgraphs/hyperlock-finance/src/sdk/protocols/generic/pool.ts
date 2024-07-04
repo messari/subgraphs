@@ -1,7 +1,7 @@
 import { TokenManager } from "./tokens";
 import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../../util/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, INT_ZERO } from "../../util/constants";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
@@ -88,8 +88,8 @@ export class Pool {
     this.pool.createdTimestamp = event.block.timestamp;
     this.pool.createdBlockNumber = event.block.number;
 
-    this.pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-    this.pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    this.pool.inputTokenBalances = [];
+    this.pool.inputTokenBalancesUSD = [];
     this.pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -214,6 +214,14 @@ export class Pool {
     balance: BigInt,
     updateMetrics: boolean = true
   ): void {
+    if (this.pool.inputTokenBalances == new Array<BigInt>()) {
+      this.pool.inputTokenBalances = new Array<BigInt>().fill(
+        BIGINT_ZERO,
+        INT_ZERO,
+        this.pool.inputTokens.length
+      );
+    }
+
     this.pool.inputTokenBalances[index] =
       this.pool.inputTokenBalances[index].plus(balance);
     this.setInputTokenBalancesUSD();
