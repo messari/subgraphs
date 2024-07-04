@@ -22,7 +22,7 @@ import * as POLYGON_ZKEVM from "../config/polygon_zkevm";
 import { Configurations, CustomPriceType } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-import { _ERC20 } from "../../../generated/DepositQueue/_ERC20";
+import { _ERC20 } from "../../../generated/ERC20PointsDeposit/_ERC20";
 import {
   Address,
   BigInt,

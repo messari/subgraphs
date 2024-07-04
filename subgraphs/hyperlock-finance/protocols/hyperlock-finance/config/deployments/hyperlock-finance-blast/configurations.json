@@ -1,6 +1,11 @@
 {
   "network": "blast-mainnet",
 
+  "ThrusterPointNFT": {
+    "address": "0x434575eaea081b735c985fa9bf63cd7b87e227f9",
+    "startBlock": "158648"
+  },
+
   "ERC20PointsDeposit": {
     "address": "0xc3ecadb7a5fab07c72af6bcfbd588b7818c4a40e",
     "startBlock": "469335"

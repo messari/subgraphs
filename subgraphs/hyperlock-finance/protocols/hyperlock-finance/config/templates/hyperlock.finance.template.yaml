@@ -11,6 +11,67 @@ graft:
 dataSources:
   - kind: ethereum
     network: {{ network }}
+    name: ThrusterPointNFT
+    source:
+      address: "{{ ThrusterPointNFT.address }}"
+      abi: ThrusterPointNFT
+      startBlock: {{ ThrusterPointNFT.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+      abis:
+        - name: ThrusterPointNFT
+          file: ./abis/ThrusterPointNFT.json
+        - name: ThrusterV2
+          file: ./abis/ThrusterV2.json
+        - name: ThrusterV3
+          file: ./abis/ThrusterV3.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: IncreaseLiquidity(indexed uint256,uint128,uint256,uint256,int24,int24,address)
+          handler: handleIncreaseLiquidity
+        - event: DecreaseLiquidity(indexed uint256,uint128,uint256,uint256,int24,int24,address)
+          handler: handleDecreaseLiquidity
+      file: ./src/mappings/thrusterPointNftMappings.ts
+  - kind: ethereum
+    network: {{ network }}
     name: ERC20PointsDeposit
     source:
       address: "{{ ERC20PointsDeposit.address }}"
@@ -27,6 +88,8 @@ dataSources:
           file: ./abis/ERC20PointsDeposit.json
         - name: ThrusterV2
           file: ./abis/ThrusterV2.json
+        - name: ThrusterV3
+          file: ./abis/ThrusterV3.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -84,6 +147,10 @@ dataSources:
       abis:
         - name: ERC721PointsDeposit
           file: ./abis/ERC721PointsDeposit.json
+        - name: ThrusterPointNFT
+          file: ./abis/ThrusterPointNFT.json
+        - name: ThrusterV2
+          file: ./abis/ThrusterV2.json
         - name: ThrusterV3
           file: ./abis/ThrusterV3.json
         - name: ERC20

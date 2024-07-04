@@ -159,6 +159,18 @@ export class Pool {
   }
 
   /**
+   * Utility function to get the input token at any given index.
+   *
+   * @param index
+   * @returns The input token.
+   */
+  getInputToken(index: i32): Token {
+    return this.tokens.getOrCreateToken(
+      Address.fromBytes(this.pool.inputTokens.at(index))
+    );
+  }
+
+  /**
    * Utility function to convert some amount of input token to USD.
    *
    * @param token
@@ -183,6 +195,27 @@ export class Pool {
     updateMetrics: boolean = true
   ): void {
     this.pool.inputTokenBalances = newBalances;
+    this.setInputTokenBalancesUSD();
+    if (updateMetrics) {
+      this.refreshTotalValueLocked();
+    }
+  }
+
+  /**
+   * Adds the pool's input token balance to the given amount for a given index. It will optionally
+   * update the pool's and protocol's total value locked. If not stated, will default to true.
+   *
+   * @param index index of the input token.
+   * @param amount amount to be set as the pool's input token balance.
+   * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
+   */
+  addInputTokenBalance(
+    index: i32,
+    balance: BigInt,
+    updateMetrics: boolean = true
+  ): void {
+    this.pool.inputTokenBalances[index] =
+      this.pool.inputTokenBalances[index].plus(balance);
     this.setInputTokenBalancesUSD();
     if (updateMetrics) {
       this.refreshTotalValueLocked();

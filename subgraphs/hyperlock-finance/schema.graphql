@@ -350,3 +350,19 @@ type _ActivityHelper @entity {
 
   dailyActiveUsers: Int!
 }
+
+type _ThrusterPositionsNftHelper @entity {
+  " { pool address }-{ nft token id } "
+  id: Bytes!
+
+  token0: Bytes!
+  token1: Bytes!
+
+  amount0: BigInt! 
+  amount1: BigInt! 
+  
+  liquidity: BigInt!
+
+  lastUpdateBlockNumber: BigInt!
+  lastUpdateTimestamp: BigInt!
+}

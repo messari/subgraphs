@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/DepositQueue/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/ERC20PointsDeposit/CalculationsCurve";
 
 export function getCalculationsCurveContract(
   contract: OracleContract,

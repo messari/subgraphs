@@ -4,8 +4,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/DepositQueue/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/DepositQueue/CurveRegistry";
+import { CurvePool as CurvePoolContract } from "../../../generated/ERC20PointsDeposit/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/ERC20PointsDeposit/CurveRegistry";
 
 export function isCurveLpToken(
   lpAddress: Address,
