@@ -4,8 +4,8 @@ import * as constants from "../common/constants";
 import { Pool } from "../sdk/protocols/generic/pool";
 import { ProtocolConfig } from "../sdk/protocols/config";
 import { Pricer, TokenInit, readValue } from "../common/utils";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _ThrusterPositionsNftHelper } from "../../generated/schema";
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { ThrusterV2 } from "../../generated/ERC20PointsDeposit/ThrusterV2";
 import { ThrusterPointNFT } from "../../generated/ThrusterPointNFT/ThrusterPointNFT";
 
