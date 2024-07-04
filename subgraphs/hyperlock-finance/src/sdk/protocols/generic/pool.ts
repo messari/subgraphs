@@ -214,11 +214,11 @@ export class Pool {
     balance: BigInt,
     updateMetrics: boolean = true
   ): void {
-    if (this.pool.inputTokenBalances == new Array<BigInt>()) {
+    if (this.pool.inputTokenBalances.length == 0) {
       this.pool.inputTokenBalances = new Array<BigInt>().fill(
         BIGINT_ZERO,
         INT_ZERO,
-        this.pool.inputTokens.length
+        this.pool.inputTokens.length - 1
       );
     }
 
