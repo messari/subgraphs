@@ -3,12 +3,19 @@ import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { getUpdatedPricedToken } from "./helpers";
 
 import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import { ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
+import {
+  BIGINT_MINUS_ONE,
+  BIGINT_ZERO,
+  ETH_ADDRESS,
+  INT_ZERO,
+  ZERO_ADDRESS,
+} from "../sdk/util/constants";
 
 import { Token } from "../../generated/schema";
 import { AddEntity } from "../../generated/Factory/Factory";
@@ -17,6 +24,7 @@ import { Collateral as CollateralTemplate } from "../../generated/templates";
 import {
   Deposit,
   Withdraw,
+  Collateral,
 } from "../../generated/templates/Collateral/Collateral";
 
 const conf = new ProtocolConfig(
@@ -28,14 +36,54 @@ const conf = new ProtocolConfig(
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
-    const pricedToken = Address.fromBytes(token.id);
-    return getUsdPricePerToken(pricedToken).usdPrice;
+    const pricedToken = getUpdatedPricedToken(Address.fromBytes(token.id));
+    const pricedTokenAddr = pricedToken.addr;
+    const pricedTokenMultiplier = pricedToken.multiplier;
+    const pricedTokenChanged = pricedToken.changed;
+
+    const returnedPrice = getUsdPricePerToken(pricedTokenAddr).usdPrice.times(
+      pricedTokenMultiplier
+    );
+    if (pricedTokenChanged) {
+      log.debug(
+        "[getTokenPrice] inputToken: {} pricedToken: {} multiplier: {} returnedPrice: {}",
+        [
+          token.id.toHexString(),
+          pricedTokenAddr.toHexString(),
+          pricedTokenMultiplier.toString(),
+          returnedPrice.toString(),
+        ]
+      );
+    }
+
+    return returnedPrice;
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
-    const pricedToken = Address.fromBytes(token.id);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
-    return getUsdPrice(pricedToken, _amount);
+
+    const pricedToken = getUpdatedPricedToken(Address.fromBytes(token.id));
+    const pricedTokenAddr = pricedToken.addr;
+    const pricedTokenMultiplier = pricedToken.multiplier;
+    const pricedTokenChanged = pricedToken.changed;
+
+    const returnedPrice = getUsdPrice(pricedTokenAddr, _amount).times(
+      pricedTokenMultiplier
+    );
+    if (pricedTokenChanged) {
+      log.debug(
+        "[getAmountValueUSD] inputToken: {} pricedToken: {} multiplier: {} amount: {} returnedPrice: {}",
+        [
+          token.id.toHexString(),
+          pricedTokenAddr.toHexString(),
+          pricedTokenMultiplier.toString(),
+          _amount.toString(),
+          returnedPrice.toString(),
+        ]
+      );
+    }
+
+    return returnedPrice;
   }
 }
 
@@ -83,34 +131,90 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleAddEntity(event: AddEntity): void {
-  log.warning("[AddEntity] collateral: {} tx: {}", [
-    event.params.entity.toHexString(),
-    event.transaction.hash.toHexString(),
-  ]);
   CollateralTemplate.create(event.params.entity);
 }
 
 export function handleDeposit(event: Deposit): void {
-  log.warning(
-    "[Deposit] depositor: {} recipient: {} amount: {} tx.from: {} tx: {}",
-    [
-      event.params.depositor.toHexString(),
-      event.params.recipient.toHexString(),
-      event.params.amount.toString(),
-      event.transaction.from.toHexString(),
-      event.transaction.hash.toHexString(),
-    ]
+  const user = event.transaction.from;
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
   );
+
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
+
+  let asset = Address.fromString(ZERO_ADDRESS);
+  const collateralContract = Collateral.bind(event.address);
+  const assetCall = collateralContract.try_asset();
+  if (!assetCall.reverted) {
+    asset = assetCall.value;
+  }
+  const token = sdk.Tokens.getOrCreateToken(asset);
+  const outputToken = sdk.Tokens.getOrCreateToken(event.address);
+
+  const pool = sdk.Pools.loadPool(outputToken.id);
+  if (!pool.isInitialized) {
+    pool.initialize(
+      outputToken.name,
+      outputToken.symbol,
+      [token.id],
+      outputToken,
+      true
+    );
+  }
+
+  const amount = event.params.amount;
+  let totalSupply = BIGINT_ZERO;
+  const totalSupplyCall = collateralContract.try_totalSupply();
+  if (!totalSupplyCall.reverted) {
+    totalSupply = totalSupplyCall.value;
+  }
+
+  pool.addInputTokenBalances([amount], true);
+  pool.setOutputTokenSupply(outputToken, totalSupply);
 }
 export function handleWithdraw(event: Withdraw): void {
-  log.warning(
-    "[Withdraw] withdrawer: {} recipient: {} amount: {} tx.from: {} tx: {}",
-    [
-      event.params.withdrawer.toHexString(),
-      event.params.recipient.toHexString(),
-      event.params.amount.toString(),
-      event.transaction.from.toHexString(),
-      event.transaction.hash.toHexString(),
-    ]
+  const user = event.transaction.from;
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
   );
+
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
+
+  let asset = Address.fromString(ZERO_ADDRESS);
+  const collateralContract = Collateral.bind(event.address);
+  const assetCall = collateralContract.try_asset();
+  if (!assetCall.reverted) {
+    asset = assetCall.value;
+  }
+  const token = sdk.Tokens.getOrCreateToken(asset);
+  const outputToken = sdk.Tokens.getOrCreateToken(event.address);
+
+  const pool = sdk.Pools.loadPool(outputToken.id);
+  if (!pool.isInitialized) {
+    pool.initialize(
+      outputToken.name,
+      outputToken.symbol,
+      [token.id],
+      outputToken,
+      true
+    );
+  }
+
+  const amount = event.params.amount;
+  let totalSupply = BIGINT_ZERO;
+  const totalSupplyCall = collateralContract.try_totalSupply();
+  if (!totalSupplyCall.reverted) {
+    totalSupply = totalSupplyCall.value;
+  }
+
+  pool.addInputTokenBalances([amount.times(BIGINT_MINUS_ONE)], true);
+  pool.setOutputTokenSupply(outputToken, totalSupply);
 }

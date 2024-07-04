@@ -2,5 +2,5 @@
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_NAME = "Impermax Finance";
-export const PROTOCOL_SLUG = "impermax-finance";
+export const PROTOCOL_NAME = "Symbiotic";
+export const PROTOCOL_SLUG = "symbiotic";

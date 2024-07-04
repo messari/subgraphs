@@ -75,6 +75,11 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Mispriced Tokens
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
       eventHandlers:
         - event: AddEntity(indexed address)
           handler: handleAddEntity
@@ -144,6 +149,11 @@ templates:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        # Mispriced Tokens
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
       eventHandlers:
         - event: Deposit(indexed address,indexed address,uint256)
           handler: handleDeposit
