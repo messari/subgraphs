@@ -115,7 +115,7 @@ export function getOrCreatePositionsNft(
     }
 
     positionsNft.token0 = token0;
-    positionsNft.token0 = token1;
+    positionsNft.token1 = token1;
 
     positionsNft.amount0 = constants.BIGINT_ZERO;
     positionsNft.amount1 = constants.BIGINT_ZERO;
