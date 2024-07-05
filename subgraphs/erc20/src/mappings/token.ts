@@ -320,20 +320,15 @@ function handleTransferEvent(
     if (isNewAccount(destination)) {
       // It means the receiver is a new holder
       toAddressIsNewHolderNum = BIGINT_ONE;
-    } else {
-      balance = getOrCreateAccountBalance(
-        getOrCreateAccount(destination),
-        token
-      );
-      if (balance.amount == BIGINT_ONE) {
-        // It means the receiver's token balance is 0 before transferal.
-        toBalanceIsZeroNum = BIGINT_ONE;
-      }
+    }
+    balance = getOrCreateAccountBalance(getOrCreateAccount(destination), token);
+    if (balance.amount == BIGINT_ZERO) {
+      // It means the receiver's token balance is 0 before transferal.
+      toBalanceIsZeroNum = BIGINT_ONE;
     }
 
     token.currentHolderCount = token.currentHolderCount
       .minus(FromBalanceToZeroNum)
-      .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
     token.cumulativeHolderCount = token.cumulativeHolderCount.plus(
       toAddressIsNewHolderNum
@@ -343,7 +338,6 @@ function handleTransferEvent(
     let dailySnapshot = getOrCreateTokenDailySnapshot(token, event.block);
     dailySnapshot.currentHolderCount = dailySnapshot.currentHolderCount
       .minus(FromBalanceToZeroNum)
-      .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
     dailySnapshot.cumulativeHolderCount =
       dailySnapshot.cumulativeHolderCount.plus(toAddressIsNewHolderNum);
@@ -357,7 +351,6 @@ function handleTransferEvent(
     let hourlySnapshot = getOrCreateTokenHourlySnapshot(token, event.block);
     hourlySnapshot.currentHolderCount = hourlySnapshot.currentHolderCount
       .minus(FromBalanceToZeroNum)
-      .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
     hourlySnapshot.cumulativeHolderCount =
       hourlySnapshot.cumulativeHolderCount.plus(toAddressIsNewHolderNum);
