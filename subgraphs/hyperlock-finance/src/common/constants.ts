@@ -15,7 +15,8 @@ export namespace Protocol {
 //////////////////////////////
 
 export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-export const POSITIONS_NFT_ADDRESS = "0x434575eaea081b735c985fa9bf63cd7b87e227f9";
+export const POSITIONS_NFT_ADDRESS =
+  "0x434575eaea081b735c985fa9bf63cd7b87e227f9";
 
 export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
