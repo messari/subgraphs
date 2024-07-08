@@ -336,7 +336,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.4.2",
+          "subgraph": "2.4.3",
           "methodology": "1.1.0"
         },
         "files": {
@@ -4598,7 +4598,7 @@
         "status": "prod",
         "versions": {
           "schema": "4.0.1",
-          "subgraph": "1.3.1",
+          "subgraph": "1.3.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5109,7 +5109,7 @@
           },
           "decentralized-network": {
             "slug": "qidao-base",
-            "query-id": "TODO"
+            "query-id": "9NHJ9k31qaGCYXppm9isJTiEoiB6v3tJDnR6SrQrxcjw"
           }
         }
       },
@@ -6697,7 +6697,7 @@
           },
           "decentralized-network": {
             "slug": "ens-governance",
-            "query-id": "F7MznC87sv5y5jNUaBSrKFgCqTqP9Vgc11xcreZQpX7e"
+            "query-id": "GyijYxW9yiSRcEd5u2gfquSvneQKi5QuvU3WZgFyfFSn"
           }
         }
       }
@@ -6714,7 +6714,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6731,7 +6731,7 @@
           },
           "decentralized-network": {
             "slug": "euler-governance",
-            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
+            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
           }
         }
       }
@@ -8134,7 +8134,7 @@
           },
           "decentralized-network": {
             "slug": "the-graph-arbitrum",
-            "query-id": "UNKNOWN"
+            "query-id": "EExUE3FayKraaTteewjxaUpZW4M33j4bsD6pgxNCHnGd"
           }
         },
         "files": {
@@ -11369,7 +11369,7 @@
           },
           "decentralized-network": {
             "slug": "ring-few-blast",
-            "query-id": "TODO"
+            "query-id": "FfTNTmfsJAz1gUqnc3RxGEqyaeMTRdaS4C5bYHAHbzsC"
           }
         }
       }
@@ -11403,7 +11403,41 @@
           },
           "decentralized-network": {
             "slug": "cygnus-finance-base",
-            "query-id": "TODO"
+            "query-id": "ELqNv3KbLggc6kN6uoeKvrbfBpbkQbAorZo3FABZJb6A"
+          }
+        }
+      }
+    }
+  },
+  "symbiotic": {
+    "schema": "generic",
+    "base": "symbiotic",
+    "protocol": "symbiotic",
+    "project": "symbiotic",
+    "deployments": {
+      "symbiotic-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "symbiotic.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "symbiotic-ethereum",
+            "query-id": "symbiotic-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "symbiotic-ethereum",
+            "query-id": "todo"
           }
         }
       }
