@@ -17,23 +17,25 @@ export function handleStake(event: Stake): void {
   const pool = getOrCreateV2Pool(poolAddress, sdk);
 
   updateV2PoolsLpTokenPrice(pool, sdk);
-  pool.addInputTokenBalance(constants.INT_TWO, amount, true);
+  pool.addInputTokenBalances(
+    [constants.BIGINT_ZERO, constants.BIGINT_ZERO, amount],
+    true
+  );
 
   const account = sdk.Accounts.loadAccount(event.transaction.from);
   account.trackActivity();
 }
 
 export function handleUnStake(event: Unstake): void {
-  const amount = event.params.amount;
+  const amount = event.params.amount.times(constants.BIGINT_MINUS_ONE);
   const poolAddress = event.params.lpToken;
 
   const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreateV2Pool(poolAddress, sdk);
 
   updateV2PoolsLpTokenPrice(pool, sdk);
-  pool.addInputTokenBalance(
-    constants.INT_TWO,
-    amount.times(constants.BIGINT_MINUS_ONE),
+  pool.addInputTokenBalances(
+    [constants.BIGINT_ZERO, constants.BIGINT_ZERO, amount],
     true
   );
 

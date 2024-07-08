@@ -1,3 +1,4 @@
+import { log } from "@graphprotocol/graph-ts";
 import {
   IncreaseLiquidity,
   DecreaseLiquidity,
@@ -22,6 +23,21 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   positionNft.amount1 = positionNft.amount1.plus(amount1);
   positionNft.liquidity = positionNft.liquidity.plus(liquidity);
   positionNft.save();
+
+  log.warning(
+    "[IncreaseLiquidity] pool: {}, tokenId: {}, amounts: [{}, {}], updatedAmounts: [{}, {}], liquidity: {}, log_index: {}, txn: {}",
+    [
+      poolAddress.toHexString(),
+      tokenId.toString(),
+      amount0.toString(),
+      amount1.toString(),
+      positionNft.amount0.toString(),
+      positionNft.amount1.toString(),
+      liquidity.toString(),
+      event.logIndex.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 }
 
 export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
@@ -42,4 +58,19 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   positionNft.amount1 = positionNft.amount1.minus(amount1);
   positionNft.liquidity = positionNft.liquidity.minus(liquidity);
   positionNft.save();
+
+  log.warning(
+    "[DecreaseLiquidity] pool: {}, tokenId: {}, amounts: [{}, {}], updatedAmounts: [{}, {}], liquidity: {}, log_index: {}, txn: {}",
+    [
+      poolAddress.toHexString(),
+      tokenId.toString(),
+      amount0.toString(),
+      amount1.toString(),
+      positionNft.amount0.toString(),
+      positionNft.amount1.toString(),
+      liquidity.toString(),
+      event.logIndex.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 }

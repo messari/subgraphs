@@ -3,7 +3,13 @@ import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, INT_ZERO } from "../../util/constants";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
-import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
+import {
+  Bytes,
+  BigDecimal,
+  BigInt,
+  Address,
+  log,
+} from "@graphprotocol/graph-ts";
 
 /**
  * This file contains the PoolManager, which is used to
@@ -202,28 +208,37 @@ export class Pool {
   }
 
   /**
-   * Adds the pool's input token balance to the given amount for a given index. It will optionally
+   * Adds the pool's input token balance to the given amounts. It will optionally
    * update the pool's and protocol's total value locked. If not stated, will default to true.
    *
-   * @param index index of the input token.
-   * @param amount amount to be set as the pool's input token balance.
+   * @param balances balances to be added to the pool's input token balance.
    * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
    */
-  addInputTokenBalance(
-    index: i32,
-    balance: BigInt,
+  addInputTokenBalances(
+    balances: BigInt[],
     updateMetrics: boolean = true
   ): void {
     if (this.pool.inputTokenBalances.length == 0) {
-      this.pool.inputTokenBalances = new Array<BigInt>().fill(
-        BIGINT_ZERO,
-        INT_ZERO,
-        this.pool.inputTokens.length - 1
-      );
+      this.pool.inputTokenBalances = new Array<BigInt>(
+        this.pool.inputTokens.length
+      ).fill(BIGINT_ZERO);
     }
 
-    this.pool.inputTokenBalances[index] =
-      this.pool.inputTokenBalances[index].plus(balance);
+    const inputTokenBalances: BigInt[] = [];
+    for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
+      const inputTokenBalance = this.pool.inputTokenBalances[idx].plus(
+        balances[idx]
+      );
+
+      inputTokenBalances.push(inputTokenBalance);
+    }
+    this.pool.inputTokenBalances = inputTokenBalances;
+
+    log.warning(
+      "[addInputTokenBalance] balances: {}, updatedInputTokenBalances: {}",
+      [balances.join(", ").toString(), this.pool.inputTokenBalances.join(", ")]
+    );
+
     this.setInputTokenBalancesUSD();
     if (updateMetrics) {
       this.refreshTotalValueLocked();

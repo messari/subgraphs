@@ -100,7 +100,9 @@ export function getOrCreatePositionsNft(
   if (!positionsNft) {
     positionsNft = new _ThrusterPositionsNftHelper(id);
 
-    const positionsNftContract = ThrusterPointNFT.bind(poolAddress);
+    const positionsNftContract = ThrusterPointNFT.bind(
+      Address.fromString(constants.POSITIONS_NFT_ADDRESS)
+    );
 
     let token0 = constants.NULL.TYPE_ADDRESS;
     let token1 = constants.NULL.TYPE_ADDRESS;
@@ -111,6 +113,8 @@ export function getOrCreatePositionsNft(
       token0 = positions.value.getToken0();
       token1 = positions.value.getToken1();
     }
+
+    positionsNft.tokenId = tokenId;
 
     positionsNft.token0 = token0;
     positionsNft.token1 = token1;

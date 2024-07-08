@@ -22,8 +22,10 @@ export function handleDeposit(event: Deposit): void {
     event.block
   );
 
-  pool.addInputTokenBalance(constants.INT_ZERO, positionsNft.amount0, false);
-  pool.addInputTokenBalance(constants.INT_ONE, positionsNft.amount1, true);
+  pool.addInputTokenBalances(
+    [positionsNft.amount0, positionsNft.amount1],
+    true
+  );
 
   const account = sdk.Accounts.loadAccount(event.transaction.from);
   account.trackActivity();
@@ -42,14 +44,11 @@ export function handleWithdraw(event: Withdraw): void {
     event.block
   );
 
-  pool.addInputTokenBalance(
-    constants.INT_ZERO,
-    positionsNft.amount0.times(constants.BIGINT_MINUS_ONE),
-    false
-  );
-  pool.addInputTokenBalance(
-    constants.INT_ONE,
-    positionsNft.amount1.times(constants.BIGINT_MINUS_ONE),
+  pool.addInputTokenBalances(
+    [
+      positionsNft.amount0.times(constants.BIGINT_MINUS_ONE),
+      positionsNft.amount1.times(constants.BIGINT_MINUS_ONE),
+    ],
     true
   );
 

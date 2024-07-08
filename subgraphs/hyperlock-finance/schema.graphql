@@ -355,6 +355,8 @@ type _ThrusterPositionsNftHelper @entity {
   " { pool address }-{ nft token id } "
   id: Bytes!
 
+  tokenId: BigInt!
+
   token0: Bytes!
   token1: Bytes!
 
