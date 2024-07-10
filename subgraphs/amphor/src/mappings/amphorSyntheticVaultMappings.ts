@@ -40,7 +40,10 @@ export function handleEpochEnd(event: EpochEnd): void {
   const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreatePool(event.address, sdk);
 
-  const supplySideRevenue = returnedAssets.minus(lastSavedBalance);
+  let supplySideRevenue = constants.BIGINT_ZERO;
+  if (returnedAssets.gt(lastSavedBalance)) {
+    supplySideRevenue = returnedAssets.minus(lastSavedBalance);
+  }
   const protocolSideRevenue = fees;
 
   pool.addRevenueNative(
