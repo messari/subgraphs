@@ -9,9 +9,7 @@ import {
 import {
   Deposit,
   Withdraw,
-  EpochEnd,
 } from "../../generated/LRTVault/AmphorSyntheticVault";
-import * as constants from "../common/constants";
 
 export function handleDeposit(event: Deposit): void {
   const sdk = initializeSDKFromEvent(event);
