@@ -4,7 +4,7 @@ import * as constants from "../common/constants";
 import { Pool } from "../sdk/protocols/generic/pool";
 import { Pricer, TokenInit, readValue } from "./utils";
 import { ProtocolConfig } from "../sdk/protocols/config";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { AmphorAsyncVault } from "../../generated/LRTVault/AmphorAsyncVault";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
