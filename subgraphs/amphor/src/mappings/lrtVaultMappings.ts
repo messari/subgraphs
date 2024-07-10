@@ -34,21 +34,3 @@ export function handleWithdraw(event: Withdraw): void {
   const account = sdk.Accounts.loadAccount(event.transaction.from);
   account.trackActivity();
 }
-
-export function handleEpochEnd(event: EpochEnd): void {
-  const fees = event.params.fees;
-  const returnedAssets = event.params.returnedAssets;
-  const lastSavedBalance = event.params.lastSavedBalance;
-
-  const sdk = initializeSDKFromEvent(event);
-  const pool = getOrCreatePool(event.address, sdk);
-
-  const supplySideRevenue = returnedAssets.minus(lastSavedBalance);
-  const protocolSideRevenue = fees;
-
-  pool.addRevenueNative(
-    pool.getInputToken(constants.INT_ZERO),
-    supplySideRevenue,
-    protocolSideRevenue
-  );
-}

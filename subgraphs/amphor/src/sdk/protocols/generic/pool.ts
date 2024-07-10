@@ -275,8 +275,8 @@ export class Pool {
    */
   addRevenueNative(
     inputToken: Token,
-    protocolSide: BigInt,
-    supplySide: BigInt
+    supplySide: BigInt,
+    protocolSide: BigInt
   ): void {
     const pricer = this.protocol.pricer;
 

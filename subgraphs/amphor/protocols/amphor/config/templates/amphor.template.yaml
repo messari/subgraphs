@@ -201,7 +201,5 @@ dataSources:
           handler: handleDeposit
         - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleWithdraw
-        - event: EpochEnd(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleEpochEnd
       file: ./src/mappings/lrtVaultMappings.ts
 
