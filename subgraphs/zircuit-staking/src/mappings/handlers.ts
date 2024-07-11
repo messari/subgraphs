@@ -9,13 +9,7 @@ import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import {
-  BIGINT_MINUS_ONE,
-  BIGINT_ZERO,
-  ETH_ADDRESS,
-  INT_ZERO,
-  ZERO_ADDRESS,
-} from "../sdk/util/constants";
+import { BIGINT_MINUS_ONE, ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
 
 import { Token } from "../../generated/schema";
 import { Deposit, Withdraw } from "../../generated/ZtakingPool/ZtakingPool";
