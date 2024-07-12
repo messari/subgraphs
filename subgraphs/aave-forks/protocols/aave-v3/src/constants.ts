@@ -11,6 +11,7 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 ///// Ethereum Addresses /////
 //////////////////////////////
 
+export const DUSD_TOKEN_ADDRESS = "0x4d6e79013212f10a026a1fb0b926c9fd0432b96c"; // DUSD
 export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // ETH
 export const USDC_POS_TOKEN_ADDRESS =
   "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // Polygon
@@ -105,6 +106,11 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
     return new NetworkSpecificConstant(
       Address.fromString("0x69850d0b276776781c063771b161bd8894bcdd04"),
       Network.SCROLL
+    );
+  } else if (equalsIgnoreCase(network, 'frax-testnet')) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x4e78cb95a44ad8a1279d7d75786d45aa66c5157f"),
+      Network.FRAXTAL_TESTNET
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network: {}", [

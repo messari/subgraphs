@@ -14,6 +14,7 @@ import {
   AAVE_DECIMALS,
   BALANCE_TRANSFER_DATA_TYPE,
   BALANCE_TRANSFER_SIGNATURE,
+  DUSD_TOKEN_ADDRESS,
   getNetworkSpecificConstant,
   InterestRateMode,
   Protocol,
@@ -676,6 +677,20 @@ function getAssetPriceFallback(
       return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
     }
   }
+
+  if (equalsIgnoreCase(dataSource.network(), Network.FRAXTAL_TESTNET)) {
+    const priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(DUSD_TOKEN_ADDRESS)),
+      BIGINT_ZERO
+    );
+
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
+  }
+  
   return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
 }
 

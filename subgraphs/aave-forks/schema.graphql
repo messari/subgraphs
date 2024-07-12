@@ -31,6 +31,8 @@ enum Network {
   SCROLL
   XLAYER_MAINNET
   ZKSYNC_ERA
+  FRAXTAL
+  FRAXTAL_TESTNET
 }
 
 enum ProtocolType {

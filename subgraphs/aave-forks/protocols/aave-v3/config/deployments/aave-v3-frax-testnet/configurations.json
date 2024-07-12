@@ -1,0 +1,22 @@
+{
+  "network": "frax-testnet",
+  "factory": {
+    "startBlock": 10301742,
+    "address": "0x9B76e32616cb2e3E5FC4f24C887Ff9CC9E2fcEA4"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": 10301910,
+    "address": "0x60E9c0E91Ee7644FA423bdF77d159BD29c7A7ff6"
+  },
+  "LendingPool": {
+    "address": "0x56639f1aefA6992f03B6c1aA3616895147fc7FA6",
+    "startBlock": 10301903
+  },
+  "RewardsController": {
+    "address": "0xd75197021020c83C5a90BfA4d5e9704C1D21d023",
+    "startBlock": 10302594
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

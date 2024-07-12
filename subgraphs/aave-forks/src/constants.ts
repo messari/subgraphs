@@ -33,6 +33,8 @@ export namespace Network {
   export const SCROLL = "SCROLL";
   export const XLAYER_MAINNET = "XLAYER_MAINNET";
   export const ZKSYNC_ERA = "ZKSYNC_ERA";
+  export const FRAXTAL = "FRAXTAL";
+  export const FRAXTAL_TESTNET = "FRAXTAL_TESTNET";
 }
 
 export namespace ProtocolType {

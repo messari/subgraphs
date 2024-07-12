@@ -1,15 +1,10 @@
 specVersion: 1.0.0
 schema:
   file: ./schema.graphql
-indexerHints:
-  prune: auto
 {{#graftEnabled}}
 description: ...
 features:
   - grafting
-graft:
-  base: {{subgraphId}} # Subgraph ID of base subgraph
-  block: {{graftStartBlock}} # Block number
 {{/graftEnabled}}
 dataSources:
   - kind: ethereum
