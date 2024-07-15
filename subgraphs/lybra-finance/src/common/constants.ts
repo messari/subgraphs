@@ -17,6 +17,7 @@ export namespace Protocol {
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
+export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 
 ////////////////////////
 ///// Type Helpers /////

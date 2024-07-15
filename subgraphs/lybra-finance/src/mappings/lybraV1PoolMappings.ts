@@ -3,6 +3,7 @@ import {
   initializeSDKFromEvent,
 } from "../common/initializers";
 import * as constants from "../common/constants";
+import { Address } from "@graphprotocol/graph-ts";
 import { Mint, Burn, FeeDistribution } from "../../generated/LybraV1/LybraV1";
 import { updatePoolOutputTokenSupply, updateV1PoolTVL } from "../common/utils";
 
@@ -34,7 +35,9 @@ export function handleFeeDistribution(event: FeeDistribution): void {
   const sdk = initializeSDKFromEvent(event);
   const pool = getOrCreateV1Pool(event.address, sdk);
 
-  const inputToken = pool.getInputToken(constants.INT_ZERO);
+  const inputToken = sdk.Tokens.getOrCreateToken(
+    Address.fromString(constants.USDC_ADDRESS)
+  );
 
   const supplySideRevenue = fees.div(
     constants.BIGINT_TEN.pow(
