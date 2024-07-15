@@ -47,7 +47,7 @@ export function initializeSDKFromCall(call: ethereum.Call): SDK {
   return sdk;
 }
 
-export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
+export function getOrCreateV1Pool(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 
   if (!pool.isInitialized) {
@@ -67,6 +67,25 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
       [inputToken.id],
       outputToken
     );
+  }
+
+  return pool;
+}
+
+export function getOrCreateV2Pool(poolAddress: Address, sdk: SDK): Pool {
+  const pool = sdk.Pools.loadPool(poolAddress);
+
+  if (!pool.isInitialized) {
+    const poolContract = LybraV2.bind(poolAddress);
+
+    const inputTokenAddress = readValue<Address>(
+      poolContract.try_getAsset(),
+      Address.fromString(constants.STETH_ADDRESS)
+    );
+
+    const inputToken = sdk.Tokens.getOrCreateToken(inputTokenAddress);
+
+    pool.initialize(inputToken.name, inputToken.symbol, [inputToken.id], null);
   }
 
   return pool;

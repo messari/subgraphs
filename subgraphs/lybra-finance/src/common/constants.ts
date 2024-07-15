@@ -22,7 +22,7 @@ export const STETH_ADDRESS = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
 ///// Type Helpers /////
 ////////////////////////
 
-export const DEFAULT_DECIMALS = 18;
+export const DEFAULT_DECIMALS: i32 = 18;
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");

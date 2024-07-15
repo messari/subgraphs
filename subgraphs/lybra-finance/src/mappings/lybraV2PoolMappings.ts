@@ -1,5 +1,5 @@
 import {
-  getOrCreatePool,
+  getOrCreateV2Pool,
   initializeSDKFromEvent,
 } from "../common/initializers";
 import {
@@ -12,7 +12,7 @@ import { updatePoolOutputTokenSupply, updateV2PoolTVL } from "../common/utils";
 
 export function handleMint(event: Mint): void {
   const sdk = initializeSDKFromEvent(event);
-  const pool = getOrCreatePool(event.address, sdk);
+  const pool = getOrCreateV2Pool(event.address, sdk);
 
   updatePoolOutputTokenSupply(pool);
   updateV2PoolTVL(pool);
@@ -23,7 +23,7 @@ export function handleMint(event: Mint): void {
 
 export function handleBurn(event: Burn): void {
   const sdk = initializeSDKFromEvent(event);
-  const pool = getOrCreatePool(event.address, sdk);
+  const pool = getOrCreateV2Pool(event.address, sdk);
 
   updatePoolOutputTokenSupply(pool);
   updateV2PoolTVL(pool);
@@ -36,9 +36,17 @@ export function handleFeeDistribution(event: FeeDistribution): void {
   const fees = event.params.feeAmount;
 
   const sdk = initializeSDKFromEvent(event);
-  const pool = getOrCreatePool(event.address, sdk);
+  const pool = getOrCreateV2Pool(event.address, sdk);
 
   const inputToken = pool.getInputToken(constants.INT_ZERO);
 
-  pool.addRevenueNative(inputToken, fees, fees);
+  const supplySideRevenue = fees.div(
+    constants.BIGINT_TEN.pow(
+      (constants.DEFAULT_DECIMALS - inputToken.decimals) as u8
+    )
+  );
+
+  const protocolSideRevenue = supplySideRevenue;
+
+  pool.addRevenueNative(inputToken, supplySideRevenue, protocolSideRevenue);
 }
