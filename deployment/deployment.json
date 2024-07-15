@@ -11476,5 +11476,39 @@
         }
       }
     }
+  },
+  "amphor": {
+    "schema": "generic",
+    "base": "amphor",
+    "protocol": "amphor",
+    "project": "amphor",
+    "deployments": {
+      "amphor-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "amphor.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "amphor-ethereum",
+            "query-id": "amphor-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "amphor-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
