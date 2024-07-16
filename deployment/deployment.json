@@ -11510,5 +11510,39 @@
         }
       }
     }
+  },
+  "zircuit-staking": {
+    "schema": "generic",
+    "base": "zircuit-staking",
+    "protocol": "zircuit-staking",
+    "project": "zircuit-staking",
+    "deployments": {
+      "zircuit-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zircuit.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zircuit-staking-ethereum",
+            "query-id": "zircuit-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "zircuit-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

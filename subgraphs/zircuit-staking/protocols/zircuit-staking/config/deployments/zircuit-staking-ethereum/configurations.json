@@ -1,0 +1,16 @@
+{
+  "deployment": "ZIRCUIT_STAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "pools": [
+    {
+      "name": "ZtakingPool",
+      "abi": "ZtakingPool",
+      "address": "0xf047ab4c75cebf0eb9ed34ae2c186f3611aeafa6",
+      "startBlock": "19237243"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
