@@ -1,0 +1,53 @@
+{
+  "network": "mainnet",
+
+  "AmphorSyntheticVault": [
+    {
+      "name": "ampr-LP-USD",
+      "address": "0x3b022edecd65b63288704a6fa33a8b9185b5096b",
+      "startBlock": "18299242"
+    },
+    {
+      "name": "ampr-LP-ETH",
+      "address": "0x2791eb5807d69fe10c02eed6b4dc12bac0701744",
+      "startBlock": "18535914"
+    },
+    {
+      "name": "ampr-LP-BTC",
+      "address": "0xc4a324fdf8a2495776b4d6ca46599b5a52f96489",
+      "startBlock": "18762448"
+    },
+    {
+      "name": "amprPTweETH",
+      "address": "0xf97ecda5f9ff31d83f635a6ea70d2d3b9c8f2e00",
+      "startBlock": "19468305"
+    },
+    {
+      "name": "amprPTrsETH",
+      "address": "0x0498b85fb4ec85ef5efe82513aa9daf767358a15",
+      "startBlock": "19468305"
+    },
+    {
+      "name": "amprPTezETH",
+      "address": "0x920f17e741029d904936c58a545dffc72f82c079",
+      "startBlock": "19468305"
+    }
+  ],
+
+  "AmphorAsyncVault": [
+    {
+      "name": "amprETH",
+      "address": "0xcdc51f2b0e5f0906f2fd5f557de49d99c34df54e",
+      "startBlock": "19668779"
+    }
+  ],
+
+  "LRTVault": {
+    "address": "0x06824c27c8a0dbde5f72f770ec82e3c0fd4dcec3",
+    "startBlock": "20126194"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
