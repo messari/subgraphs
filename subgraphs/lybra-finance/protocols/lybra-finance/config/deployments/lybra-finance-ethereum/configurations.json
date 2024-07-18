@@ -1,0 +1,35 @@
+{
+  "network": "mainnet",
+
+  "LybraV1": {
+    "address": "0x97de57ec338ab5d51557da3434828c5dbfada371",
+    "startBlock": "17115039"
+  },
+
+  "LybraV2Pools": [
+    {
+      "name": "LybraStETHVault",
+      "address": "0xa980d4c0c2e48d305b582aa439a3575e3de06f0e",
+      "startBlock": "17990141"
+    },
+    {
+      "name": "LybraWstETHVault",
+      "address": "0x5e28b5858da2c6fb4e449d69eeb5b82e271c45ce",
+      "startBlock": "17990257"
+    },
+    {
+      "name": "LybraWBETHVault",
+      "address": "0xb72da4a9866b0993b9a7d842e5060716f74bf262",
+      "startBlock": "17990348"
+    },
+    {
+      "name": "LybraRETHVault",
+      "address": "0x090b2787d6798000710a8e821ec6111d254bb958",
+      "startBlock": "17990357"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

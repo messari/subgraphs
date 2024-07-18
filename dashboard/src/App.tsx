@@ -65,6 +65,12 @@ function App() {
           })
           .then(function (json) {
             setLoading(false);
+            // Hacky fix for the subgraph status API returning an error response, setting protocols to empty object.
+            // Status Page Will Not Load With This Condition, but the charting will work.
+            if (JSON.stringify(Object.keys(json)) == JSON.stringify(['error', 'data'])) {
+              console.log("Error Response from Messari Subgraph Status API. Setting protocols to empty object.");
+              json = {};
+            }
             setProtocolsToQuery(json);
           })
           .catch((err) => {

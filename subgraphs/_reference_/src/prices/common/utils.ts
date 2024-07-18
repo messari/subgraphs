@@ -5,6 +5,7 @@ import * as CELO from "../config/celo";
 import * as FUSE from "../config/fuse";
 import * as XDAI from "../config/gnosis";
 import * as BLAST from "../config/blast";
+import * as LINEA from "../config/linea";
 import * as CRONOS from "../config/cronos";
 import * as AURORA from "../config/aurora";
 import * as FANTOM from "../config/fantom";
@@ -123,6 +124,8 @@ export function getConfig(): Configurations {
     return new SCROLL.config();
   } else if (network == ZKSYNC_ERA.NETWORK_STRING) {
     return new ZKSYNC_ERA.config();
+  } else if (network == LINEA.NETWORK_STRING) {
+    return new LINEA.config();
   }
 
   return new TEMPLATE.config();

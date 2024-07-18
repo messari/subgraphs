@@ -336,7 +336,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.4.2",
+          "subgraph": "2.4.3",
           "methodology": "1.1.0"
         },
         "files": {
@@ -703,7 +703,7 @@
           },
           "decentralized-network": {
             "slug": "kinza-finance-bsc",
-            "query-id": "todo"
+            "query-id": "435cubRAqNsFYKzyQHRRiHvR7oJjh828r5Aqe4cZC586"
           }
         }
       }
@@ -720,7 +720,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -737,7 +737,7 @@
           },
           "decentralized-network": {
             "slug": "seismic-blast",
-            "query-id": "todo"
+            "query-id": "d7gMk1zkEyCQuNVeirBYA6keCZv8hTLheCZ4DBCjRfz"
           }
         }
       }
@@ -754,7 +754,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -771,7 +771,7 @@
           },
           "decentralized-network": {
             "slug": "pac-finance-blast",
-            "query-id": "todo"
+            "query-id": "ERsfyKMQTpTEN6LtyWvFwhDENLf6aAAggbtrNEnFKLpx"
           }
         }
       }
@@ -805,7 +805,7 @@
           },
           "decentralized-network": {
             "slug": "zerolend-ethereum",
-            "query-id": "todo"
+            "query-id": "4Zf4doH54RDit9KVsfCp3MkjrP3szhJZwvw2z5PHczx9"
           }
         }
       },
@@ -831,7 +831,7 @@
           },
           "decentralized-network": {
             "slug": "zerolend-blast",
-            "query-id": "todo"
+            "query-id": "6JP9542ArawumBSYczerbWGu6k7uu3hqk6qJnSkrgTM5"
           }
         }
       },
@@ -857,7 +857,7 @@
           },
           "decentralized-network": {
             "slug": "zerolend-zksync-era",
-            "query-id": "todo"
+            "query-id": "3CHaJvCkTMqXa4PRKNshVecE9JqgNFCdsXNyGLZXFeM2"
           }
         }
       },
@@ -883,7 +883,7 @@
           },
           "decentralized-network": {
             "slug": "zerolend-linea",
-            "query-id": "todo"
+            "query-id": "DLzwo1WFaKy7R7MgQWrnBXr19EbGwPRubu9YmsSmRMfC"
           }
         }
       },
@@ -909,7 +909,7 @@
           },
           "decentralized-network": {
             "slug": "zerolend-xlayer",
-            "query-id": "todo"
+            "query-id": "NRh6ScvPKoieeSH7tRiKyXJ97DR9aYraas8eREPQ8e3"
           }
         }
       }
@@ -2554,7 +2554,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.4.0",
+          "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2666,7 +2666,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.1.0",
-          "subgraph": "2.2.3",
+          "subgraph": "2.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4598,7 +4598,7 @@
         "status": "prod",
         "versions": {
           "schema": "4.0.1",
-          "subgraph": "1.3.1",
+          "subgraph": "1.3.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5084,6 +5084,32 @@
           "decentralized-network": {
             "slug": "qidao-avalanche",
             "query-id": "98GG74FxxsG25Ltd8qvJ9BRfFmQWyN1AkS92MZBG1BsR"
+          }
+        }
+      },
+      "qidao-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-base",
+            "query-id": "qidao-base"
+          },
+          "decentralized-network": {
+            "slug": "qidao-base",
+            "query-id": "9NHJ9k31qaGCYXppm9isJTiEoiB6v3tJDnR6SrQrxcjw"
           }
         }
       },
@@ -5802,7 +5828,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.2",
-          "subgraph": "1.5.2",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6030,7 +6056,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.2",
-          "subgraph": "1.1.15",
+          "subgraph": "1.1.16",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6188,7 +6214,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.2",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6671,7 +6697,7 @@
           },
           "decentralized-network": {
             "slug": "ens-governance",
-            "query-id": "F7MznC87sv5y5jNUaBSrKFgCqTqP9Vgc11xcreZQpX7e"
+            "query-id": "GyijYxW9yiSRcEd5u2gfquSvneQKi5QuvU3WZgFyfFSn"
           }
         }
       }
@@ -6688,7 +6714,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6705,7 +6731,7 @@
           },
           "decentralized-network": {
             "slug": "euler-governance",
-            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
+            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
           }
         }
       }
@@ -8108,7 +8134,7 @@
           },
           "decentralized-network": {
             "slug": "the-graph-arbitrum",
-            "query-id": "UNKNOWN"
+            "query-id": "EExUE3FayKraaTteewjxaUpZW4M33j4bsD6pgxNCHnGd"
           }
         },
         "files": {
@@ -11093,7 +11119,7 @@
           },
           "decentralized-network": {
             "slug": "karak-ethereum",
-            "query-id": "todo"
+            "query-id": "2vzPTkDT2DddrRoXtg25AGK55nviKXeJiG21Cu56nurg"
           }
         }
       },
@@ -11119,7 +11145,7 @@
           },
           "decentralized-network": {
             "slug": "karak-arbitrum",
-            "query-id": "todo"
+            "query-id": "7kCkjx6GK67WZrVo54UcLWZ7kBx65TogBW1CD316XZgn"
           }
         }
       },
@@ -11145,7 +11171,7 @@
           },
           "decentralized-network": {
             "slug": "karak-bsc",
-            "query-id": "todo"
+            "query-id": "8YGDQQgExT7zLJioLRQdcSQko1qgiCjfwVg7TBV6eR7W"
           }
         }
       }
@@ -11179,7 +11205,7 @@
           },
           "decentralized-network": {
             "slug": "renzo-ethereum",
-            "query-id": "TODO"
+            "query-id": "91jPrEeA5BPzDHmjKjVwmgDvGEQpAwh5yusTbHCQiQbM"
           }
         }
       },
@@ -11205,7 +11231,7 @@
           },
           "decentralized-network": {
             "slug": "renzo-arbitrum",
-            "query-id": "TODO"
+            "query-id": "5P79EkkSDxiXxWgiYcpsvML7Q3MSu64sHi8LF2xVggQz"
           }
         }
       },
@@ -11231,11 +11257,11 @@
           },
           "decentralized-network": {
             "slug": "renzo-base",
-            "query-id": "TODO"
+            "query-id": "Atj9RDj7hzmUd6a3PTzpPCpjJPzqMbvPLdxMfF2BFy5B"
           }
         }
       },
-      "renzo-blast-mainnet": {
+      "renzo-blast": {
         "network": "blast-mainnet",
         "status": "prod",
         "versions": {
@@ -11252,12 +11278,12 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "renzo-blast-mainnet",
-            "query-id": "renzo-blast-mainnet"
+            "slug": "renzo-blast",
+            "query-id": "renzo-blast"
           },
           "decentralized-network": {
-            "slug": "renzo-blast-mainnet",
-            "query-id": "TODO"
+            "slug": "renzo-blast",
+            "query-id": "HXWd4suSQ4TztRznBCi1dWdBKrHvkDPZBA2hy5nng1eL"
           }
         }
       },
@@ -11283,7 +11309,7 @@
           },
           "decentralized-network": {
             "slug": "renzo-bsc",
-            "query-id": "TODO"
+            "query-id": "JD3KpTX2bdwVMtZvX3HmPKSGQsVYP8FRkUJs51vZBJPR"
           }
         }
       },
@@ -11309,6 +11335,244 @@
           },
           "decentralized-network": {
             "slug": "renzo-mode",
+            "query-id": "AUcw3uDfWmRQDHKgnQ6C7P2139scRwvzMfrJovSGbACW"
+          }
+        }
+      }
+    }
+  },
+  "ring-few": {
+    "schema": "generic",
+    "base": "ring-few",
+    "protocol": "ring-few",
+    "project": "ring-few",
+    "deployments": {
+      "ring-few-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "ring.few.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ring-few-blast",
+            "query-id": "ring-few-blast"
+          },
+          "decentralized-network": {
+            "slug": "ring-few-blast",
+            "query-id": "FfTNTmfsJAz1gUqnc3RxGEqyaeMTRdaS4C5bYHAHbzsC"
+          }
+        }
+      }
+    }
+  },
+  "cygnus-finance": {
+    "schema": "generic",
+    "base": "cygnus-finance",
+    "protocol": "cygnus-finance",
+    "project": "cygnus-finance",
+    "deployments": {
+      "cygnus-finance-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cygnus.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cygnus-finance-base",
+            "query-id": "cygnus-finance-base"
+          },
+          "decentralized-network": {
+            "slug": "cygnus-finance-base",
+            "query-id": "ELqNv3KbLggc6kN6uoeKvrbfBpbkQbAorZo3FABZJb6A"
+          }
+        }
+      }
+    }
+  },
+  "symbiotic": {
+    "schema": "generic",
+    "base": "symbiotic",
+    "protocol": "symbiotic",
+    "project": "symbiotic",
+    "deployments": {
+      "symbiotic-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "symbiotic.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "symbiotic-ethereum",
+            "query-id": "symbiotic-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "symbiotic-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "hyperlock-finance": {
+    "schema": "generic",
+    "base": "hyperlock-finance",
+    "protocol": "hyperlock-finance",
+    "project": "hyperlock-finance",
+    "deployments": {
+      "hyperlock-finance-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "hyperlock.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "hyperlock-finance-blast",
+            "query-id": "hyperlock-finance-blast"
+          },
+          "decentralized-network": {
+            "slug": "hyperlock-finance-blast",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "amphor": {
+    "schema": "generic",
+    "base": "amphor",
+    "protocol": "amphor",
+    "project": "amphor",
+    "deployments": {
+      "amphor-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "amphor.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "amphor-ethereum",
+            "query-id": "amphor-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "amphor-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "zircuit-staking": {
+    "schema": "generic",
+    "base": "zircuit-staking",
+    "protocol": "zircuit-staking",
+    "project": "zircuit-staking",
+    "deployments": {
+      "zircuit-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "zircuit.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "zircuit-staking-ethereum",
+            "query-id": "zircuit-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "zircuit-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "lybra-finance": {
+    "schema": "generic",
+    "base": "lybra-finance",
+    "protocol": "lybra-finance",
+    "project": "lybra-finance",
+    "deployments": {
+      "lybra-finance-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "lybra.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "lybra-finance-ethereum",
+            "query-id": "lybra-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "lybra-finance-ethereum",
             "query-id": "TODO"
           }
         }
