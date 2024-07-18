@@ -11510,5 +11510,39 @@
         }
       }
     }
+  },
+  "kelp-dao": {
+    "schema": "generic",
+    "base": "kelp-dao",
+    "protocol": "kelp-dao",
+    "project": "kelp-dao",
+    "deployments": {
+      "kelp-dao-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kelp.dao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kelp-dao-ethereum",
+            "query-id": "kelp-dao-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "kelp-dao-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
