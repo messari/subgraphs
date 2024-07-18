@@ -8,7 +8,7 @@
     "prepare:constants": "mustache protocols/${BLOCKCHAIN}-${VERSION}/config/deployments/${BLOCKCHAIN}-${VERSION}-${NETWORK}/configurations.json protocols/${BLOCKCHAIN}-${VERSION}/config/templates/${BLOCKCHAIN}.${VERSION}.template.yaml > subgraph.yaml",
     "prepare:fraxtal-testnet": "BLOCKCHAIN=aave VERSION=v3 NETWORK=frax-testnet npm run prepare:constants",
     "create-fraxtal-testnet": "graph create --node http://52.11.39.166:8020 stablyio-aave-v3-messari-testnet",
-    "deploy-fraxtal-testnet": "graph deploy stablyio-aave-v3-messari-testnet  --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.2.1"
+    "deploy-fraxtal-testnet": "graph deploy stablyio-aave-v3-messari-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.2.1"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.60.0",
