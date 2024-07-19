@@ -6164,6 +6164,10 @@
           "hosted-service": {
             "slug": "uniswap-v2-swap-ethereum",
             "query-id": "uniswap-v2-swap-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v2-swap-ethereum",
+            "query-id": "3onEbd9MLfXTTWAfP91yqsKr7C68VCT2ZiF7EoQiQAFj"
           }
         }
       }
