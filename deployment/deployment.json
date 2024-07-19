@@ -11582,5 +11582,39 @@
         }
       }
     }
+  },
+  "concentrator": {
+    "schema": "generic",
+    "base": "concentrator",
+    "protocol": "concentrator",
+    "project": "concentrator",
+    "deployments": {
+      "concentrator-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "concentrator.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "concentrator-ethereum",
+            "query-id": "concentrator-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "concentrator-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
