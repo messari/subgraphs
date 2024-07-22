@@ -36,6 +36,11 @@
       "name": "CryptoPoolFactory",
       "address": "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99",
       "startBlock": "14005321"
+    },
+    {
+      "name": "CurveTricryptoFactory",
+      "address": "0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963",
+      "startBlock": "17371439"
     }
   ],
 
@@ -309,6 +314,11 @@
       "address": "0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca",
       "lpToken": "0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca",
       "startBlock": "12242627"
+    },
+    {
+      "name": "oldcontract",
+      "address": "0x2e60cf74d81ac34eb21eeff58db4d385920ef419",
+      "startBlock": "9325883"
     }
   ],
 
