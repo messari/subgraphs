@@ -5,9 +5,9 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 //////////////////////////////
 
 export namespace Protocol {
-  export const ID = "0x3b022edecd65b63288704a6fa33a8b9185b5096b";
-  export const NAME = "Amphor";
-  export const SLUG = "amphor";
+  export const ID = "0x2b95a1dcc3d405535f9ed33c219ab38e8d7e0884";
+  export const NAME = "Concentrator";
+  export const SLUG = "concentrator";
 }
 
 //////////////////////////////
