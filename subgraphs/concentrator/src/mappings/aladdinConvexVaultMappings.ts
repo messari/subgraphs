@@ -116,7 +116,7 @@ export function handleWithdrawWithShares(event: WithdrawWithShares): void {
 }
 
 export function handleHarvest(event: Harvest): void {
-  let decoded = ethereum.decode(
+  const decoded = ethereum.decode(
     "harvest(uint256,address,uint256)",
     event.transaction.input
   );
@@ -124,7 +124,7 @@ export function handleHarvest(event: Harvest): void {
   let poolId = constants.BIGINT_ZERO;
 
   if (decoded) {
-    let decodedTuple = decoded.toTuple();
+    const decodedTuple = decoded.toTuple();
     poolId = decodedTuple[0].toBigInt();
 
     log.warning("[Harvest [AL-CVX]] PoolId Decoded: {}", [poolId.toString()]);
