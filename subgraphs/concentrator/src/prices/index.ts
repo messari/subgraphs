@@ -25,6 +25,9 @@ export function getUsdPricePerToken(
     return new CustomPriceType();
   }
 
+  if (tokenAddr.equals(constants.SDCRV_ADDRESS))
+    tokenAddr = constants.CRV_ADDRESS;
+
   const config = utils.getConfig();
   if (config.network() == "default") {
     log.warning("Failed to fetch price: network {} not implemented", [

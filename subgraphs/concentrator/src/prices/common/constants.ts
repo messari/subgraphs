@@ -41,3 +41,15 @@ export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 export const AAVE_ORACLE_DECIMALS = 8;
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+
+export const SDCRV_ADDRESS: Address = Address.fromString(
+  "0xd1b5651e55d4ceed36251c61c50c889b36f6abb5"
+);
+
+export const CRV_ADDRESS: Address = Address.fromString(
+  "0xd533a949740bb3306d119cc777fa900ba034cd52"
+);
+
+export const CURVE_ROUTER_BLACKLIST: Address[] = [
+  Address.fromString("0x06325440d014e39736583c165c2963ba99faf14e"),
+];

@@ -74,6 +74,9 @@ export function getCurvePriceUsdc(
   lpAddress: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {
+  if (constants.CURVE_ROUTER_BLACKLIST.includes(lpAddress))
+    return new CustomPriceType();
+
   if (isLpCryptoPool(lpAddress, block))
     return cryptoPoolLpPriceUsdc(lpAddress, block);
 
