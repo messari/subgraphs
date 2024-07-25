@@ -5,9 +5,9 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 //////////////////////////////
 
 export namespace Protocol {
-  export const ID = "0xd9a442856c234a39a81a089c06451ebaa4306a72";
-  export const NAME = "Puffer Finance";
-  export const SLUG = "puffer-finance";
+  export const ID = "0x727ed4ef04bb2a96ec77e44c1a91dbb01b605e42";
+  export const NAME = "Umami Finance";
+  export const SLUG = "umami-finance";
 }
 
 //////////////////////////////
