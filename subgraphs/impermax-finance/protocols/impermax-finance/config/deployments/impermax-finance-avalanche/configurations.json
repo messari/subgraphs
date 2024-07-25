@@ -1,0 +1,28 @@
+{
+  "deployment": "IMPERMAX_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x8c3736e2fe63cc2cd89ee228d9dbcab6ce5b767b",
+      "startBlock": "5928819"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0x9708e0b216a88d38d469b255ce78c1369ad898e6",
+      "startBlock": "23242952"
+    },
+    {
+      "name": "Factory3",
+      "abi": "Factory",
+      "address": "0xc7f24fd6329738320883ba429c6c8133e6492739",
+      "startBlock": "28057891"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
