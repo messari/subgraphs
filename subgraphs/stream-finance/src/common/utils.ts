@@ -53,9 +53,7 @@ export class TokenInit implements TokenInitializer {
 }
 
 export function updatePoolTVL(pool: Pool): void {
-  const vaultContract = StreamVault.bind(
-    Address.fromBytes(pool.getBytesID())
-  );
+  const vaultContract = StreamVault.bind(Address.fromBytes(pool.getBytesID()));
 
   const vaultTVL = readValue<BigInt>(
     vaultContract.try_totalBalance(),

@@ -1,8 +1,8 @@
 import { Versions } from "../versions";
+import { Pricer, TokenInit } from "./utils";
 import { SDK } from "../sdk/protocols/generic";
 import * as constants from "../common/constants";
 import { Pool } from "../sdk/protocols/generic/pool";
-import { Pricer, TokenInit, readValue } from "./utils";
 import { ProtocolConfig } from "../sdk/protocols/config";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { StreamVault } from "../../generated/LevUSDC/StreamVault";
