@@ -53,3 +53,8 @@ export const CRV_ADDRESS: Address = Address.fromString(
 export const CURVE_ROUTER_BLACKLIST: Address[] = [
   Address.fromString("0x06325440d014e39736583c165c2963ba99faf14e"),
 ];
+
+export const GLOBAL_PRICING_BLACKLIST: Address[] = [
+  Address.fromString("0x0000000000000000000000000000000000000000"),
+  Address.fromString("0xc4c319e2d4d66cca4464c0c2b32c9bd23ebe784e"), // Curve.fi Factory Pool: alETH
+];

@@ -21,7 +21,7 @@ export function getUsdPricePerToken(
   tokenAddr: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {
-  if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
+  if (constants.GLOBAL_PRICING_BLACKLIST.includes(tokenAddr)) {
     return new CustomPriceType();
   }
 
@@ -141,12 +141,6 @@ export function getUsdPrice(
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
-    if (
-      tokenPrice.oracleType == constants.OracleType.UNISWAP_FORKS_ROUTER ||
-      tokenPrice.oracleType == constants.OracleType.CURVE_ROUTER
-    ) {
-      return getLiquidityBoundPrice(tokenAddr, tokenPrice, amount);
-    }
     return tokenPrice.usdPrice.times(amount);
   }
 
