@@ -11624,7 +11624,7 @@
     "project": "umami-finance",
     "deployments": {
       "umami-finance-arbitrum": {
-        "network": "arbitrum-one",
+        "network": "arbitrum",
         "status": "prod",
         "versions": {
           "schema": "3.0.0",
