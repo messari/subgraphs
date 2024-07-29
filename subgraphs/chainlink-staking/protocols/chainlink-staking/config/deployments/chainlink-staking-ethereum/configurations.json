@@ -10,6 +10,10 @@
     "address": "0xa1d76a7ca72128541e9fcacafbda3a92ef94fdc5",
     "startBlock": "18572190"
   },
+  "stakingOld": {
+    "address": "0x3feb1e09b4bb0e7f0387cee092a52e85797ab889",
+    "startBlock": "16083969"
+  },
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": 0

@@ -28,12 +28,12 @@ import {
   Unstaked as UnstakedOperator,
   RewardVaultSet as RewardVaultSetOperator,
 } from "../../generated/OperatorStakingPool/OperatorStakingPool";
-// import {
-//   Staked as StakedOld,
-//   Unstaked as UnstakedOld,
-// } from "../../generated/Staking/Staking";
-// import { LinkToken } from "../../generated/CommunityStakingPool/LinkToken";
-import { _ERC20 } from "../../generated/CommunityStakingPool/_ERC20";
+import {
+  Staked as StakedOld,
+  Unstaked as UnstakedOld,
+} from "../../generated/Staking/Staking";
+import { LinkToken } from "../../generated/Staking/LinkToken";
+import { _ERC20 } from "../../generated/Staking/_ERC20";
 import { RewardVault as RewardVaultTemplate } from "../../generated/templates";
 import {
   CommunityPoolRewardUpdated,
@@ -297,64 +297,58 @@ export function handleOperatorPoolRewardUpdated(
   pool.setlastRewardUpdateTimestamp(event.block.timestamp);
 }
 
-// export function handleStakedOld(event: StakedOld): void {
-//   const sdk = SDK.initializeFromEvent(
-//     conf,
-//     new Pricer(),
-//     new TokenInit(),
-//     event
-//   );
-//   const token = sdk.Tokens.getOrCreateToken(
-//     Address.fromString(NetworkConfigs.getProtocolToken())
-//   );
+export function handleStakedOld(event: StakedOld): void {
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  const token = sdk.Tokens.getOrCreateToken(
+    Address.fromString(NetworkConfigs.getProtocolToken())
+  );
+  const pool = sdk.Pools.loadPool(event.address);
+  if (!pool.isInitialized) {
+    pool.initialize("Staking Pool Old", token.symbol, [token.id], null, false);
+  }
+  let amount = BIGINT_ZERO;
+  const linkTokenContract = LinkToken.bind(
+    Address.fromString(NetworkConfigs.getProtocolToken())
+  );
+  const balanceOfCall = linkTokenContract.try_balanceOf(event.address);
+  if (!balanceOfCall.reverted) {
+    amount = balanceOfCall.value;
+  }
+  pool.setInputTokenBalances([amount], true);
+  const user = event.transaction.from;
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
+}
 
-//   const pool = sdk.Pools.loadPool(event.address);
-//   if (!pool.isInitialized) {
-//     pool.initialize("Staking Pool Old", token.symbol, [token.id], null, false);
-//   }
-
-//   let amount = BIGINT_ZERO;
-//   const linkTokenContract = LinkToken.bind(
-//     Address.fromString(NetworkConfigs.getProtocolToken())
-//   );
-//   const balanceOfCall = linkTokenContract.try_balanceOf(event.address);
-//   if (!balanceOfCall.reverted) {
-//     amount = balanceOfCall.value;
-//   }
-//   pool.setInputTokenBalances([amount], true);
-
-//   const user = event.transaction.from;
-//   const account = sdk.Accounts.loadAccount(user);
-//   account.trackActivity();
-// }
-
-// export function handleUnstakedOld(event: UnstakedOld): void {
-//   const sdk = SDK.initializeFromEvent(
-//     conf,
-//     new Pricer(),
-//     new TokenInit(),
-//     event
-//   );
-//   const token = sdk.Tokens.getOrCreateToken(
-//     Address.fromString(NetworkConfigs.getProtocolToken())
-//   );
-
-//   const pool = sdk.Pools.loadPool(event.address);
-//   if (!pool.isInitialized) {
-//     pool.initialize("Staking Pool Old", token.symbol, [token.id], null, false);
-//   }
-
-//   let amount = BIGINT_ZERO;
-//   const linkTokenContract = LinkToken.bind(
-//     Address.fromString(NetworkConfigs.getProtocolToken())
-//   );
-//   const balanceOfCall = linkTokenContract.try_balanceOf(event.address);
-//   if (!balanceOfCall.reverted) {
-//     amount = balanceOfCall.value;
-//   }
-//   pool.setInputTokenBalances([amount.times(BIGINT_MINUS_ONE)], true);
-
-//   const user = event.transaction.from;
-//   const account = sdk.Accounts.loadAccount(user);
-//   account.trackActivity();
-// }
+export function handleUnstakedOld(event: UnstakedOld): void {
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  const token = sdk.Tokens.getOrCreateToken(
+    Address.fromString(NetworkConfigs.getProtocolToken())
+  );
+  const pool = sdk.Pools.loadPool(event.address);
+  if (!pool.isInitialized) {
+    pool.initialize("Staking Pool Old", token.symbol, [token.id], null, false);
+  }
+  let amount = BIGINT_ZERO;
+  const linkTokenContract = LinkToken.bind(
+    Address.fromString(NetworkConfigs.getProtocolToken())
+  );
+  const balanceOfCall = linkTokenContract.try_balanceOf(event.address);
+  if (!balanceOfCall.reverted) {
+    amount = balanceOfCall.value;
+  }
+  pool.setInputTokenBalances([amount.times(BIGINT_MINUS_ONE)], true);
+  const user = event.transaction.from;
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
+}
