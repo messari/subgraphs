@@ -68,10 +68,11 @@ export function updatePoolTVL(
 ): void {
   const vaultContract = AladdinConvexVault.bind(vaultAddress);
 
-  const vaultTVL = readValue<BigInt>(
-    vaultContract.try_getTotalUnderlying(poolId),
-    constants.BIGINT_ZERO
-  );
+  let vaultTVL = constants.BIGINT_ZERO;
+  const poolInfoCall = vaultContract.try_poolInfo(poolId);
+  if (!poolInfoCall.reverted) {
+    vaultTVL = poolInfoCall.value.getTotalUnderlying();
+  }
 
   pool.setInputTokenBalances([vaultTVL], true);
 }
