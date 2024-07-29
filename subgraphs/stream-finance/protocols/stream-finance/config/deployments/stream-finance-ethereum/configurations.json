@@ -1,0 +1,25 @@
+{
+  "network": "mainnet",
+
+  "StreamVaults": [
+    {
+      "name": "LevUSDC",
+      "address": "0xf3b466F09ef476E311Ce275407Cfb09a8D8De3a7",
+      "startBlock": "19179289"
+    },
+    {
+      "name": "HodlwETH",
+      "address": "0x2a2f84e9AfE7b39146CDaF068b06b84EE23892c2",
+      "startBlock": "19179289"
+    },
+    {
+      "name": "HodlwBTC",
+      "address": "0x6efa12b38038A6249B7aBdd5a047D211fB0aD48E",
+      "startBlock": "19179289"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
