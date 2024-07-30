@@ -127,17 +127,6 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleAssetDeposit(event: AssetDeposit): void {
-  log.warning(
-    "[AssetDeposit] asset: {} depositor: {} amount: {} mintAmount: {} tx: {}",
-    [
-      event.params.asset.toHexString(),
-      event.params.depositor.toHexString(),
-      event.params.depositAmount.toString(),
-      event.params.rsethMintAmount.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
-
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -145,7 +134,9 @@ export function handleAssetDeposit(event: AssetDeposit): void {
     event
   );
   const token = sdk.Tokens.getOrCreateToken(event.params.asset);
-  const outputToken = sdk.Tokens.getOrCreateToken(event.address);
+  const outputToken = sdk.Tokens.getOrCreateToken(
+    Address.fromString(NetworkConfigs.getLRT())
+  );
 
   const pool = sdk.Pools.loadPool(outputToken.id);
   if (!pool.isInitialized) {
@@ -155,7 +146,7 @@ export function handleAssetDeposit(event: AssetDeposit): void {
   const amount = event.params.depositAmount;
   pool.addInputTokenBalances([amount], true);
 
-  const lrtContract = RSETH.bind(event.address);
+  const lrtContract = RSETH.bind(Address.fromString(NetworkConfigs.getLRT()));
   const supply = lrtContract.totalSupply();
   pool.setOutputTokenSupply(outputToken, supply);
 
@@ -165,13 +156,6 @@ export function handleAssetDeposit(event: AssetDeposit): void {
 }
 
 export function handleETHDeposit(event: ETHDeposit): void {
-  log.warning("[ETHDeposit] depositor: {} amount: {} mintAmount: {} tx: {}", [
-    event.params.depositor.toHexString(),
-    event.params.depositAmount.toString(),
-    event.params.rsethMintAmount.toString(),
-    event.transaction.hash.toHexString(),
-  ]);
-
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -179,7 +163,9 @@ export function handleETHDeposit(event: ETHDeposit): void {
     event
   );
   const token = sdk.Tokens.getOrCreateToken(Address.fromString(ETH_ADDRESS));
-  const outputToken = sdk.Tokens.getOrCreateToken(event.address);
+  const outputToken = sdk.Tokens.getOrCreateToken(
+    Address.fromString(NetworkConfigs.getLRT())
+  );
 
   const pool = sdk.Pools.loadPool(outputToken.id);
   if (!pool.isInitialized) {
@@ -189,7 +175,7 @@ export function handleETHDeposit(event: ETHDeposit): void {
   const amount = event.params.depositAmount;
   pool.addInputTokenBalances([amount], true);
 
-  const lrtContract = RSETH.bind(event.address);
+  const lrtContract = RSETH.bind(Address.fromString(NetworkConfigs.getLRT()));
   const supply = lrtContract.totalSupply();
   pool.setOutputTokenSupply(outputToken, supply);
 
@@ -201,17 +187,6 @@ export function handleETHDeposit(event: ETHDeposit): void {
 export function handleAssetWithdrawalQueued(
   event: AssetWithdrawalQueued
 ): void {
-  log.warning(
-    "[AssetWithdrawalQueued] asset: {} withdrawer: {} rsETHUnstaked: {} userNonce: {} tx: {}",
-    [
-      event.params.asset.toHexString(),
-      event.params.withdrawer.toHexString(),
-      event.params.rsETHUnstaked.toString(),
-      event.params.userNonce.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
-
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -227,17 +202,6 @@ export function handleAssetWithdrawalQueued(
 export function handleAssetWithdrawalFinalized(
   event: AssetWithdrawalFinalized
 ): void {
-  log.warning(
-    "[AssetWithdrawalFinalized] asset: {} withdrawer: {} amountReceived: {} amountBurned: {} tx: {}",
-    [
-      event.params.asset.toHexString(),
-      event.params.withdrawer.toHexString(),
-      event.params.amountReceived.toString(),
-      event.params.amountBurned.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
-
   const sdk = SDK.initializeFromEvent(
     conf,
     new Pricer(),
@@ -245,7 +209,9 @@ export function handleAssetWithdrawalFinalized(
     event
   );
   const token = sdk.Tokens.getOrCreateToken(event.params.asset);
-  const outputToken = sdk.Tokens.getOrCreateToken(event.address);
+  const outputToken = sdk.Tokens.getOrCreateToken(
+    Address.fromString(NetworkConfigs.getLRT())
+  );
 
   const pool = sdk.Pools.loadPool(outputToken.id);
   if (!pool.isInitialized) {
@@ -255,7 +221,7 @@ export function handleAssetWithdrawalFinalized(
   const amount = event.params.amountReceived;
   pool.addInputTokenBalances([amount.times(BIGINT_MINUS_ONE)], true);
 
-  const lrtContract = RSETH.bind(event.address);
+  const lrtContract = RSETH.bind(Address.fromString(NetworkConfigs.getLRT()));
   const supply = lrtContract.totalSupply();
   pool.setOutputTokenSupply(outputToken, supply);
 }

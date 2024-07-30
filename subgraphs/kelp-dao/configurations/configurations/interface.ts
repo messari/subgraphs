@@ -3,4 +3,5 @@ export interface Configurations {
   getProtocolId(): string;
   getProtocolName(): string;
   getProtocolSlug(): string;
+  getLRT(): string;
 }

@@ -18,4 +18,7 @@ export class KelpDAOMainnetConfigurations implements Configurations {
   getProtocolSlug(): string {
     return PROTOCOL_SLUG;
   }
+  getLRT(): string {
+    return "0xa1290d69c65a6fe4df752f95823fae25cb99e5a7";
+  }
 }

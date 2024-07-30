@@ -344,7 +344,7 @@ export class Pool {
    */
   setOutputTokenSupply(token: Token, amount: BigInt): void {
     this.pool.outputTokenSupply = amount;
-    this.refreshOutputTokenPriceUSD(token);
+    // this.refreshOutputTokenPriceUSD(token);
     this.save();
   }
 
