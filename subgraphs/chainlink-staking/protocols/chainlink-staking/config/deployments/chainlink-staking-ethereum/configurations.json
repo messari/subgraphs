@@ -1,0 +1,20 @@
+{
+  "deployment": "CHAINLINK_STAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "communityStakingPool": {
+    "address": "0xbc10f2e862ed4502144c7d632a3459f49dfcdb5e",
+    "startBlock": "18572190"
+  },
+  "operatorStakingPool": {
+    "address": "0xa1d76a7ca72128541e9fcacafbda3a92ef94fdc5",
+    "startBlock": "18572190"
+  },
+  "stakingOld": {
+    "address": "0x3feb1e09b4bb0e7f0387cee092a52e85797ab889",
+    "startBlock": "16083969"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
