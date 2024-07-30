@@ -1,0 +1,478 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      { "internalType": "bytes", "name": "rdata", "type": "bytes" }
+    ],
+    "name": "ClaimRedeemFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "redeemRequestId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "withdrawalEventId",
+        "type": "uint256"
+      }
+    ],
+    "name": "DoesNotMatch",
+    "type": "error"
+  },
+  { "inputs": [], "name": "IncompatibleArrayLengths", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "version", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "expectedVersion",
+        "type": "uint256"
+      }
+    ],
+    "name": "InvalidInitialization",
+    "type": "error"
+  },
+  { "inputs": [], "name": "InvalidZeroAddress", "type": "error" },
+  { "inputs": [], "name": "InvalidZeroAmount", "type": "error" },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
+    "name": "RedeemRequestAlreadyClaimed",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
+    "name": "RedeemRequestOutOfBounds",
+    "type": "error"
+  },
+  { "inputs": [], "name": "TransferError", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "caller", "type": "address" }
+    ],
+    "name": "Unauthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
+    "name": "WithdrawalEventOutOfBounds",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "withdrawalAmount",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "redeemDemand", "type": "uint256" }
+    ],
+    "name": "WithdrawalExceedsRedeemDemand",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "redeemRequestId",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lsEthAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "remainingLsEthAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "ClaimedRedeemRequest",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "cdata",
+        "type": "bytes"
+      }
+    ],
+    "name": "Initialize",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "height",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "id",
+        "type": "uint32"
+      }
+    ],
+    "name": "ReportedWithdrawal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "height",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxRedeemableEth",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "id",
+        "type": "uint32"
+      }
+    ],
+    "name": "RequestedRedeem",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "redeemRequestId",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "withdrawalEventId",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lsEthAmountSatisfied",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethAmountSatisfied",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lsEthAmountRemaining",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethAmountExceeding",
+        "type": "uint256"
+      }
+    ],
+    "name": "SatisfiedRedeemRequest",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldRedeemDemand",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newRedeemDemand",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetRedeemDemand",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "river",
+        "type": "address"
+      }
+    ],
+    "name": "SetRiver",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32[]",
+        "name": "redeemRequestIds",
+        "type": "uint32[]"
+      },
+      {
+        "internalType": "uint32[]",
+        "name": "withdrawalEventIds",
+        "type": "uint32[]"
+      },
+      { "internalType": "bool", "name": "skipAlreadyClaimed", "type": "bool" },
+      { "internalType": "uint16", "name": "_depth", "type": "uint16" }
+    ],
+    "name": "claimRedeemRequests",
+    "outputs": [
+      { "internalType": "uint8[]", "name": "claimStatuses", "type": "uint8[]" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32[]",
+        "name": "_redeemRequestIds",
+        "type": "uint32[]"
+      },
+      {
+        "internalType": "uint32[]",
+        "name": "_withdrawalEventIds",
+        "type": "uint32[]"
+      }
+    ],
+    "name": "claimRedeemRequests",
+    "outputs": [
+      { "internalType": "uint8[]", "name": "claimStatuses", "type": "uint8[]" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getBufferedExceedingEth",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRedeemDemand",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRedeemRequestCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint32", "name": "_redeemRequestId", "type": "uint32" }
+    ],
+    "name": "getRedeemRequestDetails",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "maxRedeemableEth",
+            "type": "uint256"
+          },
+          { "internalType": "address", "name": "owner", "type": "address" },
+          { "internalType": "uint256", "name": "height", "type": "uint256" }
+        ],
+        "internalType": "struct RedeemQueue.RedeemRequest",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRiver",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getWithdrawalEventCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_withdrawalEventId",
+        "type": "uint32"
+      }
+    ],
+    "name": "getWithdrawalEventDetails",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "withdrawnEth",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "height", "type": "uint256" }
+        ],
+        "internalType": "struct WithdrawalStack.WithdrawalEvent",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_river", "type": "address" }
+    ],
+    "name": "initializeRedeemManagerV1",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_max", "type": "uint256" }
+    ],
+    "name": "pullExceedingEth",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_lsETHWithdrawable",
+        "type": "uint256"
+      }
+    ],
+    "name": "reportWithdraw",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_lsETHAmount", "type": "uint256" },
+      { "internalType": "address", "name": "_recipient", "type": "address" }
+    ],
+    "name": "requestRedeem",
+    "outputs": [
+      { "internalType": "uint32", "name": "redeemRequestId", "type": "uint32" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_lsETHAmount", "type": "uint256" }
+    ],
+    "name": "requestRedeem",
+    "outputs": [
+      { "internalType": "uint32", "name": "redeemRequestId", "type": "uint32" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32[]",
+        "name": "_redeemRequestIds",
+        "type": "uint32[]"
+      }
+    ],
+    "name": "resolveRedeemRequests",
+    "outputs": [
+      {
+        "internalType": "int64[]",
+        "name": "withdrawalEventIds",
+        "type": "int64[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

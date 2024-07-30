@@ -11718,5 +11718,39 @@
         }
       }
     }
+  },
+  "liquid-collective": {
+    "schema": "generic",
+    "base": "liquid-collective",
+    "protocol": "liquid-collective",
+    "project": "liquid-collective",
+    "deployments": {
+      "liquid-collective-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "liquid.collective.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "liquid-collective-ethereum",
+            "query-id": "liquid-collective-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "liquid-collective-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

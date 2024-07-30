@@ -1,0 +1,16 @@
+{
+  "deployment": "LIQUID_COLLECTIVE_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "lsETH": {
+    "address": "0x8c1bed5b9a0928467c9b1341da1d7bd5e10b6549",
+    "startBlock": "15676402"
+  },
+  "redeemManager": {
+    "address": "0x080b3a41390b357ad7e8097644d1dedf57ad3375",
+    "startBlock": "17371894"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
