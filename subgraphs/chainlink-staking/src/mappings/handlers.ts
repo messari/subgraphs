@@ -311,15 +311,17 @@ export function handleStakedOld(event: StakedOld): void {
   if (!pool.isInitialized) {
     pool.initialize("Staking Pool Old", token.symbol, [token.id], null, false);
   }
-  let amount = BIGINT_ZERO;
+
+  let balance = BIGINT_ZERO;
   const linkTokenContract = LinkToken.bind(
     Address.fromString(NetworkConfigs.getProtocolToken())
   );
   const balanceOfCall = linkTokenContract.try_balanceOf(event.address);
   if (!balanceOfCall.reverted) {
-    amount = balanceOfCall.value;
+    balance = balanceOfCall.value;
   }
-  pool.setInputTokenBalances([amount], true);
+  pool.setInputTokenBalances([balance], true);
+
   const user = event.transaction.from;
   const account = sdk.Accounts.loadAccount(user);
   account.trackActivity();
@@ -339,15 +341,16 @@ export function handleUnstakedOld(event: UnstakedOld): void {
   if (!pool.isInitialized) {
     pool.initialize("Staking Pool Old", token.symbol, [token.id], null, false);
   }
-  let amount = BIGINT_ZERO;
+
+  let balance = BIGINT_ZERO;
   const linkTokenContract = LinkToken.bind(
     Address.fromString(NetworkConfigs.getProtocolToken())
   );
   const balanceOfCall = linkTokenContract.try_balanceOf(event.address);
   if (!balanceOfCall.reverted) {
-    amount = balanceOfCall.value;
+    balance = balanceOfCall.value;
   }
-  pool.setInputTokenBalances([amount.times(BIGINT_MINUS_ONE)], true);
+  pool.setInputTokenBalances([balance], true);
   const user = event.transaction.from;
   const account = sdk.Accounts.loadAccount(user);
   account.trackActivity();
