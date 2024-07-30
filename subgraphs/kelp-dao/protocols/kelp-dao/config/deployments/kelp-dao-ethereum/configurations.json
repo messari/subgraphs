@@ -1,0 +1,16 @@
+{
+  "deployment": "KELP_DAO_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "depositPool": {
+    "address": "0x036676389e48133b63a802f8635ad39e752d375d",
+    "startBlock": "18758282"
+  },
+  "withdrawalManager": {
+    "address": "0x62de59c08eb5dae4b7e6f7a8cad3006d6965ec16",
+    "startBlock": "19730468"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
