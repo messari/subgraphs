@@ -6164,6 +6164,10 @@
           "hosted-service": {
             "slug": "uniswap-v2-swap-ethereum",
             "query-id": "uniswap-v2-swap-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v2-swap-ethereum",
+            "query-id": "3onEbd9MLfXTTWAfP91yqsKr7C68VCT2ZiF7EoQiQAFj"
           }
         }
       }
@@ -11573,6 +11577,74 @@
           },
           "decentralized-network": {
             "slug": "lybra-finance-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "stream-finance": {
+    "schema": "generic",
+    "base": "stream-finance",
+    "protocol": "stream-finance",
+    "project": "stream-finance",
+    "deployments": {
+      "stream-finance-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stream.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stream-finance-ethereum",
+            "query-id": "stream-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stream-finance-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "umami-finance": {
+    "schema": "generic",
+    "base": "umami-finance",
+    "protocol": "umami-finance",
+    "project": "umami-finance",
+    "deployments": {
+      "umami-finance-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "umami.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "umami-finance-arbitrum",
+            "query-id": "umami-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "umami-finance-arbitrum",
             "query-id": "TODO"
           }
         }
