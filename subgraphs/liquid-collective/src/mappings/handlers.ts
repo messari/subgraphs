@@ -17,6 +17,7 @@ import {
   RequestedRedeem,
   ClaimedRedeemRequest,
 } from "../../generated/RedeemManager/RedeemManager";
+import { WETH_ADDRESS } from "../prices/config/mainnet";
 
 const conf = new ProtocolConfig(
   NetworkConfigs.getProtocolId(),
@@ -86,7 +87,7 @@ export function handlePulledELFees(event: PulledELFees): void {
     new TokenInit(),
     event
   );
-  const token = sdk.Tokens.getOrCreateToken(Address.fromString(ETH_ADDRESS));
+  const token = sdk.Tokens.getOrCreateToken(WETH_ADDRESS);
   const outputToken = sdk.Tokens.getOrCreateToken(event.address);
 
   const pool = sdk.Pools.loadPool(event.address);
@@ -119,7 +120,7 @@ export function handleUserDeposit(event: UserDeposit): void {
     new TokenInit(),
     event
   );
-  const token = sdk.Tokens.getOrCreateToken(Address.fromString(ETH_ADDRESS));
+  const token = sdk.Tokens.getOrCreateToken(WETH_ADDRESS);
   const outputToken = sdk.Tokens.getOrCreateToken(event.address);
 
   const pool = sdk.Pools.loadPool(event.address);
@@ -166,7 +167,7 @@ export function handleClaimedRedeemRequest(event: ClaimedRedeemRequest): void {
     new TokenInit(),
     event
   );
-  const token = sdk.Tokens.getOrCreateToken(Address.fromString(ETH_ADDRESS));
+  const token = sdk.Tokens.getOrCreateToken(WETH_ADDRESS);
   const outputToken = sdk.Tokens.getOrCreateToken(
     Address.fromString(NetworkConfigs.getProtocolId())
   );
