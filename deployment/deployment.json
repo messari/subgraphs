@@ -11752,5 +11752,65 @@
         }
       }
     }
+  },
+  "binance-staked-eth": {
+    "schema": "generic",
+    "base": "binance-staked-eth",
+    "protocol": "binance-staked-eth",
+    "project": "binance-staked-eth",
+    "deployments": {
+      "binance-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "binance-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "binance-staked-eth-ethereum",
+            "query-id": "binance-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "binance-staked-eth-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "binance-staked-eth-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "binance-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "binance-staked-eth-bsc",
+            "query-id": "binance-staked-eth-bsc"
+          },
+          "decentralized-network": {
+            "slug": "binance-staked-eth-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
