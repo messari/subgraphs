@@ -1,0 +1,358 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: CommunityStakingPool
+    network: {{ network }}
+    source:
+      address: "{{ communityStakingPool.address }}"
+      abi: CommunityStakingPool
+      startBlock: {{ communityStakingPool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: Staking
+          file: ./abis/ChainlinkStaking/Staking.json
+        - name: CommunityStakingPool
+          file: ./abis/ChainlinkStaking/CommunityStakingPool.json
+        - name: OperatorStakingPool
+          file: ./abis/ChainlinkStaking/OperatorStakingPool.json
+        - name: RewardVault
+          file: ./abis/ChainlinkStaking/RewardVault.json
+        - name: LinkToken
+          file: ./abis/ChainlinkStaking/LinkToken.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # Mispriced Tokens
+        - name: EGETH
+          file: ./abis/Prices/EGETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256,uint256,uint256)
+          handler: handleStakedCommunity
+        - event: Unstaked(indexed address,uint256,uint256,uint256)
+          handler: handleUnstakedCommunity
+        - event: RewardVaultSet(indexed address,indexed address)
+          handler: handleRewardVaultSetCommunity
+      file: {{{ file }}}
+  - kind: ethereum
+    name: OperatorStakingPool
+    network: {{ network }}
+    source:
+      address: "{{ operatorStakingPool.address }}"
+      abi: OperatorStakingPool
+      startBlock: {{ operatorStakingPool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: Staking
+          file: ./abis/ChainlinkStaking/Staking.json
+        - name: CommunityStakingPool
+          file: ./abis/ChainlinkStaking/CommunityStakingPool.json
+        - name: OperatorStakingPool
+          file: ./abis/ChainlinkStaking/OperatorStakingPool.json
+        - name: RewardVault
+          file: ./abis/ChainlinkStaking/RewardVault.json
+        - name: LinkToken
+          file: ./abis/ChainlinkStaking/LinkToken.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # Mispriced Tokens
+        - name: EGETH
+          file: ./abis/Prices/EGETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256,uint256,uint256)
+          handler: handleStakedOperator
+        - event: Unstaked(indexed address,uint256,uint256,uint256)
+          handler: handleUnstakedOperator
+        - event: RewardVaultSet(indexed address,indexed address)
+          handler: handleRewardVaultSetCommunity
+      file: {{{ file }}}
+  - kind: ethereum
+    name: Staking
+    network: {{ network }}
+    source:
+      address: "{{ stakingOld.address }}"
+      abi: Staking
+      startBlock: {{ stakingOld.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: Staking
+          file: ./abis/ChainlinkStaking/Staking.json
+        - name: CommunityStakingPool
+          file: ./abis/ChainlinkStaking/CommunityStakingPool.json
+        - name: OperatorStakingPool
+          file: ./abis/ChainlinkStaking/OperatorStakingPool.json
+        - name: RewardVault
+          file: ./abis/ChainlinkStaking/RewardVault.json
+        - name: LinkToken
+          file: ./abis/ChainlinkStaking/LinkToken.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # Mispriced Tokens
+        - name: EGETH
+          file: ./abis/Prices/EGETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+      eventHandlers:
+        - event: Staked(address,uint256,uint256)
+          handler: handleStakedOld
+        - event: Unstaked(address,uint256,uint256,uint256)
+          handler: handleUnstakedOld
+      file: {{{ file }}}
+templates:
+  - kind: ethereum
+    name: RewardVault
+    network: {{ network }}
+    source:
+      abi: RewardVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: Staking
+          file: ./abis/ChainlinkStaking/Staking.json
+        - name: CommunityStakingPool
+          file: ./abis/ChainlinkStaking/CommunityStakingPool.json
+        - name: OperatorStakingPool
+          file: ./abis/ChainlinkStaking/OperatorStakingPool.json
+        - name: RewardVault
+          file: ./abis/ChainlinkStaking/RewardVault.json
+        - name: LinkToken
+          file: ./abis/ChainlinkStaking/LinkToken.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # Mispriced Tokens
+        - name: EGETH
+          file: ./abis/Prices/EGETH.json
+        - name: EigenpieMLRT
+          file: ./abis/Prices/EigenpieMLRT.json
+        - name: WBETH
+          file: ./abis/Prices/WBETH.json
+        - name: SFRAX
+          file: ./abis/Prices/SFRAX.json
+      eventHandlers:
+        - event: CommunityPoolRewardUpdated(uint256)
+          handler: handleCommunityPoolRewardUpdated
+        - event: OperatorPoolRewardUpdated(uint256,uint256)
+          handler: handleOperatorPoolRewardUpdated
+      file: {{{ file }}}
