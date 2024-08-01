@@ -2,7 +2,6 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
@@ -19,8 +18,6 @@ import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
   BIGDECIMAL_ZERO,
-  BIGINT_MINUS_ONE,
-  BIGINT_TEN,
   ETH_ADDRESS,
   INT_ZERO,
   Network,
@@ -29,7 +26,7 @@ import {
 import { _ERC20 } from "../../generated/WBETH/_ERC20";
 import { ChainlinkDataFeed } from "../../generated/WBETH/ChainlinkDataFeed";
 import { WBETH, Mint, Burn } from "../../generated/WBETH/WBETH";
-import { Token, _UnstakeRequest } from "../../generated/schema";
+import { Token } from "../../generated/schema";
 import { CustomPriceType } from "../prices/common/types";
 
 const conf = new ProtocolConfig(
