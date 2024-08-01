@@ -12,6 +12,7 @@ def extract_deployment_info(data):
                 decentralized_network = deployment_data["services"]["decentralized-network"]
                 row = {
                     "deployment name": deployment_name,
+                    "protocol name": project_data["protocol"],
                     "protocol type": schema,
                     "network": deployment_data["network"],
                     "status": deployment_data["status"],
@@ -36,3 +37,11 @@ df_general = df_general.sort_values(by=["protocol type", "deployment name"])
 # Save to CSV
 csv_file_path_general = "decentralized_network_deployments.csv"
 df_general.to_csv(csv_file_path_general, index=False)
+
+# Print Deployment Statistics
+df_prod = df_general[df_general['status'] == 'prod']
+distinct_protocols = df_prod['protocol name'].nunique()
+non_governance_protocols = df_prod[~df_prod['protocol name'].str.contains('governance', case=False, na=False)]['protocol name'].nunique()
+
+print(f"Number of distinct protocols in production: {distinct_protocols}")
+print(f"Number of non-governance protocols in production: {non_governance_protocols}")
