@@ -11651,6 +11651,108 @@
       }
     }
   },
+  "kelp-dao": {
+    "schema": "generic",
+    "base": "kelp-dao",
+    "protocol": "kelp-dao",
+    "project": "kelp-dao",
+    "deployments": {
+      "kelp-dao-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kelp.dao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kelp-dao-ethereum",
+            "query-id": "kelp-dao-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "kelp-dao-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "chainlink-staking": {
+    "schema": "generic",
+    "base": "chainlink-staking",
+    "protocol": "chainlink-staking",
+    "project": "chainlink-staking",
+    "deployments": {
+      "chainlink-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "chainlink.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "chainlink-staking-ethereum",
+            "query-id": "chainlink-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "chainlink-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "liquid-collective": {
+    "schema": "generic",
+    "base": "liquid-collective",
+    "protocol": "liquid-collective",
+    "project": "liquid-collective",
+    "deployments": {
+      "liquid-collective-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "liquid.collective.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "liquid-collective-ethereum",
+            "query-id": "liquid-collective-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "liquid-collective-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "binance-staked-eth": {
     "schema": "generic",
     "base": "binance-staked-eth",
