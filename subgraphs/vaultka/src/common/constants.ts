@@ -5,9 +5,9 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 //////////////////////////////
 
 export namespace Protocol {
-  export const ID = "0xf3b466f09ef476e311ce275407cfb09a8d8de3a7";
-  export const NAME = "Stream Finance";
-  export const SLUG = "stream-finance";
+  export const ID = "0xc99c6427cb0b824207606dc2745a512c6b066e7c";
+  export const NAME = "Vaultka";
+  export const SLUG = "Vaultka";
 }
 
 //////////////////////////////
