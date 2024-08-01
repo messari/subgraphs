@@ -1,0 +1,75 @@
+{
+  "network": "arbitrum-one",
+
+  "Vaults": [
+    {
+      "name": "vodkaV1Water",
+      "address": "0xc99c6427cb0b824207606dc2745a512c6b066e7c",
+      "startBlock": "123730274"
+    },
+    {
+      "name": "vodkaV2Water",
+      "address": "0x9045ae36f963b7184861bdce205ea8b08913b48c",
+      "startBlock": "133043914"
+    },
+    {
+      "name": "sakeWater",
+      "address": "0x6b367F9EB22B2E6074E9548689cddaF9224FC0Ab",
+      "startBlock": "106052093"
+    },
+    {
+      "name": "sakeWaterV2",
+      "address": "0x806e8538fc05774ea83d9428f778e423f6492475",
+      "startBlock": "121182614"
+    },
+    {
+      "name": "WaterV3",
+      "address": "0xa100e02e861132c4703ae96d6868664f27eaa431",
+      "startBlock": "98652685"
+    },
+    {
+      "name": "vodkaV2DNARBWater",
+      "address": "0x175995159ca4F833794C88f7873B3e7fB12Bb1b6",
+      "startBlock": "150623720"
+    },
+    {
+      "name": "vodkaV2DNBTCWater",
+      "address": "0x4e9e41Bbf099fE0ef960017861d181a9aF6DDa07",
+      "startBlock": "150623750"
+    },
+    {
+      "name": "vodkaV2DNLINKWater",
+      "address": "0xff614dd6fc857e4dada196d75dac51d522a2ccf7",
+      "startBlock": "170950638"
+    },
+    {
+      "name": "glmVault",
+      "address": "0xB455f2ab7905785e90ED09fF542290a722b3FBb5",
+      "startBlock": "177955750"
+    },
+    {
+      "name": "agedVodkaV2BTC",
+      "address": "0x83C8A6B6867A3706a99573d39dc65a6805D26770",
+      "startBlock": "159319126"
+    },
+    {
+      "name": "agedVodkaV2ETH",
+      "address": "0xE502474DfC23Cd11C28c379819Ea97A69aF7E10F",
+      "startBlock": "159318447"
+    },
+    {
+      "name": "vodkaV2DNETHWater",
+      "address": "0x8A98929750e6709Af765F976c6bddb5BfFE6C06c",
+      "startBlock": "150623685"
+    },
+    {
+      "name": "agedVodka",
+      "address": "0x9566db22DC32E54234d2D0Ae7B72f44e05158239",
+      "startBlock": "147672585"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
