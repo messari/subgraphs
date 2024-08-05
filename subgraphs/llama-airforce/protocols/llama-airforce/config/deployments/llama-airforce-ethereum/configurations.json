@@ -1,0 +1,53 @@
+{
+  "network": "mainnet",
+
+  "Vaults": [
+    {
+      "name": "UnionVault",
+      "address": "0x83507cc8c8b67ed48badd1f59f684d5d02884c81",
+      "startBlock": "13984370"
+    },
+    {
+      "name": "stkCvxCrvVault",
+      "address": "0x4ebad8dbd4edbd74db0278714fbd67ebc76b89b7",
+      "startBlock": "16447598"
+    },
+    {
+      "name": "stkCvxCrvVaultV2",
+      "address": "0xde2bef0a01845257b4aef2a2eaa48f6eaeafa8b7",
+      "startBlock": "16904032"
+    },
+    {
+      "name": "GenericUnionVault",
+      "address": "0xf964b0e3ffdea659c44a5a52bc0b82a24b89ce0e",
+      "startBlock": "14369996"
+    },
+    {
+      "name": "stkCvxFxsVault",
+      "address": "0x3a886455e5b33300a31c5e77bac01e76c0c7b29c",
+      "startBlock": "16831542"
+    },
+    {
+      "name": "stkCvxPrismaVault",
+      "address": "0x9bfd08d7b3cc40129132a17b4d5b9ea3351464bd",
+      "startBlock": "19008821"
+    },
+    {
+      "name": "AuraBalVault",
+      "address": "0x8c4eb0fc6805ee7337ac126f89a807271a88dd67",
+      "startBlock": "16224765"
+    }
+  ],
+
+  "V2Vaults": [
+    {
+      "name": "UnionPirexVault",
+      "address": "0x8659fc767cad6005de79af65dafe4249c57927af",
+      "startBlock": "14878958"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
