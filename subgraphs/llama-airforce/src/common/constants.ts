@@ -5,7 +5,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 //////////////////////////////
 
 export namespace Protocol {
-  export const ID = "0x3b022edecd65b63288704a6fa33a8b9185b5096b";
+  export const ID = "0x8659fc767cad6005de79af65dafe4249c57927af";
   export const NAME = "Llama Airforce";
   export const SLUG = "llama-airforce";
 }
