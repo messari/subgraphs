@@ -1,0 +1,16 @@
+{
+  "deployment": "TAROT_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x36df0a76a124d8b2205fa11766ec2eff8ce38a35",
+      "startBlock": "28060439"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

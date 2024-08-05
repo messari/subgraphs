@@ -1,0 +1,28 @@
+{
+  "deployment": "TAROT_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "factories": [
+    {
+      "name": "Factory1",
+      "abi": "Factory",
+      "address": "0x2217aec3440e8fd6d49a118b1502e539f88dba55",
+      "startBlock": "38359651"
+    },
+    {
+      "name": "Factory2",
+      "abi": "Factory",
+      "address": "0x1bbd5637421a83b00c5cd549b9c3721b28553f80",
+      "startBlock": "61875412"
+    },
+    {
+      "name": "Factory3",
+      "abi": "Factory",
+      "address": "0x4b6dae049a35196a773028b2e835cccce9dd4723",
+      "startBlock": "43331685"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
