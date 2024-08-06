@@ -11880,5 +11880,39 @@
         }
       }
     }
+  },
+  "benqi-staked-avax": {
+    "schema": "generic",
+    "base": "benqi-staked-avax",
+    "protocol": "benqi-staked-avax",
+    "project": "benqi-staked-avax",
+    "deployments": {
+      "benqi-staked-avax-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "benqi-staked-avax.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "benqi-staked-avax-avalanche",
+            "query-id": "benqi-staked-avax-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "benqi-staked-avax-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
