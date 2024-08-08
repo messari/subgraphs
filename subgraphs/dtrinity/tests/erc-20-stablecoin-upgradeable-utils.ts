@@ -13,7 +13,7 @@ import {
   RoleRevoked,
   Transfer,
   Unpaused
-} from "../generated/dusd-stablecoin/dusd-stablecoin"
+} from "../generated/ERC20StablecoinUpgradeable/ERC20StablecoinUpgradeable"
 
 export function createAdminChangedEvent(
   previousAdmin: Address,
