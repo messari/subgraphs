@@ -8,6 +8,8 @@
     "create-local": "graph create --node http://localhost:8020/ dtrinity-dusd-fraxtal-testnet",
     "remove-local": "graph remove --node http://localhost:8020/ dtrinity-dusd-fraxtal-testnet",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dtrinity-dusd-fraxtal-testnet",
+    "create-fraxtal-testnet": "graph create --node http://52.11.39.166:8020 stablyio-dtrinity-dusd-testnet",
+    "deploy-fraxtal-testnet": "graph deploy stablyio-dtrinity-dusd-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.1",
     "test": "graph test"
   },
   "dependencies": {
