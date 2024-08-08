@@ -1,6 +1,6 @@
 {
-  "fraxtal-testnet": {
-    "ERC20StablecoinUpgradeable": {
+  "mainnet": {
+    "ERC20StablecoinUpgradeable.json": {
       "address": "0x4D6E79013212F10A026A1FB0b926C9Fd0432b96c",
       "startBlock": 10047781
     }
