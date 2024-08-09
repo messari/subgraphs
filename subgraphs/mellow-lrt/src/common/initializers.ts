@@ -63,12 +63,10 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
 export function updatePoolTVL(pool: Pool): void {
   const poolContract = Vault.bind(Address.fromBytes(pool.getBytesID()));
 
-  let tokens: Address[] = [];
   let underlyingAmounts: BigInt[] = [];
   const poolUnderlyingTVL = poolContract.try_underlyingTvl();
 
   if (!poolUnderlyingTVL.reverted) {
-    tokens = poolUnderlyingTVL.value.getTokens();
     underlyingAmounts = poolUnderlyingTVL.value.getAmounts();
   }
 
