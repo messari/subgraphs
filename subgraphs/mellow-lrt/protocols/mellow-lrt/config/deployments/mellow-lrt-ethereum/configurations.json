@@ -1,0 +1,60 @@
+{
+  "network": "mainnet",
+
+  "Vaults": [
+    {
+      "name": "Vault",
+      "address": "0xbeef69ac7870777598a04b2bd4771c71212e6abc",
+      "startBlock": "20045981"
+    },
+    {
+      "name": "Re7LabsLRT",
+      "address": "0x84631c0d0081fde56deb72f6de77abbbf6a9f93a",
+      "startBlock": "20046215"
+    },
+    {
+      "name": "AmphorRestakedETH",
+      "address": "0x5fd13359ba15a84b76f7f87568309040176167cd",
+      "startBlock": "20046849"
+    },
+    {
+      "name": "RestakingVaultETH",
+      "address": "0x7a4effd87c2f3c55ca251080b1343b605f327e3a",
+      "startBlock": "20046493"
+    },
+    {
+      "name": "EthenaLRTVaultENA",
+      "address": "0xc65433845ecd16688eda196497fa9130d6c47bd8",
+      "startBlock": "20163126"
+    },
+    {
+      "name": "EthenaLRTVaultsUSDe",
+      "address": "0x82f5104b23ff2fa54c2345f821dac9369e9e0b26",
+      "startBlock": "20163297"
+    },
+    {
+      "name": "InfStonesRestakedETH",
+      "address": "0x49cd586dd9ba227be9654c735a659a1db08232a9",
+      "startBlock": "20176677"
+    },
+    {
+      "name": "LuganodesRestakedETH",
+      "address": "0x82dc3260f599f4fc4307209a1122b6eaa007163b",
+      "startBlock": "20176545"
+    },
+    {
+      "name": "ETHRestakingPro",
+      "address": "0xd6e09a5e6d719d1c881579c9c8670a210437931b",
+      "startBlock": "20175898"
+    },
+    {
+      "name": "RenzoRestakedLST",
+      "address": "0x8c9532a60e0e7c6bbd2b2c1303f63ace1c3e9811",
+      "startBlock": "20175746"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

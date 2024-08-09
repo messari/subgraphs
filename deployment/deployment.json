@@ -11914,5 +11914,39 @@
         }
       }
     }
+  },
+  "mellow-lrt": {
+    "schema": "generic",
+    "base": "mellow-lrt",
+    "protocol": "mellow-lrt",
+    "project": "mellow-lrt",
+    "deployments": {
+      "mellow-lrt-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mellow.lrt.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mellow-lrt-ethereum",
+            "query-id": "mellow-lrt-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mellow-lrt-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
