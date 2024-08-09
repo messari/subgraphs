@@ -21,6 +21,10 @@ export function getUsdPricePerToken(
   tokenAddr: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {
+  if (tokenAddr.equals(constants.PIREX_CVX_ADDRESS)) {
+    tokenAddr = constants.CONVEX_TOKEN_ADDRESS;
+  }
+
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
     return new CustomPriceType();
   }

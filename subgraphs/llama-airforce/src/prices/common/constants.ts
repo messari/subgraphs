@@ -41,3 +41,10 @@ export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 export const AAVE_ORACLE_DECIMALS = 8;
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+
+export const PIREX_CVX_ADDRESS = Address.fromString(
+  "0xbce0cf87f513102f22232436cca2ca49e815c3ac"
+);
+export const CONVEX_TOKEN_ADDRESS = Address.fromString(
+  "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b"
+);
