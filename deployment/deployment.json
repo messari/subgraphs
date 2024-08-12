@@ -11914,5 +11914,39 @@
         }
       }
     }
+  },
+  "stakestone": {
+    "schema": "generic",
+    "base": "stakestone",
+    "protocol": "stakestone",
+    "project": "stakestone",
+    "deployments": {
+      "stakestone-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stakestone.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stakestone-ethereum",
+            "query-id": "stakestone-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stakestone-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
