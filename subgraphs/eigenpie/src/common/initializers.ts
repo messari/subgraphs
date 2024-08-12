@@ -7,7 +7,6 @@ import { MLRT } from "../../generated/EigenConfig/MLRT";
 import { ProtocolConfig } from "../sdk/protocols/config";
 import { ERC20 } from "../../generated/EigenConfig/ERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { EigenStaking } from "../../generated/EigenConfig/EigenStaking";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(
@@ -72,13 +71,11 @@ export function getOrCreatePool(poolAddress: Address, sdk: SDK): Pool {
   return pool;
 }
 
-export function updatePoolTVL(pool: Pool, asset: Address): void {
-  const stakingContract = EigenStaking.bind(
-    Address.fromString(constants.EIGEN_STAKING_ADDRESS)
-  );
+export function updatePoolTVL(pool: Pool): void {
+  const contract = MLRT.bind(Address.fromBytes(pool.getBytesID()));
 
   const poolUnderlyingTVL = readValue<BigInt>(
-    stakingContract.try_getTotalAssetDeposits(asset),
+    contract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
 

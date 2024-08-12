@@ -128,4 +128,6 @@ dataSources:
       eventHandlers:
         - event: AssetDeposit(indexed address,indexed address,uint256,indexed address,uint256,bool)
           handler: handleAssetDeposit
+        - event: AssetDeposit(indexed address,indexed address,uint256,indexed address)
+          handler: handleAssetDepositWithoutMintAmount
       file: ./src/mappings/eigenStakingMappings.ts

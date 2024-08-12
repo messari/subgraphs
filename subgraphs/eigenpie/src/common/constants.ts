@@ -26,6 +26,7 @@ export const EIGEN_CONFIG_ADDRESS =
   "0x20b70e4a1883b81429533fed944d7957121c7cab";
 export const EIGEN_STAKING_ADDRESS =
   "0x24db6717db1c75b9db6ea47164d8730b63875db7";
+export const EGETH_TOKEN_ADDRESS = "0xefefefefefefefefefefefefefefefefefefefef";
 
 ////////////////////////
 ///// Type Helpers /////

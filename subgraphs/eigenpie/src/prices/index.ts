@@ -25,6 +25,9 @@ export function getUsdPricePerToken(
     return new CustomPriceType();
   }
 
+  if (constants.WETH_LIKE_TOKENS.includes(tokenAddr))
+    tokenAddr = Address.fromString(constants.WETH_ADDRESS);
+
   const config = utils.getConfig();
   if (config.network() == "default") {
     log.warning("Failed to fetch price: network {} not implemented", [

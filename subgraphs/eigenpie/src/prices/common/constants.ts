@@ -41,3 +41,12 @@ export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 export const AAVE_ORACLE_DECIMALS = 8;
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+
+export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+
+export const WETH_LIKE_TOKENS: Address[] = [
+  Address.fromString("0xefefefefefefefefefefefefefefefefefefefef"), // egETH
+  Address.fromString("0xf1c9acdc66974dfb6decb12aa385b9cd01190e38"), // osETH
+  Address.fromString("0xac3e018457b222d93114458476f3e3416abbe38f"), // sfrxETH
+  Address.fromString("0xa2e3356610840701bdf5611a53974510ae27e2e1"), // wBETH
+];

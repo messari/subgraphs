@@ -37,7 +37,7 @@ export class TokenInit implements TokenInitializer {
     let default_symbol = "UNKNOWN";
     let default_decimals = constants.INT_ZERO as i32;
 
-    if (address == Address.fromString(constants.ETH_ADDRESS)) {
+    if (address == Address.fromString(constants.EGETH_TOKEN_ADDRESS)) {
       default_name = constants.ETH_NAME;
       default_symbol = constants.ETH_SYMBOL;
       default_decimals = constants.DEFAULT_DECIMALS as i32;
