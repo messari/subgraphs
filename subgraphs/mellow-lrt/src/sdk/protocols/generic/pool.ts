@@ -134,18 +134,6 @@ export class Pool {
     this.save();
   }
 
-  // export function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
-  //   const retval = new Array<T>(x.length - 1);
-  //   let nI = 0;
-  //   for (let i = 0; i < x.length; i++) {
-  //     if (i != index) {
-  //       retval[nI] = x[i];
-  //       nI += 1;
-  //     }
-  //   }
-  //   return retval;
-  // }
-
   removeInputToken(token: Address): void {
     const inputTokens = this.pool.inputTokens;
     const newArray = new Array<Bytes>(inputTokens.length - 1);
@@ -159,7 +147,6 @@ export class Pool {
     }
 
     this.pool.inputTokens = newArray;
-
     this.save();
   }
 
