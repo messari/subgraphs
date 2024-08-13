@@ -1,0 +1,16 @@
+{
+  "deployment": "SYNTHETIX_V3_ARBITRUM",
+  "network": "arbitrum",
+  "file": "./src/mappings/handlers.ts",
+  "coreProxy": {
+    "address": "0xffffffaeff0b96ea8e4f94b2253f31abdd875847",
+    "startBlock": "218272801"
+  },
+  "spotMarketProxy": {
+    "address": "0xa65538a6b9a8442854decb6e3f85782c60757d60",
+    "startBlock": "218272989"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

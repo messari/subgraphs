@@ -1,0 +1,16 @@
+{
+  "deployment": "SYNTHETIX_V3_BASE",
+  "network": "base",
+  "file": "./src/mappings/handlers.ts",
+  "coreProxy": {
+    "address": "0x32c222a9a159782afd7529c87fa34b96ca72c696",
+    "startBlock": "7889198"
+  },
+  "spotMarketProxy": {
+    "address": "0x18141523403e2595d31b22604acb8fc06a4caa61",
+    "startBlock": "7889389"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,0 +1,159 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: CoreProxy
+    network: {{ network }}
+    source:
+      address: "{{ coreProxy.address }}"
+      abi: CoreProxy
+      startBlock: {{ coreProxy.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: CoreProxy
+          file: ./abis/SynthetixV3/CoreProxy1.json
+        - name: SpotMarketProxy
+          file: ./abis/SynthetixV3/SpotMarketProxy.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Deposited(indexed uint128,indexed address,uint256,indexed address)
+          handler: handleDeposited
+        - event: Withdrawn(indexed uint128,indexed address,uint256,indexed address)
+          handler: handleWithdrawn
+        - event: CollateralConfigured(indexed address,(bool,uint256,uint256,uint256,bytes32,address,uint256))
+          handler: handleCollateralConfigured
+        - event: Liquidation(indexed uint128,indexed uint128,indexed address,(uint256,uint256,uint256),uint128,address)
+          handler: handleLiquidation
+        - event: MarketRegistered(indexed address,indexed uint128,indexed address)
+          handler: handleMarketRegistered
+        - event: PoolCreated(indexed uint128,indexed address,indexed address)
+          handler: handlePoolCreated
+      file: {{{ file }}}
+  # - kind: ethereum
+  #   name: SpotMarketProxy
+  #   network: {{ network }}
+  #   source:
+  #     address: "{{ spotMarketProxy.address }}"
+  #     abi: SpotMarketProxy
+  #     startBlock: {{ spotMarketProxy.startBlock }}
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.7
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Token
+  #       - Pool
+  #       - PoolDailySnapshot
+  #       - PoolHourlySnapshot
+  #       - Protocol
+  #       - FinancialsDailySnapshot
+  #       - UsageMetricsDailySnapshot
+  #       - UsageMetricsHourlySnapshot
+  #     abis:
+  #       - name: CoreProxy
+  #         file: ./abis/SynthetixV3/CoreProxy.json
+  #       - name: SpotMarketProxy
+  #         file: ./abis/SynthetixV3/SpotMarketProxy.json
+
+  #       - name: ERC20
+  #         file: ./abis/Tokens/ERC20.json
+  #       - name: ERC20SymbolBytes
+  #         file: ./abis/Tokens/ERC20SymbolBytes.json
+  #       - name: ERC20NameBytes
+  #         file: ./abis/Tokens/ERC20NameBytes.json
+
+  #       ###########################################
+  #       ############## Price Oracle ###############
+  #       ###########################################
+  #       # ERC20
+  #       - name: _ERC20
+  #         file: ./abis/Prices/ERC20.json
+  #       # Curve Contracts
+  #       - name: CurvePool
+  #         file: ./abis/Prices/Curve/Pool.json
+  #       - name: CurveRegistry
+  #         file: ./abis/Prices/Curve/Registry.json
+  #       - name: CalculationsCurve
+  #         file: ./abis/Prices/Calculations/Curve.json
+  #       # YearnLens Contracts
+  #       - name: YearnLensContract
+  #         file: ./abis/Prices/YearnLens.json
+  #       # Aave Oracle Contract
+  #       - name: AaveOracleContract
+  #         file: ./abis/Prices/AaveOracle.json
+  #       # SushiSwap Contracts
+  #       - name: CalculationsSushiSwap
+  #         file: ./abis/Prices/Calculations/SushiSwap.json
+  #       # ChainLink Contracts
+  #       - name: ChainLinkContract
+  #         file: ./abis/Prices/ChainLink.json
+  #       # Uniswap Contracts
+  #       - name: UniswapRouter
+  #         file: ./abis/Prices/Uniswap/Router.json
+  #       - name: UniswapFactory
+  #         file: ./abis/Prices/Uniswap/Factory.json
+  #       - name: UniswapPair
+  #         file: ./abis/Prices/Uniswap/Pair.json
+  #     eventHandlers:
+  #       - event: OrderSettled(indexed uint128,indexed uint128,uint256,(uint256,uint256,int256,int256),uint256,indexed address,uint256,uint8)
+  #         handler: handleOrderSettled
+  #     file: {{{ file }}}

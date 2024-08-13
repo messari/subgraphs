@@ -1,0 +1,202 @@
+[
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "Deposited",
+    "inputs": [
+      {
+        "type": "uint128",
+        "name": "accountId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "collateralType",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "tokenAmount"
+      },
+      {
+        "type": "address",
+        "name": "sender",
+        "indexed": true
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "Withdrawn",
+    "inputs": [
+      {
+        "type": "uint128",
+        "name": "accountId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "collateralType",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "tokenAmount"
+      },
+      {
+        "type": "address",
+        "name": "sender",
+        "indexed": true
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "CollateralConfigured",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "collateralType",
+        "indexed": true
+      },
+      {
+        "type": "tuple",
+        "name": "config",
+        "components": [
+          {
+            "type": "bool",
+            "name": "depositingEnabled",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "issuanceRatioD18",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "liquidationRatioD18",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "liquidationRewardD18",
+            "indexed": false
+          },
+          {
+            "type": "bytes32",
+            "name": "oracleNodeId",
+            "indexed": false
+          },
+          {
+            "type": "address",
+            "name": "tokenAddress",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "minDelegationD18",
+            "indexed": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "Liquidation",
+    "inputs": [
+      {
+        "type": "uint128",
+        "name": "accountId",
+        "indexed": true
+      },
+      {
+        "type": "uint128",
+        "name": "poolId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "collateralType",
+        "indexed": true
+      },
+      {
+        "type": "tuple",
+        "name": "liquidationData",
+        "components": [
+          {
+            "type": "uint256",
+            "name": "debtLiquidated",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "collateralLiquidated",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "amountRewarded",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "uint128",
+        "name": "liquidateAsAccountId"
+      },
+      {
+        "type": "address",
+        "name": "sender"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "MarketRegistered",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "market",
+        "indexed": true
+      },
+      {
+        "type": "uint128",
+        "name": "marketId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "sender",
+        "indexed": true
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "PoolCreated",
+    "inputs": [
+      {
+        "type": "uint128",
+        "name": "poolId",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "owner",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "sender",
+        "indexed": true
+      }
+    ]
+  }
+]
