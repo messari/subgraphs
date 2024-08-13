@@ -12016,5 +12016,39 @@
         }
       }
     }
+  },
+  "eigenpie": {
+    "schema": "generic",
+    "base": "eigenpie",
+    "protocol": "eigenpie",
+    "project": "eigenpie",
+    "deployments": {
+      "eigenpie-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "eigenpie.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "eigenpie-ethereum",
+            "query-id": "eigenpie-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "eigenpie-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
