@@ -12152,5 +12152,39 @@
         }
       }
     }
+  },
+  "bedrock-unieth": {
+    "schema": "generic",
+    "base": "bedrock-unieth",
+    "protocol": "bedrock-unieth",
+    "project": "bedrock-unieth",
+    "deployments": {
+      "bedrock-unieth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "bedrock.unieth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bedrock-unieth-ethereum",
+            "query-id": "bedrock-unieth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "bedrock-unieth-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
