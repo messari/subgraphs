@@ -1,0 +1,17 @@
+{
+  "network": "mainnet",
+
+  "LRTConfig": {
+    "address": "0xf879c7859b6de6fadafb74224ff05b16871646bf",
+    "startBlock": "19138974"
+  },
+
+  "LRTDepositPool": {
+    "address": "0xa479582c8b64533102f6f528774c536e354b8d32",
+    "startBlock": "19143860"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
