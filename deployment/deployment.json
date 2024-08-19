@@ -12051,6 +12051,74 @@
       }
     }
   },
+  "prime-staked-eth": {
+    "schema": "generic",
+    "base": "prime-staked-eth",
+    "protocol": "prime-staked-eth",
+    "project": "prime-staked-eth",
+    "deployments": {
+      "prime-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "prime.staked.eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "prime-staked-eth-ethereum",
+            "query-id": "prime-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "prime-staked-eth-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "coinbase-wrapped-staked-eth": {
+    "schema": "generic",
+    "base": "coinbase-wrapped-staked-eth",
+    "protocol": "coinbase-wrapped-staked-eth",
+    "project": "coinbase-wrapped-staked-eth",
+    "deployments": {
+      "coinbase-wrapped-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "coinbase-wrapped-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "coinbase-wrapped-staked-eth-ethereum",
+            "query-id": "coinbase-wrapped-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "coinbase-wrapped-staked-eth-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "slisbnb": {
     "schema": "generic",
     "base": "slisbnb",
@@ -12061,7 +12129,7 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "2.1.1",
+          "schema": "3.0.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
