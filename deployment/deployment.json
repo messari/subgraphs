@@ -12118,5 +12118,39 @@
         }
       }
     }
+  },
+  "slisbnb": {
+    "schema": "generic",
+    "base": "slisbnb",
+    "protocol": "slisbnb",
+    "project": "slisbnb",
+    "deployments": {
+      "slisbnb-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "slisbnb.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "slisbnb-bsc",
+            "query-id": "slisbnb-bsc"
+          },
+          "decentralized-network": {
+            "slug": "slisbnb-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
