@@ -15,7 +15,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
   "0xb023e699f5a33916ea823a16485e259257ca8bd1",
-  25825996
+  25825996,
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -60,13 +60,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619"
+  "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
+  "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
 );
 
 export class config implements Configurations {
@@ -132,7 +132,7 @@ export class config implements Configurations {
 
   getOracleOverride(
     tokenAddr: Address | null,
-    block: ethereum.Block | null
+    block: ethereum.Block | null,
   ): OracleConfig | null {
     return null;
   }

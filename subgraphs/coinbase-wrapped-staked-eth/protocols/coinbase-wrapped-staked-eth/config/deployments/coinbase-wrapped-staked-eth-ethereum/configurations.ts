@@ -7,7 +7,9 @@ import {
 } from "../../../../../src/common/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
-export class CoinbaseWrappedStakedEthMainnetConfigurations implements Configurations {
+export class CoinbaseWrappedStakedEthMainnetConfigurations
+  implements Configurations
+{
   getNetwork(): string {
     return Network.MAINNET;
   }

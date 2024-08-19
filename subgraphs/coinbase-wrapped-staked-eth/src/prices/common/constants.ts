@@ -20,7 +20,7 @@ export namespace OracleType {
 }
 
 export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000348"
+  "0x0000000000000000000000000000000000000348",
 );
 
 export const PRICE_LIB_VERSION = "1.3.2";

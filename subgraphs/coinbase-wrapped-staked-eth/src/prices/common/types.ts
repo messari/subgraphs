@@ -15,7 +15,7 @@ export class OracleContract {
 
   constructor(
     contractAddress: string = constants.NULL.TYPE_STRING,
-    startBlock: i32 = -1
+    startBlock: i32 = -1,
   ) {
     this._contractAddress = contractAddress;
     this._contractStartBlock = startBlock;
@@ -48,7 +48,7 @@ export class CustomPriceType {
     _usdPrice: BigDecimal,
     _decimals: i32 = 0,
     _oracleType: string = "",
-    _liquidity: BigDecimal | null = null
+    _liquidity: BigDecimal | null = null,
   ): CustomPriceType {
     const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
@@ -65,7 +65,7 @@ export class CustomPriceType {
 
   get usdPrice(): BigDecimal {
     return changetype<Wrapped<BigDecimal>>(this._usdPrice).inner.div(
-      constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal()
+      constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal(),
     );
   }
 
@@ -142,6 +142,6 @@ export interface Configurations {
 
   getOracleOverride(
     tokenAddr: Address | null,
-    block: ethereum.Block | null
+    block: ethereum.Block | null,
   ): OracleConfig | null;
 }
