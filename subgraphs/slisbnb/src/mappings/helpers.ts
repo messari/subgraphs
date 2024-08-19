@@ -19,7 +19,7 @@ export class PricedTokenParams {
 
 export function getUpdatedPricedToken(tokenAddr: Address): PricedTokenParams {
   let pricedToken = tokenAddr;
-  let multiplier = BIGDECIMAL_ONE;
+  const multiplier = BIGDECIMAL_ONE;
   let changed = false;
 
   const network = dataSource.network().toUpperCase().replace("-", "_");
