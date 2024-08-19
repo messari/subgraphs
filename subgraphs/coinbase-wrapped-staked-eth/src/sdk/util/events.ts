@@ -28,7 +28,7 @@ export class CustomEventType {
       BIGINT_ZERO,
       BIGINT_ZERO,
       null,
-      null
+      null,
     );
     this.transaction = new ethereum.Transaction(
       Bytes.empty(),
@@ -39,7 +39,7 @@ export class CustomEventType {
       BIGINT_ZERO,
       BIGINT_ZERO,
       Bytes.empty(),
-      BIGINT_ZERO
+      BIGINT_ZERO,
     );
     this.logIndex = BIGINT_ZERO;
     this.event = null;
@@ -49,7 +49,7 @@ export class CustomEventType {
     block: ethereum.Block,
     transaction: ethereum.Transaction,
     logIndex: BigInt,
-    event: ethereum.Event | null = null
+    event: ethereum.Event | null = null,
   ): CustomEventType {
     const customEvent = new CustomEventType();
     customEvent.block = block;

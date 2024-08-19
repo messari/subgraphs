@@ -61,7 +61,7 @@ export class Pool {
     protocol: ProtocolManager,
     pool: PoolSchema,
     tokens: TokenManager,
-    isInitialized: bool
+    isInitialized: bool,
   ) {
     this.pool = pool;
     this.protocol = protocol;
@@ -83,7 +83,7 @@ export class Pool {
     symbol: string,
     inputTokens: Bytes[],
     outputToken: Token | null,
-    isLiquidity: bool
+    isLiquidity: bool,
   ): void {
     if (this.isInitialized) {
       return;
@@ -198,7 +198,7 @@ export class Pool {
    */
   addInputTokenBalances(
     amounts: BigInt[],
-    updateMetrics: boolean = true
+    updateMetrics: boolean = true,
   ): void {
     if (amounts.length != this.pool.inputTokenBalances.length) return;
 
@@ -218,7 +218,7 @@ export class Pool {
    */
   setInputTokenBalances(
     newBalances: BigInt[],
-    updateMetrics: boolean = true
+    updateMetrics: boolean = true,
   ): void {
     this.pool.inputTokenBalances = newBalances;
     this.setInputTokenBalancesUSD();
@@ -235,12 +235,12 @@ export class Pool {
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
       const inputTokenBalance = this.pool.inputTokenBalances[idx];
       const inputToken = this.tokens.getOrCreateToken(
-        Address.fromBytes(this.pool.inputTokens[idx])
+        Address.fromBytes(this.pool.inputTokens[idx]),
       );
 
       const amountUSD = this.getInputTokenAmountPrice(
         inputToken,
-        inputTokenBalance
+        inputTokenBalance,
       );
       inputTokenBalancesUSD.push(amountUSD);
     }
@@ -302,7 +302,7 @@ export class Pool {
   addRevenueNative(
     inputToken: Token,
     protocolSide: BigInt,
-    supplySide: BigInt
+    supplySide: BigInt,
   ): void {
     const pricer = this.protocol.pricer;
 
@@ -388,7 +388,7 @@ export class Pool {
   setRewardEmissions(
     type: RewardTokenType,
     token: Token,
-    amount: BigInt
+    amount: BigInt,
   ): void {
     const rToken = this.tokens.getOrCreateRewardToken(type, token);
     const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
@@ -406,12 +406,12 @@ export class Pool {
       this.pool.rewardTokenEmissionsAmount = updateArrayAtIndex(
         this.pool.rewardTokenEmissionsAmount!,
         amount,
-        index
+        index,
       );
       this.pool.rewardTokenEmissionsUSD = updateArrayAtIndex(
         this.pool.rewardTokenEmissionsUSD!,
         amountUSD,
-        index
+        index,
       );
       this.save();
       return;

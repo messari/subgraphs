@@ -11,16 +11,16 @@ export const NETWORK_STRING = "mainnet";
 
 export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
   "0x83d95e0d5f402511db06817aff3f9ea88224b030",
-  12242339
+  12242339,
 );
 export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract(
   "0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf",
-  12864088
+  12864088,
 );
 export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
 export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
   "0x8263e161a855b644f582d9c164c66aabee53f927",
-  12692284
+  12692284,
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
   "0x25bf7b72815476dd515044f9650bf79bad0df655",
-  12370088
+  12370088,
 );
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
@@ -176,13 +176,13 @@ class DelperOverride implements OracleConfig {
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 );
 
 export class config implements Configurations {
@@ -248,7 +248,7 @@ export class config implements Configurations {
 
   getOracleOverride(
     tokenAddr: Address | null,
-    block: ethereum.Block | null
+    block: ethereum.Block | null,
   ): OracleConfig | null {
     if (tokenAddr || block) {
       if (

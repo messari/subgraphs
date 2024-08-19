@@ -19,7 +19,7 @@ const conf = new ProtocolConfig(
   NetworkConfigs.getLSTAddress().toHexString(),
   NetworkConfigs.getProtocolName(),
   NetworkConfigs.getProtocolSlug(),
-  Versions
+  Versions,
 );
 
 class Pricer implements TokenPricer {
@@ -32,7 +32,7 @@ class Pricer implements TokenPricer {
     const pricedTokenChanged = pricedToken.changed;
 
     returnedPrice = getUsdPricePerToken(pricedTokenAddr).usdPrice.times(
-      pricedTokenMultiplier
+      pricedTokenMultiplier,
     );
     if (pricedTokenChanged) {
       log.debug(
@@ -42,7 +42,7 @@ class Pricer implements TokenPricer {
           pricedTokenAddr.toHexString(),
           pricedTokenMultiplier.toString(),
           returnedPrice.toString(),
-        ]
+        ],
       );
     }
 
@@ -59,7 +59,7 @@ class Pricer implements TokenPricer {
     const pricedTokenChanged = pricedToken.changed;
 
     returnedPrice = getUsdPrice(pricedTokenAddr, _amount).times(
-      pricedTokenMultiplier
+      pricedTokenMultiplier,
     );
     if (pricedTokenChanged) {
       log.debug(
@@ -70,7 +70,7 @@ class Pricer implements TokenPricer {
           pricedTokenMultiplier.toString(),
           _amount.toString(),
           returnedPrice.toString(),
-        ]
+        ],
       );
     }
 
@@ -133,7 +133,7 @@ export function handleMint(event: Mint): void {
     conf,
     new Pricer(),
     new TokenInit(),
-    event
+    event,
   );
   const token = sdk.Tokens.getOrCreateToken(event.address);
 
@@ -162,7 +162,7 @@ export function handleBurn(event: Burn): void {
     conf,
     new Pricer(),
     new TokenInit(),
-    event
+    event,
   );
   const token = sdk.Tokens.getOrCreateToken(event.address);
 

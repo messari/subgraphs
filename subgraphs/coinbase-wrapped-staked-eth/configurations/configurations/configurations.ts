@@ -12,7 +12,7 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     default: {
       log.critical(
         "No configurations found for deployment protocol/network",
-        []
+        [],
       );
       return new CoinbaseWrappedStakedEthMainnetConfigurations();
     }
