@@ -12118,5 +12118,39 @@
         }
       }
     }
+  },
+  "origin-ether": {
+    "schema": "generic",
+    "base": "origin-ether",
+    "protocol": "origin-ether",
+    "project": "origin-ether",
+    "deployments": {
+      "origin-ether-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "origin.ether.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "origin-ether-ethereum",
+            "query-id": "origin-ether-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "origin-ether-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
