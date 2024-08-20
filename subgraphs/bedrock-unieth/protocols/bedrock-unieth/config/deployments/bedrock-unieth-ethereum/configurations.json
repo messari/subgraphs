@@ -1,0 +1,12 @@
+{
+  "network": "mainnet",
+
+  "Staking": {
+    "address": "0x4befa2aa9c305238aa3e0b5d17eb20c045269e9d",
+    "startBlock": "15636615"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

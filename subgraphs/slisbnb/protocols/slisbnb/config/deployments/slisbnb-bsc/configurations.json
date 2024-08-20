@@ -1,0 +1,12 @@
+{
+  "deployment": "STAKED_LISTA_BNB_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "listaStakeManager": {
+    "address": "0x1adb950d8bb3da4be104211d5ab038628e477fe6",
+    "startBlock": "29524859"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
