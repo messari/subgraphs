@@ -20,7 +20,7 @@ import {
 import { Swap } from "../modules/Swap";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { getOrCreateLiquidityPool } from "../common/initializers";
 
