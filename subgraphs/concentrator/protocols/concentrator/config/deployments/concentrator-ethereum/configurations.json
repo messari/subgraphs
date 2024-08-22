@@ -1,0 +1,63 @@
+{
+  "network": "mainnet",
+
+  "ConcentratorCvxCRV": [
+    {
+      "name": "ConcentratorCvxCRV",
+      "address": "0x2b95a1dcc3d405535f9ed33c219ab38e8d7e0884",
+      "startBlock": "14338749"
+    },
+    {
+      "name": "AladdinFXS",
+      "address": "0xdaf03d70fe637b91ba6e521a32e1fb39256d3ec9",
+      "startBlock": "15351404"
+    },
+    {
+      "name": "AladdinETH",
+      "address": "0xb15ad6113264094fd9bf2238729410a07ebe5aba",
+      "startBlock": "16234109"
+    },
+    {
+      "name": "SdCrvCompounder",
+      "address": "0x43e54c2e7b3e294de3a155785f52ab49d87b9922",
+      "startBlock": "16528036"
+    },
+    {
+      "name": "StakeDAOCRVVault",
+      "address": "0x2b3e72f568f96d7209e20c8b8f4f2a363ee1e3f6",
+      "startBlock": "16528004"
+    },
+    {
+      "name": "CvxCompounder",
+      "address": "0xb0903ab70a7467ee5756074b31ac88aebb8fb777",
+      "startBlock": "18368544"
+    }
+  ],
+
+  "AladdinConvexVault": [
+    {
+      "name": "AladdinConvexVault",
+      "address": "0xc8ff37f7d057df1bb9ad681b53fa4726f268e0e8",
+      "startBlock": "14338793"
+    },
+    {
+      "name": "ConcentratorIFOVault",
+      "address": "0x3Cf54F3A1969be9916DAD548f3C084331C4450b5",
+      "startBlock": "15141158"
+    },
+    {
+      "name": "ConcentratorAladdinETHVault",
+      "address": "0x50b47c4a642231dbe0b411a0b2fbc1ebd129346d",
+      "startBlock": "16234307"
+    },
+    {
+      "name": "ConcentratorVaultForAsdCRV",
+      "address": "0x59866ec5650e9ba00c51f6d681762b48b0ada3de",
+      "startBlock": "17512238"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

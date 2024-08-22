@@ -6164,6 +6164,10 @@
           "hosted-service": {
             "slug": "uniswap-v2-swap-ethereum",
             "query-id": "uniswap-v2-swap-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v2-swap-ethereum",
+            "query-id": "3onEbd9MLfXTTWAfP91yqsKr7C68VCT2ZiF7EoQiQAFj"
           }
         }
       }
@@ -11437,7 +11441,7 @@
           },
           "decentralized-network": {
             "slug": "symbiotic-ethereum",
-            "query-id": "todo"
+            "query-id": "2Bp6ibq6y7LLUoZRi4AfPmDNLrMcM6pKJCbusMPCAvzr"
           }
         }
       }
@@ -11471,7 +11475,7 @@
           },
           "decentralized-network": {
             "slug": "hyperlock-finance-blast",
-            "query-id": "TODO"
+            "query-id": "tXk1UdCXjJkyvBRXvc5KvqGGZVSpdsdPoYrTAemT1kV"
           }
         }
       }
@@ -11505,7 +11509,7 @@
           },
           "decentralized-network": {
             "slug": "amphor-ethereum",
-            "query-id": "TODO"
+            "query-id": "RkDsVce2tRzGWbNAeZJrRy7nLAmMWtxQ6ixerhhw581"
           }
         }
       }
@@ -11539,7 +11543,7 @@
           },
           "decentralized-network": {
             "slug": "zircuit-staking-ethereum",
-            "query-id": "todo"
+            "query-id": "AFZyi8H8ASMA3JzBf4d2eG3Ajxtx7mbD1H5G4Bpjn4ZD"
           }
         }
       }
@@ -11573,7 +11577,645 @@
           },
           "decentralized-network": {
             "slug": "lybra-finance-ethereum",
+            "query-id": "2fNZY1J6FzuoHnx8ZTuhiEiM5AhzU3JiC7vp4UqaktSj"
+          }
+        }
+      }
+    }
+  },
+  "stream-finance": {
+    "schema": "generic",
+    "base": "stream-finance",
+    "protocol": "stream-finance",
+    "project": "stream-finance",
+    "deployments": {
+      "stream-finance-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stream.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stream-finance-ethereum",
+            "query-id": "stream-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stream-finance-ethereum",
+            "query-id": "7wzhzJbytdHNsE12B3ascjZKhP8LvoVtuhXqZ97gz2Dr"
+          }
+        }
+      }
+    }
+  },
+  "umami-finance": {
+    "schema": "generic",
+    "base": "umami-finance",
+    "protocol": "umami-finance",
+    "project": "umami-finance",
+    "deployments": {
+      "umami-finance-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "umami.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "umami-finance-arbitrum",
+            "query-id": "umami-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "umami-finance-arbitrum",
+            "query-id": "3nfuRKwAnT5xEBtKT9cKhdCp517TDvEqhgY1eDKAtuZi"
+          }
+        }
+      }
+    }
+  },
+  "kelp-dao": {
+    "schema": "generic",
+    "base": "kelp-dao",
+    "protocol": "kelp-dao",
+    "project": "kelp-dao",
+    "deployments": {
+      "kelp-dao-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kelp.dao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kelp-dao-ethereum",
+            "query-id": "kelp-dao-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "kelp-dao-ethereum",
+            "query-id": "BKAuuey1mAQimbeKHWHQTLkFHeSn4Z9cfSJcHBaYhrV2"
+          }
+        }
+      }
+    }
+  },
+  "chainlink-staking": {
+    "schema": "generic",
+    "base": "chainlink-staking",
+    "protocol": "chainlink-staking",
+    "project": "chainlink-staking",
+    "deployments": {
+      "chainlink-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "chainlink.staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "chainlink-staking-ethereum",
+            "query-id": "chainlink-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "chainlink-staking-ethereum",
+            "query-id": "CEvNvcykaphaHuipRNsP5fd2LE75QLsFtLnofTcf6JZX"
+          }
+        }
+      }
+    }
+  },
+  "liquid-collective": {
+    "schema": "generic",
+    "base": "liquid-collective",
+    "protocol": "liquid-collective",
+    "project": "liquid-collective",
+    "deployments": {
+      "liquid-collective-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "liquid.collective.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "liquid-collective-ethereum",
+            "query-id": "liquid-collective-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "liquid-collective-ethereum",
+            "query-id": "4kRPyZuhGgAcjYuVgbR79qm5WQ3TvXeaqVHRHx6MV5U7"
+          }
+        }
+      }
+    }
+  },
+  "binance-staked-eth": {
+    "schema": "generic",
+    "base": "binance-staked-eth",
+    "protocol": "binance-staked-eth",
+    "project": "binance-staked-eth",
+    "deployments": {
+      "binance-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "binance-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "binance-staked-eth-ethereum",
+            "query-id": "binance-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "binance-staked-eth-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "binance-staked-eth-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "binance-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "binance-staked-eth-bsc",
+            "query-id": "binance-staked-eth-bsc"
+          },
+          "decentralized-network": {
+            "slug": "binance-staked-eth-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "concentrator": {
+    "schema": "generic",
+    "base": "concentrator",
+    "protocol": "concentrator",
+    "project": "concentrator",
+    "deployments": {
+      "concentrator-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "concentrator.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "concentrator-ethereum",
+            "query-id": "concentrator-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "concentrator-ethereum",
             "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "vaultka": {
+    "schema": "generic",
+    "base": "vaultka",
+    "protocol": "vaultka",
+    "project": "vaultka",
+    "deployments": {
+      "vaultka-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "vaultka.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "vaultka-arbitrum",
+            "query-id": "vaultka-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "vaultka-arbitrum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "benqi-staked-avax": {
+    "schema": "generic",
+    "base": "benqi-staked-avax",
+    "protocol": "benqi-staked-avax",
+    "project": "benqi-staked-avax",
+    "deployments": {
+      "benqi-staked-avax-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "benqi-staked-avax.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "benqi-staked-avax-avalanche",
+            "query-id": "benqi-staked-avax-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "benqi-staked-avax-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "stakestone": {
+    "schema": "generic",
+    "base": "stakestone",
+    "protocol": "stakestone",
+    "project": "stakestone",
+    "deployments": {
+      "stakestone-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stakestone.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stakestone-ethereum",
+            "query-id": "stakestone-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stakestone-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "llama-airforce": {
+    "schema": "generic",
+    "base": "llama-airforce",
+    "protocol": "llama-airforce",
+    "project": "llama-airforce",
+    "deployments": {
+      "llama-airforce-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "llama.airforce.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "llama-airforce-ethereum",
+            "query-id": "llama-airforce-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "llama-airforce-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "mellow-lrt": {
+    "schema": "generic",
+    "base": "mellow-lrt",
+    "protocol": "mellow-lrt",
+    "project": "mellow-lrt",
+    "deployments": {
+      "mellow-lrt-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mellow.lrt.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mellow-lrt-ethereum",
+            "query-id": "mellow-lrt-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mellow-lrt-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "eigenpie": {
+    "schema": "generic",
+    "base": "eigenpie",
+    "protocol": "eigenpie",
+    "project": "eigenpie",
+    "deployments": {
+      "eigenpie-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "eigenpie.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "eigenpie-ethereum",
+            "query-id": "eigenpie-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "eigenpie-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "prime-staked-eth": {
+    "schema": "generic",
+    "base": "prime-staked-eth",
+    "protocol": "prime-staked-eth",
+    "project": "prime-staked-eth",
+    "deployments": {
+      "prime-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "prime.staked.eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "prime-staked-eth-ethereum",
+            "query-id": "prime-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "prime-staked-eth-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "coinbase-wrapped-staked-eth": {
+    "schema": "generic",
+    "base": "coinbase-wrapped-staked-eth",
+    "protocol": "coinbase-wrapped-staked-eth",
+    "project": "coinbase-wrapped-staked-eth",
+    "deployments": {
+      "coinbase-wrapped-staked-eth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "coinbase-wrapped-staked-eth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "coinbase-wrapped-staked-eth-ethereum",
+            "query-id": "coinbase-wrapped-staked-eth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "coinbase-wrapped-staked-eth-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "slisbnb": {
+    "schema": "generic",
+    "base": "slisbnb",
+    "protocol": "slisbnb",
+    "project": "slisbnb",
+    "deployments": {
+      "slisbnb-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "slisbnb.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "slisbnb-bsc",
+            "query-id": "slisbnb-bsc"
+          },
+          "decentralized-network": {
+            "slug": "slisbnb-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "bedrock-unieth": {
+    "schema": "generic",
+    "base": "bedrock-unieth",
+    "protocol": "bedrock-unieth",
+    "project": "bedrock-unieth",
+    "deployments": {
+      "bedrock-unieth-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "bedrock.unieth.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bedrock-unieth-ethereum",
+            "query-id": "bedrock-unieth-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "bedrock-unieth-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "origin-ether": {
+    "schema": "generic",
+    "base": "origin-ether",
+    "protocol": "origin-ether",
+    "project": "origin-ether",
+    "deployments": {
+      "origin-ether-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "origin.ether.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "origin-ether-ethereum",
+            "query-id": "origin-ether-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "origin-ether-ethereum",
+            "query-id": "todo"
           }
         }
       }

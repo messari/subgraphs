@@ -1,0 +1,60 @@
+{
+  "network": "arbitrum-one",
+
+  "AssetVault": [
+    {
+      "name": "glpUSDC",
+      "address": "0x727ed4ef04bb2a96ec77e44c1a91dbb01b605e42",
+      "startBlock": "104763834"
+    },
+    {
+      "name": "glpWETH",
+      "address": "0xbb84d79159d6bbe1de148dc82640caa677e06126",
+      "startBlock": "104763867"
+    },
+    {
+      "name": "glpWBTC",
+      "address": "0x6a89faf99587a12e6bb0351f2fa9006c6cd12257",
+      "startBlock": "104763901"
+    },
+    {
+      "name": "glpLINK",
+      "address": "0xe0a21a475f8da0ee7fa5af8c1809d8ac5257607d",
+      "startBlock": "104763834"
+    },
+    {
+      "name": "glpUNI",
+      "address": "0x37c0705a65948ea5e0ae1add13552bcad7711a23",
+      "startBlock": "104763967"
+    },
+    {
+      "name": "gmUSDC",
+      "address": "0x959f3807f0aa7921e18c78b00b2819ba91e52fef",
+      "startBlock": "171962802"
+    },
+    {
+      "name": "gmWETH",
+      "address": "0x4bca8d73561aaeee2d3a584b9f4665310de1dd69",
+      "startBlock": "171962763"
+    },
+    {
+      "name": "gm_USDC",
+      "address": "0x5f851f67d24419982ecd7b7765defd64fbb50a97",
+      "startBlock": "192568538"
+    },
+    {
+      "name": "gmWBTC",
+      "address": "0xcd8011aab161a75058eab24e0965bab0b918af29",
+      "startBlock": "192568506"
+    },
+    {
+      "name": "GlpUSDCVault",
+      "address": "0x2e2153fd13459eba1f277ab9acd624f045d676ce",
+      "startBlock": "18703806"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

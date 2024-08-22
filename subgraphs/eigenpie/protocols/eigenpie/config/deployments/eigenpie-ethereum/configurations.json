@@ -1,0 +1,17 @@
+{
+  "network": "mainnet",
+
+  "EigenConfig": {
+    "address": "0x20b70E4A1883b81429533FeD944d7957121c7CAB",
+    "startBlock": "19090400"
+  },
+
+  "EigenStaking": {
+    "address": "0x24db6717db1c75b9db6ea47164d8730b63875db7",
+    "startBlock": "19090400"
+  },
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

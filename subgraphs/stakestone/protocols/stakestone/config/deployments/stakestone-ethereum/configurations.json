@@ -1,0 +1,16 @@
+{
+  "deployment": "STAKESTONE_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "strategyController": {
+    "address": "0x396abf9ff46e21694f4ef01ca77c6d7893a017b2",
+    "startBlock": "18203833"
+  },
+  "assetVault": {
+    "address": "0x9485711f11B17f73f2CCc8561bcae05BDc7E9ad9",
+    "startBlock": "18203880"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,0 +1,14 @@
+{
+  "name": "coinbase-wrapped-staked-eth",
+  "license": "MIT",
+  "scripts": {
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.71.2",
+    "@graphprotocol/graph-ts": "^0.35.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}

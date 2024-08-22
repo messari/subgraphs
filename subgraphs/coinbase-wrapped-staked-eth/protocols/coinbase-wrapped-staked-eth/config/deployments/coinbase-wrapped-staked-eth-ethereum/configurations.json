@@ -1,0 +1,12 @@
+{
+  "deployment": "COINBASE_WRAPPED_STAKED_ETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "cbETH": {
+    "address": "0xbe9895146f7af43049ca1c1ae358b0541ea49704",
+    "startBlock": "14133762"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
