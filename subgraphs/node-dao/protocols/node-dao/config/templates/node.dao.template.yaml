@@ -1,0 +1,353 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: LiquidStaking
+    network: {{ network }}
+    source:
+      address: "{{ liquidStaking.address }}"
+      abi: LiquidStaking
+      startBlock: {{ liquidStaking.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: LiquidStaking
+          file: ./abis/node-dao/LiquidStaking.json
+        - name: WithdrawalRequest
+          file: ./abis/node-dao/WithdrawalRequest.json
+        - name: NodeOperatorRegistry
+          file: ./abis/node-dao/NodeOperatorRegistry.json
+        - name: LargeStaking
+          file: ./abis/node-dao/LargeStaking.json
+        - name: NethPool
+          file: ./abis/node-dao/NethPool.json
+        - name: NETH
+          file: ./abis/node-dao/NETH.json
+        - name: RestakingPool
+          file: ./abis/node-dao/RestakingPool.json
+        - name: RNETH
+          file: ./abis/node-dao/RNETH.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: EthStake(indexed uint256,indexed address,uint256,uint256)
+          handler: handleEthStakeV1
+        - event: EthUnstake(indexed uint256,uint256,address,uint256,uint256)
+          handler: handleEthUnstakeV1
+      file: {{{ file }}}
+  - kind: ethereum
+    name: WithdrawalRequest
+    network: {{ network }}
+    source:
+      address: "{{ withdrawalRequest.address }}"
+      abi: WithdrawalRequest
+      startBlock: {{ withdrawalRequest.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: LiquidStaking
+          file: ./abis/node-dao/LiquidStaking.json
+        - name: WithdrawalRequest
+          file: ./abis/node-dao/WithdrawalRequest.json
+        - name: NodeOperatorRegistry
+          file: ./abis/node-dao/NodeOperatorRegistry.json
+        - name: LargeStaking
+          file: ./abis/node-dao/LargeStaking.json
+        - name: NethPool
+          file: ./abis/node-dao/NethPool.json
+        - name: NETH
+          file: ./abis/node-dao/NETH.json
+        - name: RestakingPool
+          file: ./abis/node-dao/RestakingPool.json
+        - name: RNETH
+          file: ./abis/node-dao/RNETH.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: WithdrawalsReceive(uint256,uint256)
+          handler: handleWithdrawalsReceive
+        - event: LargeWithdrawalsRequest(uint256,address,uint256)
+          handler: handleLargeWithdrawalsRequest
+        - event: LargeWithdrawalsClaim(address,uint256)
+          handler: handleLargeWithdrawalsClaim
+      file: {{{ file }}}
+  - kind: ethereum
+    name: NethPool
+    network: {{ network }}
+    source:
+      address: "{{ nethPool.address }}"
+      abi: NethPool
+      startBlock: {{ nethPool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: LiquidStaking
+          file: ./abis/node-dao/LiquidStaking.json
+        - name: WithdrawalRequest
+          file: ./abis/node-dao/WithdrawalRequest.json
+        - name: NodeOperatorRegistry
+          file: ./abis/node-dao/NodeOperatorRegistry.json
+        - name: LargeStaking
+          file: ./abis/node-dao/LargeStaking.json
+        - name: NethPool
+          file: ./abis/node-dao/NethPool.json
+        - name: NETH
+          file: ./abis/node-dao/NETH.json
+        - name: RestakingPool
+          file: ./abis/node-dao/RestakingPool.json
+        - name: RNETH
+          file: ./abis/node-dao/RNETH.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: EthStake(address,uint256,uint256)
+          handler: handleEthStakeStaking
+        - event: EthUnstake(address,uint256,uint256)
+          handler: handleEthUnstakeStaking
+        - event: WithdrawalsRequest(address,uint256,uint256)
+          handler: handleWithdrawalsRequestStaking
+        - event: WithdrawalsClaimed(address,uint256,uint256)
+          handler: handleWithdrawalsClaimedStaking
+      file: {{{ file }}}
+  - kind: ethereum
+    name: RestakingPool
+    network: {{ network }}
+    source:
+      address: "{{ restakingPool.address }}"
+      abi: RestakingPool
+      startBlock: {{ restakingPool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: LiquidStaking
+          file: ./abis/node-dao/LiquidStaking.json
+        - name: WithdrawalRequest
+          file: ./abis/node-dao/WithdrawalRequest.json
+        - name: NodeOperatorRegistry
+          file: ./abis/node-dao/NodeOperatorRegistry.json
+        - name: LargeStaking
+          file: ./abis/node-dao/LargeStaking.json
+        - name: NethPool
+          file: ./abis/node-dao/NethPool.json
+        - name: NETH
+          file: ./abis/node-dao/NETH.json
+        - name: RestakingPool
+          file: ./abis/node-dao/RestakingPool.json
+        - name: RNETH
+          file: ./abis/node-dao/RNETH.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: EthStake(address,uint256,uint256)
+          handler: handleEthStakeRestaking
+        - event: EthUnstake(address,uint256,uint256)
+          handler: handleEthUnstakeRestaking
+        - event: WithdrawalsRequest(address,uint256,uint256)
+          handler: handleWithdrawalsRequestRestaking
+        - event: WithdrawalsClaimed(address,uint256,uint256)
+          handler: handleWithdrawalsClaimedRestaking
+      file: {{{ file }}}

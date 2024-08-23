@@ -1,0 +1,24 @@
+{
+  "deployment": "NODE_DAO_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "liquidStaking": {
+    "address": "0x8103151E2377e78C04a3d2564e20542680ed3096",
+    "startBlock": "16683911"
+  },
+  "withdrawalRequest": {
+    "address": "0xE81fC969D14Cad8537ebAFa2a1c478F29d7840FC",
+    "startBlock": "17079761"
+  },
+  "nethPool": {
+    "address": "0xf3c79408164abfb6fd5ddfe33b084e4ad2c07c18",
+    "startBlock": "19516980"
+  },
+  "restakingPool": {
+    "address": "0x0d6f764452ca43eb8bd22788c9db43e4b5a725bc",
+    "startBlock": "19516980"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
