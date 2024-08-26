@@ -1,0 +1,653 @@
+[
+  { "inputs": [], "name": "AlreadyClaimed", "type": "error" },
+  { "inputs": [], "name": "AlreadyUnstake", "type": "error" },
+  { "inputs": [], "name": "InvalidParameter", "type": "error" },
+  { "inputs": [], "name": "InvalidRequestId", "type": "error" },
+  { "inputs": [], "name": "NethTransferFailed", "type": "error" },
+  { "inputs": [], "name": "PermissionDenied", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldDao",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_dao",
+        "type": "address"
+      }
+    ],
+    "name": "DaoAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalPendingEthAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "LargeWithdrawalsClaim",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalNethAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "LargeWithdrawalsRequest",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldLiquidStakingContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_liquidStakingContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "LiquidStakingChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NftUnstake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldNodeOperatorRegistryContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_nodeOperatorRegistryContract",
+        "type": "address"
+      }
+    ],
+    "name": "NodeOperatorRegistryContractSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldVaultManagerContractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_vaultManagerContract",
+        "type": "address"
+      }
+    ],
+    "name": "VaultManagerContractSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "WithdrawalsReceive",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_NETH_WITHDRAWAL_AMOUNT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_NETH_WITHDRAWAL_AMOUNT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_requestIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "claimLargeWithdrawals",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dao",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getNftUnstakeBlockNumber",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" }
+    ],
+    "name": "getOperatorLargeWithdrawalPendingInfo",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalPendingClaimedAmounts",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" }
+    ],
+    "name": "getUserUnstakeButOperatorNoExitNfs",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" }
+    ],
+    "name": "getWithdrawalOfOperator",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "operatorId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "withdrawHeight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "withdrawNethAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "withdrawExchange",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "claimEthAmount",
+            "type": "uint256"
+          },
+          { "internalType": "address", "name": "owner", "type": "address" },
+          { "internalType": "bool", "name": "isClaim", "type": "bool" }
+        ],
+        "internalType": "struct WithdrawalRequest.WithdrawalInfo[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_requestId", "type": "uint256" }
+    ],
+    "name": "getWithdrawalOfRequestId",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "bool", "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_owner", "type": "address" }
+    ],
+    "name": "getWithdrawalRequestIdOfOwner",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_dao", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_liquidStakingAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nVNFTContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nETHContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nodeOperatorRegistryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_vaultManagerContract",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidStakingContract",
+    "outputs": [
+      {
+        "internalType": "contract ILiquidStaking",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nETHContract",
+    "outputs": [
+      { "internalType": "contract INETH", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nodeOperatorRegistryContract",
+    "outputs": [
+      {
+        "internalType": "contract INodeOperatorsRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "operatorPendingEthRequestAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "receiveWithdrawals",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" },
+      { "internalType": "uint256[]", "name": "_amounts", "type": "uint256[]" }
+    ],
+    "name": "requestLargeWithdrawals",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_dao", "type": "address" }
+    ],
+    "name": "setDaoAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_liquidStakingContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setLiquidStaking",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_nodeOperatorRegistryContract",
+        "type": "address"
+      }
+    ],
+    "name": "setNodeOperatorRegistryContract",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_vaultManagerContract",
+        "type": "address"
+      }
+    ],
+    "name": "setVaultManagerContract",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "_tokenIds", "type": "uint256[]" }
+    ],
+    "name": "unstakeNFT",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      { "internalType": "bytes", "name": "data", "type": "bytes" }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vNFTContract",
+    "outputs": [
+      { "internalType": "contract IVNFT", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vaultManagerContract",
+    "outputs": [
+      {
+        "internalType": "contract IVaultManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

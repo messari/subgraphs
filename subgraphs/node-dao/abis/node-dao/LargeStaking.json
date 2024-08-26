@@ -1,0 +1,1448 @@
+[
+  { "inputs": [], "name": "DuplicatePubKey", "type": "error" },
+  { "inputs": [], "name": "InsufficientFunds", "type": "error" },
+  { "inputs": [], "name": "InsufficientMargin", "type": "error" },
+  { "inputs": [], "name": "InvalidAddr", "type": "error" },
+  { "inputs": [], "name": "InvalidAmount", "type": "error" },
+  { "inputs": [], "name": "InvalidParameter", "type": "error" },
+  { "inputs": [], "name": "InvalidReport", "type": "error" },
+  { "inputs": [], "name": "InvalidRewardAddr", "type": "error" },
+  { "inputs": [], "name": "InvalidRewardRatio", "type": "error" },
+  { "inputs": [], "name": "InvalidWithdrawalCredentials", "type": "error" },
+  { "inputs": [], "name": "PermissionDenied", "type": "error" },
+  { "inputs": [], "name": "RequireOperatorTrusted", "type": "error" },
+  { "inputs": [], "name": "SharedRewardPoolNotOpened", "type": "error" },
+  { "inputs": [], "name": "SharedRewardPoolOpened", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakeAmounts",
+        "type": "uint256"
+      }
+    ],
+    "name": "AppendMigretaStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "AppendStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldLargeOracleContractAddr",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_largeOracleContractAddr",
+        "type": "address"
+      }
+    ],
+    "name": "ConsensusOracleChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldDao",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_dao",
+        "type": "address"
+      }
+    ],
+    "name": "DaoAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldDaoElCommissionRate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_daoElCommissionRate",
+        "type": "uint256"
+      }
+    ],
+    "name": "DaoELCommissionRateChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_daoVaultAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_daoRewards",
+        "type": "uint256"
+      }
+    ],
+    "name": "DaoPrivateRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "daoVaultAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_daoRewards",
+        "type": "uint256"
+      }
+    ],
+    "name": "DaoSharedRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldDaoVaultAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_daoVaultAddress",
+        "type": "address"
+      }
+    ],
+    "name": "DaoVaultAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldElRewardFactory",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_elRewardFactory",
+        "type": "address"
+      }
+    ],
+    "name": "ELRewardFactoryChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_daoReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_poolReward",
+        "type": "uint256"
+      }
+    ],
+    "name": "ELShareingRewardSettle",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_daoReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_poolReward",
+        "type": "uint256"
+      }
+    ],
+    "name": "ElPrivateRewardSettle",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldElRewardAddr",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_elRewardAddr",
+        "type": "address"
+      }
+    ],
+    "name": "ElRewardAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_unstakeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FastUnstake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_curStakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_elRewardAddr",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_isELRewardSharing",
+        "type": "bool"
+      }
+    ],
+    "name": "LargeStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingIds",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorIds",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "_pubkey",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amounts",
+        "type": "uint256"
+      }
+    ],
+    "name": "LargeStakingSlash",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "LargeUnstake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldMaxSlashAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_maxSlashAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxSlashAmountChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_curStakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_elRewardAddr",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_isELRewardSharing",
+        "type": "bool"
+      }
+    ],
+    "name": "MigretaStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldMinStakeAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_minStakeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "MinStakeAmountChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldNodeOperatorRegistryContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_nodeOperatorRegistryAddress",
+        "type": "address"
+      }
+    ],
+    "name": "NodeOperatorsRegistryChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorRewards",
+        "type": "uint256"
+      }
+    ],
+    "name": "OperatorPrivateRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_rewardAddresses",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_rewardAmounts",
+        "type": "uint256"
+      }
+    ],
+    "name": "OperatorRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorRewards",
+        "type": "uint256"
+      }
+    ],
+    "name": "OperatorSharedRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldOperatorSlashContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_operatorSlashContract",
+        "type": "address"
+      }
+    ],
+    "name": "OperatorSlashChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_elRewardPoolAddr",
+        "type": "address"
+      }
+    ],
+    "name": "SharedRewardPoolStart",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_beneficiary",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_rewards",
+        "type": "uint256"
+      }
+    ],
+    "name": "UserRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes[]",
+        "name": "_pubkey",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "ValidatorExitReport",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_operatorId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakeingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "_pubKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "ValidatorRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_SLASH_AMOUNT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_STAKE_AMOUNT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" },
+      { "internalType": "address", "name": "_owner", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      }
+    ],
+    "name": "appendLargeStake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" },
+      { "internalType": "address", "name": "_owner", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      },
+      { "internalType": "bytes[]", "name": "_pubKeys", "type": "bytes[]" }
+    ],
+    "name": "appendMigrateStake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" },
+      { "internalType": "address", "name": "_elRewardAddr", "type": "address" }
+    ],
+    "name": "changeElRewardAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_stakingIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "claimRewardsOfDao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" },
+      {
+        "internalType": "uint256[]",
+        "name": "_privatePoolStakingIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "claimRewardsOfOperator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" },
+      { "internalType": "uint256", "name": "rewards", "type": "uint256" }
+    ],
+    "name": "claimRewardsOfUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dao",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "daoElCommissionRate",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "daoPrivateRewards",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "daoSharedRewards",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "daoVaultAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositContract",
+    "outputs": [
+      {
+        "internalType": "contract IDepositContract",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "eLSharedRewardSettleInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "valuePerSharePoint",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "rewardBalance", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "elPrivateRewardPool",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "elRewardFactory",
+    "outputs": [
+      {
+        "internalType": "contract IELRewardFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "elSharedRewardPool",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" }
+    ],
+    "name": "getOperatorValidatorCounts",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" }
+    ],
+    "name": "getRewardPoolInfo",
+    "outputs": [
+      { "internalType": "uint256", "name": "operatorId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "rewardPoolAddr",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "rewards", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_owner", "type": "address" }
+    ],
+    "name": "getStakingInfoOfOwner",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isELRewardSharing",
+            "type": "bool"
+          },
+          { "internalType": "uint256", "name": "stakingId", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "operatorId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "stakingAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "alreadyUsedAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unstakeRequestAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unstakeAmount",
+            "type": "uint256"
+          },
+          { "internalType": "address", "name": "owner", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "elRewardAddr",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "withdrawCredentials",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct LargeStaking.StakingInfo[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" }
+    ],
+    "name": "getValidatorsOfStakingId",
+    "outputs": [{ "internalType": "bytes[]", "name": "", "type": "bytes[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      }
+    ],
+    "name": "getWithdrawCredentials",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_dao", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_daoVaultAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nodeOperatorRegistryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_operatorSlashContract",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_largeOracleContractAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_elRewardFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_depositContract",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "largeOracleContractAddr",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" },
+      { "internalType": "address", "name": "_elRewardAddr", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      },
+      { "internalType": "bool", "name": "_isELRewardSharing", "type": "bool" }
+    ],
+    "name": "largeStake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "largeStakings",
+    "outputs": [
+      { "internalType": "bool", "name": "isELRewardSharing", "type": "bool" },
+      { "internalType": "uint256", "name": "stakingId", "type": "uint256" },
+      { "internalType": "uint256", "name": "operatorId", "type": "uint256" },
+      { "internalType": "uint256", "name": "stakingAmount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "alreadyUsedAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "unstakeRequestAmount",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "unstakeAmount", "type": "uint256" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "elRewardAddr", "type": "address" },
+      {
+        "internalType": "bytes32",
+        "name": "withdrawCredentials",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "largeUnstake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_owner", "type": "address" },
+      { "internalType": "address", "name": "_elRewardAddr", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_withdrawCredentials",
+        "type": "address"
+      },
+      { "internalType": "bool", "name": "_isELRewardSharing", "type": "bool" },
+      { "internalType": "bytes[]", "name": "_pubKeys", "type": "bytes[]" }
+    ],
+    "name": "migrateStake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nodeOperatorRegistryContract",
+    "outputs": [
+      {
+        "internalType": "contract INodeOperatorsRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "operatorPrivateRewards",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "operatorSharedRewards",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "operatorSlashContract",
+    "outputs": [
+      {
+        "internalType": "contract IOperatorSlash",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" },
+      { "internalType": "bytes[]", "name": "_pubkeys", "type": "bytes[]" },
+      { "internalType": "bytes[]", "name": "_signatures", "type": "bytes[]" },
+      {
+        "internalType": "bytes32[]",
+        "name": "_depositDataRoots",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "registerValidator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint128", "name": "stakingId", "type": "uint128" },
+          { "internalType": "bytes[]", "name": "pubkeys", "type": "bytes[]" }
+        ],
+        "internalType": "struct CLStakingExitInfo[]",
+        "name": "_clStakingExitInfo",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          { "internalType": "uint128", "name": "stakingId", "type": "uint128" },
+          {
+            "internalType": "uint128",
+            "name": "slashAmount",
+            "type": "uint128"
+          },
+          { "internalType": "bytes", "name": "pubkey", "type": "bytes" }
+        ],
+        "internalType": "struct CLStakingSlashInfo[]",
+        "name": "_clStakingSlashInfo",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "reportCLStakingData",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" }
+    ],
+    "name": "reward",
+    "outputs": [
+      { "internalType": "uint256", "name": "userReward", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_dao", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_daoVaultAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_daoElCommissionRate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_MIN_STAKE_AMOUNT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_MAX_SLASH_AMOUNT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_nodeOperatorRegistryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_largeOracleContractAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_elRewardFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_operatorSlashContract",
+        "type": "address"
+      }
+    ],
+    "name": "setLargeStakingSetting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakingId", "type": "uint256" }
+    ],
+    "name": "settleElPrivateReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" }
+    ],
+    "name": "settleElSharedReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_operatorId", "type": "uint256" }
+    ],
+    "name": "startupSharedRewardPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalLargeStakingCounts",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "totalShares",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "unclaimedPrivateRewards",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "unclaimedSharedRewards",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      { "internalType": "bytes", "name": "data", "type": "bytes" }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes", "name": "", "type": "bytes" }],
+    "name": "validatorInfo",
+    "outputs": [
+      { "internalType": "uint256", "name": "stakingId", "type": "uint256" },
+      { "internalType": "uint256", "name": "registerBlock", "type": "uint256" },
+      { "internalType": "uint256", "name": "exitBlock", "type": "uint256" },
+      { "internalType": "uint256", "name": "slashAmount", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "valuePerShare",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,1064 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  { "inputs": [], "name": "CanUnstakeETH", "type": "error" },
+  { "inputs": [], "name": "DelayTooLarge", "type": "error" },
+  { "inputs": [], "name": "DepositRootMismatch", "type": "error" },
+  { "inputs": [], "name": "InsufficientFunds", "type": "error" },
+  { "inputs": [], "name": "InvalidAddr", "type": "error" },
+  { "inputs": [], "name": "InvalidAmount", "type": "error" },
+  { "inputs": [], "name": "InvalidApr", "type": "error" },
+  { "inputs": [], "name": "InvalidLength", "type": "error" },
+  { "inputs": [], "name": "InvalidParameter", "type": "error" },
+  { "inputs": [], "name": "InvalidRequestId", "type": "error" },
+  { "inputs": [], "name": "InvalidVersion", "type": "error" },
+  { "inputs": [], "name": "InvalidtypeId", "type": "error" },
+  { "inputs": [], "name": "PermissionDenied", "type": "error" },
+  { "inputs": [], "name": "TransferFailed", "type": "error" },
+  { "inputs": [], "name": "UnstakeNotEnabled", "type": "error" },
+  { "inputs": [], "name": "UpdateTimelocked", "type": "error" },
+  { "inputs": [], "name": "WithrawalsRequestCannotClaimed", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldApr",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_apr",
+        "type": "uint256"
+      }
+    ],
+    "name": "AprUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_totalUnderlyingAsset",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_estimatedRewards",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_blockNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "AssetsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldDao",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_dao",
+        "type": "address"
+      }
+    ],
+    "name": "DaoChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_staker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_stakeAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_mintAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "EthStake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_unstakeAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_ethAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "EthUnstake",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldAprManager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_aprManager",
+        "type": "address"
+      }
+    ],
+    "name": "RateManagerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Received",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_strategyAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "StrategyDeposited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "StrategyReturn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldStrategyVault",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_strategyVault",
+        "type": "address"
+      }
+    ],
+    "name": "StrategyVaultChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_oldUnstakeAllowed",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_unstakeAllowed",
+        "type": "bool"
+      }
+    ],
+    "name": "UnstakeAllowedUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldValidatorManager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_validatorManager",
+        "type": "address"
+      }
+    ],
+    "name": "ValidatorManagerChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes[]",
+        "name": "_pubkeys",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "ValidatorRegistration",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldValidatorManager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_validatorManager",
+        "type": "address"
+      }
+    ],
+    "name": "ValidatorRegistryChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldWithdrawalDelayBlocks",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_withdrawalDelayBlocks",
+        "type": "uint256"
+      }
+    ],
+    "name": "WithdrawalDelayChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_claimAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "WithdrawalsClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_withdrawalAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_blockNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "WithdrawalsRequest",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "APR_PERCENT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BLOCK_NUMBER_PER_YEAR",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_APR",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_WITHDRAWAL_DELAY_BLOCKS",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UPDATE_BLOCK_LIMIT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_ownerAddr", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "_withdrawalDelayBlocks",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "_apr", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_totalUnderlyingAsset",
+        "type": "uint256"
+      },
+      { "internalType": "address", "name": "_dao", "type": "address" },
+      { "internalType": "address", "name": "_poolToken", "type": "address" },
+      { "internalType": "address", "name": "_rateManager", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_validatorManager",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_depositContract",
+        "type": "address"
+      },
+      { "internalType": "bool", "name": "_unstakeAllowed", "type": "bool" }
+    ],
+    "name": "__BasePool_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_receiver", "type": "address" },
+      { "internalType": "uint256", "name": "_requestId", "type": "uint256" }
+    ],
+    "name": "canClaimWithdrawal",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "clRewardsAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_receiver", "type": "address" },
+      {
+        "internalType": "uint256[]",
+        "name": "_requestIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "claimWithdrawals",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_unstakeAmount", "type": "uint256" }
+    ],
+    "name": "convertToAssets",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_stakeAmount", "type": "uint256" }
+    ],
+    "name": "convertToShares",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentApr",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dao",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositContract",
+    "outputs": [
+      {
+        "internalType": "contract IDepositContract",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "elRewardsAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "exchangeRate",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCLVaultAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getPoolAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_receiver", "type": "address" }
+    ],
+    "name": "getUserWithdrawals",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint96",
+            "name": "withdrawalHeight",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "withdrawalExchange",
+            "type": "uint96"
+          },
+          { "internalType": "uint64", "name": "isClaim", "type": "uint64" },
+          {
+            "internalType": "uint128",
+            "name": "withdrawalAmount",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "claimAmount",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct WithdrawalRequest.WithdrawalInfo[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "implementation",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_ownerAddr", "type": "address" },
+      { "internalType": "uint256", "name": "_apr", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_totalUnderlyingAsset",
+        "type": "uint256"
+      },
+      { "internalType": "address", "name": "_dao", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_elRewardsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_clRewardsAddress",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_poolToken", "type": "address" },
+      { "internalType": "address", "name": "_rateManager", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_validatorManager",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_depositContract",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "poolToken",
+    "outputs": [
+      { "internalType": "contract ILsdETH", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rateManager",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "receiveRewards",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_depositContractRoot",
+        "type": "bytes32"
+      },
+      { "internalType": "bytes[]", "name": "_pubkeys", "type": "bytes[]" },
+      { "internalType": "bytes[]", "name": "_signatures", "type": "bytes[]" },
+      {
+        "internalType": "bytes32[]",
+        "name": "_depositDataRoots",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "registerValidator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_unstakeAmount", "type": "uint256" }
+    ],
+    "name": "requestWithdrawals",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewardsUpdateBlock",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_dao", "type": "address" }
+    ],
+    "name": "setDao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_rateManager", "type": "address" }
+    ],
+    "name": "setRateManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_strategyVault", "type": "address" }
+    ],
+    "name": "setStrategyVault",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bool", "name": "_unstakeAllowed", "type": "bool" }
+    ],
+    "name": "setUnstakeAllowed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_validatorManager",
+        "type": "address"
+      }
+    ],
+    "name": "setValidatorManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_validatorRegistry",
+        "type": "address"
+      }
+    ],
+    "name": "setValidatorRegistry",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_withdrawalDelayBlocks",
+        "type": "uint256"
+      }
+    ],
+    "name": "setWithdrawalDelayBlocks",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakeETH",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "strategyAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "strategyDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "strategyReturn",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "strategyVault",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalAssets",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalUnderlyingAsset",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalWithdrawalAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "typeId",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unpause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "unstakeAllowed",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_unstakeAmount", "type": "uint256" }
+    ],
+    "name": "unstakeETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_apr", "type": "uint256" }
+    ],
+    "name": "updateApr",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      { "internalType": "bytes", "name": "data", "type": "bytes" }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "validatorManager",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "validatorRegistry",
+    "outputs": [
+      {
+        "internalType": "contract IValidatorRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawCredentials",
+    "outputs": [{ "internalType": "bytes", "name": "", "type": "bytes" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawalDelayBlocks",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "stateMutability": "payable", "type": "receive" }
+]

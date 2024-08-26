@@ -1,0 +1,20 @@
+import { log } from "@graphprotocol/graph-ts";
+
+import { Configurations } from "./interface";
+import { Deploy } from "./deploy";
+import { NodeDAOMainnetConfigurations } from "../../protocols/node-dao/config/deployments/node-dao-ethereum/configurations";
+
+export function getNetworkConfigurations(deploy: i32): Configurations {
+  switch (deploy) {
+    case Deploy.NODE_DAO_ETHEREUM: {
+      return new NodeDAOMainnetConfigurations();
+    }
+    default: {
+      log.critical(
+        "No configurations found for deployment protocol/network",
+        []
+      );
+      return new NodeDAOMainnetConfigurations();
+    }
+  }
+}
