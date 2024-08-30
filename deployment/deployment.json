@@ -11841,7 +11841,7 @@
           },
           "decentralized-network": {
             "slug": "concentrator-ethereum",
-            "query-id": "TODO"
+            "query-id": "FigcbmZouBnKctj6zqsvp1LhHiV1pZdVQ6ABrA27w3Lk"
           }
         }
       }
@@ -11875,7 +11875,7 @@
           },
           "decentralized-network": {
             "slug": "vaultka-arbitrum",
-            "query-id": "TODO"
+            "query-id": "GerYgkkJgdtE5LoxqiqXrxJzjDrLWixEd7D3aqfDQBxe"
           }
         }
       }
@@ -11909,7 +11909,7 @@
           },
           "decentralized-network": {
             "slug": "benqi-staked-avax-avalanche",
-            "query-id": "todo"
+            "query-id": "6vSK9N1NGT65mRgMtNfoxwPkaMJoJBQJA2Z5G1fKEKCu"
           }
         }
       }
@@ -11943,7 +11943,7 @@
           },
           "decentralized-network": {
             "slug": "stakestone-ethereum",
-            "query-id": "todo"
+            "query-id": "Dks14vz78EJf4i5SomNUBcpoLRbFKrAD8imtMdUC37bg"
           }
         }
       }
@@ -11977,7 +11977,7 @@
           },
           "decentralized-network": {
             "slug": "llama-airforce-ethereum",
-            "query-id": "TODO"
+            "query-id": "C2EGJcZhx44BMaT9hJ2K2zjPGdYmrnuK7MusKEXaEPPH"
           }
         }
       }
@@ -12011,7 +12011,7 @@
           },
           "decentralized-network": {
             "slug": "mellow-lrt-ethereum",
-            "query-id": "TODO"
+            "query-id": "B5asn3DbqssJhSevYyQQUPVrtoXqfnQBqNvp1En52wCY"
           }
         }
       }
@@ -12045,7 +12045,7 @@
           },
           "decentralized-network": {
             "slug": "eigenpie-ethereum",
-            "query-id": "TODO"
+            "query-id": "BbkLSUBpyJv8UiCyMyQBGpngz8qfdhx4LJBqFdHqiwhH"
           }
         }
       }
@@ -12079,7 +12079,7 @@
           },
           "decentralized-network": {
             "slug": "prime-staked-eth-ethereum",
-            "query-id": "TODO"
+            "query-id": "222GCE8sewRURAfh7meRbkyNE9NNG2HqfVfYmfFg9MkR"
           }
         }
       }
@@ -12108,12 +12108,12 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "coinbase-wrapped-staked-eth-ethereum",
-            "query-id": "coinbase-wrapped-staked-eth-ethereum"
+            "slug": "coinbase-wsteth-ethereum",
+            "query-id": "coinbase-wsteth-ethereum"
           },
           "decentralized-network": {
-            "slug": "coinbase-wrapped-staked-eth-ethereum",
-            "query-id": "todo"
+            "slug": "coinbase-wsteth-ethereum",
+            "query-id": "4bPFmTTqoKZcQL8DXj8jBbo86pm4RisAQeuGhZKkvA9X"
           }
         }
       }
@@ -12147,7 +12147,7 @@
           },
           "decentralized-network": {
             "slug": "slisbnb-bsc",
-            "query-id": "todo"
+            "query-id": "7Ptuvapgqo21jvcH2dquePfmfpEwENFHERN48pKptZf3"
           }
         }
       }
@@ -12181,7 +12181,7 @@
           },
           "decentralized-network": {
             "slug": "bedrock-unieth-ethereum",
-            "query-id": "TODO"
+            "query-id": "69xran7p1VnLJoLrC7g5jeGTWsEkMD5kNqhYaEPbAzx6"
           }
         }
       }
@@ -12215,7 +12215,7 @@
           },
           "decentralized-network": {
             "slug": "origin-ether-ethereum",
-            "query-id": "todo"
+            "query-id": "EYpKTVtNYaVN3LfDi1BCQBxhhUq53BTWcbExDt53cH75"
           }
         }
       }
@@ -12249,7 +12249,7 @@
           },
           "decentralized-network": {
             "slug": "node-dao-ethereum",
-            "query-id": "todo"
+            "query-id": "FfhhdxuMRwc7R2dBZd4MH4NZKRwZm5rqEFzY4XDoEq6x"
           }
         }
       }
