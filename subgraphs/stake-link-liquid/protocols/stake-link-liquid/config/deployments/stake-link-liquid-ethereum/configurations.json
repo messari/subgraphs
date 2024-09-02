@@ -1,0 +1,16 @@
+{
+  "deployment": "STAKE_LINK_LIQUID_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "stLINK": {
+    "address": "0xb8b295df2cd735b15be5eb419517aa626fc43cd5",
+    "startBlock": "16118200"
+  },
+  "priorityPool": {
+    "address": "0xddc796a66e8b83d0bccd97df33a6ccfba8fd60ea",
+    "startBlock": "18178346"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

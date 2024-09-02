@@ -12254,5 +12254,39 @@
         }
       }
     }
+  },
+  "stake-link-liquid": {
+    "schema": "generic",
+    "base": "stake-link-liquid",
+    "protocol": "stake-link-liquid",
+    "project": "stake-link-liquid",
+    "deployments": {
+      "stake-link-liquid-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stake-link-liquid.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stake-link-liquid-ethereum",
+            "query-id": "stake-link-liquid-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stake-link-liquid-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
