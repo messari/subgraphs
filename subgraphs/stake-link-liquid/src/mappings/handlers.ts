@@ -110,7 +110,7 @@ export function handleUpdateStrategyRewards(
   const fee = event.params.totalFees;
   const rewards = event.params.rewardsAmount;
 
-  pool.addRevenueNative(token, fee, rewards);
+  pool.addRevenueNative(token, rewards, fee);
 }
 
 export function handleDeposit(event: Deposit): void {
