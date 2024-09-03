@@ -1,0 +1,16 @@
+{
+  "deployment": "DINERO_PXETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "pirexETH": {
+    "address": "0xd664b74274dfeb538d9bac494f3a4760828b02b0",
+    "startBlock": "18765713"
+  },
+  "pirexFees": {
+    "address": "0x177d685384aa1ac5aba41b7e649f9fa0be717fdb",
+    "startBlock": "18765713"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
