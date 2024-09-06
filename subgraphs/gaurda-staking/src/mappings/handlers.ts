@@ -8,12 +8,7 @@ import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import {
-  BIGDECIMAL_ZERO,
-  ETH_ADDRESS,
-  INT_ZERO,
-  ZERO_ADDRESS,
-} from "../sdk/util/constants";
+import { BIGDECIMAL_ZERO, ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
 
 import { Transfer, GETH } from "../../generated/GETH/GETH";
 import { _ERC20 } from "../../generated/GETH/_ERC20";
