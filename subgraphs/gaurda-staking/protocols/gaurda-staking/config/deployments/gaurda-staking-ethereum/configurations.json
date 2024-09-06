@@ -1,0 +1,12 @@
+{
+  "deployment": "GAURDA_STAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "gETH": {
+    "address": "0x3802c218221390025bceabbad5d8c59f40eb74b8",
+    "startBlock": "13455313"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
