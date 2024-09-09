@@ -12356,5 +12356,39 @@
         }
       }
     }
+  },
+  "gaurda-staking": {
+    "schema": "generic",
+    "base": "gaurda-staking",
+    "protocol": "gaurda-staking",
+    "project": "gaurda-staking",
+    "deployments": {
+      "gaurda-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "gaurda-staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gaurda-staking-ethereum",
+            "query-id": "gaurda-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "gaurda-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
