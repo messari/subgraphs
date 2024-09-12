@@ -1,0 +1,12 @@
+{
+  "deployment": "TENDERIZE_V2_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "registry": {
+    "address": "0xa7ca8732be369caeae8c230537fc8ef82a3387ee",
+    "startBlock": "175531230"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
