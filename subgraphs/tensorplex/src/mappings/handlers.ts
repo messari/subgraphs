@@ -56,7 +56,7 @@ class Pricer implements TokenPricer {
   }
 
   getAmountValueUSD(token: Token, amount: BigInt, block: BigInt): BigDecimal {
-    let usdPrice = this.getTokenPrice(token, block);
+    const usdPrice = this.getTokenPrice(token, block);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
 
     return usdPrice.times(_amount);
