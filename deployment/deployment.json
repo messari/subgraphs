@@ -12323,6 +12323,134 @@
       }
     }
   },
+  "gogopool": {
+    "schema": "generic",
+    "base": "gogopool",
+    "protocol": "gogopool",
+    "project": "gogopool",
+    "deployments": {
+      "gogopool-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "gogopool.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gogopool-avalanche",
+            "query-id": "gogopool-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "gogopool-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "gaurda-staking": {
+    "schema": "generic",
+    "base": "gaurda-staking",
+    "protocol": "gaurda-staking",
+    "project": "gaurda-staking",
+    "deployments": {
+      "gaurda-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "gaurda-staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gaurda-staking-ethereum",
+            "query-id": "gaurda-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "gaurda-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "tenderize-v2": {
+    "schema": "generic",
+    "base": "tenderize-v2",
+    "protocol": "tenderize-v2",
+    "project": "tenderize-v2",
+    "deployments": {
+      "tenderize-v2-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tenderize-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tenderize-v2-ethereum",
+            "query-id": "tenderize-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "tenderize-v2-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "tenderize-v2-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tenderize-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tenderize-v2-arbitrum",
+            "query-id": "tenderize-v2-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "tenderize-v2-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "tensorplex": {
     "schema": "generic",
     "base": "tensorplex",

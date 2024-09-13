@@ -1,0 +1,44 @@
+{
+  "deployment": "GOGOPOOL_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "ggAVAX": {
+    "address": "0xa25eaf2906fa1a3a13edac9b9657108af7b703e3",
+    "startBlock": "28365002"
+  },
+  "minipoolManagers": [
+    {
+      "name": "MinipoolManager1",
+      "abi": "MinipoolManager",
+      "address": "0x9e6579161c6f53722541edbd5ac96779c5b280e9",
+      "startBlock": "34805434"
+    },
+    {
+      "name": "MinipoolManager2",
+      "abi": "MinipoolManager",
+      "address": "0xe51262211948c338c50640f1d5bdba4f4d208dea",
+      "startBlock": "37284561"
+    },
+    {
+      "name": "MinipoolManager3",
+      "abi": "MinipoolManager",
+      "address": "0xb84fa022c7fe1ce3a1f94c49f2f13236c3d1ed08",
+      "startBlock": "37284659"
+    },
+    {
+      "name": "MinipoolManager4",
+      "abi": "MinipoolManager",
+      "address": "0x17395ad76b236fabeac3634b78ff8f6970222199",
+      "startBlock": "42855225"
+    },
+    {
+      "name": "MinipoolManager5",
+      "abi": "MinipoolManager",
+      "address": "0xc300bc9b4b690ba7a182126299a0618ece268ee7",
+      "startBlock": "48965588"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
