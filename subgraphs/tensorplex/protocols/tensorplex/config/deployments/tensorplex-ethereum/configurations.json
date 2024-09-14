@@ -1,0 +1,12 @@
+{
+  "deployment": "TENSORPLEX_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "plxTAO": {
+    "address": "0xb60acd2057067dc9ed8c083f5aa227a244044fd6",
+    "startBlock": "19219041"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
