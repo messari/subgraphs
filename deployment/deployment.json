@@ -12484,5 +12484,39 @@
         }
       }
     }
+  },
+  "paxos-gold": {
+    "schema": "generic",
+    "base": "paxos-gold",
+    "protocol": "paxos-gold",
+    "project": "paxos-gold",
+    "deployments": {
+      "paxos-gold-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "paxos-gold.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "paxos-gold-ethereum",
+            "query-id": "paxos-gold-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "paxos-gold-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
