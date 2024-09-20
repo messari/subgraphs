@@ -12484,5 +12484,39 @@
         }
       }
     }
+  },
+  "tether-gold": {
+    "schema": "generic",
+    "base": "tether-gold",
+    "protocol": "tether-gold",
+    "project": "tether-gold",
+    "deployments": {
+      "tether-gold-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tether-gold.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tether-gold-ethereum",
+            "query-id": "tether-gold-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "tether-gold-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
