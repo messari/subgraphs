@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -6,9 +6,8 @@ import { NetworkConfigs } from "../../configurations/configure";
 import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
-import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
+import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
-  BIGDECIMAL_THOUSAND,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   ETH_ADDRESS,
@@ -109,11 +108,6 @@ export function handleFeeCollectionAddressChanged(
     pool.initialize(token.name, token.symbol, [token.id], null);
   }
   pool.setFeeCollectionAddress(event.params.feeCollectionAddress.toHexString());
-
-  log.warning("[FeeCollectionAddressChanged] addr: {} tx: {}", [
-    event.params.feeCollectionAddress.toHexString(),
-    event.transaction.hash.toHexString(),
-  ]);
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -131,31 +125,21 @@ export function handleTransfer(event: Transfer): void {
   const TMetalContract = TMetal.bind(event.address);
   const supply = TMetalContract.totalSupply();
   pool.setInputTokenBalances([supply], true);
-  if (
-    event.params.from == Address.fromString(ZERO_ADDRESS) ||
-    event.params.to == Address.fromString(ZERO_ADDRESS)
-  ) {
-    const user = event.transaction.from;
+  if (event.params.from == Address.fromString(ZERO_ADDRESS)) {
+    const user = event.params.to;
     const account = sdk.Accounts.loadAccount(user);
     account.trackActivity();
-
-    log.warning("[Transfer Mint/Burn] from: {} to: {} value: {} tx: {}", [
-      event.params.from.toHexString(),
-      event.params.to.toHexString(),
-      event.params.value.toString(),
-      event.transaction.hash.toHexString(),
-    ]);
-  } else if (
+  } else if (event.params.to == Address.fromString(ZERO_ADDRESS)) {
+    const user = event.params.from;
+    const account = sdk.Accounts.loadAccount(user);
+    account.trackActivity();
+  }
+  if (
+    Address.fromString(pool.getFeeCollectionAddress()) !=
+      Address.fromString(ZERO_ADDRESS) &&
     event.params.to == Address.fromString(pool.getFeeCollectionAddress())
   ) {
     const fee = event.params.value;
     pool.addRevenueNative(token, BIGINT_ZERO, fee);
-
-    log.warning("[Transfer Fee] from: {} to: {} value: {} tx: {}", [
-      event.params.from.toHexString(),
-      event.params.to.toHexString(),
-      event.params.value.toString(),
-      event.transaction.hash.toHexString(),
-    ]);
   }
 }
