@@ -12484,5 +12484,39 @@
         }
       }
     }
+  },
+  "klimadao": {
+    "schema": "generic",
+    "base": "klimadao",
+    "protocol": "klimadao",
+    "project": "klimadao",
+    "deployments": {
+      "klimadao-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "klimadao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "klimadao-polygon",
+            "query-id": "klimadao-polygon"
+          },
+          "decentralized-network": {
+            "slug": "klimadao-polygon",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
