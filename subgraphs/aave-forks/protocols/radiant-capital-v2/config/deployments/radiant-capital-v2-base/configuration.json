@@ -1,0 +1,18 @@
+{
+    "network": "base",
+    "factory": {
+      "startBlock": "14597186",
+      "address": "0xe7f252D19AB96254144Fbb0D94ebC0ff7EA0C541"
+    },
+    "lendingPoolConfigurator": {
+      "startBlock": "14597188",
+      "address": "0x177a926569b7E976f2e68EAf4d6709312d18a705"
+    },
+    "lendingPool": {
+      "startBlock": "14597186",
+      "address": "0x30798cFe2CCa822321ceed7e6085e633aAbC492F"
+    },
+    "graftEnabled": false,
+    "subgraphId": "",
+    "graftStartBlock": 0
+  }
