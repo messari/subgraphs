@@ -1,4 +1,5 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -14,11 +15,7 @@ import {
   ZERO_ADDRESS,
 } from "../sdk/util/constants";
 
-import {
-  Transfer,
-  InterestsDistributed,
-  STBT,
-} from "../../generated/STBT/STBT";
+import { Transfer, InterestsDistributed } from "../../generated/STBT/STBT";
 import { DataFeed } from "../../generated/STBT/DataFeed";
 import { _ERC20 } from "../../generated/STBT/_ERC20";
 import { Token } from "../../generated/schema";
