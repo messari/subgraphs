@@ -1,0 +1,12 @@
+{
+  "deployment": "PAXOS_GOLD_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "pAXG": {
+    "address": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+    "startBlock": "8426430"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
