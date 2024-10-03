@@ -1,11 +1,7 @@
 import { TokenManager } from "./tokens";
 import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  ZERO_ADDRESS,
-} from "../../util/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../../util/constants";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
