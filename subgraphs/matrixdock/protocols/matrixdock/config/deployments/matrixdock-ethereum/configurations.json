@@ -1,0 +1,12 @@
+{
+  "deployment": "MATRIXDOCK_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "STBT": {
+    "address": "0x530824da86689c9c17cdc2871ff29b058345b44a",
+    "startBlock": "17530418"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

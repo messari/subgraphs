@@ -12620,5 +12620,39 @@
         }
       }
     }
+  },
+  "matrixdock": {
+    "schema": "generic",
+    "base": "matrixdock",
+    "protocol": "matrixdock",
+    "project": "matrixdock",
+    "deployments": {
+      "matrixdock-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "matrixdock.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "matrixdock-ethereum",
+            "query-id": "matrixdock-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "matrixdock-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
