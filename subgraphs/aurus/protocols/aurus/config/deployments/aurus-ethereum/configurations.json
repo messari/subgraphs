@@ -1,0 +1,25 @@
+{
+  "deployment": "AURUS_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "tMetals": [
+    {
+      "name": "Silver",
+      "address": "0x34abce75d2f8f33940c721dca0f562617787bff3",
+      "startBlock": "15740497"
+    },
+    {
+      "name": "Gold",
+      "address": "0xe4a6f23fb9e00fca037aa0ea0a6954de0a6c53bf",
+      "startBlock": "15740471"
+    },
+    {
+      "name": "Platinum",
+      "address": "0x19b22dbadc298c359a1d1b59e35f352a2b40e33c",
+      "startBlock": "15740525"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
