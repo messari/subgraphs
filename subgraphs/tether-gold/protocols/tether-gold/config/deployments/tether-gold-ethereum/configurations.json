@@ -1,0 +1,12 @@
+{
+  "deployment": "TETHER_GOLD_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "XAUT": {
+    "address": "0x68749665ff8d2d112fa859aa293f07a622782f38",
+    "startBlock": "13524498"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -12484,5 +12484,175 @@
         }
       }
     }
+  },
+  "paxos-gold": {
+    "schema": "generic",
+    "base": "paxos-gold",
+    "protocol": "paxos-gold",
+    "project": "paxos-gold",
+    "deployments": {
+      "paxos-gold-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "paxos-gold.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "paxos-gold-ethereum",
+            "query-id": "paxos-gold-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "paxos-gold-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "tether-gold": {
+    "schema": "generic",
+    "base": "tether-gold",
+    "protocol": "tether-gold",
+    "project": "tether-gold",
+    "deployments": {
+      "tether-gold-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "tether-gold.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tether-gold-ethereum",
+            "query-id": "tether-gold-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "tether-gold-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "aurus": {
+    "schema": "generic",
+    "base": "aurus",
+    "protocol": "aurus",
+    "project": "aurus",
+    "deployments": {
+      "aurus-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aurus.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aurus-ethereum",
+            "query-id": "aurus-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "aurus-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "klimadao": {
+    "schema": "generic",
+    "base": "klimadao",
+    "protocol": "klimadao",
+    "project": "klimadao",
+    "deployments": {
+      "klimadao-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "klimadao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "klimadao-polygon",
+            "query-id": "klimadao-polygon"
+          },
+          "decentralized-network": {
+            "slug": "klimadao-polygon",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "matrixdock": {
+    "schema": "generic",
+    "base": "matrixdock",
+    "protocol": "matrixdock",
+    "project": "matrixdock",
+    "deployments": {
+      "matrixdock-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "matrixdock.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "matrixdock-ethereum",
+            "query-id": "matrixdock-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "matrixdock-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
