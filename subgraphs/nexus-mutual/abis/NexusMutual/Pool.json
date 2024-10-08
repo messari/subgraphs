@@ -1,0 +1,454 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_master", "type": "address" },
+      { "internalType": "address", "name": "_priceOracle", "type": "address" },
+      { "internalType": "address", "name": "_swapOperator", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_nxmTokenAddress",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_previousPool", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "DepositReturned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "assetAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Payout",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "ETH",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MCR_RATIO_DECIMALS",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" },
+      { "internalType": "bool", "name": "isCoverAsset", "type": "bool" },
+      { "internalType": "uint256", "name": "_min", "type": "uint256" },
+      { "internalType": "uint256", "name": "_max", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_maxSlippageRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "addAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "assets",
+    "outputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" },
+      { "internalType": "bool", "name": "isCoverAsset", "type": "bool" },
+      { "internalType": "bool", "name": "isAbandoned", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalAssetValue",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "mcrEth", "type": "uint256" }
+    ],
+    "name": "calculateMCRRatio",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "changeDependentContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "masterAddress", "type": "address" }
+    ],
+    "name": "changeMasterAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "assetId", "type": "uint256" }
+    ],
+    "name": "getAsset",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "assetAddress",
+            "type": "address"
+          },
+          { "internalType": "bool", "name": "isCoverAsset", "type": "bool" },
+          { "internalType": "bool", "name": "isAbandoned", "type": "bool" }
+        ],
+        "internalType": "struct Asset",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" }
+    ],
+    "name": "getAssetSwapDetails",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint104", "name": "minAmount", "type": "uint104" },
+          { "internalType": "uint104", "name": "maxAmount", "type": "uint104" },
+          {
+            "internalType": "uint32",
+            "name": "lastSwapTime",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "maxSlippageRatio",
+            "type": "uint16"
+          }
+        ],
+        "internalType": "struct SwapDetails",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAssets",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "assetAddress",
+            "type": "address"
+          },
+          { "internalType": "bool", "name": "isCoverAsset", "type": "bool" },
+          { "internalType": "bool", "name": "isAbandoned", "type": "bool" }
+        ],
+        "internalType": "struct Asset[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "assetId", "type": "uint256" }
+    ],
+    "name": "getInternalTokenPriceInAsset",
+    "outputs": [
+      { "internalType": "uint256", "name": "tokenPrice", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "assetId", "type": "uint256" }
+    ],
+    "name": "getInternalTokenPriceInAssetAndUpdateTwap",
+    "outputs": [
+      { "internalType": "uint256", "name": "tokenPrice", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getMCRRatio",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getPoolValueInEth",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTokenPrice",
+    "outputs": [
+      { "internalType": "uint256", "name": "tokenPrice", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "internalContracts",
+    "outputs": [
+      { "internalType": "address payable", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "master",
+    "outputs": [
+      { "internalType": "contract INXMMaster", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nxmToken",
+    "outputs": [
+      { "internalType": "contract INXMToken", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "priceFeedOracle",
+    "outputs": [
+      {
+        "internalType": "contract IPriceFeedOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "member", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "sendEth",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "assetId", "type": "uint256" },
+      {
+        "internalType": "address payable",
+        "name": "payoutAddress",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "ethDepositAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "sendPayout",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "assetId", "type": "uint256" },
+      { "internalType": "bool", "name": "isCoverAsset", "type": "bool" },
+      { "internalType": "bool", "name": "isAbandoned", "type": "bool" }
+    ],
+    "name": "setAssetDetails",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" },
+      { "internalType": "uint256", "name": "_min", "type": "uint256" },
+      { "internalType": "uint256", "name": "_max", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_maxSlippageRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSwapDetails",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" },
+      { "internalType": "uint32", "name": "lastSwapTime", "type": "uint32" }
+    ],
+    "name": "setSwapDetailsLastSwapTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "newValue", "type": "uint256" }
+    ],
+    "name": "setSwapValue",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "swapDetails",
+    "outputs": [
+      { "internalType": "uint104", "name": "minAmount", "type": "uint104" },
+      { "internalType": "uint104", "name": "maxAmount", "type": "uint104" },
+      { "internalType": "uint32", "name": "lastSwapTime", "type": "uint32" },
+      { "internalType": "uint16", "name": "maxSlippageRatio", "type": "uint16" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapOperator",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapValue",
+    "outputs": [{ "internalType": "uint96", "name": "", "type": "uint96" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" },
+      {
+        "internalType": "address payable",
+        "name": "destination",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "transferAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "assetAddress", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "transferAssetToSwapOperator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes8", "name": "code", "type": "bytes8" },
+      { "internalType": "address", "name": "value", "type": "address" }
+    ],
+    "name": "updateAddressParameters",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes8", "name": "", "type": "bytes8" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "updateUintParameters",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "newPoolAddress",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeCapitalPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  { "stateMutability": "payable", "type": "receive" }
+]
