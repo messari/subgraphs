@@ -11781,7 +11781,7 @@
           },
           "decentralized-network": {
             "slug": "binance-staked-eth-ethereum",
-            "query-id": "todo"
+            "query-id": "EdxuQc4V8zGV9f34KZJhUNmBrfdPWMmbjVTzjUsyJZgd"
           }
         }
       },
@@ -11807,7 +11807,7 @@
           },
           "decentralized-network": {
             "slug": "binance-staked-eth-bsc",
-            "query-id": "todo"
+            "query-id": "Hfb8J7aNfT8cjgDTYMjWt5Mb7yRtS1CJC4UQeWEfWNsU"
           }
         }
       }
@@ -12283,7 +12283,7 @@
           },
           "decentralized-network": {
             "slug": "dinero-pxeth-ethereum",
-            "query-id": "todo"
+            "query-id": "4WV13q7iDBhFyqprdbFX5eb2h29Qh6c7aVuCjUHX8148"
           }
         }
       }
@@ -12317,7 +12317,7 @@
           },
           "decentralized-network": {
             "slug": "stake-link-liquid-ethereum",
-            "query-id": "todo"
+            "query-id": "AV8BsSRc9oC4dr6yN7wPi4PyXsBnW3oHqbvoKfbEr1XW"
           }
         }
       }
@@ -12351,7 +12351,7 @@
           },
           "decentralized-network": {
             "slug": "gogopool-avalanche",
-            "query-id": "todo"
+            "query-id": "4fD8jH8YUR4HSyQZArgyX5RVvgPLoG6H1stzUeHSNBne"
           }
         }
       }
@@ -12385,7 +12385,7 @@
           },
           "decentralized-network": {
             "slug": "gaurda-staking-ethereum",
-            "query-id": "todo"
+            "query-id": "7Ax8MpZkfR5CnQFKRxUEGG8TuyrW5UwxohXC8opnqZ7j"
           }
         }
       }
@@ -12419,7 +12419,7 @@
           },
           "decentralized-network": {
             "slug": "tenderize-v2-ethereum",
-            "query-id": "todo"
+            "query-id": "7dyhXtGrSebgffTAduYLzbdef1EQwDWEULnVogeTDmfG"
           }
         }
       },
@@ -12445,7 +12445,7 @@
           },
           "decentralized-network": {
             "slug": "tenderize-v2-arbitrum",
-            "query-id": "todo"
+            "query-id": "Fx59VkMxNeoPDsCaHbjiqq6tmfFzt4LrUEtnAmv7GYrP"
           }
         }
       }
@@ -12479,7 +12479,7 @@
           },
           "decentralized-network": {
             "slug": "tensorplex-ethereum",
-            "query-id": "todo"
+            "query-id": "Fx59VkMxNeoPDsCaHbjiqq6tmfFzt4LrUEtnAmv7GYrP"
           }
         }
       }
@@ -12513,7 +12513,7 @@
           },
           "decentralized-network": {
             "slug": "paxos-gold-ethereum",
-            "query-id": "todo"
+            "query-id": "3GYHnRz961CsPut6udWqaVdDJN7imKZWjBqfyzaAbPri"
           }
         }
       }
@@ -12547,7 +12547,7 @@
           },
           "decentralized-network": {
             "slug": "tether-gold-ethereum",
-            "query-id": "todo"
+            "query-id": "E9VxYW2ULCFGyYGibzbq3NW3LySAwEEvbqTpKuGjTrN3"
           }
         }
       }
@@ -12581,7 +12581,7 @@
           },
           "decentralized-network": {
             "slug": "aurus-ethereum",
-            "query-id": "todo"
+            "query-id": "E9VxYW2ULCFGyYGibzbq3NW3LySAwEEvbqTpKuGjTrN3"
           }
         }
       }
@@ -12615,7 +12615,7 @@
           },
           "decentralized-network": {
             "slug": "klimadao-polygon",
-            "query-id": "todo"
+            "query-id": "6SasXXKVoVSFEJqEGQqUQMEL2nufjaapbNuzE7tDCuu8"
           }
         }
       }
@@ -12649,6 +12649,40 @@
           },
           "decentralized-network": {
             "slug": "matrixdock-ethereum",
+            "query-id": "CAKvXVz7dzbF5HH4MVWXi1ozhCm1omWpmYk4n2s56tjJ"
+          }
+        }
+      }
+    }
+  },
+  "powh3d": {
+    "schema": "generic",
+    "base": "powh3d",
+    "protocol": "powh3d",
+    "project": "powh3d",
+    "deployments": {
+      "powh3d-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "powh3d.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "powh3d-ethereum",
+            "query-id": "powh3d-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "powh3d-ethereum",
             "query-id": "todo"
           }
         }

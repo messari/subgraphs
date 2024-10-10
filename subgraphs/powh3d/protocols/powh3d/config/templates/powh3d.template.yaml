@@ -1,0 +1,57 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: Hourglass
+    network: {{ network }}
+    source:
+      address: "{{ hourglass.address }}"
+      abi: Hourglass
+      startBlock: {{ hourglass.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: Hourglass
+          file: ./abis/Powh3d/Hourglass.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json        
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: onTokenPurchase(indexed address,uint256,uint256,indexed address)
+          handler: handleOnTokenPurchase
+        - event: onTokenSell(indexed address,uint256,uint256)
+          handler: handleOnTokenSell
+        - event: onReinvestment(indexed address,uint256,uint256)
+          handler: handleOnReinvestment
+        - event: onWithdraw(indexed address,uint256)
+          handler: handleOnWithdraw
+        # - event: Transfer(indexed address,indexed address,uint256)
+        #   handler: handleTransfer
+      file: {{{ file }}}
