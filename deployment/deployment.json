@@ -12688,5 +12688,39 @@
         }
       }
     }
+  },
+  "nexus-mutual": {
+    "schema": "generic",
+    "base": "nexus-mutual",
+    "protocol": "nexus-mutual",
+    "project": "nexus-mutual",
+    "deployments": {
+      "nexus-mutual-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "nexus-mutual.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "nexus-mutual-ethereum",
+            "query-id": "nexus-mutual-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "nexus-mutual-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
