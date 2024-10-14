@@ -9,7 +9,6 @@ import {
 import {
   BIGDECIMAL_ONE,
   BIGINT_TEN_TO_EIGHTEENTH,
-  BIGINT_TEN_TO_SIX,
   Network,
 } from "../sdk/util/constants";
 
