@@ -1,0 +1,12 @@
+{
+  "deployment": "BLACKWING_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "vault": {
+    "address": "0xd00789260984160a64dcf19a03896dff73bf4514",
+    "startBlock": "36736188"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
