@@ -1,0 +1,16 @@
+{
+  "deployment": "CRETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "cream": {
+    "address": "0x2ba592f78db6436527729929aaf6c908497cb200",
+    "startBlock": "13631289"
+  },
+  "creth": {
+    "address": "0x49d72e3973900a195a155a46441f0c08179fdb64",
+    "startBlock": "13631289"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
