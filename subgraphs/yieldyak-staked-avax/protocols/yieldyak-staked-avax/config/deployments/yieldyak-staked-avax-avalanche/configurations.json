@@ -1,0 +1,12 @@
+{
+  "deployment": "YY_STAKED_AVAX_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "gAVAX": {
+    "address": "0x6026a85e11bd895c934af02647e8c7b4ea2d9808",
+    "startBlock": "16328316"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
