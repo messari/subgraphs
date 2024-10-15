@@ -12722,5 +12722,39 @@
         }
       }
     }
+  },
+  "creth2": {
+    "schema": "generic",
+    "base": "creth2",
+    "protocol": "creth2",
+    "project": "creth2",
+    "deployments": {
+      "creth2-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "creth2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "creth2-ethereum",
+            "query-id": "creth2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "creth2-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
