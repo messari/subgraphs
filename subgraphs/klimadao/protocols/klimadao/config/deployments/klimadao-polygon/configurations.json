@@ -1,0 +1,12 @@
+{
+  "deployment": "KLIMADAO_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "BCT": {
+    "address": "0x2f800db0fdb5223b3c3f354886d907a671414a7f",
+    "startBlock": "54379303"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

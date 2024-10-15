@@ -1,0 +1,12 @@
+{
+  "deployment": "NEXUS_MUTUAL_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "master": {
+    "address": "0x01bfd82675dbcc7762c84019ca518e701c0cd07e",
+    "startBlock": "10226621"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,0 +1,12 @@
+{
+  "deployment": "POWH3D_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "hourglass": {
+    "address": "0xb3775fb83f7d12a36e0475abdd1fca35c091efbe",
+    "startBlock": "10606501"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
