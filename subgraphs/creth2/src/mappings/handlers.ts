@@ -9,8 +9,6 @@ import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
   BIGDECIMAL_ZERO,
-  BIGINT_MINUS_ONE,
-  BIGINT_ONE,
   ETH_ADDRESS,
   INT_ZERO,
   ZERO_ADDRESS,
@@ -97,11 +95,13 @@ export function handleTransferCreth(event: TransferCreth): void {
   const supply = contract.totalSupply();
   pool.setInputTokenBalances([supply], true);
 
-  if (
-    event.params.from == Address.fromString(ZERO_ADDRESS) ||
-    event.params.to == Address.fromString(ZERO_ADDRESS)
-  ) {
+  if (event.params.from == Address.fromString(ZERO_ADDRESS)) {
     const user = event.params.to;
+    const account = sdk.Accounts.loadAccount(user);
+    account.trackActivity();
+  }
+  if (event.params.to == Address.fromString(ZERO_ADDRESS)) {
+    const user = event.params.from;
     const account = sdk.Accounts.loadAccount(user);
     account.trackActivity();
   }

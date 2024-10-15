@@ -12723,6 +12723,40 @@
       }
     }
   },
+  "yieldyak-staked-avax": {
+    "schema": "generic",
+    "base": "yieldyak-staked-avax",
+    "protocol": "yieldyak-staked-avax",
+    "project": "yieldyak-staked-avax",
+    "deployments": {
+      "yieldyak-staked-avax-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "yieldyak-staked-avax.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yieldyak-staked-avax-avalanche",
+            "query-id": "yieldyak-staked-avax-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "yieldyak-staked-avax-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "creth2": {
     "schema": "generic",
     "base": "creth2",
