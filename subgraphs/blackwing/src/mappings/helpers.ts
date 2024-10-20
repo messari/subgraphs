@@ -196,6 +196,22 @@ export function getUpdatedPricedToken(tokenAddr: Address): PricedTokenParams {
       }
     }
   }
+  if (network == Network.ARBITRUM_ONE) {
+    if (
+      [
+        Address.fromString("0x8ea5040d423410f1fdc363379af88e1db5ea1c34"), // PT-ezETH-27JUN2024
+        Address.fromString("0xafd22f824d51fb7eed4778d303d4388ac644b026"), // PT-rsETH-27JUN2024
+        Address.fromString("0x1c27ad8a19ba026adabd615f6bc77158130cfbe4"), // PT-weETH-27JUN2024
+        Address.fromString("0x35751007a407ca6feffe80b3cb397736d2cf4dbe"), // weETH
+        Address.fromString("0x2416092f143378750bb29b79ed961ab195cceea5"), // ezETH
+      ].includes(pricedToken)
+    ) {
+      pricedToken = Address.fromString(
+        "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+      );
+      changed = true;
+    }
+  }
 
   return new PricedTokenParams(pricedToken, multiplier, changed);
 }
