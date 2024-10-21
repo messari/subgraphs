@@ -20,6 +20,6 @@ export class STCELOCeloConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getLST(): Address {
-    return Address.fromString("0xC668583dcbDc9ae6FA3CE46462758188adfdfC24");
+    return Address.fromString("0xc668583dcbdc9ae6fa3ce46462758188adfdfc24");
   }
 }
