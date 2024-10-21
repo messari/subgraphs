@@ -12757,6 +12757,92 @@
       }
     }
   },
+  "blackwing": {
+    "schema": "generic",
+    "base": "blackwing",
+    "protocol": "blackwing",
+    "project": "blackwing",
+    "deployments": {
+      "blackwing-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "blackwing.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "blackwing-ethereum",
+            "query-id": "blackwing-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "blackwing-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "blackwing-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "blackwing.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "blackwing-arbitrum",
+            "query-id": "blackwing-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "blackwing-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "blackwing-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "blackwing.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "blackwing-bsc",
+            "query-id": "blackwing-bsc"
+          },
+          "decentralized-network": {
+            "slug": "blackwing-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "creth2": {
     "schema": "generic",
     "base": "creth2",
