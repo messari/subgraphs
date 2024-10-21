@@ -1,0 +1,12 @@
+{
+  "deployment": "STCELO_CELO",
+  "network": "celo",
+  "file": "./src/mappings/handlers.ts",
+  "stcelo": {
+    "address": "0x4aad04d41fd7fd495503731c5a2579e19054c432",
+    "startBlock": "13823413"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

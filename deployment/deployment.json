@@ -12876,5 +12876,39 @@
         }
       }
     }
+  },
+  "stcelo": {
+    "schema": "generic",
+    "base": "stcelo",
+    "protocol": "stcelo",
+    "project": "stcelo",
+    "deployments": {
+      "stcelo-celo": {
+        "network": "celo",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stcelo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stcelo-celo",
+            "query-id": "stcelo-celo"
+          },
+          "decentralized-network": {
+            "slug": "stcelo-celo",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
