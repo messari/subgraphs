@@ -12757,6 +12757,160 @@
       }
     }
   },
+  "blackwing": {
+    "schema": "generic",
+    "base": "blackwing",
+    "protocol": "blackwing",
+    "project": "blackwing",
+    "deployments": {
+      "blackwing-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "blackwing.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "blackwing-ethereum",
+            "query-id": "blackwing-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "blackwing-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "blackwing-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "blackwing.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "blackwing-arbitrum",
+            "query-id": "blackwing-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "blackwing-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "blackwing-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "blackwing.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "blackwing-bsc",
+            "query-id": "blackwing-bsc"
+          },
+          "decentralized-network": {
+            "slug": "blackwing-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "creth2": {
+    "schema": "generic",
+    "base": "creth2",
+    "protocol": "creth2",
+    "project": "creth2",
+    "deployments": {
+      "creth2-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "creth2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "creth2-ethereum",
+            "query-id": "creth2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "creth2-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "stcelo": {
+    "schema": "generic",
+    "base": "stcelo",
+    "protocol": "stcelo",
+    "project": "stcelo",
+    "deployments": {
+      "stcelo-celo": {
+        "network": "celo",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stcelo.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stcelo-celo",
+            "query-id": "stcelo-celo"
+          },
+          "decentralized-network": {
+            "slug": "stcelo-celo",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "hord-fi": {
     "schema": "generic",
     "base": "hord-fi",
