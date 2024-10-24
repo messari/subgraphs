@@ -40,6 +40,6 @@ export class ProtocolConfig implements ProtocolConfigurer {
 }
 
 export interface TokenPricer {
-  getTokenPrice(token: Token, block: BigInt): BigDecimal;
-  getAmountValueUSD(token: Token, amount: BigInt, block: BigInt): BigDecimal;
+  getTokenPrice(token: Token): BigDecimal;
+  getAmountValueUSD(token: Token, amount: BigInt): BigDecimal;
 }

@@ -28,7 +28,7 @@ const conf = new ProtocolConfig(
 );
 
 class Pricer implements TokenPricer {
-  getTokenPrice(token: Token, block: BigInt): BigDecimal {
+  getTokenPrice(token: Token): BigDecimal {
     if (Address.fromBytes(token.id) == Address.fromString(ETH_ADDRESS)) {
       const chainlinkDataFeedContract = ChainlinkDataFeed.bind(
         Address.fromString("0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419") // ETH / USD feed
@@ -40,8 +40,8 @@ class Pricer implements TokenPricer {
     return BIGDECIMAL_ZERO;
   }
 
-  getAmountValueUSD(token: Token, amount: BigInt, block: BigInt): BigDecimal {
-    const usdPrice = this.getTokenPrice(token, block);
+  getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
+    const usdPrice = this.getTokenPrice(token);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
 
     return usdPrice.times(_amount);
