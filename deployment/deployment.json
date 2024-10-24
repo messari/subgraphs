@@ -12910,5 +12910,39 @@
         }
       }
     }
+  },
+  "hord-fi": {
+    "schema": "generic",
+    "base": "hord-fi",
+    "protocol": "hord-fi",
+    "project": "hord-fi",
+    "deployments": {
+      "hord-fi-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "hord-fi.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "hord-fi-ethereum",
+            "query-id": "hord-fi-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "hord-fi-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
