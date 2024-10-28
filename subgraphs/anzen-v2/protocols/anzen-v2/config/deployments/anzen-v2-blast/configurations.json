@@ -1,0 +1,16 @@
+{
+  "deployment": "ANZEN_V2_BLAST",
+  "network": "blast-mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "usdz": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": "5504730"
+  },
+  "childUsdz": {
+    "address": "0x52056ed29fe015f4ba2e3b079d10c0b87f46e8c6",
+    "startBlock": "5504730"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
