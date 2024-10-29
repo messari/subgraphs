@@ -29,9 +29,9 @@ import {
   RedeemFeeRateChanged,
   OFTSent,
   OFTReceived,
+  Transfer,
   USDZ,
 } from "../../generated/USDZ/USDZ";
-import { Transfer } from "../../generated/ChildUSDZ/ChildUSDZ";
 import { _ERC20 } from "../../generated/USDZ/_ERC20";
 import { Token } from "../../generated/schema";
 
@@ -144,10 +144,6 @@ export function handleMint(event: Mint): void {
     .times(feeRate.toBigDecimal())
     .div(feeCoeff.toBigDecimal());
   pool.addRevenueNative(token, BIGINT_ZERO, bigDecimalToBigInt(feeAmount));
-
-  const user = event.transaction.from;
-  const account = sdk.Accounts.loadAccount(user);
-  account.trackActivity();
 }
 
 export function handleMintFeeRateChanged(event: MintFeeRateChanged): void {
@@ -192,10 +188,6 @@ export function handleRedeem(event: Redeem): void {
     .times(feeRate.toBigDecimal())
     .div(feeCoeff.toBigDecimal());
   pool.addRevenueNative(token, BIGINT_ZERO, bigDecimalToBigInt(feeAmount));
-
-  const user = event.transaction.from;
-  const account = sdk.Accounts.loadAccount(user);
-  account.trackActivity();
 }
 
 export function handleRedeemFeeRateChanged(event: RedeemFeeRateChanged): void {
@@ -232,6 +224,10 @@ export function handleOFTSent(event: OFTSent): void {
   const contract = USDZ.bind(event.address);
   const supply = contract.totalSupply();
   pool.setInputTokenBalances([supply], true);
+
+  const user = event.transaction.from;
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
 }
 
 export function handleOFTReceived(event: OFTReceived): void {
