@@ -123,7 +123,7 @@ export function handleProposalApproved(event: ProposalApproved): void {
   const ids = contract.getIdsByType(BigInt.fromI32(5));
   pool.setIds(ids);
 
-  let withdrawalPools: Bytes[] = [];
+  const withdrawalPools: Bytes[] = [];
   for (let i = 0; i < ids.length; i++) {
     withdrawalPools.push(contract.planetWithdrawalPool(ids[i]));
   }
