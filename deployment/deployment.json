@@ -13056,5 +13056,39 @@
         }
       }
     }
+  },
+  "mev-protocol": {
+    "schema": "generic",
+    "base": "mev-protocol",
+    "protocol": "mev-protocol",
+    "project": "mev-protocol",
+    "deployments": {
+      "mev-protocol-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mev-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mev-protocol-ethereum",
+            "query-id": "mev-protocol-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mev-protocol-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
