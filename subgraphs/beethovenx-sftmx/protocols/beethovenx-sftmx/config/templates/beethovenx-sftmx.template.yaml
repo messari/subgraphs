@@ -1,0 +1,58 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: FTMStaking
+    network: {{ network }}
+    source:
+      address: "{{ ftmStaking.address }}"
+      abi: FTMStaking
+      startBlock: {{ ftmStaking.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: FTMStaking
+          file: ./abis/BeethovenX/FTMStaking.json
+        - name: Vault
+          file: ./abis/BeethovenX/Vault.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: LogDeposited(indexed address,uint256,uint256)
+          handler: handleLogDeposited
+        - event: LogUndelegated(indexed address,uint256,uint256)
+          handler: handleLogUndelegated
+        - event: LogWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleLogWithdrawn
+        - event: LogVaultWithdrawn(indexed address)
+          handler: handleLogVaultWithdrawn
+          receipt: true
+      file: {{{ file }}}
