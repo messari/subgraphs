@@ -1,0 +1,12 @@
+{
+  "deployment": "HETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "heth": {
+    "address": "0x5bbe36152d3cd3eb7183a82470b39b29eedf068b",
+    "startBlock": "16583572"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
