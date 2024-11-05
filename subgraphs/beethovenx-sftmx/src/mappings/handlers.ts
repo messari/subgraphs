@@ -40,7 +40,7 @@ const conf = new ProtocolConfig(
 );
 
 class Pricer implements TokenPricer {
-  getTokenPrice(token: Token, block: BigInt): BigDecimal {
+  getTokenPrice(token: Token): BigDecimal {
     if (Address.fromBytes(token.id) == NetworkConfigs.getLST()) {
       const chainlinkDataFeedContract = ChainlinkDataFeed.bind(
         Address.fromString("0xf4766552d15ae4d256ad41b6cf2933482b0680dc") // FTM / USD feed
@@ -52,8 +52,8 @@ class Pricer implements TokenPricer {
     return BIGDECIMAL_ZERO;
   }
 
-  getAmountValueUSD(token: Token, amount: BigInt, block: BigInt): BigDecimal {
-    const usdPrice = this.getTokenPrice(token, block);
+  getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
+    const usdPrice = this.getTokenPrice(token);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
 
     return usdPrice.times(_amount);

@@ -1,11 +1,7 @@
 import { TokenManager } from "./tokens";
 import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  ZERO_ADDRESS,
-} from "../../util/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../../util/constants";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
@@ -161,9 +157,7 @@ export class Pool {
       (token.lastPriceBlockNumber &&
         token.lastPriceBlockNumber! < this.protocol.event.block.number)
     ) {
-      const pricePerToken = this.protocol
-        .getTokenPricer()
-        .getTokenPrice(token, this.protocol.event.block.number);
+      const pricePerToken = this.protocol.getTokenPricer().getTokenPrice(token);
       token.lastPriceUSD = pricePerToken;
       token.lastPriceBlockNumber = this.protocol.event.block.number;
       token.save();
@@ -180,9 +174,7 @@ export class Pool {
   getInputTokenAmountPrice(token: Token, amount: BigInt): BigDecimal {
     this.setTokenPrice(token);
 
-    return this.protocol
-      .getTokenPricer()
-      .getAmountValueUSD(token, amount, this.protocol.event.block.number);
+    return this.protocol.getTokenPricer().getAmountValueUSD(token, amount);
   }
 
   addInputTokenBalances(
@@ -295,16 +287,8 @@ export class Pool {
   ): void {
     const pricer = this.protocol.pricer;
 
-    const pAmountUSD = pricer.getAmountValueUSD(
-      inputToken,
-      protocolSide,
-      this.protocol.event.block.number
-    );
-    const sAmountUSD = pricer.getAmountValueUSD(
-      inputToken,
-      supplySide,
-      this.protocol.event.block.number
-    );
+    const pAmountUSD = pricer.getAmountValueUSD(inputToken, protocolSide);
+    const sAmountUSD = pricer.getAmountValueUSD(inputToken, supplySide);
     this.addRevenueUSD(pAmountUSD, sAmountUSD);
   }
 
