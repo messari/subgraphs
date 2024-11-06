@@ -10,7 +10,6 @@ import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_TEN_TO_EIGHTEENTH,
-  BIGINT_ZERO,
   ETH_ADDRESS,
   INT_ZERO,
   ZERO_ADDRESS,
