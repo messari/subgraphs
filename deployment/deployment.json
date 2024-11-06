@@ -13091,6 +13091,40 @@
       }
     }
   },
+  "geode": {
+    "schema": "generic",
+    "base": "geode",
+    "protocol": "geode",
+    "project": "geode",
+    "deployments": {
+      "geode-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "geode.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "geode-avalanche",
+            "query-id": "geode-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "geode-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "beethovenx-sftmx": {
     "schema": "generic",
     "base": "beethovenx-sftmx",
