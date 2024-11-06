@@ -1,0 +1,16 @@
+{
+  "deployment": "GEODE_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "portal": {
+    "address": "0x4fe8c658f268842445ae8f95d4d6d8cfd356a8c8",
+    "startBlock": "16328353"
+  },
+  "gAVAX": {
+    "address": "0x6026a85e11bd895c934af02647e8c7b4ea2d9808",
+    "startBlock": "16328316"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

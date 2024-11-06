@@ -1,0 +1,12 @@
+{
+  "deployment": "MEVETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "meveth": {
+    "address": "0x24ae2da0f361aa4be46b48eb19c91e02c5e4f27e",
+    "startBlock": "18278049"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

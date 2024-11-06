@@ -1,0 +1,12 @@
+{
+  "deployment": "ANZEN_V2_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "usdz": {
+    "address": "0xa469b7ee9ee773642b3e93e842e5d9b5baa10067",
+    "startBlock": "19881600"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

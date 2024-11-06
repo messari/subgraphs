@@ -12945,6 +12945,220 @@
       }
     }
   },
+  "anzen-v2": {
+    "schema": "generic",
+    "base": "anzen-v2",
+    "protocol": "anzen-v2",
+    "project": "anzen-v2",
+    "deployments": {
+      "anzen-v2-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "anzen-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "anzen-v2-ethereum",
+            "query-id": "anzen-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "anzen-v2-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "anzen-v2-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "anzen-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "anzen-v2-base",
+            "query-id": "anzen-v2-base"
+          },
+          "decentralized-network": {
+            "slug": "anzen-v2-base",
+            "query-id": "todo"
+          }
+        }
+      },
+      "anzen-v2-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "anzen-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "anzen-v2-arbitrum",
+            "query-id": "anzen-v2-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "anzen-v2-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "anzen-v2-blast": {
+        "network": "blast-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "anzen-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "anzen-v2-blast",
+            "query-id": "anzen-v2-blast"
+          },
+          "decentralized-network": {
+            "slug": "anzen-v2-blast",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "mev-protocol": {
+    "schema": "generic",
+    "base": "mev-protocol",
+    "protocol": "mev-protocol",
+    "project": "mev-protocol",
+    "deployments": {
+      "mev-protocol-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mev-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mev-protocol-ethereum",
+            "query-id": "mev-protocol-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mev-protocol-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "geode": {
+    "schema": "generic",
+    "base": "geode",
+    "protocol": "geode",
+    "project": "geode",
+    "deployments": {
+      "geode-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "geode.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "geode-avalanche",
+            "query-id": "geode-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "geode-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "beethovenx-sftmx": {
+    "schema": "generic",
+    "base": "beethovenx-sftmx",
+    "protocol": "beethovenx-sftmx",
+    "project": "beethovenx-sftmx",
+    "deployments": {
+      "beethovenx-sftmx-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "beethovenx-sftmx.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beethovenx-sftmx-fantom",
+            "query-id": "beethovenx-sftmx-fantom"
+          },
+          "decentralized-network": {
+            "slug": "beethovenx-sftmx-fantom",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "stakewise-v2": {
     "schema": "generic",
     "base": "stakewise-v2",

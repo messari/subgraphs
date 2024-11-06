@@ -1,0 +1,12 @@
+{
+  "deployment": "ANZEN_V2_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "usdz": {
+    "address": "0x5018609ab477cc502e170a5accf5312b86a4b94f",
+    "startBlock": "244489246"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
