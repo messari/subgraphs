@@ -13124,5 +13124,39 @@
         }
       }
     }
+  },
+  "beethovenx-sftmx": {
+    "schema": "generic",
+    "base": "beethovenx-sftmx",
+    "protocol": "beethovenx-sftmx",
+    "project": "beethovenx-sftmx",
+    "deployments": {
+      "beethovenx-sftmx-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "beethovenx-sftmx.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beethovenx-sftmx-fantom",
+            "query-id": "beethovenx-sftmx-fantom"
+          },
+          "decentralized-network": {
+            "slug": "beethovenx-sftmx-fantom",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
