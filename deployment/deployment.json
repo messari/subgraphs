@@ -13158,5 +13158,65 @@
         }
       }
     }
+  },
+  "stakewise-v2": {
+    "schema": "generic",
+    "base": "stakewise-v2",
+    "protocol": "stakewise-v2",
+    "project": "stakewise-v2",
+    "deployments": {
+      "stakewise-v2-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stakewise-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stakewise-v2-ethereum",
+            "query-id": "stakewise-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "stakewise-v2-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "stakewise-v2-gnosis": {
+        "network": "gnosis",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stakewise-v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stakewise-v2-gnosis",
+            "query-id": "stakewise-v2-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "stakewise-v2-gnosis",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

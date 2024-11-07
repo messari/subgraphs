@@ -1,0 +1,13 @@
+{
+  "deployment": "STAKEWISE_V2_GNOSIS",
+  "network": "gnosis",
+  "file": "./src/mappings/handlers-gnosis.ts",
+  "StakedGnoToken": {
+    "address": "0xa4ef9da5ba71cc0d2e5e877a910a37ec43420445",
+    "startBlock": "21275850"
+  },
+  "onGnosis": true,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -1,0 +1,29 @@
+{
+  "deployment": "STAKEWISE_V2_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "RewardEthToken": {
+    "address": "0x20bc832ca081b91433ff6c17f85701b6e92486c5",
+    "startBlock": "11726341"
+  },
+  "StakedEthToken": {
+    "address": "0xfe2e637202056d30016725477c5da089ab0a043a",
+    "startBlock": "11726304"
+  },
+  "Solos": {
+    "address": "0xeadcba8bf9aca93f627f31fb05470f5a0686ceca",
+    "startBlock": "11726299"
+  },
+  "VaultsRegistry": {
+    "address": "0x3a0008a588772446f6e656133c2d5029cc4fc20e",
+    "startBlock": "18470079"
+  },
+  "OsTokenVaultController": {
+    "address": "0x2a261e60fb14586b474c208b1b7ac6d0f5000306",
+    "startBlock": "18470083"
+  },
+  "onEthereum": true,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

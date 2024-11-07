@@ -1,0 +1,344 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+{{#onEthereum}}
+  - kind: ethereum
+    name: RewardEthToken
+    network: {{ network }}
+    source:
+      address: "{{ RewardEthToken.address }}"
+      abi: RewardEthToken
+      startBlock: {{ RewardEthToken.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: RewardEthToken
+          file: ./abis/Stakewise/RewardEthToken.json
+        - name: StakedEthToken
+          file: ./abis/Stakewise/StakedEthToken.json
+        - name: Solos
+          file: ./abis/Stakewise/Solos.json
+        - name: VaultsRegistry
+          file: ./abis/Stakewise/VaultsRegistry.json
+        - name: Vault
+          file: ./abis/Stakewise/Vault.json
+        - name: OsTokenVaultController
+          file: ./abis/Stakewise/OsTokenVaultController.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferRewardEthToken
+        - event: RewardsUpdated(uint256,uint256,uint256,uint256,uint256)
+          handler: handleRewardsUpdated
+      file: {{{ file }}}
+  - kind: ethereum
+    name: StakedEthToken
+    network: {{ network }}
+    source:
+      address: "{{ StakedEthToken.address }}"
+      abi: StakedEthToken
+      startBlock: {{ StakedEthToken.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: RewardEthToken
+          file: ./abis/Stakewise/RewardEthToken.json
+        - name: StakedEthToken
+          file: ./abis/Stakewise/StakedEthToken.json
+        - name: Solos
+          file: ./abis/Stakewise/Solos.json
+        - name: VaultsRegistry
+          file: ./abis/Stakewise/VaultsRegistry.json
+        - name: Vault
+          file: ./abis/Stakewise/Vault.json
+        - name: OsTokenVaultController
+          file: ./abis/Stakewise/OsTokenVaultController.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferStakedEthToken
+      file: {{{ file }}}
+  - kind: ethereum
+    name: Solos
+    network: {{ network }}
+    source:
+      address: "{{ Solos.address }}"
+      abi: Solos
+      startBlock: {{ Solos.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: RewardEthToken
+          file: ./abis/Stakewise/RewardEthToken.json
+        - name: StakedEthToken
+          file: ./abis/Stakewise/StakedEthToken.json
+        - name: Solos
+          file: ./abis/Stakewise/Solos.json
+        - name: VaultsRegistry
+          file: ./abis/Stakewise/VaultsRegistry.json
+        - name: Vault
+          file: ./abis/Stakewise/Vault.json
+        - name: OsTokenVaultController
+          file: ./abis/Stakewise/OsTokenVaultController.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: ValidatorRegistered(indexed bytes32,bytes,uint256,address)
+          handler: handleValidatorRegistered
+      file: {{{ file }}}
+  - kind: ethereum
+    name: VaultsRegistry
+    network: {{ network }}
+    source:
+      address: "{{ VaultsRegistry.address }}"
+      abi: VaultsRegistry
+      startBlock: {{ VaultsRegistry.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: RewardEthToken
+          file: ./abis/Stakewise/RewardEthToken.json
+        - name: StakedEthToken
+          file: ./abis/Stakewise/StakedEthToken.json
+        - name: Solos
+          file: ./abis/Stakewise/Solos.json
+        - name: VaultsRegistry
+          file: ./abis/Stakewise/VaultsRegistry.json
+        - name: Vault
+          file: ./abis/Stakewise/Vault.json
+        - name: OsTokenVaultController
+          file: ./abis/Stakewise/OsTokenVaultController.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: VaultAdded(indexed address,indexed address)
+          handler: handleVaultAdded
+      file: {{{ file }}}
+  - kind: ethereum
+    name: OsTokenVaultController
+    network: {{ network }}
+    source:
+      address: "{{ OsTokenVaultController.address }}"
+      abi: OsTokenVaultController
+      startBlock: {{ OsTokenVaultController.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: RewardEthToken
+          file: ./abis/Stakewise/RewardEthToken.json
+        - name: StakedEthToken
+          file: ./abis/Stakewise/StakedEthToken.json
+        - name: Solos
+          file: ./abis/Stakewise/Solos.json
+        - name: VaultsRegistry
+          file: ./abis/Stakewise/VaultsRegistry.json
+        - name: Vault
+          file: ./abis/Stakewise/Vault.json
+        - name: OsTokenVaultController
+          file: ./abis/Stakewise/OsTokenVaultController.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: StateUpdated(uint256,uint256,uint256)
+          handler: handleStateUpdated
+      file: {{{ file }}}
+templates:
+  - kind: ethereum
+    name: Vault
+    network: {{ network }}
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: RewardEthToken
+          file: ./abis/Stakewise/RewardEthToken.json
+        - name: StakedEthToken
+          file: ./abis/Stakewise/StakedEthToken.json
+        - name: Solos
+          file: ./abis/Stakewise/Solos.json
+        - name: VaultsRegistry
+          file: ./abis/Stakewise/VaultsRegistry.json
+        - name: Vault
+          file: ./abis/Stakewise/Vault.json
+        - name: OsTokenVaultController
+          file: ./abis/Stakewise/OsTokenVaultController.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Deposited(indexed address,indexed address,uint256,uint256,address)
+          handler: handleDeposited
+        - event: Redeemed(indexed address,indexed address,uint256,uint256)
+          handler: handleRedeemed
+      file: {{{ file }}}
+{{/onEthereum}}
+{{#onGnosis}}
+  - kind: ethereum
+    name: StakedGnoToken
+    network: {{ network }}
+    source:
+      address: "{{ StakedGnoToken.address }}"
+      abi: StakedGnoToken
+      startBlock: {{ StakedGnoToken.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: StakedGnoToken
+          file: ./abis/Stakewise/StakedGnoToken.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferStakedGnoToken
+      file: {{{ file }}}
+{{/onGnosis}}
