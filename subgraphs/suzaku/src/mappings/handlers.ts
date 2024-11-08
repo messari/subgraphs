@@ -1,11 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ByteArray,
-  crypto,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -15,14 +8,7 @@ import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  ETH_ADDRESS,
-  INT_TWO,
-  INT_ZERO,
-} from "../sdk/util/constants";
-import { addToArrayAtIndex } from "../sdk/util/arrays";
+import { BIGDECIMAL_ZERO, ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
 
 import { AddEntity } from "../../generated/CollateralFactory/CollateralFactory";
 import { Collateral as CollateralTemplate } from "../../generated/templates";
@@ -32,7 +18,7 @@ import {
   Collateral,
 } from "../../generated/CollateralFactory/Collateral";
 import { _ERC20 } from "../../generated/CollateralFactory/_ERC20";
-import { _Deployments, Token } from "../../generated/schema";
+import { Token } from "../../generated/schema";
 
 const conf = new ProtocolConfig(
   NetworkConfigs.getProtocolId(),

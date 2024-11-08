@@ -350,10 +350,3 @@ type _ActivityHelper @entity {
 
   dailyActiveUsers: Int!
 }
-
-type _Deployments @entity {
-  id: ID!
-  addr: String!
-  proxy: String!
-  allAddr: [String!]!
-}
