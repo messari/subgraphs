@@ -17,7 +17,7 @@ import {
 
 import { Transfer, StakedAvail } from "../../generated/StakedAvail/StakedAvail";
 import { _ERC20 } from "../../generated/StakedAvail/_ERC20";
-import { _Deployments, Token } from "../../generated/schema";
+import { Token } from "../../generated/schema";
 import { getAvailPrice } from "./helpers";
 
 const conf = new ProtocolConfig(
