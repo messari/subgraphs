@@ -13219,6 +13219,40 @@
       }
     }
   },
+  "suzaku": {
+    "schema": "generic",
+    "base": "suzaku",
+    "protocol": "suzaku",
+    "project": "suzaku",
+    "deployments": {
+      "suzaku-avalanche": {
+        "network": "avalanche",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "suzaku.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "suzaku-avalanche",
+            "query-id": "suzaku-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "suzaku-avalanche",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "deq": {
     "schema": "generic",
     "base": "deq",
