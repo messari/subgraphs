@@ -13286,5 +13286,39 @@
         }
       }
     }
+  },
+  "aspida": {
+    "schema": "generic",
+    "base": "aspida",
+    "protocol": "aspida",
+    "project": "aspida",
+    "deployments": {
+      "aspida-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aspida.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aspida-ethereum",
+            "query-id": "aspida-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "aspida-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
