@@ -13252,5 +13252,39 @@
         }
       }
     }
+  },
+  "deq": {
+    "schema": "generic",
+    "base": "deq",
+    "protocol": "deq",
+    "project": "deq",
+    "deployments": {
+      "deq-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "deq.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "deq-ethereum",
+            "query-id": "deq-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "deq-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
