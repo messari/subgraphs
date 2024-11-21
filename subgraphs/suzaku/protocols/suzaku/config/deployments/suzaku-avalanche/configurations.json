@@ -1,0 +1,12 @@
+{
+  "deployment": "SUZAKU_AVAX",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "factory": {
+    "address": "0xe5296638aa86bd4175d802a210e158688e41a93c",
+    "startBlock": "51180393"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
