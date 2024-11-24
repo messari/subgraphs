@@ -9,12 +9,7 @@ import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import {
-  BIGINT_ZERO,
-  ETH_ADDRESS,
-  INT_ZERO,
-  ZERO_ADDRESS,
-} from "../sdk/util/constants";
+import { BIGINT_ZERO, ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
 
 import { Transfer, INETH } from "../../generated/INETH/INETH";
 import {
@@ -116,7 +111,7 @@ export function handleTransfer(event: Transfer): void {
     event
   );
 
-  let token = sdk.Tokens.getOrCreateToken(Address.fromString(ETH_ADDRESS));
+  const token = sdk.Tokens.getOrCreateToken(Address.fromString(ETH_ADDRESS));
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
@@ -148,7 +143,7 @@ export function handleDeposit(event: Deposit): void {
   const strategyContract = Strategy.bind(strategy);
   const asset = strategyContract.underlyingToken();
 
-  let token = sdk.Tokens.getOrCreateToken(asset);
+  const token = sdk.Tokens.getOrCreateToken(asset);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
@@ -180,7 +175,7 @@ export function handleRedeem(event: Redeem): void {
   const strategyContract = Strategy.bind(strategy);
   const asset = strategyContract.underlyingToken();
 
-  let token = sdk.Tokens.getOrCreateToken(asset);
+  const token = sdk.Tokens.getOrCreateToken(asset);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
@@ -212,7 +207,7 @@ export function handleWithdraw(event: Withdraw): void {
   const strategyContract = Strategy.bind(strategy);
   const asset = strategyContract.underlyingToken();
 
-  let token = sdk.Tokens.getOrCreateToken(asset);
+  const token = sdk.Tokens.getOrCreateToken(asset);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
@@ -244,7 +239,7 @@ export function handleFlashWithdraw(event: FlashWithdraw): void {
   const strategyContract = Strategy.bind(strategy);
   const asset = strategyContract.underlyingToken();
 
-  let token = sdk.Tokens.getOrCreateToken(asset);
+  const token = sdk.Tokens.getOrCreateToken(asset);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
