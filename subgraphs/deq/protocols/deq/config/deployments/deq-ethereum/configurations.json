@@ -1,0 +1,12 @@
+{
+  "deployment": "DEQ_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "stakedAvail": {
+    "address": "0x3742f3fcc56b2d46c7b8ca77c23be60cd43ca80a",
+    "startBlock": "20366026"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

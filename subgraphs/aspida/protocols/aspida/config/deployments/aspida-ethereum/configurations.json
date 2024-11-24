@@ -1,0 +1,12 @@
+{
+  "deployment": "AETH_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "aeth": {
+    "address": "0xfc87753df5ef5c368b5fba8d4c5043b77e8c5b39",
+    "startBlock": "19039168"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
