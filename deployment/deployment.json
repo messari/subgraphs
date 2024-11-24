@@ -13218,5 +13218,39 @@
         }
       }
     }
+  },
+  "inception": {
+    "schema": "generic",
+    "base": "inception",
+    "protocol": "inception",
+    "project": "inception",
+    "deployments": {
+      "inception-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "inception.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "inception-ethereum",
+            "query-id": "inception-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "inception-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
