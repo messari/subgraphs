@@ -13218,5 +13218,65 @@
         }
       }
     }
+  },
+  "yieldnest": {
+    "schema": "generic",
+    "base": "yieldnest",
+    "protocol": "yieldnest",
+    "project": "yieldnest",
+    "deployments": {
+      "yieldnest-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "yieldnest.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yieldnest-ethereum",
+            "query-id": "yieldnest-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "yieldnest-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "yieldnest-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "yieldnest.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yieldnest-bsc",
+            "query-id": "yieldnest-bsc"
+          },
+          "decentralized-network": {
+            "slug": "yieldnest-bsc",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

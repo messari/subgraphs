@@ -1,0 +1,13 @@
+{
+  "deployment": "YIELDNEST_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "ynETH": {
+    "address": "0x304b5845b9114182ecb4495be4c91a273b74b509",
+    "startBlock": "42243781"
+  },
+  "rewardsDistributorDeployment": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
