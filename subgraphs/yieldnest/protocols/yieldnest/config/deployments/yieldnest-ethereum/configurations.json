@@ -1,0 +1,17 @@
+{
+  "deployment": "YIELDNEST_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "ynETH": {
+    "address": "0x09db87a538bd693e9d08544577d5ccfaa6373a48",
+    "startBlock": "19839557"
+  },
+  "rewardsDistributorDeployment": true,
+  "rewardsDistributor": {
+    "address": "0x40d5ff3e218f54f4982661a0464a298cf6652351",
+    "startBlock": "19839557"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
