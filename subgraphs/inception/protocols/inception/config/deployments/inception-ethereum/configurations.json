@@ -1,0 +1,74 @@
+{
+  "deployment": "INCEPTION_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "inETH": {
+    "address": "0xf073bac22dab7faf4a3dd6c6189a70d54110525c",
+    "startBlock": "18871508"
+  },
+  "inVaults": [
+    {
+      "name": "ankreth",
+      "address": "0x36b429439ab227fab170a4dfb3321741c8815e55",
+      "startBlock": "19085874"
+    },
+    {
+      "name": "cbeth",
+      "address": "0xfe715358368416e01d3a961d3a037b7359735d5e",
+      "startBlock": "19090422"
+    },
+    {
+      "name": "ethx",
+      "address": "0x90e80e25abdb6205b08deba29a87f7eb039023c2",
+      "startBlock": "19098682"
+    },
+    {
+      "name": "oeth",
+      "address": "0x4878f636a9aa314b776ac51a25021c44caf86bed",
+      "startBlock": "19085874"
+    },
+    {
+      "name": "oseth",
+      "address": "0xa9f8c770661bee8df2d026edb1cb6ff763c780ff",
+      "startBlock": "19085901"
+    },
+    {
+      "name": "reth",
+      "address": "0x1Aa53BC4Beb82aDf7f5EDEE9e3bBF3434aD59F12",
+      "startBlock": "18983815"
+    },
+    {
+      "name": "steth",
+      "address": "0x814CC6B8fd2555845541FB843f37418b05977d8d",
+      "startBlock": "18983837"
+    },
+    {
+      "name": "sweth",
+      "address": "0xc4181dC7BB31453C4A48689ce0CBe975e495321c",
+      "startBlock": "19098696"
+    },
+    {
+      "name": "wbeth",
+      "address": "0xC0660932C5dCaD4A1409b7975d147203B1e9A2B6",
+      "startBlock": "19090374"
+    },
+    {
+      "name": "iseth",
+      "address": "0x6E17a8b5D33e6DBdB9fC61d758BF554b6AD93322",
+      "startBlock": "19117926"
+    },
+    {
+      "name": "frxeth",
+      "address": "0x295234B7E370a5Db2D2447aCA83bc7448f151161",
+      "startBlock": "19117938"
+    },
+    {
+      "name": "meth",
+      "address": "0xd0ee89d82183D7Ddaef14C6b4fC0AA742F426355",
+      "startBlock": "19117950"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
