@@ -17,6 +17,7 @@ import {
 } from "../sdk/util/constants";
 
 import { Transfer, APETH } from "../../generated/APETH/APETH";
+import { Minted } from "../../generated/APETHEarlyDeposits/APETHEarlyDeposits";
 import { _ERC20 } from "../../generated/APETH/_ERC20";
 import { ChainlinkDataFeed } from "../../generated/APETH/ChainlinkDataFeed";
 import { Token } from "../../generated/schema";
@@ -101,12 +102,27 @@ export function handleTransfer(event: Transfer): void {
     pool.addRevenueNative(token, BIGINT_ZERO, bigDecimalToBigInt(fee));
   }
 
-  if (
-    event.params.from == Address.fromString(ZERO_ADDRESS) ||
-    event.params.to == Address.fromString(ZERO_ADDRESS)
-  ) {
-    const user = event.transaction.from;
+  if (event.params.from == Address.fromString(ZERO_ADDRESS)) {
+    const user = event.params.to;
     const account = sdk.Accounts.loadAccount(user);
     account.trackActivity();
   }
+  if (event.params.to == Address.fromString(ZERO_ADDRESS)) {
+    const user = event.params.from;
+    const account = sdk.Accounts.loadAccount(user);
+    account.trackActivity();
+  }
+}
+
+export function handleMinted(event: Minted): void {
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const user = event.params.recipient;
+  const account = sdk.Accounts.loadAccount(user);
+  account.trackActivity();
 }

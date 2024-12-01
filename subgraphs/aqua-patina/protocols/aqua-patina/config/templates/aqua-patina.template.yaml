@@ -32,6 +32,8 @@ dataSources:
       abis:
         - name: APETH
           file: ./abis/AquaPatina/APETH.json
+        - name: APETHEarlyDeposits
+          file: ./abis/AquaPatina/APETHEarlyDeposits.json
 
         - name: ERC20
           file: ./abis/Tokens/ERC20.json
@@ -46,4 +48,44 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      file: {{{ file }}}
+  - kind: ethereum
+    name: APETHEarlyDeposits
+    network: {{ network }}
+    source:
+      address: "{{ apETHEarlyDeposits.address }}"
+      abi: APETHEarlyDeposits
+      startBlock: {{ apETHEarlyDeposits.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: APETH
+          file: ./abis/AquaPatina/APETH.json
+        - name: APETHEarlyDeposits
+          file: ./abis/AquaPatina/APETHEarlyDeposits.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Minted(address,uint256)
+          handler: handleMinted
       file: {{{ file }}}
