@@ -1,0 +1,20 @@
+{
+  "deployment": "KERNEL_PROTOCOL_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "krETH": {
+    "address": "0xf02c96dbbb92dc0325ad52b3f9f2b951f972bf00",
+    "startBlock": "20112201"
+  },
+  "ksETH": {
+    "address": "0x513d27c94c0d81eed9dc2a88b4531a69993187cf",
+    "startBlock": "20112202"
+  },
+  "kUSD": {
+    "address": "0x0bb9ab78aaf7179b7515e6753d89822b91e670c4",
+    "startBlock": "20112203"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

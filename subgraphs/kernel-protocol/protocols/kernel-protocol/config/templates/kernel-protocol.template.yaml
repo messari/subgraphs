@@ -1,0 +1,242 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: KRETH
+    network: {{ network }}
+    source:
+      address: "{{ krETH.address }}"
+      abi: KRETH
+      startBlock: {{ krETH.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: KRETH
+          file: ./abis/KernelProtocol/KRETH.json
+        - name: KSETH
+          file: ./abis/KernelProtocol/KSETH.json
+        - name: KUSD
+          file: ./abis/KernelProtocol/KUSD.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: MintFeeSet(uint256,uint256)
+          handler: handleMintFeeSetKRETH
+        - event: RedeemFeeSet(uint256,uint256)
+          handler: handleRedeemFeeSetKRETH
+        - event: Deposit(indexed address,uint256)
+          handler: handleDepositKRETH
+        - event: Redeemed(indexed address,uint256)
+          handler: handleRedeemedKRETH
+      file: {{{ file }}}
+  - kind: ethereum
+    name: KSETH
+    network: {{ network }}
+    source:
+      address: "{{ ksETH.address }}"
+      abi: KSETH
+      startBlock: {{ ksETH.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: KRETH
+          file: ./abis/KernelProtocol/KRETH.json
+        - name: KSETH
+          file: ./abis/KernelProtocol/KSETH.json
+        - name: KUSD
+          file: ./abis/KernelProtocol/KUSD.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: MintFeeSet(uint256,uint256)
+          handler: handleMintFeeSetKSETH
+        - event: RedeemFeeSet(uint256,uint256)
+          handler: handleRedeemFeeSetKSETH
+        - event: Deposit(indexed address,uint256)
+          handler: handleDepositKSETH
+        - event: Redeemed(indexed address,uint256)
+          handler: handleRedeemedKSETH
+      file: {{{ file }}}
+  - kind: ethereum
+    name: KUSD
+    network: {{ network }}
+    source:
+      address: "{{ kUSD.address }}"
+      abi: KUSD
+      startBlock: {{ kUSD.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: KRETH
+          file: ./abis/KernelProtocol/KRETH.json
+        - name: KSETH
+          file: ./abis/KernelProtocol/KSETH.json
+        - name: KUSD
+          file: ./abis/KernelProtocol/KUSD.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: MintFeeSet(uint256,uint256)
+          handler: handleMintFeeSetKUSD
+        - event: RedeemFeeSet(uint256,uint256)
+          handler: handleRedeemFeeSetKUSD
+        - event: Deposit(indexed address,uint256)
+          handler: handleDepositKUSD
+        - event: Redeemed(indexed address,uint256)
+          handler: handleRedeemedKUSD
+      file: {{{ file }}}
