@@ -44,7 +44,7 @@ class Pricer implements TokenPricer {
     }
     if (
       [
-        Address.fromString("0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"),
+        Address.fromString("0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f"),
       ].includes(Address.fromBytes(token.id))
     ) {
       const chainlinkDataFeedContract = ChainlinkDataFeed.bind(
