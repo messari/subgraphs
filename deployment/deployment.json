@@ -13414,5 +13414,39 @@
         }
       }
     }
+  },
+  "aqua-patina": {
+    "schema": "generic",
+    "base": "aqua-patina",
+    "protocol": "aqua-patina",
+    "project": "aqua-patina",
+    "deployments": {
+      "aqua-patina-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aqua-patina.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aqua-patina-ethereum",
+            "query-id": "aqua-patina-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "aqua-patina-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

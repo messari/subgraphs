@@ -1,0 +1,16 @@
+{
+  "deployment": "AP_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "apETH": {
+    "address": "0xaaaaaaabc6cbc3a1fd3a0fe0fdec43251c6562f5",
+    "startBlock": "20937487"
+  },
+  "apETHEarlyDeposits": {
+    "address": "0x9b4f8873090fcb3b9d5e562afcdcbdf30228f301",
+    "startBlock": "20740560"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
