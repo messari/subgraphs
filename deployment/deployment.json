@@ -13508,5 +13508,39 @@
         }
       }
     }
+  },
+  "kernel-protocol": {
+    "schema": "generic",
+    "base": "kernel-protocol",
+    "protocol": "kernel-protocol",
+    "project": "kernel-protocol",
+    "deployments": {
+      "kernel-protocol-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kernel-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kernel-protocol-ethereum",
+            "query-id": "kernel-protocol-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "kernel-protocol-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
