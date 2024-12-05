@@ -1,0 +1,743 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "target", "type": "address" }
+    ],
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "AddressInsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "collateralCap", "type": "uint256" }
+    ],
+    "name": "DepositCapReached",
+    "type": "error"
+  },
+  { "inputs": [], "name": "FailedInnerCall", "type": "error" },
+  { "inputs": [], "name": "InsufficientGlobalMargin", "type": "error" },
+  { "inputs": [], "name": "InvalidInitialization", "type": "error" },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "maxVelocitySkew",
+        "type": "uint256"
+      }
+    ],
+    "name": "InvalidMaxVelocitySkew",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "skewFractionMax",
+        "type": "uint256"
+      }
+    ],
+    "name": "InvalidSkewFractionMax",
+    "type": "error"
+  },
+  { "inputs": [], "name": "MarginMismatchOnClose", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "skewFraction", "type": "uint256" }
+    ],
+    "name": "MaxSkewReached",
+    "type": "error"
+  },
+  { "inputs": [], "name": "NotInitializing", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "msgSender", "type": "address" }
+    ],
+    "name": "OnlyAuthorizedModule",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "int256", "name": "value", "type": "int256" }],
+    "name": "SafeCastOverflowedIntToUint",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "bits", "type": "uint8" },
+      { "internalType": "uint256", "name": "value", "type": "uint256" }
+    ],
+    "name": "SafeCastOverflowedUintDowncast",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" }
+    ],
+    "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ValueNotPositive",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ZeroValue",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "settledFundingFee",
+        "type": "int256"
+      }
+    ],
+    "name": "FundingFeesSettled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "moduleKey", "type": "bytes32" },
+          {
+            "internalType": "address",
+            "name": "moduleAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.AuthorizedModule",
+        "name": "_module",
+        "type": "tuple"
+      }
+    ],
+    "name": "addAuthorizedModule",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "moduleKey", "type": "bytes32" },
+          {
+            "internalType": "address",
+            "name": "moduleAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.AuthorizedModule[]",
+        "name": "_modules",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "addAuthorizedModules",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_depositAmount", "type": "uint256" }
+    ],
+    "name": "checkCollateralCap",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "checkGlobalMarginPositive",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_sizeChange", "type": "uint256" },
+      {
+        "internalType": "int256",
+        "name": "_stableCollateralChange",
+        "type": "int256"
+      }
+    ],
+    "name": "checkSkewMax",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "collateral",
+    "outputs": [
+      { "internalType": "contract IERC20", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cumulativeFundingRate",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "deletePosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentFundingRate",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "currentFundingRate_",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentSkew",
+    "outputs": [
+      { "internalType": "int256", "name": "_skew", "type": "int256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getGlobalPositions",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "int256",
+            "name": "marginDepositedTotal",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "averagePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sizeOpenedTotal",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.GlobalPositions",
+        "name": "_globalPositionsDetails",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "getPosition",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "averagePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "marginDeposited",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "additionalSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryCumulativeFunding",
+            "type": "int256"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.Position",
+        "name": "_positionDetails",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getVaultSummary",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "int256", "name": "marketSkew", "type": "int256" },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingRate",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "lastRecomputedFundingRate",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "lastRecomputedFundingTimestamp",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint256",
+            "name": "stableCollateralTotal",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "int256",
+                "name": "marginDepositedTotal",
+                "type": "int256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "averagePrice",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "sizeOpenedTotal",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct FlatcoinStructs.GlobalPositions",
+            "name": "globalPositions",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.VaultSummary",
+        "name": "_vaultSummary",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxFundingVelocity",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxVelocitySkew",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_skewFractionMax",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_stableCollateralCap",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_minExecutabilityAge",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_maxExecutabilityAge",
+        "type": "uint64"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "moduleAddress", "type": "address" }
+    ],
+    "name": "isAuthorizedModule",
+    "outputs": [
+      { "internalType": "bool", "name": "authorized", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "moduleKey", "type": "bytes32" }
+    ],
+    "name": "isModulePaused",
+    "outputs": [{ "internalType": "bool", "name": "paused", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastRecomputedFundingRate",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastRecomputedFundingTimestamp",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxExecutabilityAge",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxFundingVelocity",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxVelocitySkew",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minExecutabilityAge",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "moduleKey", "type": "bytes32" }
+    ],
+    "name": "moduleAddress",
+    "outputs": [
+      { "internalType": "address", "name": "moduleAddress", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_moduleKey", "type": "bytes32" }
+    ],
+    "name": "pauseModule",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_modKey", "type": "bytes32" }
+    ],
+    "name": "removeAuthorizedModule",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "sendCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_minExecutabilityAge",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_maxExecutabilityAge",
+        "type": "uint64"
+      }
+    ],
+    "name": "setExecutabilityAge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newMaxFundingVelocity",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxFundingVelocity",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newMaxVelocitySkew",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxVelocitySkew",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "averagePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "marginDeposited",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "additionalSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryCumulativeFunding",
+            "type": "int256"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.Position",
+        "name": "_newPosition",
+        "type": "tuple"
+      },
+      { "internalType": "uint256", "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "setPosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_skewFractionMax",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSkewFractionMax",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_collateralCap", "type": "uint256" }
+    ],
+    "name": "setStableCollateralCap",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "settleFundingFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "skewFractionMax",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stableCollateralCap",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stableCollateralTotal",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_moduleKey", "type": "bytes32" }
+    ],
+    "name": "unpauseModule",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_price", "type": "uint256" },
+      { "internalType": "int256", "name": "_marginDelta", "type": "int256" },
+      {
+        "internalType": "int256",
+        "name": "_additionalSizeDelta",
+        "type": "int256"
+      }
+    ],
+    "name": "updateGlobalPositionData",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int256",
+        "name": "_stableCollateralAdjustment",
+        "type": "int256"
+      }
+    ],
+    "name": "updateStableCollateralTotal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

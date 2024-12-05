@@ -1,0 +1,603 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "uint256", "name": "minAmount", "type": "uint256" }
+    ],
+    "name": "AmountTooSmall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "spender", "type": "address" },
+      { "internalType": "uint256", "name": "allowance", "type": "uint256" },
+      { "internalType": "uint256", "name": "needed", "type": "uint256" }
+    ],
+    "name": "ERC20InsufficientAllowance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "uint256", "name": "balance", "type": "uint256" },
+      { "internalType": "uint256", "name": "needed", "type": "uint256" }
+    ],
+    "name": "ERC20InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "approver", "type": "address" }
+    ],
+    "name": "ERC20InvalidApprover",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "ERC20InvalidReceiver",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "sender", "type": "address" }
+    ],
+    "name": "ERC20InvalidSender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "spender", "type": "address" }
+    ],
+    "name": "ERC20InvalidSpender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "supplied", "type": "uint256" },
+      { "internalType": "uint256", "name": "accepted", "type": "uint256" }
+    ],
+    "name": "HighSlippage",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }],
+    "name": "InvalidFee",
+    "type": "error"
+  },
+  { "inputs": [], "name": "InvalidInitialization", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "skewFraction", "type": "uint256" }
+    ],
+    "name": "MaxSkewReached",
+    "type": "error"
+  },
+  { "inputs": [], "name": "ModuleKeyEmpty", "type": "error" },
+  { "inputs": [], "name": "NotInitializing", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "msgSender", "type": "address" }
+    ],
+    "name": "OnlyAuthorizedModule",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "msgSender", "type": "address" }
+    ],
+    "name": "OnlyOwner",
+    "type": "error"
+  },
+  { "inputs": [], "name": "PriceImpactDuringFullWithdraw", "type": "error" },
+  { "inputs": [], "name": "PriceImpactDuringWithdraw", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "bits", "type": "uint8" },
+      { "internalType": "uint256", "name": "value", "type": "uint256" }
+    ],
+    "name": "SafeCastOverflowedUintDowncast",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Approval",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "depositor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "depositAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "mintedAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Deposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Locked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Unlocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "withdrawer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "withdrawAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "burnedAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdraw",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_LIQUIDITY",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MODULE_KEY",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "spender", "type": "address" }
+    ],
+    "name": "allowance",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "spender", "type": "address" },
+      { "internalType": "uint256", "name": "value", "type": "uint256" }
+    ],
+    "name": "approve",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "balanceOf",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_account", "type": "address" },
+      {
+        "internalType": "uint64",
+        "name": "_executableAtTime",
+        "type": "uint64"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "depositAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minAmountOut",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "announcedBy",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.AnnouncedStableDeposit",
+        "name": "_announcedDeposit",
+        "type": "tuple"
+      }
+    ],
+    "name": "executeDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_account", "type": "address" },
+      {
+        "internalType": "uint64",
+        "name": "_executableAtTime",
+        "type": "uint64"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "withdrawAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minAmountOut",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct FlatcoinStructs.AnnouncedStableWithdraw",
+        "name": "_announcedWithdraw",
+        "type": "tuple"
+      }
+    ],
+    "name": "executeWithdraw",
+    "outputs": [
+      { "internalType": "uint256", "name": "_amountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "_withdrawFee", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_account", "type": "address" }
+    ],
+    "name": "getLockedAmount",
+    "outputs": [
+      { "internalType": "uint256", "name": "_amountLocked", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IFlatcoinVault",
+        "name": "_vault",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_stableWithdrawFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_account", "type": "address" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "lock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_stableWithdrawFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setStableWithdrawFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IFlatcoinVault",
+        "name": "_vault",
+        "type": "address"
+      }
+    ],
+    "name": "setVault",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stableCollateralPerShare",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_collateralPerShare",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint32", "name": "_maxAge", "type": "uint32" },
+      { "internalType": "bool", "name": "_priceDiffCheck", "type": "bool" }
+    ],
+    "name": "stableCollateralPerShare",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_collateralPerShare",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stableCollateralTotalAfterSettlement",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_stableCollateralBalance",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint32", "name": "_maxAge", "type": "uint32" },
+      { "internalType": "bool", "name": "_priceDiffCheck", "type": "bool" }
+    ],
+    "name": "stableCollateralTotalAfterSettlement",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_stableCollateralBalance",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_depositAmount", "type": "uint256" }
+    ],
+    "name": "stableDepositQuote",
+    "outputs": [
+      { "internalType": "uint256", "name": "_amountOut", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stableWithdrawFee",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_withdrawAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "stableWithdrawQuote",
+    "outputs": [
+      { "internalType": "uint256", "name": "_amountOut", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "value", "type": "uint256" }
+    ],
+    "name": "transfer",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "value", "type": "uint256" }
+    ],
+    "name": "transferFrom",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_account", "type": "address" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "unlock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vault",
+    "outputs": [
+      {
+        "internalType": "contract IFlatcoinVault",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

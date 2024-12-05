@@ -1,0 +1,145 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: UNIT
+    network: {{ network }}
+    source:
+      address: "{{ unit.address }}"
+      abi: UNIT
+      startBlock: {{ unit.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: UNIT
+          file: ./abis/FlatMoney/UNIT.json
+        - name: LiquidationModule
+          file: ./abis/FlatMoney/LiquidationModule.json
+        - name: DelayedOrder
+          file: ./abis/FlatMoney/DelayedOrder.json
+        - name: FlatcoinVault
+          file: ./abis/FlatMoney/FlatcoinVault.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Deposit(address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(address,uint256,uint256)
+          handler: handleWithdraw
+      file: {{{ file }}}
+  - kind: ethereum
+    name: LiquidationModule
+    network: {{ network }}
+    source:
+      address: "{{ liquidationModule.address }}"
+      abi: LiquidationModule
+      startBlock: {{ liquidationModule.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: UNIT
+          file: ./abis/FlatMoney/UNIT.json
+        - name: LiquidationModule
+          file: ./abis/FlatMoney/LiquidationModule.json
+        - name: DelayedOrder
+          file: ./abis/FlatMoney/DelayedOrder.json
+        - name: FlatcoinVault
+          file: ./abis/FlatMoney/FlatcoinVault.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: PositionLiquidated(uint256,address,uint256,uint256,(int256,int256,int256))
+          handler: handlePositionLiquidated
+      file: {{{ file }}}
+  - kind: ethereum
+    name: DelayedOrder
+    network: {{ network }}
+    source:
+      address: "{{ delayedOrder.address }}"
+      abi: DelayedOrder
+      startBlock: {{ delayedOrder.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: UNIT
+          file: ./abis/FlatMoney/UNIT.json
+        - name: LiquidationModule
+          file: ./abis/FlatMoney/LiquidationModule.json
+        - name: DelayedOrder
+          file: ./abis/FlatMoney/DelayedOrder.json
+        - name: FlatcoinVault
+          file: ./abis/FlatMoney/FlatcoinVault.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: OrderExecuted(address,uint8,uint256)
+          handler: handleOrderExecuted
+      file: {{{ file }}}
