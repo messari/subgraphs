@@ -8,7 +8,6 @@ import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_MINUS_ONE,
   BIGINT_ZERO,
