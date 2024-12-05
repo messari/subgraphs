@@ -1,0 +1,461 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "target", "type": "address" }
+    ],
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "AddressInsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "uint256", "name": "minAmount", "type": "uint256" }
+    ],
+    "name": "AmountTooSmall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "DelayedOrderInvalid",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "executableTime", "type": "uint256" }
+    ],
+    "name": "ExecutableTimeNotReached",
+    "type": "error"
+  },
+  { "inputs": [], "name": "FailedInnerCall", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "supplied", "type": "uint256" },
+      { "internalType": "uint256", "name": "accepted", "type": "uint256" }
+    ],
+    "name": "HighSlippage",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }],
+    "name": "InvalidFee",
+    "type": "error"
+  },
+  { "inputs": [], "name": "InvalidInitialization", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "InvariantViolation",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "maxFillPrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "currentPrice", "type": "uint256" }
+    ],
+    "name": "MaxFillPriceTooLow",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "minFillPrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "currentPrice", "type": "uint256" }
+    ],
+    "name": "MinFillPriceTooHigh",
+    "type": "error"
+  },
+  { "inputs": [], "name": "ModuleKeyEmpty", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "totalBalance", "type": "uint256" },
+      { "internalType": "uint256", "name": "withdrawAmount", "type": "uint256" }
+    ],
+    "name": "NotEnoughBalanceForWithdraw",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "int256", "name": "marginAmount", "type": "int256" },
+      { "internalType": "uint256", "name": "feeAmount", "type": "uint256" }
+    ],
+    "name": "NotEnoughMarginForFees",
+    "type": "error"
+  },
+  { "inputs": [], "name": "NotInitializing", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "address", "name": "msgSender", "type": "address" }
+    ],
+    "name": "NotTokenOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "msgSender", "type": "address" }
+    ],
+    "name": "OnlyOwner",
+    "type": "error"
+  },
+  { "inputs": [], "name": "OrderHasExpired", "type": "error" },
+  { "inputs": [], "name": "OrderHasNotExpired", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "moduleKey", "type": "bytes32" }
+    ],
+    "name": "Paused",
+    "type": "error"
+  },
+  { "inputs": [], "name": "PositionCreatesBadDebt", "type": "error" },
+  { "inputs": [], "name": "ReentrancyGuardReentrantCall", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" }
+    ],
+    "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ValueNotPositive",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "withdrawAmount",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" }
+    ],
+    "name": "WithdrawalTooSmall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "variableName", "type": "string" }
+    ],
+    "name": "ZeroValue",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum FlatcoinStructs.OrderType",
+        "name": "orderType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "keeperFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "OrderAnnounced",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum FlatcoinStructs.OrderType",
+        "name": "orderType",
+        "type": "uint8"
+      }
+    ],
+    "name": "OrderCancelled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum FlatcoinStructs.OrderType",
+        "name": "orderType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "keeperFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "OrderExecuted",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_DEPOSIT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MODULE_KEY",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      {
+        "internalType": "int256",
+        "name": "marginAdjustment",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "additionalSizeAdjustment",
+        "type": "int256"
+      },
+      { "internalType": "uint256", "name": "fillPrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" }
+    ],
+    "name": "announceLeverageAdjust",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "minFillPrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" }
+    ],
+    "name": "announceLeverageClose",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "margin", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "additionalSize",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "maxFillPrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" }
+    ],
+    "name": "announceLeverageOpen",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "margin", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "additionalSize",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "maxFillPrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" },
+      { "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "announceLeverageOpenFor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "depositAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "minAmountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" }
+    ],
+    "name": "announceStableDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "depositAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "minAmountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" },
+      { "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "announceStableDepositFor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "withdrawAmount",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "minAmountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "keeperFee", "type": "uint256" }
+    ],
+    "name": "announceStableWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "cancelExistingOrder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      {
+        "internalType": "bytes[]",
+        "name": "priceUpdateData",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "executeOrder",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "getAnnouncedOrder",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum FlatcoinStructs.OrderType",
+            "name": "orderType",
+            "type": "uint8"
+          },
+          { "internalType": "uint256", "name": "keeperFee", "type": "uint256" },
+          {
+            "internalType": "uint64",
+            "name": "executableAtTime",
+            "type": "uint64"
+          },
+          { "internalType": "bytes", "name": "orderData", "type": "bytes" }
+        ],
+        "internalType": "struct FlatcoinStructs.Order",
+        "name": "order",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "hasOrderExpired",
+    "outputs": [{ "internalType": "bool", "name": "expired", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IFlatcoinVault",
+        "name": "_vault",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IFlatcoinVault",
+        "name": "_vault",
+        "type": "address"
+      }
+    ],
+    "name": "setVault",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vault",
+    "outputs": [
+      {
+        "internalType": "contract IFlatcoinVault",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

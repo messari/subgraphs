@@ -13542,5 +13542,39 @@
         }
       }
     }
+  },
+  "flat-money": {
+    "schema": "generic",
+    "base": "flat-money",
+    "protocol": "flat-money",
+    "project": "flat-money",
+    "deployments": {
+      "flat-money-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "flat-money.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "flat-money-base",
+            "query-id": "flat-money-base"
+          },
+          "decentralized-network": {
+            "slug": "flat-money-base",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
