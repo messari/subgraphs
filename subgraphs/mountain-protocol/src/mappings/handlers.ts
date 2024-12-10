@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -6,16 +6,8 @@ import { NetworkConfigs } from "../../configurations/configure";
 import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
-import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
-import {
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_ZERO,
-  BIGINT_MINUS_ONE,
-  BIGINT_ZERO,
-  ETH_ADDRESS,
-  INT_ZERO,
-  ZERO_ADDRESS,
-} from "../sdk/util/constants";
+import { bigIntToBigDecimal } from "../sdk/util/numbers";
+import { BIGDECIMAL_ONE, ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
 
 import { Transfer, USDM } from "../../generated/USDM/USDM";
 import { _ERC20 } from "../../generated/USDM/_ERC20";
@@ -30,6 +22,7 @@ const conf = new ProtocolConfig(
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
+    log.debug("[getTokenPrice] token: {}", [token.id.toHexString()]);
     return BIGDECIMAL_ONE;
   }
 
