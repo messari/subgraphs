@@ -24,13 +24,15 @@ import {
   RampA,
   StopRampA,
   ApplyNewFee,
-  SetNewMATime
+  SetNewMATime,
+  Account,
 } from "../generated/schema"
 
 export function handleTransfer(event: TransferEvent): void {
   let entity = new Transfer(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
+
   entity.sender = event.params.sender
   entity.receiver = event.params.receiver
   entity.value = event.params.value
@@ -38,6 +40,38 @@ export function handleTransfer(event: TransferEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
+  if (event.params.sender.equals(event.address)) {
+    let account = new Account(event.params.receiver)
+    account.id = event.params.receiver
+    account.save()
+  } 
+  else if (!event.params.receiver.equals(event.address)) {
+    // Update sender's account
+    let senderPosition = Account.load(event.params.sender)
+    if (senderPosition) {
+      senderPosition.balance = senderPosition.balance.minus(event.params.value)
+      senderPosition.save()
+    }
+
+    // Update or create receiver's account
+    let receiverPosition = Account.load(event.params.receiver)
+    if (!receiverPosition) {
+      receiverPosition = new Account(event.params.receiver)
+      receiverPosition.id = event.params.receiver
+      receiverPosition.balance = event.params.value
+    } else {
+      receiverPosition.balance = receiverPosition.balance.plus(event.params.value)
+    }
+    receiverPosition.save()
+  }
+  else {
+    let senderPosition = Account.load(event.params.sender)
+    if (senderPosition) {
+      senderPosition.balance = senderPosition.balance.minus(event.params.value)
+      senderPosition.save()
+    }
+  }
 
   entity.save()
 }

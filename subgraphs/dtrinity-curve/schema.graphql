@@ -126,3 +126,8 @@ type SetNewMATime @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type Account @entity {
+  id: Bytes! # address
+  balance: BigInt! # uint256
+}

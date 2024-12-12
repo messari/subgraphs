@@ -4,5 +4,11 @@
       "address": "0x1FCa361032eE8123cbeB82Ae2dfA169e4d56fcd0",
       "startBlock": 15400257
     }
+  },
+  "frax-mainnet": {
+    "implementation_v_700": {
+      "address": "0x788D96f655735f52c676A133f4dFC53cEC614d4A",
+      "startBlock": 13579109
+    }
   }
 }

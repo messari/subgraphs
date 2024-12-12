@@ -8,6 +8,14 @@
     "create-local": "graph create --node http://localhost:8020/ dtrinity-curve",
     "remove-local": "graph remove --node http://localhost:8020/ dtrinity-curve",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dtrinity-curve",
+
+    "create-dtrinity-curve-testnet": "graph create --node http://52.11.39.166:8020 stablyio-dtrinity-curve-testnet",
+    "deploy-dtrinity-curve-testnet": "graph deploy stablyio-dtrinity-curve-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.2",
+
+    "create-dtrinity-curve-mainnet": "graph create --node http://35.165.38.147:8020 stablyio-dtrinity-curve-mainnet",
+    "deploy-dtrinity-curve-mainnet": "graph deploy stablyio-dtrinity-curve-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.2",
+
+
     "test": "graph test"
   },
   "dependencies": {
