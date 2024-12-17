@@ -1,0 +1,137 @@
+specVersion: 0.0.8
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }} # Subgraph ID of base subgraph
+  block: {{ graftStartBlock }} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: USTBL
+    network: {{ network }}
+    source:
+      address: "{{ ustbl.address }}"
+      abi: USTBL
+      startBlock: {{ ustbl.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: USTBL
+          file: ./abis/Spiko/USTBL.json
+        - name: EUTBL
+          file: ./abis/Spiko/EUTBL.json
+        - name: Redemption
+          file: ./abis/Spiko/Redemption.json
+        
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferUSTBL
+      file: {{{ file }}}
+  - kind: ethereum
+    name: EUTBL
+    network: {{ network }}
+    source:
+      address: "{{ eutbl.address }}"
+      abi: EUTBL
+      startBlock: {{ eutbl.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: USTBL
+          file: ./abis/Spiko/USTBL.json
+        - name: EUTBL
+          file: ./abis/Spiko/EUTBL.json
+        - name: Redemption
+          file: ./abis/Spiko/Redemption.json
+        
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferEUTBL
+      file: {{{ file }}}
+  - kind: ethereum
+    name: Redemption
+    network: {{ network }}
+    source:
+      address: "{{ redemption.address }}"
+      abi: Redemption
+      startBlock: {{ redemption.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - Protocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: USTBL
+          file: ./abis/Spiko/USTBL.json
+        - name: EUTBL
+          file: ./abis/Spiko/EUTBL.json
+        - name: Redemption
+          file: ./abis/Spiko/Redemption.json
+        
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: _ERC20
+          file: ./abis/Tokens/_ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        - name: ChainlinkDataFeed
+          file: ./abis/Tokens/ChainlinkDataFeed.json
+      eventHandlers:
+        - event: RedemptionInitiated(indexed bytes32,indexed address,indexed address,address,uint256,bytes32)
+          handler: handleRedemptionInitiated
+      file: {{{ file }}}

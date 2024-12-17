@@ -1,0 +1,20 @@
+{
+  "deployment": "SPIKO_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "ustbl": {
+    "address": "0xe4880249745eac5f1ed9d8f7df844792d560e750",
+    "startBlock": "19690265"
+  },
+  "eutbl": {
+    "address": "0xa0769f7a8fc65e47de93797b4e21c073c117fc80",
+    "startBlock": "19690261"
+  },
+  "redemption": {
+    "address": "0xda5599f04e9b437c8394b0c2bc68b502a66ebfe8",
+    "startBlock": "19690259"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
