@@ -15,6 +15,7 @@ import {
   BALANCE_TRANSFER_DATA_TYPE,
   BALANCE_TRANSFER_SIGNATURE,
   DUSD_TOKEN_ADDRESS,
+  DUSD_TOKEN_ADDRESS_TESTNET,
   getNetworkSpecificConstant,
   InterestRateMode,
   Protocol,
@@ -679,6 +680,19 @@ function getAssetPriceFallback(
   }
 
   if (equalsIgnoreCase(dataSource.network(), Network.FRAXTAL_TESTNET)) {
+    const priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(DUSD_TOKEN_ADDRESS_TESTNET)),
+      BIGINT_ZERO
+    );
+
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
+  }
+
+  if (equalsIgnoreCase(dataSource.network(), Network.FRAXTAL)) {
     const priceUSDCInEth = readValue<BigInt>(
       oracle.try_getAssetPrice(Address.fromString(DUSD_TOKEN_ADDRESS)),
       BIGINT_ZERO
