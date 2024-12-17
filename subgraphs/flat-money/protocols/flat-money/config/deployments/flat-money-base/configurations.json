@@ -1,0 +1,24 @@
+{
+  "deployment": "FLAT_MONEY_BASE",
+  "network": "base",
+  "file": "./src/mappings/handlers.ts",
+  "unit": {
+    "address": "0xb95fb324b8a2faf8ec4f76e3df46c718402736e2",
+    "startBlock": "12708434"
+  },
+  "liquidationModule": {
+    "address": "0x981a29dc987136d23df5a0f67d86f428fb40e8aa",
+    "startBlock": "12708436"
+  },
+  "delayedOrder": {
+    "address": "0x6D857e9D24a7566bB72a3FB0847A3E0e4E1c2879",
+    "startBlock": "12708434"
+  },
+  "flatcoinVault": {
+    "address": "0x95fa1ddc9a78273f795e67abe8f1cd2cd39831ff",
+    "startBlock": "12708433"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
