@@ -11,7 +11,7 @@ import {
   StopRampA as StopRampAEvent,
   ApplyNewFee as ApplyNewFeeEvent,
   SetNewMATime as SetNewMATimeEvent
-} from "../generated/implementation_v_700/implementation_v_700"
+} from "../generated/CurveDTrinity/CurveDTrinity"
 import {
   Transfer,
   Approval,

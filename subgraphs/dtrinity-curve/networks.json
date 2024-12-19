@@ -7,8 +7,8 @@
   },
   "frax-mainnet": {
     "implementation_v_700": {
-      "address": "0x788D96f655735f52c676A133f4dFC53cEC614d4A",
-      "startBlock": 13579109
+      "address": "0x9CA648D2f51098941688Db9a0beb1DadC2D1B357",
+      "startBlock": 12722493
     }
   }
 }
