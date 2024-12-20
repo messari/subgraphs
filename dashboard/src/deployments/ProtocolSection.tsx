@@ -683,7 +683,7 @@ function ProtocolSection({
             schemaType !== "governance"
           ) {
             schemaCell = (
-              <Tooltip title="This deployment does not have the latest schema verison" placement="top">
+              <Tooltip title="This deployment does not have the latest schema version" placement="top">
                 <span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span>
               </Tooltip>
             );
@@ -911,7 +911,7 @@ function ProtocolSection({
             schemaType !== "governance"
           ) {
             schemaCell = (
-              <Tooltip title="This deployment does not have the latest schema verison" placement="top">
+              <Tooltip title="This deployment does not have the latest schema version" placement="top">
                 <span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span>
               </Tooltip>
             );

@@ -32,7 +32,7 @@
 
 ### protocols
 
-- Contains a `src` folder for protocols specifc code and a `config` folder that contains network specific configurations and subgraph.yaml templates.
+- Contains a `src` folder for protocols specific code and a `config` folder that contains network specific configurations and subgraph.yaml templates.
 
 ### src
 
