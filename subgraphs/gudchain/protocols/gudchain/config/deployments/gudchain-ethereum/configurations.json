@@ -1,0 +1,12 @@
+{
+  "deployment": "GUDCHAIN_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "vaultV1": {
+    "address": "0xd759e176def0f14e5c2d300238d41b1cbb5585bf",
+    "startBlock": "20203965"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
