@@ -678,7 +678,12 @@ export function handleDogBark(event: BarkEvent): void {
   const art = event.params.art;
   const due = event.params.due; //including interest, but not penalty
 
-  const market = getMarketFromIlk(ilk)!;
+  const market = getMarketFromIlk(ilk);
+  if (!market) {
+    log.warning("[handleDogBark] Failed to get market for ilk {}", [ilk.toString()]);
+    return;
+  }
+
   const token = getOrCreateToken(market.inputToken);
   const collateral = bigIntChangeDecimals(lot, WAD, token.decimals);
   const collateralUSD = bigIntToBDUseDecimals(collateral, token.decimals).times(
