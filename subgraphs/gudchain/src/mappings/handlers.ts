@@ -112,7 +112,7 @@ export function handleDeposit(event: Deposit): void {
   if (tokenAddr == Address.fromString(ZERO_ADDRESS)) {
     tokenAddr = Address.fromString(ETH_ADDRESS);
   }
-  let token = sdk.Tokens.getOrCreateToken(tokenAddr);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddr);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
@@ -136,7 +136,7 @@ export function handleWithdraw(event: Withdraw): void {
   if (tokenAddr == Address.fromString(ZERO_ADDRESS)) {
     tokenAddr = Address.fromString(ETH_ADDRESS);
   }
-  let token = sdk.Tokens.getOrCreateToken(tokenAddr);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddr);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
