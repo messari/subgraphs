@@ -1,0 +1,27 @@
+{
+  "deployment": "AFFINE_RESTAKING_LINEA",
+  "network": "linea",
+  "file": "./src/mappings/handlers.ts",
+  "vaultsEth": [
+    {
+      "name": "STETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": "99999999"
+    },
+    {
+      "name": "WSTETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": "99999999"
+    }
+  ],
+  "vaultsLinea": [
+    {
+      "name": "WETH",
+      "address": "0xb838eb4f224c2454f2529213721500faf732bf4d",
+      "startBlock": "8387237"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

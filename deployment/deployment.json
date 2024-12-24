@@ -13448,5 +13448,271 @@
         }
       }
     }
+  },
+  "affine-restaking": {
+    "schema": "generic",
+    "base": "affine-restaking",
+    "protocol": "affine-restaking",
+    "project": "affine-restaking",
+    "deployments": {
+      "affine-restaking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "affine-restaking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "affine-restaking-ethereum",
+            "query-id": "affine-restaking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "affine-restaking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "affine-restaking-linea": {
+        "network": "linea",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "affine-restaking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "affine-restaking-linea",
+            "query-id": "affine-restaking-linea"
+          },
+          "decentralized-network": {
+            "slug": "affine-restaking-linea",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "kernel-protocol": {
+    "schema": "generic",
+    "base": "kernel-protocol",
+    "protocol": "kernel-protocol",
+    "project": "kernel-protocol",
+    "deployments": {
+      "kernel-protocol-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "kernel-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kernel-protocol-ethereum",
+            "query-id": "kernel-protocol-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "kernel-protocol-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "mountain-protocol": {
+    "schema": "generic",
+    "base": "mountain-protocol",
+    "protocol": "mountain-protocol",
+    "project": "mountain-protocol",
+    "deployments": {
+      "mountain-protocol-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mountain-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mountain-protocol-ethereum",
+            "query-id": "mountain-protocol-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "mountain-protocol-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "mountain-protocol-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mountain-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mountain-protocol-arbitrum",
+            "query-id": "mountain-protocol-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "mountain-protocol-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "mountain-protocol-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mountain-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mountain-protocol-base",
+            "query-id": "mountain-protocol-base"
+          },
+          "decentralized-network": {
+            "slug": "mountain-protocol-base",
+            "query-id": "todo"
+          }
+        }
+      },
+      "mountain-protocol-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mountain-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mountain-protocol-optimism",
+            "query-id": "mountain-protocol-optimism"
+          },
+          "decentralized-network": {
+            "slug": "mountain-protocol-optimism",
+            "query-id": "todo"
+          }
+        }
+      },
+      "mountain-protocol-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "mountain-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mountain-protocol-polygon",
+            "query-id": "mountain-protocol-polygon"
+          },
+          "decentralized-network": {
+            "slug": "mountain-protocol-polygon",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "flat-money": {
+    "schema": "generic",
+    "base": "flat-money",
+    "protocol": "flat-money",
+    "project": "flat-money",
+    "deployments": {
+      "flat-money-base": {
+        "network": "base",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "flat-money.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "flat-money-base",
+            "query-id": "flat-money-base"
+          },
+          "decentralized-network": {
+            "slug": "flat-money-base",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }

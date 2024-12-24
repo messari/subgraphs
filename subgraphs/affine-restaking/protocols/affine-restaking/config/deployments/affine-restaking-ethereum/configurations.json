@@ -1,0 +1,27 @@
+{
+  "deployment": "AFFINE_RESTAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "vaultsEth": [
+    {
+      "name": "STETH",
+      "address": "0xcbc632833687dacdcc7dfac96f6c5989381f4b47",
+      "startBlock": "20428324"
+    },
+    {
+      "name": "WSTETH",
+      "address": "0xf0a949b935e367a94cdfe0f2a54892c2bc7b2131",
+      "startBlock": "20428639"
+    }
+  ],
+  "vaultsLinea": [
+    {
+      "name": "WETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": "999999999"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
