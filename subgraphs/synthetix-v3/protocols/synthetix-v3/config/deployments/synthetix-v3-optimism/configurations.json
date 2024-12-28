@@ -1,0 +1,16 @@
+{
+  "deployment": "SYNTHETIX_V3_OPTIMISM",
+  "network": "optimism",
+  "file": "./src/mappings/handlers.ts",
+  "coreProxy": {
+    "address": "0xffffffaeff0b96ea8e4f94b2253f31abdd875847",
+    "startBlock": "94845805"
+  },
+  "spotMarketProxy": {
+    "address": "0x38908ee087d7db73a1bd1ecab9aab8e8c9c74595",
+    "startBlock": "94846457"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
