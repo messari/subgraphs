@@ -45,7 +45,7 @@ dataSources:
           file: ./abis/AddressProvider.json
         - name: ERC20
           file: ./abis/ERC20.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -97,9 +97,11 @@ dataSources:
           handler: handleMetaPoolDeployed
         - event: LiquidityGaugeDeployed(address,address)
           handler: handleLiquidityGaugeDeployed
-        
+
         - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleCryptoPoolDeployed
+        - event: TricryptoPoolDeployed(address,string,string,address,address[3],address,bytes32,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleTricryptoPoolDeployed
         - event: LiquidityGaugeDeployed(address,address,address)
           handler: handleLiquidityGaugeDeployedWithToken
       file: ./src/mappings/registryMappings.ts
@@ -139,7 +141,7 @@ dataSources:
           file: ./abis/Minter.json
         - name: ERC20
           file: ./abis/ERC20.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -182,11 +184,11 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleTokenExchangeWithPriceScale
-        
+
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
           receipt: true
-        
+
         - event: AddLiquidity(indexed address,uint256[3],uint256,uint256)
           handler: handleAddLiquidity
         - event: AddLiquidity(indexed address,uint256[3],uint256,uint256,uint256)
@@ -197,7 +199,7 @@ dataSources:
           handler: handleAddLiquidityWithFees
         - event: AddLiquidity(indexed address,uint256[4],uint256[4],uint256,uint256)
           handler: handleAddLiquidityWithFees
-        
+
         - event: RemoveLiquidity(indexed address,uint256[2],uint256)
           handler: handleRemoveLiquidity
           receipt: true
@@ -213,7 +215,7 @@ dataSources:
         - event: RemoveLiquidity(indexed address,uint256[4],uint256[4],uint256)
           handler: handleRemoveLiquidityWithFees
           receipt: true
-        
+
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
           receipt: true
@@ -223,7 +225,7 @@ dataSources:
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneWithPriceScale
           receipt: true
-        
+
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
           receipt: true
@@ -265,7 +267,7 @@ dataSources:
           file: ./abis/AddressProvider.json
         - name: ERC20
           file: ./abis/ERC20.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -309,7 +311,7 @@ dataSources:
         - event: DeployedGauge(indexed address,indexed address,indexed address,bytes32,address)
           handler: handleDeployedGauge
       file: ./src/mappings/gaugeControllerMappings.ts
-  
+
 
 templates:
   - name: PoolTemplate
@@ -343,7 +345,7 @@ templates:
           file: ./abis/Minter.json
         - name: ERC20
           file: ./abis/ERC20.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -386,11 +388,11 @@ templates:
           handler: handleTokenExchange
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleTokenExchangeWithPriceScale
-        
+
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
           receipt: true
-        
+
         - event: AddLiquidity(indexed address,uint256[3],uint256,uint256)
           handler: handleAddLiquidity
         - event: AddLiquidity(indexed address,uint256[3],uint256,uint256,uint256)
@@ -401,7 +403,7 @@ templates:
           handler: handleAddLiquidityWithFees
         - event: AddLiquidity(indexed address,uint256[4],uint256[4],uint256,uint256)
           handler: handleAddLiquidityWithFees
-        
+
         - event: RemoveLiquidity(indexed address,uint256[2],uint256)
           handler: handleRemoveLiquidity
           receipt: true
@@ -417,7 +419,7 @@ templates:
         - event: RemoveLiquidity(indexed address,uint256[4],uint256[4],uint256)
           handler: handleRemoveLiquidityWithFees
           receipt: true
-        
+
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
           receipt: true
@@ -427,7 +429,7 @@ templates:
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneWithPriceScale
           receipt: true
-        
+
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
           receipt: true
@@ -438,7 +440,7 @@ templates:
           handler: handleRemoveLiquidityImbalance
           receipt: true
       file: ./src/mappings/poolMappings.ts
-  
+
   - name: LiquidityGauge
     kind: ethereum/contract
     network: {{ network }}
@@ -471,7 +473,7 @@ templates:
           file: ./abis/Minter.json
         - name: ERC20
           file: ./abis/ERC20.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
