@@ -1,0 +1,51 @@
+type Account @entity {
+  id: ID!
+  address: Bytes!
+  balance: BigInt!
+  deposits: [Deposit!]! @derivedFrom(field: "account")
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
+  liquidityLimits: [LiquidityLimit!]! @derivedFrom(field: "accountEntity")
+}
+
+type Deposit @entity {
+  id: ID!
+  account: Account!
+  provider: Bytes!
+  value: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type Withdraw @entity {
+  id: ID!
+  account: Account!
+  provider: Bytes!
+  value: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Bytes!
+  to: Bytes!
+  value: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type LiquidityLimit @entity {
+  id: ID!
+  accountEntity: Account!
+  account: Bytes!
+  originalBalance: BigInt!
+  originalSupply: BigInt!
+  workingBalance: BigInt!
+  workingSupply: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}

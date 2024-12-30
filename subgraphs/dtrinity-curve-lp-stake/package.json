@@ -1,0 +1,27 @@
+{
+    "name": "dtrinity-curve",
+    "license": "UNLICENSED",
+    "scripts": {
+      "codegen": "graph codegen",
+      "build": "graph build",
+      "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ dtrinity-curve",
+      "create-local": "graph create --node http://localhost:8020/ dtrinity-curve",
+      "remove-local": "graph remove --node http://localhost:8020/ dtrinity-curve",
+      "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dtrinity-curve",
+  
+      "create-dtrinity-curve-lp-testnet": "graph create --node http://52.11.39.166:8020 stablyio-dtrinity-curve-lp-testnet",
+      "deploy-dtrinity-curve-lp-testnet": "graph deploy stablyio-dtrinity-curve-lp-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.1",
+  
+      "create-dtrinity-curve-lp-mainnet": "graph create --node http://35.165.38.147:8020 stablyio-dtrinity-curve-lp-mainnet",
+      "deploy-dtrinity-curve-lp-mainnet": "graph deploy stablyio-dtrinity-curve-lp-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.5",
+  
+  
+      "test": "graph test"
+    },
+    "dependencies": {
+      "@graphprotocol/graph-cli": "0.80.0",
+      "@graphprotocol/graph-ts": "0.32.0"
+    },
+    "devDependencies": { "matchstick-as": "0.5.0" }
+  }
+  
