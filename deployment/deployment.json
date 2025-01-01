@@ -13748,5 +13748,65 @@
         }
       }
     }
+  },
+  "spiko": {
+    "schema": "generic",
+    "base": "spiko",
+    "protocol": "spiko",
+    "project": "spiko",
+    "deployments": {
+      "spiko-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spiko.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spiko-ethereum",
+            "query-id": "spiko-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "spiko-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "spiko-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spiko.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spiko-polygon",
+            "query-id": "spiko-polygon"
+          },
+          "decentralized-network": {
+            "slug": "spiko-polygon",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
