@@ -3508,7 +3508,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "2.4.0",
+          "subgraph": "2.4.1",
           "methodology": "1.1.0"
         },
         "files": {
@@ -8942,7 +8942,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -13709,6 +13709,134 @@
           },
           "decentralized-network": {
             "slug": "flat-money-base",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "usual": {
+    "schema": "generic",
+    "base": "usual",
+    "protocol": "usual",
+    "project": "usual",
+    "deployments": {
+      "usual-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "usual.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "usual-ethereum",
+            "query-id": "usual-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "usual-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "spiko": {
+    "schema": "generic",
+    "base": "spiko",
+    "protocol": "spiko",
+    "project": "spiko",
+    "deployments": {
+      "spiko-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spiko.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spiko-ethereum",
+            "query-id": "spiko-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "spiko-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "spiko-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spiko.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spiko-polygon",
+            "query-id": "spiko-polygon"
+          },
+          "decentralized-network": {
+            "slug": "spiko-polygon",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "gudchain": {
+    "schema": "generic",
+    "base": "gudchain",
+    "protocol": "gudchain",
+    "project": "gudchain",
+    "deployments": {
+      "gudchain-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "gudchain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gudchain-ethereum",
+            "query-id": "gudchain-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "gudchain-ethereum",
             "query-id": "todo"
           }
         }
