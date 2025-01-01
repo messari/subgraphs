@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 import { Versions } from "../versions";
@@ -7,13 +8,7 @@ import { SDK } from "../sdk/protocols/generic";
 import { ProtocolConfig, TokenPricer } from "../sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/generic/tokens";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import {
-  BIGDECIMAL_ONE,
-  BIGINT_MINUS_ONE,
-  ETH_ADDRESS,
-  INT_ZERO,
-  ZERO_ADDRESS,
-} from "../sdk/util/constants";
+import { BIGDECIMAL_ONE, ETH_ADDRESS, INT_ZERO } from "../sdk/util/constants";
 
 import { TokensPurchase } from "../../generated/SuperSaleDeposit/SuperSaleDeposit";
 import { _ERC20 } from "../../generated/SuperSaleDeposit/_ERC20";
