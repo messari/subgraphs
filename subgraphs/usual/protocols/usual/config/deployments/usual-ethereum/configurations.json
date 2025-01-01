@@ -1,0 +1,12 @@
+{
+  "deployment": "USUAL_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "usyc": {
+    "address": "0x136471a34f6ef19fe571effc1ca711fdb8e49f2b",
+    "startBlock": "19932493"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
