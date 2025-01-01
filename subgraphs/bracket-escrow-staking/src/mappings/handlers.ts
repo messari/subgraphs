@@ -121,7 +121,7 @@ export function handleDeposit(event: Deposit): void {
     event
   );
 
-  let token = sdk.Tokens.getOrCreateToken(event.params.token);
+  const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
@@ -142,7 +142,7 @@ export function handleWithdraw(event: Withdraw): void {
     event
   );
 
-  let token = sdk.Tokens.getOrCreateToken(event.params.token);
+  const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const pool = sdk.Pools.loadPool(token.id);
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, [token.id], null);
