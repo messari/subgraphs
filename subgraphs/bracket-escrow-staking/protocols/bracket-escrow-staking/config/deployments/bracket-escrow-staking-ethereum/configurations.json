@@ -1,0 +1,12 @@
+{
+  "deployment": "BRACKET_ESCROW_STAKING_ETHEREUM",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "escrow": {
+    "address": "0x9b9d7297c3374dafa2a609d47c79904e467970bc",
+    "startBlock": "20337096"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

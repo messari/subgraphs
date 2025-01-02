@@ -13843,6 +13843,100 @@
       }
     }
   },
+  "superseed": {
+    "schema": "generic",
+    "base": "superseed",
+    "protocol": "superseed",
+    "project": "superseed",
+    "deployments": {
+      "superseed-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "superseed.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "superseed-ethereum",
+            "query-id": "superseed-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "superseed-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "bracket-escrow-staking": {
+    "schema": "generic",
+    "base": "bracket-escrow-staking",
+    "protocol": "bracket-escrow-staking",
+    "project": "bracket-escrow-staking",
+    "deployments": {
+      "bracket-escrow-staking-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "bracket-escrow-staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bracket-escrow-staking-ethereum",
+            "query-id": "bracket-escrow-staking-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "bracket-escrow-staking-ethereum",
+            "query-id": "todo"
+          }
+        }
+      },
+      "bracket-escrow-staking-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "bracket-escrow-staking.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bracket-escrow-staking-arbitrum",
+            "query-id": "bracket-escrow-staking-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "bracket-escrow-staking-arbitrum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "ora-protocol": {
     "schema": "generic",
     "base": "ora-protocol",
