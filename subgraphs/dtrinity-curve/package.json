@@ -13,7 +13,10 @@
     "deploy-dtrinity-curve-testnet": "graph deploy stablyio-dtrinity-curve-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.2",
 
     "create-dtrinity-curve-mainnet": "graph create --node http://35.165.38.147:8020 stablyio-dtrinity-curve-mainnet",
-    "deploy-dtrinity-curve-mainnet": "graph deploy stablyio-dtrinity-curve-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.7",
+    "deploy-dtrinity-curve-mainnet": "graph deploy stablyio-dtrinity-curve-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.8",
+
+    "create-dtrinity-curve-todelete": "graph create --node http://35.165.38.147:8020 stablyio-dtrinity-curve-todelete",
+    "deploy-dtrinity-curve-todelete": "graph deploy stablyio-dtrinity-curve-todelete --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.1",
 
 
     "test": "graph test"
