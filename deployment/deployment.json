@@ -13842,5 +13842,39 @@
         }
       }
     }
+  },
+  "superseed": {
+    "schema": "generic",
+    "base": "superseed",
+    "protocol": "superseed",
+    "project": "superseed",
+    "deployments": {
+      "superseed-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "superseed.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "superseed-ethereum",
+            "query-id": "superseed-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "superseed-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
