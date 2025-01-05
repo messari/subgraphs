@@ -12,7 +12,9 @@ import { Configurations } from "../../../../../configurations/configurations/int
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
 import { stringToBytesList } from "../../../../../src/common/utils/utils";
 
-export class IguanaDexV3EtherlinkMainnetConfigurations implements Configurations {
+export class IguanaDexV3EtherlinkMainnetConfigurations
+  implements Configurations
+{
   getNetwork(): string {
     return Network.ETHERLINK_MAINNET;
   }
@@ -27,7 +29,7 @@ export class IguanaDexV3EtherlinkMainnetConfigurations implements Configurations
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x093ccbaecb0e0006c8bffca92e9929d117fec583")
+      Address.fromString("0x093ccbaecb0e0006c8bffca92e9929d117fec583"),
     );
   }
   getProtocolFeeOnOff(): string {
