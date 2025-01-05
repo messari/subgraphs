@@ -1,0 +1,11 @@
+{
+  "network": "etherlink-mainnet",
+  "factoryAddress": "0x093ccbaecb0e0006c8bffca92e9929d117fec583",
+  "factoryAddressStartBlock": 1960368,
+  "nonFungiblePositionManagerAddress": "0x34f957bcd46a9b0f8fccdcc945004ce03ac6bdb5",
+  "nonFungiblePositionManagerAddressStartBlock": 1960383,
+  "deployment": "IGUANADEX_V3_ETHERLINK_MAINNET",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

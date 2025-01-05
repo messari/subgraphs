@@ -17,6 +17,8 @@ import { SushiswapV3GnosisConfigurations } from "../../protocols/sushiswap-v3/co
 import { SushiswapV3MoonriverConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-moonriver/configurations";
 import { SushiswapV3OptimismConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-optimism/configurations";
 import { SushiswapV3PolygonConfigurations } from "../../protocols/sushiswap-v3/config/deployments/sushiswap-v3-polygon/configurations";
+import { IguanaDexV3EtherlinkMainnetConfigurations } from "../../protocols/iguanadex-v3/config/deployments/iguanadex-v3-etherlink-mainnet/configurations";
+
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -79,6 +81,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.SUSHISWAP_V3_POLYGON: {
       return new SushiswapV3PolygonConfigurations();
+    }
+    case Deploy.IGUANADEX_V3_ETHERLINK_MAINNET: {
+      return new IguanaDexV3EtherlinkMainnetConfigurations();
     }
     default: {
       log.critical(

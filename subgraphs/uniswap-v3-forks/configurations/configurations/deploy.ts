@@ -18,4 +18,5 @@ export namespace Deploy {
   export const SUSHISWAP_V3_MOONRIVER = 16;
   export const SUSHISWAP_V3_OPTIMISM = 17;
   export const SUSHISWAP_V3_POLYGON = 18;
+  export const IGUANADEX_V3_ETHERLINK_MAINNET = 19;
 }
