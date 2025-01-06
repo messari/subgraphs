@@ -33,6 +33,7 @@ export namespace Network {
   export const SCROLL = "SCROLL";
   export const XLAYER_MAINNET = "XLAYER_MAINNET";
   export const ZKSYNC_ERA = "ZKSYNC_ERA";
+  export const ETHERLINK_MAINNET = "ETHERLINK_MAINNET";
 }
 
 export namespace ProtocolType {
