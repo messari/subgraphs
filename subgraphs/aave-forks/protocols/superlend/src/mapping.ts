@@ -41,7 +41,7 @@ import {
   UserEModeSet,
   MintedToTreasury,
 } from "../../../generated/LendingPool/LendingPool";
-import { Market, _DefaultOracle } from "../../../generated/schema";
+import { Market } from "../../../generated/schema";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
@@ -241,8 +241,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromBytes(market.inputToken),
-    manager.getOracleAddress(),
-    event.transaction.hash.toHexString()
+    manager.getOracleAddress()
   );
 
   _handleReserveDataUpdated(
@@ -544,8 +543,7 @@ export function handleUserEModeSet(event: UserEModeSet): void {
 
 function getAssetPriceInUSDC(
   tokenAddress: Address,
-  priceOracle: Address,
-  hash: string
+  priceOracle: Address
 ): BigDecimal {
   const oracle = AaveOracle.bind(priceOracle);
   let oracleResult = readValue<BigInt>(
@@ -565,41 +563,7 @@ function getAssetPriceInUSDC(
     }
   }
 
-  // if (equalsIgnoreCase(dataSource.network(), Network.ETHERLINK_MAINNET)) {
-  const priceUSDCInEth = readValue<BigInt>(
-    oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
-    BIGINT_ZERO
-  );
-
-  //   if (priceUSDCInEth.equals(BIGINT_ZERO)) {
-  //     return BIGDECIMAL_ZERO;
-  //   } else {
-  const retval1 = oracleResult
-    .toBigDecimal()
-    .div(priceUSDCInEth.toBigDecimal());
-
-  //     return retval;
-  //   }
-  // }
-
-  const retval2 = oracleResult
-    .toBigDecimal()
-    .div(exponentToBigDecimal(AAVE_DECIMALS));
-
-  log.warning(
-    "[getAssetPriceInUSDC] token: {} res: {} usdcineth: {} r1: {} r2: {} tx: {}",
-    [
-      tokenAddress.toHexString(),
-      oracleResult.toString(),
-      priceUSDCInEth.toString(),
-      retval1.toString(),
-      retval2.toString(),
-      hash,
-    ]
-  );
-
-  return retval2;
-  // return BIGDECIMAL_ZERO;
+  return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
 }
 
 function storeLiquidationProtocolFee(
