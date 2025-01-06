@@ -49,7 +49,6 @@ import {
   Protocol,
   BALANCE_TRANSFER_DATA_TYPE,
   BALANCE_TRANSFER_SIGNATURE,
-  USDC_TOKEN_ADDRESS,
 } from "./constants";
 import {
   _handleBorrow,
