@@ -5,12 +5,10 @@ import {
   ByteArray,
   Bytes,
   crypto,
-  dataSource,
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-// import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
@@ -51,11 +49,9 @@ import {
   Protocol,
   BALANCE_TRANSFER_DATA_TYPE,
   BALANCE_TRANSFER_SIGNATURE,
-  equalsIgnoreCase,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
 import {
-  // _handleAssetConfigUpdated,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
@@ -81,14 +77,12 @@ import {
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  BIGDECIMAL_ZERO,
   BIGINT_ONE_RAY,
   BIGINT_TEN,
   BIGINT_ZERO,
   INT_FOUR,
   INT_ONE,
   INT_ZERO,
-  Network,
 } from "../../../src/constants";
 
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
@@ -106,7 +100,6 @@ import {
   RiskType,
   InterestRateType,
   PositionSide,
-  INT_TEN,
   INT_152,
   INT_THIRTY_TWO,
 } from "../../../src/sdk/constants";
@@ -139,38 +132,6 @@ const protocolData = getProtocolData();
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
-
-/////////////////////////////////////
-///// RewardController Handlers /////
-/////////////////////////////////////
-
-// export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
-//   // it is not clear which market.oracle shouild we use
-//   // use the protocol-wide defaultOracle
-//   const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
-//   let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
-//   if (!defaultOracle || !defaultOracle.oracle) {
-//     log.warning(
-//       "[handleAssetConfigUpdated]_DefaultOracle for {} not set; rewardTokenPriceUSD set to default 0.0",
-//       [protocolData.protocolID.toHexString()]
-//     );
-//   } else {
-//     rewardTokenPriceUSD = getAssetPriceInUSDC(
-//       event.params.reward,
-//       Address.fromBytes(defaultOracle.oracle)
-//     );
-//   }
-
-//   _handleAssetConfigUpdated(
-//     event,
-//     event.params.asset,
-//     event.params.reward,
-//     rewardTokenPriceUSD,
-//     event.params.newEmission,
-//     event.params.newDistributionEnd,
-//     protocolData
-//   );
-// }
 
 /////////////////////////////////////
 ///// PoolConfigurator Handlers /////
