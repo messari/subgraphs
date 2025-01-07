@@ -13970,5 +13970,39 @@
         }
       }
     }
+  },
+  "bob-fusion": {
+    "schema": "generic",
+    "base": "bob-fusion",
+    "protocol": "bob-fusion",
+    "project": "bob-fusion",
+    "deployments": {
+      "bob-fusion-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "bob-fusion.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bob-fusion-ethereum",
+            "query-id": "bob-fusion-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "bob-fusion-ethereum",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
   }
 }
