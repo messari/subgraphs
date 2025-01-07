@@ -1072,7 +1072,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.0",
+          "subgraph": "1.4.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1089,7 +1089,7 @@
           },
           "decentralized-network": {
             "slug": "convex-finance-ethereum",
-            "query-id": "7rFZ2x6aLQ7EZsNx8F5yenk4xcqwqR3Dynf9rdixCSME"
+            "query-id": "todo"
           }
         }
       }

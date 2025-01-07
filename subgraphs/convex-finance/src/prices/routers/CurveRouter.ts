@@ -203,13 +203,14 @@ export function cryptoPoolLpPriceUsdc(
   const totalSupply = utils.getTokenSupply(lpAddress);
 
   const totalValueUsdc = cryptoPoolLpTotalValueUsdc(lpAddress, block);
-  const priceUsdc = totalValueUsdc
-    .times(
+  const priceUsdc = utils.safeDiv(
+    totalValueUsdc.times(
       constants.BIGINT_TEN.pow(
         constants.DEFAULT_DECIMALS.toI32() as u8
       ).toBigDecimal()
-    )
-    .div(totalSupply.toBigDecimal());
+    ),
+    totalSupply.toBigDecimal()
+  );
 
   return CustomPriceType.initialize(
     priceUsdc,
