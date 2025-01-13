@@ -78,7 +78,14 @@ export function getCurvePriceUsdc(
     return cryptoPoolLpPriceUsdc(lpAddress, block);
 
   const basePrice = getBasePrice(lpAddress, block);
+  if (basePrice.usdPrice.equals(constants.BIGDECIMAL_ZERO)) {
+    return new CustomPriceType();
+  }
+
   const virtualPrice = getVirtualPrice(lpAddress, block).toBigDecimal();
+  if (virtualPrice.equals(constants.BIGDECIMAL_ZERO)) {
+    return new CustomPriceType(); 
+  }
 
   const config = utils.getConfig();
   const usdcTokenDecimals = config.usdcTokenDecimals();
