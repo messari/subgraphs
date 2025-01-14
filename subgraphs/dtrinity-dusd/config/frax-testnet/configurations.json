@@ -1,0 +1,15 @@
+{
+  "network": "frax-testnet",
+  "AmoManager": {
+    "address": "0xaC839c6ed8B2FE6b26458591c68fbfF742452416",
+    "startBlock": 17286166
+  },
+  "Issuer": {
+    "address": "0x55F3e0e786D69C8114eeB53c8CD1f0F65A71d4Df",
+    "startBlock": 17286169
+  },
+  "DUSD": {
+    "address": "0x4D6E79013212F10A026A1FB0b926C9Fd0432b96c",
+    "startBlock": 10047781
+  }
+}

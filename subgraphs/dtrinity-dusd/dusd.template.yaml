@@ -1,0 +1,32 @@
+specVersion: 1.0.0
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: DUSD
+    network: {{ network }}
+    source:
+      abi: ERC20
+      address: "{{ DUSD.address }}"
+      startBlock: {{ DUSD.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        # - name: AmoManager
+        #   file: ./abis/AmoManager.json
+        - name: Issuer
+          file: ./abis/Issuer.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferByContractCall
+          # receipt: true
+      file: ./src/dusd.ts
