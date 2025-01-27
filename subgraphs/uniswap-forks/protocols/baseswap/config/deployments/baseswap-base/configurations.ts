@@ -46,11 +46,11 @@ export class BaseswapBaseConfigurations implements Configurations {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTradeFee(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.25");
+    return BigDecimal.fromString("0.17");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.25");
+    return BigDecimal.fromString("0.08");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
@@ -84,12 +84,16 @@ export class BaseswapBaseConfigurations implements Configurations {
       "0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22", // coinbase wsETH
       "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", // usdc
       "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", // dai
+      "0x65a2508c429a6078a7bc2f7df81ab575bd9d9275", // dai+
+      "0xb79dd08ea68a908a97220c76d19a6aa9cbde4376", // usd+
     ];
   }
   getStableCoins(): string[] {
     return [
       "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", // USDC
       "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", // DAI
+      "0x65a2508c429a6078a7bc2f7df81ab575bd9d9275", // DAI+
+      "0xb79dd08ea68a908a97220c76d19a6aa9cbde4376", // USD+
     ];
   }
   getStableOraclePools(): string[] {
@@ -98,7 +102,9 @@ export class BaseswapBaseConfigurations implements Configurations {
     ];
   }
   getUntrackedPairs(): string[] {
-    return [];
+    return [
+      "0xda2e677649dd670dac5db2d0df06c97c0a92b40d", // Wrapped Ether/BaseHarryPotterObamaSonic10Inu
+    ];
   }
   getUntrackedTokens(): string[] {
     return [];
