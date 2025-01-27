@@ -639,7 +639,7 @@
   },
   {
     "name": "decimals",
-    "outputs": [{ "type": "uint256", "name": "" }],
+    "outputs": [{ "type": "uint8", "name": "" }],
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
