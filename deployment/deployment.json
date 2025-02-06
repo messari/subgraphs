@@ -13971,6 +13971,40 @@
       }
     }
   },
+  "iguanadex-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "iguanadex-v3",
+    "project": "iguanadex",
+    "deployments": {
+      "iguanadex-v3-etherlink-mainnet": {
+        "network": "etherlink-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "4.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+            "template": "iguanadexV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "iguanadex-v3-etherlink-mainnet",
+            "query-id": "iguanadex-v3-etherlink-mainnet"
+          },
+          "decentralized-network": {
+            "slug": "iguanadex-v3-etherlink-mainnet",
+            "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
   "superlend": {
     "schema": "lending",
     "base": "aave-forks",
@@ -13986,7 +14020,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "superlend.template.yaml"
+            "template": "superlend.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
