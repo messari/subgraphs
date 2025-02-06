@@ -179,3 +179,11 @@ export function averagePrice(prices: CustomPriceType[]): CustomPriceType {
     constants.DEFAULT_USDC_DECIMALS
   );
 }
+
+export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
+  if (amount1.equals(constants.BIGDECIMAL_ZERO)) {
+    return constants.BIGDECIMAL_ZERO;
+  } else {
+    return amount0.div(amount1);
+  }
+}
