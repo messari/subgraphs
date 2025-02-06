@@ -25,6 +25,7 @@ enum Network {
   OSMOSIS
   MATIC # aka Polygon
   XDAI # aka Gnosis Chain
+  ETHERLINK_MAINNET
 }
 
 enum ProtocolType {
