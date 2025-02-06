@@ -1,0 +1,18 @@
+{
+  "network": "etherlink-mainnet",
+  "factory": {
+    "address": "0x5ccf60c7e10547c5389e9cbff543e5d0db9f4fec",
+    "startBlock": 3283856
+  },
+  "lendingPoolConfigurator": {
+    "address": "0x30f6880bb1cf780a49eb4ef64e64585780aae060",
+    "startBlock": 3283856
+  },
+  "LendingPool": {
+    "address": "0x3bd16d195786fb2f509f2e2d7f69920262ef114d",
+    "startBlock": 3283856
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
