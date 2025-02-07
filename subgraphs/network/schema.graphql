@@ -87,7 +87,7 @@ type Network @entity @regularPolling {
   " Name of the network being indexed "
   id: ID!
 
-  " The verison of the schema "
+  " The version of the schema "
   schemaVersion: String!
 
   " The version of the subgraph "
