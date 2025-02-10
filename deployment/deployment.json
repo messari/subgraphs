@@ -13477,7 +13477,7 @@
           },
           "decentralized-network": {
             "slug": "affine-restaking-ethereum",
-            "query-id": "FK525H2L7hunrwYytG8vEN3qBUqbZE4AHXVRWKWpLnJV"
+            "query-id": "HCzjsuU3dW7V6Z2BP4ncyzkkKYi3QXeuJFaboSak2U7V"
           }
         }
       },
@@ -13503,7 +13503,7 @@
           },
           "decentralized-network": {
             "slug": "affine-restaking-linea",
-            "query-id": "todo"
+            "query-id": "FK525H2L7hunrwYytG8vEN3qBUqbZE4AHXVRWKWpLnJV"
           }
         }
       }
@@ -13649,7 +13649,7 @@
           },
           "decentralized-network": {
             "slug": "mountain-protocol-optimism",
-            "query-id": "todo"
+            "query-id": "HCzjsuU3dW7V6Z2BP4ncyzkkKYi3QXeuJFaboSak2U7V"
           }
         }
       },
