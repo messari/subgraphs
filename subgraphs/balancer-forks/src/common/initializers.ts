@@ -114,7 +114,6 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
-    protocol._poolIds = [];
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
@@ -416,7 +415,7 @@ export function getOrCreateLiquidityPool(
     pool.createdBlockNumber = block.number;
     pool.createdTimestamp = block.timestamp;
 
-    utils.updateProtocolAfterNewLiquidityPool(poolAddress);
+    utils.updateProtocolAfterNewLiquidityPool();
 
     pool.save();
   }
