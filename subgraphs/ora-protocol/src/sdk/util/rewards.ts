@@ -128,7 +128,7 @@ export function getRewardsPerDay(
     }
   }
 
-  // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
+  // Add current timestamp and block number to array if new block is at least X blocks later than previously stored.
   // Used to save memory and efficiency on array resizing.
   let recentSavedTimestamp: i32;
   if (circularBuffer.nextIndex == INT_ZERO) {

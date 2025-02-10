@@ -22,10 +22,10 @@ export function getPoolFromLpToken(
   block: ethereum.Block | null = null
 ): Address {
   const config = utils.getConfig();
-  const curveRegistryAdresses = config.curveRegistry();
+  const curveRegistryAddresses = config.curveRegistry();
 
-  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    const curveRegistry = curveRegistryAdresses[idx];
+  for (let idx = 0; idx < curveRegistryAddresses.length; idx++) {
+    const curveRegistry = curveRegistryAddresses[idx];
     if (block && curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
@@ -121,10 +121,10 @@ export function getUnderlyingCoinFromPool(
   block: ethereum.Block | null = null
 ): Address {
   const config = utils.getConfig();
-  const curveRegistryAdresses = config.curveRegistry();
+  const curveRegistryAddresses = config.curveRegistry();
 
-  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    const curveRegistry = curveRegistryAdresses[idx];
+  for (let idx = 0; idx < curveRegistryAddresses.length; idx++) {
+    const curveRegistry = curveRegistryAddresses[idx];
     if (block && curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
@@ -168,10 +168,10 @@ export function getVirtualPrice(
   block: ethereum.Block | null = null
 ): BigInt {
   const config = utils.getConfig();
-  const curveRegistryAdresses = config.curveRegistry();
+  const curveRegistryAddresses = config.curveRegistry();
 
-  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    const curveRegistry = curveRegistryAdresses[idx];
+  for (let idx = 0; idx < curveRegistryAddresses.length; idx++) {
+    const curveRegistry = curveRegistryAddresses[idx];
     if (block && curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
