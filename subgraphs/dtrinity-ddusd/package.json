@@ -1,0 +1,24 @@
+{
+  "name": "dtrinity-ddusd",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ dtrinity-ddusd",
+    "create-local": "graph create --node http://localhost:8020/ dtrinity-ddusd",
+    "remove-local": "graph remove --node http://localhost:8020/ dtrinity-ddusd",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dtrinity-ddusd",
+    "create-dtrinity-ddusd-testnet": "graph create --node http://52.11.39.166:8020 stablyio-dtrinity-ddusd-testnet",
+    "deploy-dtrinity-ddusd-testnet": "graph deploy stablyio-dtrinity-ddusd-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.2",
+    "create-dtrinity-ddusd-mainnet": "graph create --node http://35.165.38.147:8020 stablyio-dtrinity-ddusd-mainnet",
+    "deploy-dtrinity-ddusd-mainnet": "graph deploy stablyio-dtrinity-ddusd-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.20",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.80.0",
+    "@graphprotocol/graph-ts": "0.32.0"
+  },
+  "devDependencies": {
+    "matchstick-as": "0.5.0"
+  }
+}

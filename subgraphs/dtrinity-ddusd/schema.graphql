@@ -1,0 +1,107 @@
+type Token @entity {
+  id: Bytes!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  lastPriceUSD: BigDecimal
+  lastPriceBlockNumber: BigInt
+}
+
+type Market @entity {
+  id: Bytes!
+  name: String!
+  token: Token!
+  totalSupply: BigDecimal!
+  totalBorrowed: BigDecimal!
+  inputToken: Token!
+  outputToken: Token!
+  exchangeRate: BigDecimal!
+  createdTimestamp: BigInt!
+  createdBlockNumber: BigInt!
+}
+
+type Account @entity {
+  id: Bytes!
+  positionCount: BigInt!
+  tokens: [AccountBalance!]! @derivedFrom(field: "account")
+  transfersIn: [Transfer!]! @derivedFrom(field: "to")
+  transfersOut: [Transfer!]! @derivedFrom(field: "from")
+  mints: [Mint!]! @derivedFrom(field: "account")
+  burns: [Burn!]! @derivedFrom(field: "account")
+  positions: [Position!]! @derivedFrom(field: "account")
+}
+
+type Position @entity {
+  id: String!
+  account: Account!
+  market: Market!
+  balance: BigDecimal!
+  updates: [PositionUpdate!]! @derivedFrom(field: "position")
+  timestampOpened: BigInt!
+  blockNumberOpened: BigInt!
+  hashOpened: Bytes!
+  timestampClosed: BigInt
+  blockNumberClosed: BigInt
+  hashClosed: Bytes
+  lastUpdateTimestamp: BigInt!
+  lastUpdateBlockNumber: BigInt!
+  lastUpdateHash: Bytes!
+  closed: Boolean!
+}
+
+type PositionUpdate @entity {
+  id: Bytes!
+  position: Position!
+  amount: BigDecimal!
+  amountUSD: BigDecimal!
+  type: String! # "DEPOSIT" or "WITHDRAWAL"
+  source: String! # "MINT", "BURN", "TRANSFER_IN", "TRANSFER_OUT"
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  hash: Bytes!
+}
+
+type AccountBalance @entity {
+  id: Bytes!
+  account: Account!
+  market: Market!
+  balance: BigDecimal!
+  lastUpdateTimestamp: BigInt!
+  lastUpdateBlockNumber: BigInt!
+}
+
+type Transfer @entity {
+  id: Bytes!
+  from: Account!
+  to: Account!
+  market: Market!
+  amount: BigDecimal!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type Mint @entity {
+  id: Bytes!
+  account: Account!
+  market: Market!
+  amount: BigDecimal!
+  balanceIncrease: BigDecimal!
+  index: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type Burn @entity {
+  id: Bytes!
+  account: Account!
+  target: Account!
+  market: Market!
+  amount: BigDecimal!
+  balanceIncrease: BigDecimal!
+  index: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}

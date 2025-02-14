@@ -13,7 +13,7 @@
       "deploy-dtrinity-curve-lp-testnet": "graph deploy stablyio-dtrinity-curve-lp-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.1",
   
       "create-dtrinity-curve-lp-mainnet": "graph create --node http://35.165.38.147:8020 stablyio-dtrinity-curve-lp-mainnet",
-      "deploy-dtrinity-curve-lp-mainnet": "graph deploy stablyio-dtrinity-curve-lp-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.5",
+      "deploy-dtrinity-curve-lp-mainnet": "graph deploy stablyio-dtrinity-curve-lp-mainnet --ipfs http://35.165.38.147:5001 --node http://35.165.38.147:8020 --version-label=0.0.6",
   
   
       "test": "graph test"
