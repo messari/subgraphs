@@ -19,7 +19,7 @@ import * as SushiCalculations from "./calculations/CalculationsSushiswap";
 
 export function getUsdPricePerToken(
   tokenAddr: Address,
-  block: ethereum.Block | null = null,
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
     return new CustomPriceType();
@@ -40,7 +40,7 @@ export function getUsdPricePerToken(
   if (config.hardcodedStables().includes(tokenAddr)) {
     return CustomPriceType.initialize(
       constants.BIGDECIMAL_USD_PRICE,
-      constants.DEFAULT_USDC_DECIMALS,
+      constants.DEFAULT_USDC_DECIMALS
     );
   }
 
@@ -102,7 +102,7 @@ export function getUsdPricePerToken(
 export function getLiquidityBoundPrice(
   tokenAddress: Address,
   tokenPrice: CustomPriceType,
-  amount: BigDecimal,
+  amount: BigDecimal
 ): BigDecimal {
   const reportedPriceUSD = tokenPrice.usdPrice.times(amount);
   const liquidity = tokenPrice.liquidity;
@@ -112,8 +112,8 @@ export function getLiquidityBoundPrice(
     liquidityBoundPriceUSD = liquidity
       .div(
         constants.BIGINT_TEN.pow(
-          constants.DEFAULT_USDC_DECIMALS as u8,
-        ).toBigDecimal(),
+          constants.DEFAULT_USDC_DECIMALS as u8
+        ).toBigDecimal()
       )
       .times(constants.BIGINT_TEN.pow(tokenPrice.decimals as u8).toBigDecimal())
       .div(amount);
@@ -126,7 +126,7 @@ export function getLiquidityBoundPrice(
         amount.toString(),
         liquidity.toString(),
         liquidityBoundPriceUSD.toString(),
-      ],
+      ]
     );
   }
 
@@ -136,7 +136,7 @@ export function getLiquidityBoundPrice(
 export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal,
-  block: ethereum.Block | null = null,
+  block: ethereum.Block | null = null
 ): BigDecimal {
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 

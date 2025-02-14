@@ -6,7 +6,7 @@ import { AaveOracleContract } from "../../../generated/Minter/AaveOracleContract
 
 export function getAaveOracleContract(
   contract: OracleContract,
-  block: ethereum.Block | null = null,
+  block: ethereum.Block | null = null
 ): AaveOracleContract | null {
   if (
     (block && contract.startBlock.gt(block.number)) ||
@@ -19,7 +19,7 @@ export function getAaveOracleContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block: ethereum.Block | null = null,
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 
@@ -32,13 +32,13 @@ export function getTokenPriceUSDC(
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       aaveOracleContract.try_getAssetPrice(tokenAddr),
-      constants.BIGINT_ZERO,
+      constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
     constants.AAVE_ORACLE_DECIMALS,
-    constants.OracleType.AAVE_ORACLE,
+    constants.OracleType.AAVE_ORACLE
   );
 }

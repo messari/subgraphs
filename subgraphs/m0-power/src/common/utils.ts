@@ -9,7 +9,7 @@ import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
-  defaultValue: T,
+  defaultValue: T
 ): T {
   return callResult.reverted ? defaultValue : callResult.value;
 }
@@ -46,7 +46,7 @@ export class TokenInit implements TokenInitializer {
     const symbol = readValue<string>(contract.try_symbol(), default_symbol);
     const decimals = readValue<BigInt>(
       contract.try_decimals(),
-      BigInt.fromI32(default_decimals),
+      BigInt.fromI32(default_decimals)
     ).toI32();
 
     return new TokenParams(name, symbol, decimals);

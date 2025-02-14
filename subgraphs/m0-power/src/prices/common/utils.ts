@@ -31,16 +31,16 @@ export function isNullAddress(tokenAddr: Address): boolean {
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
-  decimals: i32 = constants.DEFAULT_DECIMALS.toI32(),
+  decimals: i32 = constants.DEFAULT_DECIMALS.toI32()
 ): BigDecimal {
   return quantity.divDecimal(
-    constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal(),
+    constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal()
   );
 }
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
-  defaultValue: T,
+  defaultValue: T
 ): T {
   return callResult.reverted ? defaultValue : callResult.value;
 }
@@ -57,7 +57,7 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
 
   const decimals = readValue<BigInt>(
     tokenContract.try_decimals(),
-    constants.DEFAULT_DECIMALS,
+    constants.DEFAULT_DECIMALS
   );
 
   return decimals;
@@ -68,7 +68,7 @@ export function getTokenSupply(tokenAddr: Address): BigInt {
 
   const totalSupply = readValue<BigInt>(
     tokenContract.try_totalSupply(),
-    constants.BIGINT_ONE,
+    constants.BIGINT_ONE
   );
 
   return totalSupply;
@@ -137,7 +137,7 @@ function pairwiseDiffOfPrices(prices: CustomPriceType[]): BigDecimal[] {
 
 export function kClosestPrices(
   k: i32,
-  prices: CustomPriceType[],
+  prices: CustomPriceType[]
 ): CustomPriceType[] {
   // sort by USD prices
   const pricesSorted = sortByPrices(prices);
@@ -176,6 +176,6 @@ export function averagePrice(prices: CustomPriceType[]): CustomPriceType {
 
   return CustomPriceType.initialize(
     summationUSDPrice.div(new BigDecimal(BigInt.fromI32(prices.length as i32))),
-    constants.DEFAULT_USDC_DECIMALS,
+    constants.DEFAULT_USDC_DECIMALS
   );
 }
