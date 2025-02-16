@@ -85,7 +85,12 @@ export function updatePoolTVLV1(pool: Pool): void {
     constants.BIGINT_ZERO,
   );
 
-  pool.setInputTokenBalances([baseTokenTotalSupply], true);
+  const baseTokenTotalSupplyWrapped = readValue<BigInt>(
+    contract.try_getWrapppedValue(baseTokenTotalSupply),
+    constants.BIGINT_ZERO,
+  );
+
+  pool.setInputTokenBalances([baseTokenTotalSupplyWrapped], true);
 }
 
 export function updatePoolOutputTokenSupplyV1(pool: Pool): void {
@@ -103,14 +108,7 @@ export function getOrCreatePoolV2(poolAddress: Address, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(poolAddress);
 
   if (!pool.isInitialized) {
-    const poolManagerContract = PoolContract.bind(
-      Address.fromString(constants.POOL_MANAGER_ADDRESS),
-    );
-    const inputToken = readValue<Address>(
-      poolManagerContract.try_collateralToken(),
-      constants.NULL.TYPE_ADDRESS,
-    );
-
+    const inputToken = Address.fromString(constants.FX_USD_ADDRESS);
     const outputToken = sdk.Tokens.getOrCreateToken(poolAddress);
 
     pool.initialize(

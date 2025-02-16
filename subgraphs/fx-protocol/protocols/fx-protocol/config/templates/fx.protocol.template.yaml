@@ -27,8 +27,6 @@ dataSources:
           file: ./abis/TreasuryV2.json
         - name: PoolManager
           file: ./abis/PoolManager.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: Pool
           file: ./abis/Pool.json
 
@@ -36,7 +34,7 @@ dataSources:
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: _ERC20
+        - name: ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurvePool
@@ -67,8 +65,6 @@ dataSources:
       eventHandlers:
         - event: Harvest(indexed address,indexed address,uint256,uint256,uint256,uint256)
           handler: handleHarvest
-        - event: RegisterPool(indexed address)
-          handler: handleRegisterPool
       file: ./src/mappings/poolManagerMappings.ts
 
 {{#treasuryContracts}}
@@ -90,8 +86,6 @@ dataSources:
           file: ./abis/TreasuryV2.json
         - name: PoolManager
           file: ./abis/PoolManager.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: Pool
           file: ./abis/Pool.json
 
@@ -99,7 +93,7 @@ dataSources:
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: _ERC20
+        - name: ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurvePool
@@ -132,61 +126,3 @@ dataSources:
           handler: handleHarvest
       file: ./src/mappings/treasuryTokenMappings.ts
 {{/treasuryContracts}}
-
-templates:
-  - kind: ethereum/contract
-    name: Pool
-    network: {{ network }}
-    source:
-      abi: Pool
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: Pool
-          file: ./abis/Pool.json
-        - name: TreasuryV2
-          file: ./abis/TreasuryV2.json
-        - name: PoolManager
-          file: ./abis/PoolManager.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurvePool
-          file: ./abis/Prices/Curve/Pool.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # Aave Oracle Contract
-        - name: AaveOracleContract
-          file: ./abis/Prices/AaveOracle.json
-        # SushiSwap Contracts
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-      eventHandlers:
-        - event: PositionSnapshot(uint256,int16,uint256,uint256,uint256)
-          handler: handlePositionSnapshot
-      file: ./src/mappings/poolMappings.ts

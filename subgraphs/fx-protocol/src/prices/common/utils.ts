@@ -16,7 +16,7 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 import { Configurations, CustomPriceType } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-import { _ERC20 } from "../../../generated/PoolManager/_ERC20";
+import { ERC20 } from "../../../generated/PoolManager/ERC20";
 import {
   Address,
   BigInt,
@@ -46,25 +46,25 @@ export function readValue<T>(
 }
 
 export function getTokenName(tokenAddr: Address): string {
-  const tokenContract = _ERC20.bind(tokenAddr);
+  const tokenContract = ERC20.bind(tokenAddr);
   const name = readValue<string>(tokenContract.try_name(), "");
 
   return name;
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const tokenContract = _ERC20.bind(tokenAddr);
+  const tokenContract = ERC20.bind(tokenAddr);
 
-  const decimals = readValue<BigInt>(
+  const decimals = readValue<i32>(
     tokenContract.try_decimals(),
-    constants.DEFAULT_DECIMALS,
+    constants.DEFAULT_DECIMALS.toI32(),
   );
 
-  return decimals;
+  return BigInt.fromI32(decimals);
 }
 
 export function getTokenSupply(tokenAddr: Address): BigInt {
-  const tokenContract = _ERC20.bind(tokenAddr);
+  const tokenContract = ERC20.bind(tokenAddr);
 
   const totalSupply = readValue<BigInt>(
     tokenContract.try_totalSupply(),

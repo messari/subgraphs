@@ -23,6 +23,8 @@ export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const POOL_MANAGER_ADDRESS =
   "0x250893CA4Ba5d05626C785e8da758026928FCD24";
+export const POOL_ADDRESS = "0x6ecfa38fee8a5277b91efda204c235814f0122e8";
+export const FX_USD_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0";
 
 ////////////////////////
 ///// Type Helpers /////
