@@ -7,7 +7,6 @@ import { Pricer, TokenInit, readValue } from "./utils";
 import { ProtocolConfig } from "../sdk/protocols/config";
 import { TreasuryV2 } from "../../generated/PoolManager/TreasuryV2";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Pool as PoolContract } from "../../generated/PoolManager/Pool";
 import { PoolManager as PoolManagerContract } from "../../generated/PoolManager/PoolManager";
 
 export function initializeSDKFromEvent(event: ethereum.Event): SDK {
@@ -15,7 +14,7 @@ export function initializeSDKFromEvent(event: ethereum.Event): SDK {
     constants.Protocol.ID,
     constants.Protocol.NAME,
     constants.Protocol.SLUG,
-    Versions,
+    Versions
   );
   const tokenPricer = new Pricer();
   const tokenInitializer = new TokenInit();
@@ -24,7 +23,7 @@ export function initializeSDKFromEvent(event: ethereum.Event): SDK {
     protocolConfig,
     tokenPricer,
     tokenInitializer,
-    event,
+    event
   );
 
   return sdk;
@@ -35,7 +34,7 @@ export function initializeSDKFromCall(call: ethereum.Call): SDK {
     constants.Protocol.ID,
     constants.Protocol.NAME,
     constants.Protocol.SLUG,
-    Versions,
+    Versions
   );
   const tokenPricer = new Pricer();
   const tokenInitializer = new TokenInit();
@@ -44,7 +43,7 @@ export function initializeSDKFromCall(call: ethereum.Call): SDK {
     protocolConfig,
     tokenPricer,
     tokenInitializer,
-    call,
+    call
   );
 
   return sdk;
@@ -57,12 +56,12 @@ export function getOrCreatePoolV1(poolAddress: Address, sdk: SDK): Pool {
     const contract = TreasuryV2.bind(poolAddress);
     const inputToken = readValue<Address>(
       contract.try_baseToken(),
-      constants.NULL.TYPE_ADDRESS,
+      constants.NULL.TYPE_ADDRESS
     );
 
     const outputTokenAddress = readValue<Address>(
       contract.try_fToken(),
-      constants.NULL.TYPE_ADDRESS,
+      constants.NULL.TYPE_ADDRESS
     );
     const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
 
@@ -70,7 +69,7 @@ export function getOrCreatePoolV1(poolAddress: Address, sdk: SDK): Pool {
       outputToken.name,
       outputToken.symbol,
       [inputToken],
-      outputToken,
+      outputToken
     );
   }
 
@@ -82,12 +81,12 @@ export function updatePoolTVLV1(pool: Pool): void {
 
   const baseTokenTotalSupply = readValue<BigInt>(
     contract.try_totalBaseToken(),
-    constants.BIGINT_ZERO,
+    constants.BIGINT_ZERO
   );
 
   const baseTokenTotalSupplyWrapped = readValue<BigInt>(
     contract.try_getWrapppedValue(baseTokenTotalSupply),
-    constants.BIGINT_ZERO,
+    constants.BIGINT_ZERO
   );
 
   pool.setInputTokenBalances([baseTokenTotalSupplyWrapped], true);
@@ -98,7 +97,7 @@ export function updatePoolOutputTokenSupplyV1(pool: Pool): void {
 
   const outputTokenSupply = readValue<BigInt>(
     contract.try_totalSupply(),
-    constants.BIGINT_ZERO,
+    constants.BIGINT_ZERO
   );
 
   pool.setOutputTokenSupply(outputTokenSupply);
@@ -115,7 +114,7 @@ export function getOrCreatePoolV2(poolAddress: Address, sdk: SDK): Pool {
       outputToken.name,
       outputToken.symbol,
       [inputToken],
-      outputToken,
+      outputToken
     );
   }
 
@@ -124,11 +123,11 @@ export function getOrCreatePoolV2(poolAddress: Address, sdk: SDK): Pool {
 
 export function updatePoolTVLV2(pool: Pool): void {
   const poolManagerContract = PoolManagerContract.bind(
-    Address.fromString(constants.POOL_MANAGER_ADDRESS),
+    Address.fromString(constants.POOL_MANAGER_ADDRESS)
   );
 
   const poolInfo = poolManagerContract.try_getPoolInfo(
-    Address.fromBytes(pool.getBytesID()),
+    Address.fromBytes(pool.getBytesID())
   );
   if (poolInfo.reverted) return;
 

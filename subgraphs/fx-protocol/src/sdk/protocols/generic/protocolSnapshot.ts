@@ -67,7 +67,7 @@ export class ProtocolSnapshot {
   private takeFinancialsDailySnapshot(day: i32): void {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = FinancialsDailySnapshot.load(
-      Bytes.fromI32(this.protocol.lastSnapshotDayID),
+      Bytes.fromI32(this.protocol.lastSnapshotDayID)
     );
 
     snapshot.day = day;
@@ -93,14 +93,14 @@ export class ProtocolSnapshot {
 
     if (previousSnapshot) {
       supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
-        previousSnapshot.cumulativeSupplySideRevenueUSD,
+        previousSnapshot.cumulativeSupplySideRevenueUSD
       );
       protocolSideRevenueDelta =
         snapshot.cumulativeProtocolSideRevenueUSD.minus(
-          previousSnapshot.cumulativeProtocolSideRevenueUSD,
+          previousSnapshot.cumulativeProtocolSideRevenueUSD
         );
       totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD.minus(
-        previousSnapshot.cumulativeTotalRevenueUSD,
+        previousSnapshot.cumulativeTotalRevenueUSD
       );
     }
     snapshot.dailySupplySideRevenueUSD = supplySideRevenueDelta;
@@ -115,7 +115,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
-      Bytes.fromI32(this.protocol.lastSnapshotDayID),
+      Bytes.fromI32(this.protocol.lastSnapshotDayID)
     );
 
     snapshot.protocol = this.protocol.id;

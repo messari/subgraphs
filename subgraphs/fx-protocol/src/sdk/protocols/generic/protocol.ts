@@ -43,7 +43,7 @@ export class ProtocolManager {
   private constructor(
     protocol: ProtocolSchema,
     pricer: TokenPricer,
-    event: CustomEventType,
+    event: CustomEventType
   ) {
     this.protocol = protocol;
     this.event = event;
@@ -63,7 +63,7 @@ export class ProtocolManager {
   static load(
     conf: ProtocolConfigurer,
     pricer: TokenPricer,
-    event: CustomEventType,
+    event: CustomEventType
   ): ProtocolManager {
     const id = Address.fromString(conf.getID());
     let protocol = ProtocolSchema.load(id);

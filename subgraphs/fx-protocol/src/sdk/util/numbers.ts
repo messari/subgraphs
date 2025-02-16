@@ -8,7 +8,7 @@ import {
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
-  decimals: i32 = DEFAULT_DECIMALS,
+  decimals: i32 = DEFAULT_DECIMALS
 ): BigDecimal {
   return quantity.divDecimal(BIGINT_TEN.pow(decimals as u8).toBigDecimal());
 }
@@ -35,7 +35,7 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   }
 
   return sum.div(
-    BigDecimal.fromString(BigInt.fromI32(prices.length).toString()),
+    BigDecimal.fromString(BigInt.fromI32(prices.length).toString())
   );
 }
 

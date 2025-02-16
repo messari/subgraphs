@@ -12,7 +12,7 @@ export function handleHarvest(event: Harvest): void {
 
   const pool = getOrCreatePoolV2(
     Address.fromString(constants.POOL_ADDRESS),
-    sdk,
+    sdk
   );
 
   updatePoolTVLV2(pool);

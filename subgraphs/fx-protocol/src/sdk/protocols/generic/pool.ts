@@ -52,7 +52,7 @@ export class Pool {
     protocol: ProtocolManager,
     pool: PoolSchema,
     tokens: TokenManager,
-    isInitialized: bool,
+    isInitialized: bool
   ) {
     this.pool = pool;
     this.protocol = protocol;
@@ -73,7 +73,7 @@ export class Pool {
     name: string,
     symbol: string,
     inputTokens: Bytes[],
-    outputToken: Token | null,
+    outputToken: Token | null
   ): void {
     if (this.isInitialized) {
       return;
@@ -180,7 +180,7 @@ export class Pool {
    */
   setInputTokenBalances(
     newBalances: BigInt[],
-    updateMetrics: boolean = true,
+    updateMetrics: boolean = true
   ): void {
     this.pool.inputTokenBalances = newBalances;
     this.setInputTokenBalancesUSD();
@@ -197,12 +197,12 @@ export class Pool {
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
       const inputTokenBalance = this.pool.inputTokenBalances[idx];
       const inputToken = this.tokens.getOrCreateToken(
-        Address.fromBytes(this.pool.inputTokens[idx]),
+        Address.fromBytes(this.pool.inputTokens[idx])
       );
 
       const amountUSD = this.getInputTokenAmountPrice(
         inputToken,
-        inputTokenBalance,
+        inputTokenBalance
       );
       inputTokenBalancesUSD.push(amountUSD);
     }
@@ -264,7 +264,7 @@ export class Pool {
   addRevenueNative(
     inputToken: Token,
     protocolSide: BigInt,
-    supplySide: BigInt,
+    supplySide: BigInt
   ): void {
     const pricer = this.protocol.pricer;
 

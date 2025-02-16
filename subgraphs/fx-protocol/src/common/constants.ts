@@ -5,7 +5,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 //////////////////////////////
 
 export namespace Protocol {
-  export const ID = "0x250893CA4Ba5d05626C785e8da758026928FCD24";
+  export const ID = "0x250893ca4ba5d05626c785e8da758026928fcd24";
   export const NAME = "FX Protocol";
   export const SLUG = "fx-protocol";
 }
@@ -22,7 +22,7 @@ export namespace NULL {
 export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const POOL_MANAGER_ADDRESS =
-  "0x250893CA4Ba5d05626C785e8da758026928FCD24";
+  "0x250893ca4ba5d05626c785e8da758026928fcd24";
 export const POOL_ADDRESS = "0x6ecfa38fee8a5277b91efda204c235814f0122e8";
 export const FX_USD_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0";
 
@@ -44,7 +44,7 @@ export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -72,7 +72,7 @@ export const SECONDS_PER_HOUR_BI = BigInt.fromI32(SECONDS_PER_HOUR);
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 
 ////////////////
