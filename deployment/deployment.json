@@ -13986,7 +13986,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-            "template": "iguanadexV3Template.yaml"
+          "template": "iguanadexV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -14020,7 +14020,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-            "template": "superlend.template.yaml"
+          "template": "superlend.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -14102,6 +14102,40 @@
           "decentralized-network": {
             "slug": "fx-protocol-ethereum",
             "query-id": "todo"
+          }
+        }
+      }
+    }
+  },
+  "m0-power": {
+    "schema": "generic",
+    "base": "m0-power",
+    "protocol": "m0-power",
+    "project": "m0-power",
+    "deployments": {
+      "m0-power-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "m0.power.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "m0-power-ethereum",
+            "query-id": "m0-power-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "m0-power-ethereum",
+            "query-id": "TODO"
           }
         }
       }
