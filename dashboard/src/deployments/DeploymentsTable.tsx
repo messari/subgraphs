@@ -240,9 +240,28 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
     <>
       {Object.entries(deposToPass)
         .sort((a, b) => {
-          // Move bridge schema to the last
-          if (schemaMapping[a[0]] === 'bridge') return 1;
-          if (schemaMapping[b[0]] === 'bridge') return -1;
+          // Sections to move to the bottom
+          const bottomSections = ['bridge', 'erc20', 'erc721'];
+          
+          // If a is a bottom section and b is not, move a down
+          if (bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
+              !bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) 
+            return 1;
+          
+          // If b is a bottom section and a is not, move b down
+          if (!bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
+              bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) 
+            return -1;
+          
+          // If both are bottom sections, sort them alphabetically among themselves
+          if (bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
+              bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) {
+            // Order within bottom sections: erc20, erc721, bridge
+            const aIndex = bottomSections.indexOf(schemaMapping[a[0]] || a[0].toLowerCase());
+            const bIndex = bottomSections.indexOf(schemaMapping[b[0]] || b[0].toLowerCase());
+            return aIndex - bIndex;
+          }
+          
           // For all other schemas, keep alphabetical order
           return a[0].localeCompare(b[0]);
         })
