@@ -288,7 +288,7 @@ function ProtocolSection({
                     window.open(`${window.location.href}subgraph?endpoint=${endpointURL}&tab=protocol`, "_blank");
                   } else {
                     window.open(
-                      process.env.REACT_APP_OKGRAPH_BASE_URL! + "/?q=" + depo.decentralizedNetworkId,
+                      process.env.REACT_APP_OKGRAPH_BASE_URL! + "/?q=" + deploymentId,
                       "_blank",
                     );
                   }
@@ -301,13 +301,34 @@ function ProtocolSection({
                     navigate(`/subgraph?endpoint=${endpointURL}&tab=protocol`);
                   } else {
                     window.location.href =
-                      process.env.REACT_APP_OKGRAPH_BASE_URL! + "/?q=" + depo.decentralizedNetworkId;
+                      process.env.REACT_APP_OKGRAPH_BASE_URL! + "/?q=" + deploymentId;
                   }
                 }
                 return;
               }}
               key={subgraphName + depo.decentralizedNetworkId + "DepInDevRow-DECEN"}
-              sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}
+              sx={{ 
+                height: "10px", 
+                width: "100%", 
+                backgroundColor: "rgba(22,24,29,0.9)", 
+                cursor: "pointer",
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: "4px",
+                  backgroundColor: depoObject && !depoObject["is-healthy"]
+                    ? "#B8301C" // Red for unhealthy
+                    : depoObject && depoObject["synced"] && 
+                      typeof depoObject["indexed-percentage"] === "number" &&
+                      Number(formatIntToFixed2(depoObject["indexed-percentage"])) > 99
+                      ? "#58BC82" // Green for synced
+                      : "#EFCB68", // Yellow/orange for in-progress
+                }
+              }}
             >
               <TableCell
                 sx={{
@@ -565,7 +586,7 @@ function ProtocolSection({
                   key={subgraphName + x.decentralizedNetworkId + "Logo"}
                   style={{ 
                     height: "100%", 
-                    border: borderColor + " 4px solid", 
+                    border: showDeposDropDown ? "transparent 4px solid" : `${borderColor} 4px solid`, 
                     borderRadius: "50%"
                   }}
                   href={process.env.REACT_APP_GRAPH_EXPLORER_URL! + "/subgraphs/" + x.decentralizedNetworkId}
@@ -760,7 +781,7 @@ function ProtocolSection({
                   key={subgraphName + x.decentralizedNetworkId + "Logo"}
                   style={{ 
                     height: "100%", 
-                    border: borderColor + " 4px solid", 
+                    border: showDeposDropDown ? "transparent 4px solid" : `${borderColor} 4px solid`, 
                     borderRadius: "50%"
                   }}
                   href={process.env.REACT_APP_GRAPH_EXPLORER_URL! + "/subgraphs/" + x.decentralizedNetworkId}
