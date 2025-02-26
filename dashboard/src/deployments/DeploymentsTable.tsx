@@ -239,7 +239,13 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
   return (
     <>
       {Object.entries(deposToPass)
-        .sort()
+        .sort((a, b) => {
+          // Move bridge schema to the last
+          if (schemaMapping[a[0]] === 'bridge') return 1;
+          if (schemaMapping[b[0]] === 'bridge') return -1;
+          // For all other schemas, keep alphabetical order
+          return a[0].localeCompare(b[0]);
+        })
         .map(([schemaType, subgraph]) => {
           const validDeployments: string[] = [];
           let validationSupported = true;
