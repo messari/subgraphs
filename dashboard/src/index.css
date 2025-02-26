@@ -54,3 +54,99 @@ input[type="file"] {
 .PrivatePickersSlideTransition-root {
   min-height: 200px !important;
 }
+
+/* Fix for table dividing lines to make them continuous without breaks */
+.MuiTableContainer-root .MuiTable-root {
+  border-collapse: collapse;
+}
+
+.MuiTableContainer-root .MuiTableRow-root {
+  border-bottom: 1px solid rgba(81, 81, 81, 1);
+}
+
+.MuiTableContainer-root .MuiTableCell-root {
+  border-bottom: none;
+}
+
+.MuiTableContainer-root .MuiTableBody-root .MuiTableRow-root:last-child {
+  border-bottom: none;
+}
+
+/* Specific class for continuous table borders */
+.continuous-table-borders .MuiTable-root {
+  border-spacing: 0;
+}
+
+.continuous-table-borders .MuiTableRow-root {
+  box-shadow: none;
+}
+
+.continuous-table-borders .MuiTableRow-root td {
+  border-bottom: none;
+}
+
+.continuous-table-borders .MuiTableRow-root {
+  border-bottom: 1px solid rgba(81, 81, 81, 1);
+}
+
+.continuous-table-borders .MuiTableBody-root .MuiTableRow-root:last-child {
+  border-bottom: none;
+}
+
+/* Specific styling for continuous table */
+.continuous-table {
+  border-collapse: collapse !important;
+}
+
+.continuous-table .MuiTableRow-root {
+  border-bottom: 1px solid rgba(81, 81, 81, 1) !important;
+}
+
+.continuous-table .MuiTableCell-root {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+.continuous-table .MuiTableBody-root .MuiTableRow-root:last-child {
+  border-bottom: none !important;
+}
+
+/* Global table styles to ensure continuous horizontal dividers */
+table {
+  border-collapse: collapse !important;
+}
+
+.MuiTable-root {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+
+/* Remove default Material UI table cell borders */
+.MuiTableCell-root {
+  border-bottom: none !important;
+}
+
+/* Add consistent row borders instead of cell borders */
+.MuiTableRow-root {
+  border-bottom: 1px solid rgba(81, 81, 81, 1) !important;
+}
+
+/* Remove border from last row in table body to avoid double borders */
+.MuiTableBody-root .MuiTableRow-root:last-child {
+  border-bottom: none !important;
+}
+
+/* Remove box-shadow that might be causing visual breaks */
+.MuiTableCell-root, .MuiTableRow-root {
+  box-shadow: none !important;
+}
+
+/* Ensure all table cells have vertically centered content */
+.MuiTableCell-root {
+  vertical-align: middle !important;
+}
+
+/* Ensure cell content is vertically centered when using display: flex */
+.MuiTableCell-root[style*="display: flex"] {
+  align-items: center !important;
+}

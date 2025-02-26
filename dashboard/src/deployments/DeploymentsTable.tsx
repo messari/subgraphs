@@ -8,10 +8,11 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Tooltip,
 } from "@mui/material";
-import ProtocolSection from "./ProtocolSection";
+import ProtocolSection, { FormattedNumber } from "./ProtocolSection";
 import { useEffect, useMemo, useState } from "react";
-import { downloadCSV, NewClient, schemaMapping } from "../utils";
+import { downloadCSV, NewClient, schemaMapping, enhanceHealthMetrics } from "../utils";
 import FetchEntityCSV from "./FetchEntityCSV";
 import { MultiSelectDropDown } from "../common/utilComponents/MultiSelectDropDown";
 import { DateRangePicker } from "../common/utilComponents/DateRangePicker";
@@ -162,10 +163,14 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
       if (!deploymentData?.services) {
         return;
       }
+      
+      // Enhance the health metrics data
+      const enhancedDeploymentData = enhanceHealthMetrics(deploymentData);
+      
       if (
-        !!deploymentData["services"]["hosted-service"] ||
-        !!deploymentData["services"]["decentralized-network"] ||
-        !!deploymentData["services"]["cronos-portal"]
+        !!enhancedDeploymentData["services"]["hosted-service"] ||
+        !!enhancedDeploymentData["services"]["decentralized-network"] ||
+        !!enhancedDeploymentData["services"]["cronos-portal"]
       ) {
         if (!Object.keys(deposToPass).includes(protocol.schema)) {
           deposToPass[protocol.schema] = {};
@@ -181,50 +186,50 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
         }
         let decentralizedNetworkId = null;
         let decentralizedIndexStatus = null;
-        if (!!deploymentData["services"]["decentralized-network"]) {
-          decentralizedNetworkId = deploymentData["services"]["decentralized-network"]["slug"];
+        if (!!enhancedDeploymentData["services"]["decentralized-network"]) {
+          decentralizedNetworkId = enhancedDeploymentData["services"]["decentralized-network"]["query-id"];
 
-          decentralizedIndexStatus = deploymentData["services"]["decentralized-network"]["health"][0];
+          decentralizedIndexStatus = enhancedDeploymentData["services"]["decentralized-network"]["health"][0];
         }
         let hostedServiceId = null;
         let indexStatus = null;
         let pendingIndexStatus = null;
-        if (!!deploymentData["services"]["hosted-service"]) {
-          hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+        if (!!enhancedDeploymentData["services"]["hosted-service"]) {
+          hostedServiceId = enhancedDeploymentData["services"]["hosted-service"]["slug"];
 
-          indexStatus = deploymentData["services"]["hosted-service"]["health"][0];
-          pendingIndexStatus = deploymentData["services"]["hosted-service"]["health"][1];
+          indexStatus = enhancedDeploymentData["services"]["hosted-service"]["health"][0];
+          pendingIndexStatus = enhancedDeploymentData["services"]["hosted-service"]["health"][1];
         }
-        if (!!deploymentData["services"]["cronos-portal"]) {
-          hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
+        if (!!enhancedDeploymentData["services"]["cronos-portal"]) {
+          hostedServiceId = enhancedDeploymentData["services"]["cronos-portal"]["slug"];
         }
         deposToPass[protocol.schema][protocolName].networks.push({
           deploymentName: depoKey,
-          chain: deploymentData.network,
+          chain: enhancedDeploymentData.network,
           decentralizedIndexStatus: decentralizedIndexStatus,
           indexStatus: indexStatus,
           pendingIndexStatus: pendingIndexStatus,
-          status: deploymentData?.status,
-          versions: deploymentData?.versions,
+          status: enhancedDeploymentData?.status,
+          versions: enhancedDeploymentData?.versions,
           hostedServiceId,
           decentralizedNetworkId,
         });
         if (
           !deposToPass[protocol.schema][protocolName]?.methodologyVersions?.includes(
-            deploymentData?.versions?.methodology,
+            enhancedDeploymentData?.versions?.methodology,
           )
         ) {
-          deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
+          deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(enhancedDeploymentData?.versions?.methodology);
         }
         if (
-          !deposToPass[protocol.schema][protocolName]?.subgraphVersions?.includes(deploymentData?.versions?.subgraph)
+          !deposToPass[protocol.schema][protocolName]?.subgraphVersions?.includes(enhancedDeploymentData?.versions?.subgraph)
         ) {
-          deposToPass[protocol.schema][protocolName]?.subgraphVersions?.push(deploymentData?.versions?.subgraph);
+          deposToPass[protocol.schema][protocolName]?.subgraphVersions?.push(enhancedDeploymentData?.versions?.subgraph);
         }
-        if (!deposToPass[protocol.schema][protocolName]?.schemaVersions?.includes(deploymentData?.versions?.schema)) {
-          deposToPass[protocol.schema][protocolName]?.schemaVersions?.push(deploymentData?.versions?.schema);
+        if (!deposToPass[protocol.schema][protocolName]?.schemaVersions?.includes(enhancedDeploymentData?.versions?.schema)) {
+          deposToPass[protocol.schema][protocolName]?.schemaVersions?.push(enhancedDeploymentData?.versions?.schema);
         }
-        if (deploymentData?.status === "dev") {
+        if (enhancedDeploymentData?.status === "dev") {
           deposToPass[protocol.schema][protocolName].status = false;
         }
       }
@@ -234,7 +239,32 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
   return (
     <>
       {Object.entries(deposToPass)
-        .sort()
+        .sort((a, b) => {
+          // Sections to move to the bottom
+          const bottomSections = ['bridge', 'erc20', 'erc721'];
+          
+          // If a is a bottom section and b is not, move a down
+          if (bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
+              !bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) 
+            return 1;
+          
+          // If b is a bottom section and a is not, move b down
+          if (!bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
+              bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) 
+            return -1;
+          
+          // If both are bottom sections, sort them alphabetically among themselves
+          if (bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
+              bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) {
+            // Order within bottom sections: erc20, erc721, bridge
+            const aIndex = bottomSections.indexOf(schemaMapping[a[0]] || a[0].toLowerCase());
+            const bIndex = bottomSections.indexOf(schemaMapping[b[0]] || b[0].toLowerCase());
+            return aIndex - bIndex;
+          }
+          
+          // For all other schemas, keep alphabetical order
+          return a[0].localeCompare(b[0]);
+        })
         .map(([schemaType, subgraph]) => {
           const validDeployments: string[] = [];
           let validationSupported = true;
@@ -374,7 +404,17 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
             additionalStyles = { minHeight: "510px", overflow: "hidden" };
           }
           return (
-            <TableContainer sx={{ my: 8, ...additionalStyles }} key={"TableContainer-" + schemaType.toUpperCase()}>
+            <TableContainer 
+              sx={{ 
+                my: 8, 
+                ...additionalStyles,
+                '& .MuiTableCell-root': {
+                  borderBottom: 'none'
+                }
+              }} 
+              key={"TableContainer-" + schemaType.toUpperCase()}
+              className="continuous-table-borders"
+            >
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   key={"typography-Title-" + schemaType}
@@ -415,7 +455,7 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                   />
                 </>
               ) : null}
-              <Table stickyHeader>
+              <Table stickyHeader className="continuous-table">
                 {tableHead}
                 <TableBody>{tableRows}</TableBody>
               </Table>

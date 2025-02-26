@@ -404,3 +404,114 @@ export function upperCaseFirstOfString(str: string) {
   arr[0] = arr[0].toUpperCase();
   return arr.join("");
 }
+
+/**
+ * Enhances deployment health metrics by properly extracting data from the 
+ * deployment object. This ensures the health metrics like "Indexed %",
+ * "Start Block", "Current Block", and "Chain Head" are correctly displayed.
+ * @param deploymentData Deployment data from the Messari Status API
+ * @returns Enhanced deployment data with formatted health metrics
+ */
+export function enhanceHealthMetrics(deploymentData: any) {
+  if (!deploymentData || !deploymentData.services) {
+    return deploymentData;
+  }
+
+  const hostedService = deploymentData.services["hosted-service"];
+  const decentralizedNetwork = deploymentData.services["decentralized-network"];
+  
+  // Process hosted service health data
+  if (hostedService && Array.isArray(hostedService.health) && hostedService.health.length > 0) {
+    for (let i = 0; i < hostedService.health.length; i++) {
+      const healthData = hostedService.health[i];
+      
+      if (!healthData) {
+        continue;
+      }
+      
+      // Ensure these fields exist with default values if they don't
+      // Convert to numbers where appropriate
+      healthData["start-block"] = safeNumberConversion(healthData["start-block"], 0);
+      healthData["latest-block"] = safeNumberConversion(healthData["latest-block"], 0);
+      healthData["chain-head-block"] = safeNumberConversion(healthData["chain-head-block"], 0);
+      healthData["entity-count"] = safeNumberConversion(healthData["entity-count"], 0);
+      
+      if (healthData["synced"] === undefined || healthData["synced"] === null) {
+        healthData["synced"] = false;
+      }
+      
+      // Calculate indexed percentage
+      const startBlock = healthData["start-block"];
+      const latestBlock = healthData["latest-block"];
+      const chainHeadBlock = healthData["chain-head-block"];
+      
+      if (chainHeadBlock > startBlock) {
+        const indexedPercentage = ((latestBlock - startBlock) / (chainHeadBlock - startBlock)) * 100;
+        healthData["indexed-percentage"] = indexedPercentage > 99.5 ? 100 : indexedPercentage;
+      } else {
+        healthData["indexed-percentage"] = 0;
+      }
+      
+      // Set a flag to indicate that this health data has been enhanced
+      healthData["has-been-enhanced"] = true;
+    }
+  }
+  
+  // Process decentralized network health data
+  if (decentralizedNetwork && Array.isArray(decentralizedNetwork.health) && decentralizedNetwork.health.length > 0) {
+    for (let i = 0; i < decentralizedNetwork.health.length; i++) {
+      const healthData = decentralizedNetwork.health[i];
+      
+      if (!healthData) {
+        continue;
+      }
+      
+      // Ensure these fields exist with default values if they don't
+      // Convert to numbers where appropriate
+      healthData["start-block"] = safeNumberConversion(healthData["start-block"], 0);
+      healthData["latest-block"] = safeNumberConversion(healthData["latest-block"], 0);
+      healthData["chain-head-block"] = safeNumberConversion(healthData["chain-head-block"], 0);
+      healthData["entity-count"] = safeNumberConversion(healthData["entity-count"], 0);
+      
+      if (healthData["synced"] === undefined || healthData["synced"] === null) {
+        healthData["synced"] = false;
+      }
+      
+      // Calculate indexed percentage
+      const startBlock = healthData["start-block"];
+      const latestBlock = healthData["latest-block"];
+      const chainHeadBlock = healthData["chain-head-block"];
+      
+      if (chainHeadBlock > startBlock) {
+        const indexedPercentage = ((latestBlock - startBlock) / (chainHeadBlock - startBlock)) * 100;
+        healthData["indexed-percentage"] = indexedPercentage > 99.5 ? 100 : indexedPercentage;
+      } else {
+        healthData["indexed-percentage"] = 0;
+      }
+      
+      // Set a flag to indicate that this health data has been enhanced
+      healthData["has-been-enhanced"] = true;
+    }
+  }
+  
+  return deploymentData;
+}
+
+/**
+ * Safely converts a value to a number
+ * @param value Value to convert
+ * @param defaultValue Default value if conversion fails
+ * @returns Number value
+ */
+function safeNumberConversion(value: any, defaultValue: number): number {
+  if (value === undefined || value === null) {
+    return defaultValue;
+  }
+  
+  if (typeof value === 'number') {
+    return value;
+  }
+  
+  const parsed = Number(value);
+  return !isNaN(parsed) ? parsed : defaultValue;
+}
