@@ -104,3 +104,34 @@ type Unpaused @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type TokenBalance @entity {
+  id: ID!
+
+  " The block number the entity was last updated "
+  blockNumber: BigInt!
+
+  " The timestamp of the block "
+  timestamp: BigInt!
+  account: Account!
+  value: BigDecimal!
+}
+
+type Account @entity {
+  id: ID!
+  balances: [TokenBalance!]! @derivedFrom(field: "account")
+}
+
+type HourlySnapshot @entity @hourlySnapshot {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  " The circulating DUSD amount in Issuer contract "
+  circulatingDusd: BigInt!
+}

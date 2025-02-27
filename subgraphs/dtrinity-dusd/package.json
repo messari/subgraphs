@@ -2,19 +2,24 @@
   "name": "dtrinity-dusd-fraxtal-testnet",
   "license": "UNLICENSED",
   "scripts": {
+    "prepare:constants": "mustache config/${NETWORK}/configurations.json dusd.template.yaml > subgraph.yaml",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ dtrinity-dusd-fraxtal-testnet",
     "create-local": "graph create --node http://localhost:8020/ dtrinity-dusd-fraxtal-testnet",
     "remove-local": "graph remove --node http://localhost:8020/ dtrinity-dusd-fraxtal-testnet",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dtrinity-dusd-fraxtal-testnet",
+    "prepare:fraxtal-testnet": "NETWORK=frax-testnet npm run prepare:constants",
     "create-fraxtal-testnet": "graph create --node http://52.11.39.166:8020 stablyio-dtrinity-dusd-testnet",
-    "deploy-fraxtal-testnet": "graph deploy stablyio-dtrinity-dusd-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.1",
+    "deploy-fraxtal-testnet": "graph deploy stablyio-dtrinity-dusd-testnet --ipfs http://52.11.39.166:5001 --node http://52.11.39.166:8020 --version-label=0.0.3",
     "test": "graph test"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.80.0",
     "@graphprotocol/graph-ts": "0.32.0"
   },
-  "devDependencies": { "matchstick-as": "0.5.0" }
+  "devDependencies": {
+    "mustache": "^4.2.0",
+    "matchstick-as": "0.5.0"
+  }
 }
