@@ -7,7 +7,7 @@ import { DashboardHeader } from "./common/headerComponents/DashboardHeader";
 import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import { Route, Routes } from "react-router";
 import { useEffect, useMemo, useState } from "react";
-import { NewClient, schemaMapping } from "./utils";
+import { NewClient, schemaMapping, enhanceHealthMetrics } from "./utils";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetworkSubgraphsQuery";
 
@@ -71,6 +71,29 @@ function App() {
               console.log("Error Response from Messari Subgraph Status API. Setting protocols to empty object.");
               json = {};
             }
+            
+            // Process the data to ensure all health metrics are properly populated
+            if (json && typeof json === 'object') {
+              try {
+                Object.keys(json).forEach(protocolName => {
+                  const protocol = json[protocolName];
+                  if (protocol.deployments) {
+                    Object.keys(protocol.deployments).forEach(deploymentKey => {
+                      // Enhance the health metrics of each deployment
+                      protocol.deployments[deploymentKey] = enhanceHealthMetrics(protocol.deployments[deploymentKey]);
+                    });
+                    
+                    // Debug the first protocol's health metrics
+                    if (Object.keys(json).length > 0) {
+                      debugHealthMetrics(protocol);
+                    }
+                  }
+                });
+              } catch (err) {
+                console.error("Error enhancing health metrics:", err);
+              }
+            }
+            
             setProtocolsToQuery(json);
           })
           .catch((err) => {
@@ -197,6 +220,34 @@ function App() {
       setDecentralizedDeployments(decenDepos);
     }
   }, [decentralized]);
+
+  const debugHealthMetrics = (protocol: any) => {
+    if (!protocol || !protocol.deployments) {
+      console.warn("No protocol or deployments data found for debugging");
+      return;
+    }
+    
+    try {
+      // Log a sample of health metrics for the first deployment
+      const firstDeploymentKey = Object.keys(protocol.deployments)[0];
+      if (!firstDeploymentKey) {
+        console.warn("No deployments found for debugging");
+        return;
+      }
+      
+      const deployment = protocol.deployments[firstDeploymentKey];
+      if (!deployment || !deployment.services) {
+        console.warn("Invalid deployment data for debugging");
+        return;
+      }
+      
+      const hostedService = deployment.services["hosted-service"];
+      const decentralizedNetwork = deployment.services["decentralized-network"];
+
+    } catch (err) {
+      console.error("Error in debug health metrics:", err);
+    }
+  };
 
   return (
     <div>
