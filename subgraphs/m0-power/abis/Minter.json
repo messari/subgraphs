@@ -1,0 +1,1067 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "ttgRegistrar_", "type": "address" },
+      { "internalType": "address", "name": "mToken_", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "DeactivatedMinter", "type": "error" },
+  { "inputs": [], "name": "DivisionByZero", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint240", "name": "amount", "type": "uint240" },
+      { "internalType": "uint240", "name": "maxAmount", "type": "uint240" }
+    ],
+    "name": "ExceedsMaxRepayAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint40", "name": "deadline", "type": "uint40" }
+    ],
+    "name": "ExpiredMintProposal",
+    "type": "error"
+  },
+  { "inputs": [], "name": "FrozenMinter", "type": "error" },
+  { "inputs": [], "name": "FutureTimestamp", "type": "error" },
+  { "inputs": [], "name": "InactiveMinter", "type": "error" },
+  { "inputs": [], "name": "InvalidMintProposal", "type": "error" },
+  { "inputs": [], "name": "InvalidSignature", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureLength", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureOrder", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureS", "type": "error" },
+  { "inputs": [], "name": "InvalidSignatureV", "type": "error" },
+  { "inputs": [], "name": "InvalidUInt112", "type": "error" },
+  { "inputs": [], "name": "InvalidUInt240", "type": "error" },
+  { "inputs": [], "name": "InvalidUInt48", "type": "error" },
+  { "inputs": [], "name": "NotApprovedMinter", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "validator", "type": "address" }
+    ],
+    "name": "NotApprovedValidator",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "validSignatures",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "requiredThreshold",
+        "type": "uint256"
+      }
+    ],
+    "name": "NotEnoughValidSignatures",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "validator", "type": "address" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "lastSignatureTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "OutdatedValidatorTimestamp",
+    "type": "error"
+  },
+  { "inputs": [], "name": "OverflowsPrincipalOfTotalOwedM", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint40", "name": "activeTimestamp", "type": "uint40" }
+    ],
+    "name": "PendingMintProposal",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint240",
+        "name": "totalPendingRetrievals",
+        "type": "uint240"
+      },
+      { "internalType": "uint240", "name": "collateral", "type": "uint240" }
+    ],
+    "name": "RetrievalsExceedCollateral",
+    "type": "error"
+  },
+  { "inputs": [], "name": "SignatureArrayLengthsMismatch", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "deadline", "type": "uint256" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+    ],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  { "inputs": [], "name": "SignerMismatch", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint40", "name": "newTimestamp", "type": "uint40" },
+      {
+        "internalType": "uint40",
+        "name": "earliestAllowedTimestamp",
+        "type": "uint40"
+      }
+    ],
+    "name": "StaleCollateralUpdate",
+    "type": "error"
+  },
+  { "inputs": [], "name": "StillApprovedMinter", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "activeOwedM", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "maxAllowedOwedM",
+        "type": "uint256"
+      }
+    ],
+    "name": "Undercollateralized",
+    "type": "error"
+  },
+  { "inputs": [], "name": "ZeroBurnAmount", "type": "error" },
+  { "inputs": [], "name": "ZeroMToken", "type": "error" },
+  { "inputs": [], "name": "ZeroMintAmount", "type": "error" },
+  { "inputs": [], "name": "ZeroMintDestination", "type": "error" },
+  { "inputs": [], "name": "ZeroRetrievalAmount", "type": "error" },
+  { "inputs": [], "name": "ZeroTTGRegistrar", "type": "error" },
+  { "inputs": [], "name": "ZeroTTGVault", "type": "error" },
+  { "inputs": [], "name": "ZeroTimestamp", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "amount",
+        "type": "uint240"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "payer",
+        "type": "address"
+      }
+    ],
+    "name": "BurnExecuted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint112",
+        "name": "principalAmount",
+        "type": "uint112"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "amount",
+        "type": "uint240"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "payer",
+        "type": "address"
+      }
+    ],
+    "name": "BurnExecuted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "collateral",
+        "type": "uint240"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "totalResolvedCollateralRetrieval",
+        "type": "uint240"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "metadataHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "timestamp",
+        "type": "uint40"
+      }
+    ],
+    "name": "CollateralUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "EIP712DomainChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint128",
+        "name": "index",
+        "type": "uint128"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "rate",
+        "type": "uint32"
+      }
+    ],
+    "name": "IndexUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint48",
+        "name": "mintId",
+        "type": "uint48"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "canceller",
+        "type": "address"
+      }
+    ],
+    "name": "MintCanceled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint48",
+        "name": "mintId",
+        "type": "uint48"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint112",
+        "name": "principalAmount",
+        "type": "uint112"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "amount",
+        "type": "uint240"
+      }
+    ],
+    "name": "MintExecuted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint48",
+        "name": "mintId",
+        "type": "uint48"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "amount",
+        "type": "uint240"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "destination",
+        "type": "address"
+      }
+    ],
+    "name": "MintProposed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "MinterActivated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "inactiveOwedM",
+        "type": "uint240"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "MinterDeactivated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "frozenUntil",
+        "type": "uint40"
+      }
+    ],
+    "name": "MinterFrozen",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "missedIntervals",
+        "type": "uint40"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "penaltyAmount",
+        "type": "uint240"
+      }
+    ],
+    "name": "MissedIntervalsPenaltyImposed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint48",
+        "name": "retrievalId",
+        "type": "uint48"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "amount",
+        "type": "uint240"
+      }
+    ],
+    "name": "RetrievalCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint48",
+        "name": "retrievalId",
+        "type": "uint48"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      }
+    ],
+    "name": "RetrievalResolved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "excessOwedM",
+        "type": "uint240"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint40",
+        "name": "timeSpan",
+        "type": "uint40"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint240",
+        "name": "penaltyAmount",
+        "type": "uint240"
+      }
+    ],
+    "name": "UndercollateralizedPenaltyImposed",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DOMAIN_SEPARATOR",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_MINT_RATIO",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_UPDATE_COLLATERAL_INTERVAL",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ONE",
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UPDATE_COLLATERAL_TYPEHASH",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "activateMinter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "activeOwedMOf",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "maxPrincipalAmount_",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "maxAmount_", "type": "uint256" }
+    ],
+    "name": "burnM",
+    "outputs": [
+      {
+        "internalType": "uint112",
+        "name": "principalAmount_",
+        "type": "uint112"
+      },
+      { "internalType": "uint240", "name": "amount_", "type": "uint240" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" },
+      { "internalType": "uint256", "name": "maxAmount_", "type": "uint256" }
+    ],
+    "name": "burnM",
+    "outputs": [
+      {
+        "internalType": "uint112",
+        "name": "principalAmount_",
+        "type": "uint112"
+      },
+      { "internalType": "uint240", "name": "amount_", "type": "uint240" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" },
+      { "internalType": "uint256", "name": "mintId_", "type": "uint256" }
+    ],
+    "name": "cancelMint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "collateralExpiryTimestampOf",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "collateralOf",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "collateralPenaltyDeadlineOf",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "collateralUpdateTimestampOf",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentIndex",
+    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "deactivateMinter",
+    "outputs": [
+      { "internalType": "uint240", "name": "inactiveOwedM_", "type": "uint240" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "eip712Domain",
+    "outputs": [
+      { "internalType": "bytes1", "name": "fields_", "type": "bytes1" },
+      { "internalType": "string", "name": "name_", "type": "string" },
+      { "internalType": "string", "name": "version_", "type": "string" },
+      { "internalType": "uint256", "name": "chainId_", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "verifyingContract_",
+        "type": "address"
+      },
+      { "internalType": "bytes32", "name": "salt_", "type": "bytes32" },
+      {
+        "internalType": "uint256[]",
+        "name": "extensions_",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "excessOwedM",
+    "outputs": [
+      { "internalType": "uint240", "name": "excessOwedM_", "type": "uint240" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "freezeMinter",
+    "outputs": [
+      { "internalType": "uint40", "name": "frozenUntil_", "type": "uint40" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "frozenUntilOf",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" },
+      { "internalType": "address", "name": "validator_", "type": "address" }
+    ],
+    "name": "getLastSignatureTimestamp",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" },
+      { "internalType": "uint256", "name": "collateral_", "type": "uint256" },
+      {
+        "internalType": "uint256[]",
+        "name": "retrievalIds_",
+        "type": "uint256[]"
+      },
+      { "internalType": "bytes32", "name": "metadataHash_", "type": "bytes32" },
+      { "internalType": "uint256", "name": "timestamp_", "type": "uint256" }
+    ],
+    "name": "getUpdateCollateralDigest",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "inactiveOwedMOf",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "isActiveMinter",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "isDeactivatedMinter",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "isFrozenMinter",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "isMinterApproved",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "validator_", "type": "address" }
+    ],
+    "name": "isValidatorApproved",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestIndex",
+    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "latestProposedRetrievalTimestampOf",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestUpdateTimestamp",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mToken",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "maxAllowedActiveOwedMOf",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mintDelay",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "mintId_", "type": "uint256" }
+    ],
+    "name": "mintM",
+    "outputs": [
+      {
+        "internalType": "uint112",
+        "name": "principalAmount_",
+        "type": "uint112"
+      },
+      { "internalType": "uint240", "name": "amount_", "type": "uint240" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "mintProposalOf",
+    "outputs": [
+      { "internalType": "uint48", "name": "mintId_", "type": "uint48" },
+      { "internalType": "uint40", "name": "createdAt_", "type": "uint40" },
+      { "internalType": "address", "name": "destination_", "type": "address" },
+      { "internalType": "uint240", "name": "amount_", "type": "uint240" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mintRatio",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "mintTTL",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minterFreezeTime",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minterRate",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "penalizedUntilOf",
+    "outputs": [{ "internalType": "uint40", "name": "", "type": "uint40" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "penaltyRate",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" },
+      { "internalType": "uint256", "name": "retrievalId_", "type": "uint256" }
+    ],
+    "name": "pendingCollateralRetrievalOf",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "principalOfActiveOwedMOf",
+    "outputs": [{ "internalType": "uint112", "name": "", "type": "uint112" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "principalOfTotalActiveOwedM",
+    "outputs": [{ "internalType": "uint112", "name": "", "type": "uint112" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "amount_", "type": "uint256" },
+      { "internalType": "address", "name": "destination_", "type": "address" }
+    ],
+    "name": "proposeMint",
+    "outputs": [
+      { "internalType": "uint48", "name": "mintId_", "type": "uint48" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "collateral_", "type": "uint256" }
+    ],
+    "name": "proposeRetrieval",
+    "outputs": [
+      { "internalType": "uint48", "name": "retrievalId_", "type": "uint48" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rateModel",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalActiveOwedM",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalInactiveOwedM",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalOwedM",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "minter_", "type": "address" }
+    ],
+    "name": "totalPendingCollateralRetrievalOf",
+    "outputs": [{ "internalType": "uint240", "name": "", "type": "uint240" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ttgRegistrar",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ttgVault",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "collateral_", "type": "uint256" },
+      {
+        "internalType": "uint256[]",
+        "name": "retrievalIds_",
+        "type": "uint256[]"
+      },
+      { "internalType": "bytes32", "name": "metadataHash_", "type": "bytes32" },
+      {
+        "internalType": "address[]",
+        "name": "validators_",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "timestamps_",
+        "type": "uint256[]"
+      },
+      { "internalType": "bytes[]", "name": "signatures_", "type": "bytes[]" }
+    ],
+    "name": "updateCollateral",
+    "outputs": [
+      { "internalType": "uint40", "name": "minTimestamp_", "type": "uint40" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "updateCollateralInterval",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "updateCollateralValidatorThreshold",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "updateIndex",
+    "outputs": [
+      { "internalType": "uint128", "name": "index_", "type": "uint128" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
