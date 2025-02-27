@@ -20,6 +20,9 @@ import {
 import { Swap } from "../modules/Swap";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
+import { BigInt } from "@graphprotocol/graph-ts";
+import * as constants from "../common/constants";
+import { getOrCreateLiquidityPool } from "../common/initializers";
 
 export function handleTokenExchange(event: TokenExchange): void {
   const buyer = event.params.buyer;
@@ -263,10 +266,24 @@ export function handleRemoveLiquidityOneWithPriceScale(
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
   const outputTokenBurntAmount = event.params.token_amount;
+  const withdrawCoinAmount = event.params.coin_amount;
+  const withdrawCoinIndex = event.params.coin_index;
+  const pool = getOrCreateLiquidityPool(liquidityPoolAddress, event.block);
+  const inputTokens = pool._inputTokensOrdered;
+  const withdrawnTokenAmounts: BigInt[] = [];
+
+  for (let idx = 0; idx < inputTokens.length; idx++) {
+    if ((idx = withdrawCoinIndex.toI32())) {
+      withdrawnTokenAmounts.push(withdrawCoinAmount);
+      continue;
+    }
+
+    withdrawnTokenAmounts.push(constants.BIGINT_ZERO);
+  }
 
   Withdraw(
     liquidityPoolAddress,
-    [],
+    withdrawnTokenAmounts,
     outputTokenBurntAmount,
     null,
     provider,
