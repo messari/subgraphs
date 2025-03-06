@@ -20,7 +20,7 @@ dataSources:
       abi: Registry
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - LiquidityPool
@@ -117,7 +117,7 @@ dataSources:
       abi: Pool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Registry
@@ -248,7 +248,7 @@ dataSources:
 
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       abis:
         - name: GaugeController
@@ -321,7 +321,7 @@ templates:
       abi: Pool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Registry
@@ -448,7 +448,7 @@ templates:
       abi: Gauge
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - LiquidityPool

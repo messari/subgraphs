@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-
-import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { Configurations, ContractInfo, TokenInfo } from "../common/types";
+import * as constants from "../common/constants";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Configurations, OracleConfig, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "mainnet";
 
@@ -9,59 +9,44 @@ export const NETWORK_STRING = "mainnet";
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0x83d95e0d5f402511db06817aff3f9ea88224b030"),
-  BigInt.fromI32(12242339)
+export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
+  "0x83d95e0d5f402511db06817aff3f9ea88224b030",
+  12242339,
 );
-
-export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0x07d91f5fb9bf7798734c3f606db065549f6893bb"),
-  BigInt.fromI32(12522266)
+export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract(
+  "0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf",
+  12864088,
 );
-
-export const CHAIN_LINK_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf"),
-  BigInt.fromI32(12864088)
+export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
+export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
+  "0x8263e161a855b644f582d9c164c66aabee53f927",
+  12692284,
 );
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = ContractInfo.set(
-  Address.fromString("0x25bf7b72815476dd515044f9650bf79bad0df655"),
-  BigInt.fromI32(12370088)
+export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
+  "0x25bf7b72815476dd515044f9650bf79bad0df655",
+  12370088,
 );
 
-export const CURVE_REGISTRY_ADDRESSES = [
-  ContractInfo.set(
-    Address.fromString("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c"),
-    BigInt.fromI32(11154794)
-  ),
-  ContractInfo.set(
-    Address.fromString("0x8f942c20d02befc377d41445793068908e2250d0"),
-    BigInt.fromI32(13986752)
-  ),
+// Address Provider: https://etherscan.io/address/0x0000000022d53366457f9d5e68ec105046fc4383
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
+  new OracleContract("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c", 11154794),
+  new OracleContract("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5", 12195750), // Main Registry
+  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752), // CryptoSwap Registry
+  new OracleContract("0xf98b45fa17de75fb1ad0e7afd971b0ca00e379fc", 15732062), // Meta Registry
 ];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_CALCULATIONS_ADDRESS = ContractInfo.set(
-  Address.fromString("0x5ea7e501c9a23f4a76dc7d33a11d995b13a1dd25"),
-  BigInt.fromI32(2396120)
-);
-
-export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
-  ContractInfo.set(
-    Address.fromString("0x7a250d5630b4cf539739df2c5dacb4c659f2488d"), // Uniswap
-    BigInt.fromI32(10207858)
-  ),
-  ContractInfo.set(
-    Address.fromString("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f"), // SushiSwap
-    BigInt.fromI32(10794261)
-  ),
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
+  new OracleContract("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f", 10794261), // SushiSwap
+  new OracleContract("0x7a250d5630b4cf539739df2c5dacb4c659f2488d", 10207858), // Uniswap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -73,18 +58,12 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x8daebade922df735c38c80c7ebd708af50815faa"), // tBTC
   Address.fromString("0x0316eb71485b0ab14103307bf65a021042c6d380"), // Huobi BTC
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
-  Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
-  Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
-  Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
 ];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
   Address.fromString("0xc4ad29ba4b3c580e6d59105fff484999997675ff"), // crv3Crypto
 ];
-export const INCH_ORACLE_BLACKLIST: Address[] = [
-  Address.fromString("0x365accfca291e7d3914637abf1f7635db165bb09"), // FXN
-];
-export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -140,100 +119,166 @@ export const HARDCODED_STABLES: Address[] = [
 ];
 
 ///////////////////////////////////////////////////////////////////////////
+///////////////////////// ORACLE CONFIG OVERRIDES /////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+// https://github.com/messari/subgraphs/issues/2090
+class SpellOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+// https://github.com/messari/subgraphs/issues/726
+class StETHOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+// https://github.com/messari/subgraphs/issues/2097
+class BaxaOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.SUSHI_CALCULATIONS,
+    ];
+  }
+}
+
+// https://github.com/messari/subgraphs/issues/2329
+class DelperOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.SUSHI_CALCULATIONS,
+    ];
+  }
+}
+
+// https://github.com/messari/subgraphs/issues/2290
+class CurveFactoryPoolOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+class PreferUniswapOverride implements OracleConfig {
+  oracleCount(): number {
+    return constants.INT_ONE;
+  }
+  oracleOrder(): string[] {
+    return [
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.YEARN_LENS_ORACLE,
+    ];
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const WHITELISTED_TOKENS = new TypedMap<string, TokenInfo>();
+export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
-WHITELISTED_TOKENS.set(
-  "USDC",
-  TokenInfo.set(
-    "USDC",
-    6,
-    Address.fromString("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
-  )
+export const ETH_ADDRESS = Address.fromString(
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
 );
-
-WHITELISTED_TOKENS.set(
-  "USDT",
-  TokenInfo.set(
-    "USDT",
-    6,
-    Address.fromString("0xdac17f958d2ee523a2206206994597c13d831ec7")
-  )
+export const WETH_ADDRESS = Address.fromString(
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 );
-
-WHITELISTED_TOKENS.set(
-  "DAI",
-  TokenInfo.set(
-    "DAI",
-    18,
-    Address.fromString("0x6b175474e89094c44da98b954eedeac495271d0f")
-  )
-);
-
-WHITELISTED_TOKENS.set(
-  "WETH",
-  TokenInfo.set(
-    "WETH",
-    18,
-    Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
-  )
-);
-
-WHITELISTED_TOKENS.set(
-  "NATIVE_TOKEN",
-  TokenInfo.set(
-    "WETH",
-    18,
-    Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
-  )
+export const USDC_ADDRESS = Address.fromString(
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 );
 
 export class config implements Configurations {
-  yearnLens(): ContractInfo | null {
+  network(): string {
+    return NETWORK_STRING;
+  }
+
+  yearnLens(): OracleContract {
     return YEARN_LENS_CONTRACT_ADDRESS;
+  }
+  chainLink(): OracleContract {
+    return CHAIN_LINK_CONTRACT_ADDRESS;
   }
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
 
-  inchOracle(): ContractInfo | null {
-    return INCH_ORACLE_CONTRACT_ADDRESS;
-  }
-  inchOracleBlacklist(): Address[] {
-    return INCH_ORACLE_BLACKLIST;
-  }
-
-  chainLink(): ContractInfo | null {
-    return CHAIN_LINK_CONTRACT_ADDRESS;
-  }
-
-  aaveOracle(): ContractInfo | null {
-    return null;
+  aaveOracle(): OracleContract {
+    return AAVE_ORACLE_CONTRACT_ADDRESS;
   }
   aaveOracleBlacklist(): Address[] {
     return AAVE_ORACLE_BLACKLIST;
   }
 
-  curveCalculations(): ContractInfo | null {
+  curveCalculations(): OracleContract {
     return CURVE_CALCULATIONS_ADDRESS;
   }
   curveCalculationsBlacklist(): Address[] {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
-  sushiCalculations(): ContractInfo | null {
+  sushiCalculations(): OracleContract {
     return SUSHISWAP_CALCULATIONS_ADDRESS;
   }
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
 
-  uniswapForks(): ContractInfo[] {
+  uniswapForks(): OracleContract[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;
   }
-  curveRegistry(): ContractInfo[] {
+  curveRegistry(): OracleContract[] {
     return CURVE_REGISTRY_ADDRESSES;
   }
 
@@ -241,7 +286,101 @@ export class config implements Configurations {
     return HARDCODED_STABLES;
   }
 
-  whitelistedTokens(): TypedMap<string, TokenInfo> {
-    return WHITELISTED_TOKENS;
+  ethAddress(): Address {
+    return ETH_ADDRESS;
+  }
+  wethAddress(): Address {
+    return WETH_ADDRESS;
+  }
+  usdcAddress(): Address {
+    return USDC_ADDRESS;
+  }
+
+  usdcTokenDecimals(): BigInt {
+    return USDC_TOKEN_DECIMALS;
+  }
+
+  getOracleOverride(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null,
+  ): OracleConfig | null {
+    if (tokenAddr || block) {
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x090185f2135308bad17527004364ebcc2d37e5f6"), // SPELL
+        ].includes(tokenAddr)
+      ) {
+        return new SpellOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
+        ].includes(tokenAddr) &&
+        block &&
+        block.number.gt(BigInt.fromString("14019699")) &&
+        block.number.lt(BigInt.fromString("14941265"))
+      ) {
+        return new StETHOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x91b08f4a7c1251dfccf5440f8894f8daa10c8de5"), // BAXA
+        ].includes(tokenAddr)
+      ) {
+        return new BaxaOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0x077416cc6242b3a7d8e42652b8a6a2599fda4a92"), // DPR
+        ].includes(tokenAddr)
+      ) {
+        return new DelperOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xed4064f376cb8d68f770fb1ff088a3d0f3ff5c4d"), // crvCRVETH
+          Address.fromString("0xf985005a3793dba4cce241b3c19ddcd3fe069ff4"), // ALCXFRAXBP-f
+          Address.fromString("0x971add32ea87f10bd192671630be3be8a11b8623"), // cvxcrv-crv-f
+          Address.fromString("0x137469b55d1f15651ba46a89d0588e97dd0b6562"), // BADGERWBTC-f
+          Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"), // KP3RETH-f
+          Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"), // SDTETH-f
+          Address.fromString("0x2889302a794da87fbf1d6db415c1492194663d13"), // crvCRVUSDTBTCWSTETH
+          Address.fromString("0x3a283d9c08e8b55966afb64c515f5143cf907611"), // crvCVXETH
+          //
+          Address.fromString("0x7f86bf177dd4f3494b841a37e810a34dd56c829b"), // TricryptoUSDC
+          Address.fromString("0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"), // TricryptoUSDT
+          Address.fromString("0x4ebdf703948ddcea3b11f675b4d1fba9d2414a14"), // TriCRV
+          Address.fromString("0xf3a43307dcafa93275993862aae628fcb50dc768"), // Factory Crypto Pool: cvxFxs/Fxs
+          Address.fromString("0xb79565c01b7ae53618d9b847b9443aaf4f9011e7"), // Factory Crypto Pool: LDO/ETH
+          Address.fromString("0x4704ab1fb693ce163f7c9d3a31b3ff4eaf797714"), // Factory Crypto Pool: FPI2Pool
+          Address.fromString("0xda68f66fc0f10ee61048e70106df4bdb26baf595"), // Factory Crypto Pool: JPEG/pETH
+          Address.fromString("0x5be6c45e2d074faa20700c49ada3e88a1cc0025d"), // Factory Crypto Pool: Curve GEAR/ETH
+          Address.fromString("0x8109a51542294cdbb489ae5516f42ffbd92177aa"), // Factory Crypto Pool: OGV/ETH
+          Address.fromString("0x390f3595bca2df7d23783dfd126427cceb997bf4"), // Factory Plain Pool: crvUSD/USDT
+          Address.fromString("0x4dece678ceceb27446b35c672dc7d61f30bad69e"), // Factory Plain Pool: crvUSD/USDC
+        ].includes(tokenAddr)
+      ) {
+        return new CurveFactoryPoolOverride();
+      }
+      if (
+        tokenAddr &&
+        [
+          Address.fromString("0xdbdb4d16eda451d0503b854cf79d55697f90c8df"), // ALCX
+          Address.fromString("0x62b9c7356a2dc64a1969e19c23e4f579f9810aa7"), // cvxCRV
+          Address.fromString("0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44"), // KP3R
+          Address.fromString("0x73968b9a57c6e53d41345fd57a6e6ae27d6cdb2f"), // SDT
+          Address.fromString("0xba3335588d9403515223f109edc4eb7269a9ab5d"), // GEAR
+        ].includes(tokenAddr)
+      ) {
+        return new PreferUniswapOverride();
+      }
+    }
+
+    return null;
   }
 }
