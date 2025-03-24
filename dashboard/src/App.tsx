@@ -7,7 +7,7 @@ import { DashboardHeader } from "./common/headerComponents/DashboardHeader";
 import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import { Route, Routes } from "react-router";
 import { useEffect, useMemo, useState } from "react";
-import { NewClient, schemaMapping, enhanceHealthMetrics } from "./utils";
+import { NewClient, schemaMapping, enhanceHealthMetrics, processDeploymentData } from "./utils";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetworkSubgraphsQuery";
 
@@ -15,8 +15,11 @@ function App() {
   console.log("RUNNING VERSION " + dashboardVersion);
   const [loading, setLoading] = useState(false);
   const [protocolsToQuery, setProtocolsToQuery] = useState<any>({});
-
   const [issuesMapping, setIssuesMapping] = useState<any>({});
+  // Add cache timestamp state
+  const [lastFetchTime, setLastFetchTime] = useState<number>(0);
+  // Cache expiry time - 15 minutes (in milliseconds)
+  const CACHE_EXPIRY_TIME = 15 * 60 * 1000;
 
   const getGithubRepoIssues = () => {
     try {
@@ -50,25 +53,55 @@ function App() {
   const getDeployments = () => {
     if (Object.keys(protocolsToQuery).length === 0) {
       setLoading(true);
-      try {
-        // TEMP FIX: Using local deployment data while the API is down
-        // TO REVERT: Replace this import with the original fetch call
-        import("./deployment-formatted.json")
-          .then(function (deploymentData) {
-            setLoading(false);
-            // Use the pre-formatted data that matches the API response format
-            const json = deploymentData.default || deploymentData;
 
-            setProtocolsToQuery(json);
+      // Check if cache is still valid (less than 15 minutes old)
+      const currentTime = Date.now();
+      const shouldUseCachedData = currentTime - lastFetchTime < CACHE_EXPIRY_TIME;
+
+      // If we have cached data that's still valid, use it from local storage
+      if (shouldUseCachedData) {
+        try {
+          const cachedData = localStorage.getItem("deploymentData");
+          if (cachedData) {
+            const parsedData = JSON.parse(cachedData);
+            setProtocolsToQuery(parsedData);
+            setLoading(false);
+            console.log("Using cached deployment data");
+            return;
+          }
+        } catch (error) {
+          console.error("Error retrieving cached data:", error);
+          // Continue with fetch if cache retrieval fails
+        }
+      }
+
+      try {
+        // Fetch the raw deployment data directly from GitHub
+        fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json")
+          .then((response) => response.json())
+          .then((deploymentData) => {
+            // Process the deployment data on the fly
+            const processedData = processDeploymentData(deploymentData);
+            setLoading(false);
+            setProtocolsToQuery(processedData);
+
+            // Update cache timestamp and store the processed data in localStorage
+            setLastFetchTime(currentTime);
+            try {
+              localStorage.setItem("deploymentData", JSON.stringify(processedData));
+            } catch (cacheError) {
+              console.error("Error caching deployment data:", cacheError);
+            }
           })
           .catch((err) => {
             setLoading(false);
-            console.error("Error loading deployment data:", err);
+            console.error("Error loading deployment data from GitHub:", err);
+            // Show empty state instead of trying to fallback to the deleted file
             setProtocolsToQuery({});
           });
       } catch (error) {
         setLoading(false);
-        console.error(error);
+        console.error("Error in getDeployments:", error);
         setProtocolsToQuery({});
       }
     }

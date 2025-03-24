@@ -545,3 +545,60 @@ function safeNumberConversion(value: any, defaultValue: number): number {
   const parsed = Number(value);
   return !isNaN(parsed) ? parsed : defaultValue;
 }
+
+/**
+ * Processes raw deployment data to ensure all deployments have the necessary health metrics structure.
+ * Similar to what the prepare-deployment-data.js script does, but performed at runtime.
+ * @param deploymentData Raw deployment data from GitHub
+ * @returns Processed deployment data with proper health metrics structure
+ */
+export function processDeploymentData(deploymentData: Record<string, any>): Record<string, any> {
+  // Create a deep copy to avoid modifying the original data
+  const processedData = JSON.parse(JSON.stringify(deploymentData));
+
+  // Process each protocol
+  Object.keys(processedData).forEach((protocolName) => {
+    const protocol = processedData[protocolName];
+
+    if (protocol.deployments) {
+      Object.keys(protocol.deployments).forEach((deploymentKey) => {
+        const deployment = protocol.deployments[deploymentKey];
+
+        // Ensure services object exists
+        if (!deployment.services) {
+          deployment.services = {};
+        }
+
+        // Ensure hosted-service exists if needed
+        if (!deployment.services["hosted-service"]) {
+          deployment.services["hosted-service"] = {
+            slug: deploymentKey,
+            "query-id": deploymentKey,
+            health: null, // Will be enhanced by enhanceHealthMetrics
+          };
+        } else if (deployment.services["hosted-service"] && !deployment.services["hosted-service"].health) {
+          deployment.services["hosted-service"].health = null;
+        }
+
+        // Ensure decentralized-network exists if needed
+        if (!deployment.services["decentralized-network"]) {
+          deployment.services["decentralized-network"] = {
+            slug: deploymentKey,
+            "query-id": "todo",
+            health: null, // Will be enhanced by enhanceHealthMetrics
+          };
+        } else if (
+          deployment.services["decentralized-network"] &&
+          !deployment.services["decentralized-network"].health
+        ) {
+          deployment.services["decentralized-network"].health = null;
+        }
+
+        // Apply the enhanceHealthMetrics function to add health metrics
+        protocol.deployments[deploymentKey] = enhanceHealthMetrics(deployment);
+      });
+    }
+  });
+
+  return processedData;
+}
