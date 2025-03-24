@@ -14,9 +14,7 @@ import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetwo
 function App() {
   console.log("RUNNING VERSION " + dashboardVersion);
   const [loading, setLoading] = useState(false);
-  const [protocolsToQuery, setProtocolsToQuery] = useState<{
-    [type: string]: { [proto: string]: { [network: string]: string } };
-  }>({});
+  const [protocolsToQuery, setProtocolsToQuery] = useState<any>({});
 
   const [issuesMapping, setIssuesMapping] = useState<any>({});
 
@@ -53,55 +51,25 @@ function App() {
     if (Object.keys(protocolsToQuery).length === 0) {
       setLoading(true);
       try {
-        fetch(process.env.REACT_APP_MESSARI_STATUS_URL!, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "x-messari-api-key": process.env.REACT_APP_MESSARI_API_KEY!,
-          },
-        })
-          .then(function (res) {
-            return res.json();
-          })
-          .then(function (json) {
+        // TEMP FIX: Using local deployment data while the API is down
+        // TO REVERT: Replace this import with the original fetch call
+        import("./deployment-formatted.json")
+          .then(function (deploymentData) {
             setLoading(false);
-            // Hacky fix for the subgraph status API returning an error response, setting protocols to empty object.
-            // Status Page Will Not Load With This Condition, but the charting will work.
-            if (JSON.stringify(Object.keys(json)) == JSON.stringify(['error', 'data'])) {
-              console.log("Error Response from Messari Subgraph Status API. Setting protocols to empty object.");
-              json = {};
-            }
-            
-            // Process the data to ensure all health metrics are properly populated
-            if (json && typeof json === 'object') {
-              try {
-                Object.keys(json).forEach(protocolName => {
-                  const protocol = json[protocolName];
-                  if (protocol.deployments) {
-                    Object.keys(protocol.deployments).forEach(deploymentKey => {
-                      // Enhance the health metrics of each deployment
-                      protocol.deployments[deploymentKey] = enhanceHealthMetrics(protocol.deployments[deploymentKey]);
-                    });
-                    
-                    // Debug the first protocol's health metrics
-                    if (Object.keys(json).length > 0) {
-                      debugHealthMetrics(protocol);
-                    }
-                  }
-                });
-              } catch (err) {
-                console.error("Error enhancing health metrics:", err);
-              }
-            }
-            
+            // Use the pre-formatted data that matches the API response format
+            const json = deploymentData.default || deploymentData;
+
             setProtocolsToQuery(json);
           })
           .catch((err) => {
-            console.log(err);
+            setLoading(false);
+            console.error("Error loading deployment data:", err);
+            setProtocolsToQuery({});
           });
       } catch (error) {
         setLoading(false);
         console.error(error);
+        setProtocolsToQuery({});
       }
     }
   };
@@ -127,7 +95,7 @@ function App() {
           subgraphEndpoints[schemaType][protocolName] = {};
         }
       }
-      if (protocol.deployments && typeof protocol.deployments === 'object') {
+      if (protocol.deployments && typeof protocol.deployments === "object") {
         Object.values(protocol.deployments).forEach((depoData: any) => {
           if (!depoData?.services) {
             return;
@@ -219,35 +187,12 @@ function App() {
       });
       setDecentralizedDeployments(decenDepos);
     }
-  }, [decentralized]);
+  }, [decentralized, decentralizedDeployments]);
 
-  const debugHealthMetrics = (protocol: any) => {
-    if (!protocol || !protocol.deployments) {
-      console.warn("No protocol or deployments data found for debugging");
-      return;
-    }
-    
-    try {
-      // Log a sample of health metrics for the first deployment
-      const firstDeploymentKey = Object.keys(protocol.deployments)[0];
-      if (!firstDeploymentKey) {
-        console.warn("No deployments found for debugging");
-        return;
-      }
-      
-      const deployment = protocol.deployments[firstDeploymentKey];
-      if (!deployment || !deployment.services) {
-        console.warn("Invalid deployment data for debugging");
-        return;
-      }
-      
-      const hostedService = deployment.services["hosted-service"];
-      const decentralizedNetwork = deployment.services["decentralized-network"];
-
-    } catch (err) {
-      console.error("Error in debug health metrics:", err);
-    }
-  };
+  // Remove this useEffect when the API service is back online
+  useEffect(() => {
+    getDeployments();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>

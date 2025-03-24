@@ -190,7 +190,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
         return (
           <TableRow
             key={depo + "RowComp"}
-            sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}
+            sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}
           >
             <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px", pointerEvents: "none" }}>
               {depo}
@@ -199,11 +199,6 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
               {type}
             </TableCell>
             <TableCell
-              onClick={() =>
-                (window.location.href = versionPending
-                  ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol&version=pending"
-                  : "#")
-              }
               sx={{
                 padding: "0",
                 paddingRight: "6px",
@@ -214,11 +209,6 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
               {versionPending}
             </TableCell>
             <TableCell
-              onClick={() =>
-                (window.location.href = versionDecen
-                  ? "/subgraph?endpoint=" + slugToQueryString[depo + " (Decentralized)"] + "&tab=protocol"
-                  : "#")
-              }
               sx={{
                 padding: "0",
                 paddingRight: "6px",
@@ -229,11 +219,6 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
               {versionDecen}
             </TableCell>
             <TableCell
-              onClick={() =>
-                (window.location.href = versionHostedService
-                  ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol"
-                  : "#")
-              }
               sx={{
                 padding: "0",
                 paddingRight: "6px",
@@ -251,11 +236,8 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
       } else if (subgraphVersionMapping[depo]) {
         failedQueryRows.push(
           <TableRow
-            onClick={() =>
-              (window.location.href = process.env.REACT_APP_OKGRAPH_BASE_URL! + "/?q=" + slugToQueryString[depo])
-            }
             key={depo + "RowComp"}
-            sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}
+            sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}
           >
             <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>{depo}</TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left", pointerEvents: "none" }}>
@@ -319,4 +301,3 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
 }
 
 export default VersionComparison;
-

@@ -163,10 +163,10 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
       if (!deploymentData?.services) {
         return;
       }
-      
+
       // Enhance the health metrics data
       const enhancedDeploymentData = enhanceHealthMetrics(deploymentData);
-      
+
       if (
         !!enhancedDeploymentData["services"]["hosted-service"] ||
         !!enhancedDeploymentData["services"]["decentralized-network"] ||
@@ -219,14 +219,24 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
             enhancedDeploymentData?.versions?.methodology,
           )
         ) {
-          deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(enhancedDeploymentData?.versions?.methodology);
+          deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(
+            enhancedDeploymentData?.versions?.methodology,
+          );
         }
         if (
-          !deposToPass[protocol.schema][protocolName]?.subgraphVersions?.includes(enhancedDeploymentData?.versions?.subgraph)
+          !deposToPass[protocol.schema][protocolName]?.subgraphVersions?.includes(
+            enhancedDeploymentData?.versions?.subgraph,
+          )
         ) {
-          deposToPass[protocol.schema][protocolName]?.subgraphVersions?.push(enhancedDeploymentData?.versions?.subgraph);
+          deposToPass[protocol.schema][protocolName]?.subgraphVersions?.push(
+            enhancedDeploymentData?.versions?.subgraph,
+          );
         }
-        if (!deposToPass[protocol.schema][protocolName]?.schemaVersions?.includes(enhancedDeploymentData?.versions?.schema)) {
+        if (
+          !deposToPass[protocol.schema][protocolName]?.schemaVersions?.includes(
+            enhancedDeploymentData?.versions?.schema,
+          )
+        ) {
           deposToPass[protocol.schema][protocolName]?.schemaVersions?.push(enhancedDeploymentData?.versions?.schema);
         }
         if (enhancedDeploymentData?.status === "dev") {
@@ -241,27 +251,33 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
       {Object.entries(deposToPass)
         .sort((a, b) => {
           // Sections to move to the bottom
-          const bottomSections = ['bridge', 'erc20', 'erc721'];
-          
+          const bottomSections = ["bridge", "erc20", "erc721"];
+
           // If a is a bottom section and b is not, move a down
-          if (bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
-              !bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) 
+          if (
+            bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) &&
+            !bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())
+          )
             return 1;
-          
+
           // If b is a bottom section and a is not, move b down
-          if (!bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
-              bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) 
+          if (
+            !bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) &&
+            bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())
+          )
             return -1;
-          
+
           // If both are bottom sections, sort them alphabetically among themselves
-          if (bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) && 
-              bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())) {
+          if (
+            bottomSections.includes(schemaMapping[a[0]] || a[0].toLowerCase()) &&
+            bottomSections.includes(schemaMapping[b[0]] || b[0].toLowerCase())
+          ) {
             // Order within bottom sections: erc20, erc721, bridge
             const aIndex = bottomSections.indexOf(schemaMapping[a[0]] || a[0].toLowerCase());
             const bIndex = bottomSections.indexOf(schemaMapping[b[0]] || b[0].toLowerCase());
             return aIndex - bIndex;
           }
-          
+
           // For all other schemas, keep alphabetical order
           return a[0].localeCompare(b[0]);
         })
@@ -404,14 +420,14 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
             additionalStyles = { minHeight: "510px", overflow: "hidden" };
           }
           return (
-            <TableContainer 
-              sx={{ 
-                my: 8, 
+            <TableContainer
+              sx={{
+                my: 8,
                 ...additionalStyles,
-                '& .MuiTableCell-root': {
-                  borderBottom: 'none'
-                }
-              }} 
+                "& .MuiTableCell-root": {
+                  borderBottom: "none",
+                },
+              }}
               key={"TableContainer-" + schemaType.toUpperCase()}
               className="continuous-table-borders"
             >
@@ -442,19 +458,7 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                   </span>
                 </Typography>
               </div>
-              {schemaMapping[schemaType] ? (
-                <>
-                  {executeDownloadCSV}
-                  <MultiSelectDropDown
-                    optionsList={validDeployments}
-                    optionsSelected={deposSelected[schemaMapping[schemaType]]}
-                    setOptionsSelected={(x: any) =>
-                      setDeposSelected({ ...deposSelected, [schemaMapping[schemaType]]: x })
-                    }
-                    label="Deployment Selection"
-                  />
-                </>
-              ) : null}
+              {schemaMapping[schemaType] ? <>{executeDownloadCSV}</> : null}
               <Table stickyHeader className="continuous-table">
                 {tableHead}
                 <TableBody>{tableRows}</TableBody>

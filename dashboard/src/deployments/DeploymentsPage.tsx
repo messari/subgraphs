@@ -106,7 +106,7 @@ function DeploymentsPage({
               navigate(`subgraph?endpoint=${val}&tab=protocol`);
             }
           }}
-          placeholder="Subgraph query name ie. messari/balancer-v2-ethereum"
+          placeholder="Enter subgraph QM hash e.g. QmXMJ2Hnhhoz6bGFNtTBjnf7kAk9CNCQG7r4R5b7fyVjD7"
         >
           Load Subgraph
         </SearchInput>
@@ -127,27 +127,6 @@ function DeploymentsPage({
             onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}
           >
             {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
-          </span>
-          <span
-            style={{
-              width: "0",
-              flex: "1 1 0",
-              textAlign: "center",
-              marginTop: "0",
-              borderRight: "#6656F8 2px solid",
-              padding: "0 30px",
-            }}
-            className="Menu-Options"
-            onClick={() => navigate("protocols-list")}
-          >
-            Protocols To Develop
-          </span>
-          <span
-            style={{ padding: "0 30px", borderRight: "#6656F8 2px solid" }}
-            className="Menu-Options"
-            onClick={() => navigate("version-comparison")}
-          >
-            Version Comparison
           </span>
           <span
             style={{ padding: "0 30px" }}
