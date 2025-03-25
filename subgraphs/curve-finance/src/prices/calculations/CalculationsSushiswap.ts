@@ -1,34 +1,47 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
+import { CustomPriceType, OracleContract } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/templates/PoolTemplate/CalculationsSushiSwap";
+import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/PoolRegistry/CalculationsSushiSwap";
+
+export function getSushiSwapContract(
+  contract: OracleContract,
+  block: ethereum.Block | null = null,
+): CalculationsSushiContract | null {
+  if (
+    (block && contract.startBlock.gt(block.number)) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
+
+  return CalculationsSushiContract.bind(contract.address);
+}
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block | null = null,
 ): CustomPriceType {
   const config = utils.getConfig();
-  const contractAddress = utils.getContract(config.sushiCalculations(), block);
 
-  if (
-    !contractAddress ||
-    config.sushiCalculationsBlacklist().includes(tokenAddr)
-  )
+  if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const curveContract = CalculationsSushiContract.bind(contractAddress);
+  const calculationSushiContract = getSushiSwapContract(
+    config.sushiCalculations(),
+    block,
+  );
+  if (!calculationSushiContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      curveContract.try_getPriceUsdc(tokenAddr),
-      constants.BIGINT_ZERO
+      calculationSushiContract.try_getPriceUsdc(tokenAddr),
+      constants.BIGINT_ZERO,
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
     constants.DEFAULT_USDC_DECIMALS,
-    constants.OracleType.SUSHI_CALCULATIONS
+    constants.OracleType.SUSHI_CALCULATIONS,
   );
 }

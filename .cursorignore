@@ -1,0 +1,20 @@
+# Ignore everything
+*
+**/node_modules/**
+**/build/**
+
+# Don't ignore the subgraphs directory itself
+!subgraphs/
+
+# But ignore all its contents
+subgraphs/*
+
+# Except for the curve-finance directory and its contents
+!subgraphs/curve-finance/
+!subgraphs/curve-finance/**
+
+# This pattern works by:
+# 1. Ignoring everything (*)
+# 2. Making an exception for the subgraphs directory (!subgraphs/)
+# 3. Ignoring all contents of subgraphs (subgraphs/*)
+# 4. Making an exception for curve-finance and its contents

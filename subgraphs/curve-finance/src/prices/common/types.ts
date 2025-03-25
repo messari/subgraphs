@@ -1,6 +1,5 @@
-import * as utils from "./utils";
 import * as constants from "./constants";
-import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export class Wrapped<T> {
   inner: T;
@@ -10,69 +9,24 @@ export class Wrapped<T> {
   }
 }
 
-export class TokenInfo {
-  private _name: string;
-  private _decimals: i32;
-  private _address: Address;
-  private _isStable: bool;
+export class OracleContract {
+  private _contractAddress: string;
+  private _contractStartBlock: i32;
 
-  constructor() {
-    this._name = "";
-    this._decimals = constants.DEFAULT_USDC_DECIMALS;
-    this._address = constants.NULL.TYPE_ADDRESS;
-  }
-
-  static set(
-    name: string,
-    decimals: i32,
-    address: Address,
-    isStable: bool = true
-  ): TokenInfo {
-    const instance = new TokenInfo();
-    instance._name = name;
-    instance._decimals = decimals;
-    instance._address = address;
-    instance._isStable = isStable;
-
-    return instance;
-  }
-
-  get name(): string {
-    return this._name;
-  }
-  get decimals(): i32 {
-    return this._decimals;
-  }
-  get address(): Address {
-    return this._address;
-  }
-  get isStable(): bool {
-    return this._isStable;
-  }
-}
-
-export class ContractInfo {
-  private _address: Address;
-  private _startBlock: BigInt;
-
-  constructor() {
-    this._address = constants.NULL.TYPE_ADDRESS;
-    this._startBlock = constants.BIGINT_ZERO;
-  }
-
-  static set(address: Address, startBlock: BigInt): ContractInfo {
-    const instance = new ContractInfo();
-    instance._address = address;
-    instance._startBlock = startBlock;
-
-    return instance;
+  constructor(
+    contractAddress: string = constants.NULL.TYPE_STRING,
+    startBlock: i32 = -1,
+  ) {
+    this._contractAddress = contractAddress;
+    this._contractStartBlock = startBlock;
   }
 
   get address(): Address {
-    return this._address;
+    return Address.fromString(this._contractAddress);
   }
+
   get startBlock(): BigInt {
-    return this._startBlock;
+    return BigInt.fromI32(this._contractStartBlock);
   }
 }
 
@@ -81,35 +35,26 @@ export class CustomPriceType {
   private _usdPrice: Wrapped<BigDecimal>;
   private _decimals: Wrapped<i32>;
   private _oracleType: string;
+  private _liquidity: Wrapped<BigDecimal>;
 
   constructor() {
     this._usdPrice = new Wrapped(constants.BIGDECIMAL_ZERO);
     this._decimals = new Wrapped(constants.BIGINT_ZERO.toI32() as u8);
     this._oracleType = "";
+    this._liquidity = new Wrapped(constants.BIGDECIMAL_ZERO);
   }
 
   static initialize(
     _usdPrice: BigDecimal,
     _decimals: i32 = 0,
-    _oracleType: string = ""
-  ): CustomPriceType {
-    const instance = new CustomPriceType();
-    instance._usdPrice = new Wrapped(_usdPrice);
-    instance._decimals = new Wrapped(_decimals as u8);
-    instance._oracleType = _oracleType;
-
-    return instance;
-  }
-
-  static initializePegged(
-    _usdPrice: BigDecimal = constants.BIGDECIMAL_USD_PRICE,
-    _decimals: i32 = constants.DEFAULT_USDC_DECIMALS,
-    _oracleType: string = "HardcodedStable"
+    _oracleType: string = "",
+    _liquidity: BigDecimal | null = null,
   ): CustomPriceType {
     const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);
     result._oracleType = _oracleType;
+    if (_liquidity) result._liquidity = new Wrapped(_liquidity);
 
     return result;
   }
@@ -117,41 +62,86 @@ export class CustomPriceType {
   get reverted(): bool {
     return this._usdPrice.inner == constants.BIGDECIMAL_ZERO;
   }
+
   get usdPrice(): BigDecimal {
     return changetype<Wrapped<BigDecimal>>(this._usdPrice).inner.div(
-      utils.exponentToBigDecimal(this.decimals as u8)
+      constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal(),
     );
   }
+
   get decimals(): i32 {
     return changetype<Wrapped<i32>>(this._decimals).inner;
   }
+
   get oracleType(): string {
     return this._oracleType;
+  }
+
+  get liquidity(): BigDecimal {
+    return this._liquidity.inner;
+  }
+
+  setLiquidity(liquidity: BigDecimal): void {
+    this._liquidity = new Wrapped(liquidity);
+  }
+}
+
+export interface OracleConfig {
+  oracleCount(): number;
+  oracleOrder(): string[];
+}
+
+export class OracleType {
+  oracleCount: number;
+  oracleOrder: string[];
+
+  constructor() {
+    this.oracleCount = constants.INT_ONE;
+    this.oracleOrder = [
+      constants.OracleType.YEARN_LENS_ORACLE,
+      constants.OracleType.CHAINLINK_FEED,
+      constants.OracleType.CURVE_CALCULATIONS,
+      constants.OracleType.SUSHI_CALCULATIONS,
+      constants.OracleType.CURVE_ROUTER,
+      constants.OracleType.UNISWAP_FORKS_ROUTER,
+    ];
+  }
+
+  setOracleConfig(override: OracleConfig): void {
+    this.oracleCount = override.oracleCount();
+    this.oracleOrder = override.oracleOrder();
   }
 }
 
 export interface Configurations {
-  yearnLens(): ContractInfo | null;
+  network(): string;
+
+  yearnLens(): OracleContract;
+  chainLink(): OracleContract;
   yearnLensBlacklist(): Address[];
 
-  inchOracle(): ContractInfo | null;
-  inchOracleBlacklist(): Address[];
-
-  chainLink(): ContractInfo | null;
-
-  aaveOracle(): ContractInfo | null;
+  aaveOracle(): OracleContract;
   aaveOracleBlacklist(): Address[];
 
-  curveCalculations(): ContractInfo | null;
+  curveCalculations(): OracleContract;
   curveCalculationsBlacklist(): Address[];
 
-  sushiCalculations(): ContractInfo | null;
+  sushiCalculations(): OracleContract;
   sushiCalculationsBlacklist(): Address[];
 
-  uniswapForks(): ContractInfo[];
-  curveRegistry(): ContractInfo[];
+  uniswapForks(): OracleContract[];
+  curveRegistry(): OracleContract[];
 
   hardcodedStables(): Address[];
 
-  whitelistedTokens(): TypedMap<string, TokenInfo>;
+  ethAddress(): Address;
+  wethAddress(): Address;
+  usdcAddress(): Address;
+
+  usdcTokenDecimals(): BigInt;
+
+  getOracleOverride(
+    tokenAddr: Address | null,
+    block: ethereum.Block | null,
+  ): OracleConfig | null;
 }
