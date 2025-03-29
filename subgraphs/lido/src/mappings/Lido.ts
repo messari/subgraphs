@@ -95,9 +95,9 @@ export function handleTransfer(event: Transfer): void {
   getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
   getOrCreateToken(Address.fromString(PROTOCOL_ID), event.block.number);
 
-  const fromZeros = sender == Address.fromString(ZERO_ADDRESS);
+  const isFromZeroAddress = sender == Address.fromString(ZERO_ADDRESS);
   const isMintToTreasury =
-    fromZeros && recipient == Address.fromString(PROTOCOL_TREASURY_ID);
+    isFromZeroAddress && recipient == Address.fromString(PROTOCOL_TREASURY_ID);
   let isMintToNodeOperators = false;
 
   // get node operators
@@ -114,7 +114,7 @@ export function handleTransfer(event: Transfer): void {
   }
 
   isMintToNodeOperators =
-    fromZeros &&
+    isFromZeroAddress &&
     ((nodeOperators.includes(recipient) as boolean) ||
       recipient == Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID));
 
@@ -131,7 +131,7 @@ export function handleETHDistributed(event: ETHDistributed): void {
     return;
   }
 
-  // Don’t mint/distribute any protocol fee on the non-profitable Lido oracle report
+  // Don't mint/distribute any protocol fee on the non-profitable Lido oracle report
   // (when beacon chain balance delta is zero or negative).
   // See ADR #3 for details: https://research.lido.fi/t/rewards-distribution-after-the-merge-architecture-decision-record/1535
   const postCLTotalBalance = event.params.postCLBalance.plus(
