@@ -1,0 +1,20 @@
+{
+  "network": "mainnet",
+
+  "cornSilos": [
+    {
+      "name": "CornSiloV1",
+      "address": "0x8bc93498b861fd98277c3b51d240e7e56e48f23c",
+      "startBlock": "20541858"
+    },
+    {
+      "name": "CornSiloV2",
+      "address": "0x6d85d1c7f58fd5d05b1b633e8b0ce2e57fca9d80",
+      "startBlock": "20643538"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

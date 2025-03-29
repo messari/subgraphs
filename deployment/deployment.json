@@ -14140,5 +14140,39 @@
         }
       }
     }
+  },
+  "corn-kernels": {
+    "schema": "generic",
+    "base": "corn-kernels",
+    "protocol": "corn-kernels",
+    "project": "corn-kernels",
+    "deployments": {
+      "corn-kernels-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "corn.kernels.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "corn-kernels-ethereum",
+            "query-id": "corn-kernels-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "corn-kernels-ethereum",
+            "query-id": "TODO"
+          }
+        }
+      }
+    }
   }
 }
