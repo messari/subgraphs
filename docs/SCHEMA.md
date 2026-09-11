@@ -28,7 +28,7 @@ All subgraphs follow a set of standardized schemas. This standardization brings 
   - timestamp: unix timestamp in `BigInt`
   - token amount: All token amounts should be BigInt to preserve precision (i.e. in wei)
   - dollar amount: All USD amounts (including prices) should be BigDecimal
-- All rates should be stored as percentage values as `BigDecimal`. For example, 70.50% should be stored as `70.5`.
+- All rates should be stored as percentage values as `BigDecimal`. For example, 70.50% should be stored as `70.5`. (Consumers: this applies to `liquidationThreshold`, `maximumLTV` and `liquidationPenalty` too; see the [lending health recipe](./recipes/LENDING_HEALTH.md) for the reduction and the guard against dividing twice.)
 - Use plurals when referring to multiple items, usually stored as an array (e.g. tokens, balances).
 - Optional fields that don't apply to an entity should be left as `null` instead of initialized with 0 or empty string.
 - Certain prefixes may be used to indicate a particular type of value:
